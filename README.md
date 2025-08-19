@@ -1,43 +1,97 @@
-# AHP Decision System
+# AHP Decision System - Full Stack Application
 
 ## 개요
-AHP(Analytic Hierarchy Process) 기반 의사결정 분석 시스템
+논문 연구를 위한 AHP(Analytic Hierarchy Process) 의사결정 분석 시스템의 풀스택 버전입니다.
+원본: https://github.com/aebonlee/AHP_forPaper
 
-## 기술 스택
-- Frontend: React 19 + TypeScript
-- Backend: Node.js + Express + PostgreSQL
-- Hosting: GitHub Pages (Frontend) + Render.com (Backend)
+## 🚀 시스템 구성
 
-## 주요 기능
-- 다계층 AHP 모델 구축 (최대 5단계)
-- 평가자 관리 및 설문 링크 생성
-- 실시간 진행률 모니터링
-- 결과 분석 및 보고서 생성
-- Excel/마크다운 벌크 입력 지원
+### Frontend
+- React 19 + TypeScript
+- Tailwind CSS
+- Recharts (데이터 시각화)
+- Zustand (상태 관리)
 
-## 설치 및 실행
+### Backend
+- Node.js + Express + TypeScript
+- PostgreSQL 데이터베이스
+- JWT 인증
+- RESTful API
 
-### 개발 환경
+## 📋 필수 요구사항
+- Node.js 18.0.0 이상
+- npm 8.0.0 이상
+- PostgreSQL 15 이상 (로컬 개발 시)
+
+## 🛠️ 설치 방법
+
+### 1. 전체 의존성 설치
 ```bash
-npm install
-npm start
+npm run install:all
 ```
 
-### 프로덕션 빌드
+### 2. 환경 변수 설정
+- `.env` 파일: Frontend 설정
+- `backend/.env` 파일: Backend 설정 (템플릿: `.env.backend`)
+
+### 3. 데이터베이스 설정
 ```bash
-npm run build
-npm run deploy
+cd backend && npm run migrate
 ```
 
-## API 엔드포인트
-- Production: https://ahp-ihvr.onrender.com
-- Development: http://localhost:5000
+## 🎮 실행 방법
 
-## 배포 URL
-- Live Service: https://aebonlee.github.io/AHP
+### 개발 모드 (프론트엔드 + 백엔드 동시 실행)
+```bash
+npm run dev:all
+```
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:5000
 
-## 라이센스
+### Docker 실행
+```bash
+docker-compose up
+```
+
+## 🏗️ 빌드
+```bash
+npm run build:all
+```
+
+## 📁 프로젝트 구조
+```
+AHP/
+├── src/                    # Frontend 소스
+├── backend/               # Backend 소스
+│   ├── src/
+│   │   ├── routes/        # API 라우트
+│   │   ├── services/      # 비즈니스 로직
+│   │   └── database/      # DB 연결
+│   └── migrations/        # DB 스키마
+├── docker-compose.yml     # Docker 설정
+└── render.yaml           # Render.com 배포
+```
+
+## 🌐 배포
+- Frontend: https://aebonlee.github.io/AHP
+- Backend API: https://ahp-backend.onrender.com
+- Database: PostgreSQL on Render.com
+
+## 📚 주요 API 엔드포인트
+- POST `/api/auth/login` - 로그인
+- GET/POST `/api/projects` - 프로젝트 관리
+- POST `/api/evaluate` - 평가 제출
+- GET `/api/results/:id` - 결과 조회
+
+## 🔒 보안
+- JWT 기반 인증
+- bcrypt 암호화
+- CORS 설정
+- Helmet.js 보안 헤더
+
+## 📝 라이센스
 MIT License
 
 ## 문의
 - 개발자: aebonlee
+- Issues: https://github.com/aebonlee/AHP/issues

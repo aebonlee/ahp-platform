@@ -1,6 +1,24 @@
 services:
+  # 백엔드 서비스
   - type: web
-    name: ahp-decision-system
+    name: ahp-backend
+    env: node
+    buildCommand: cd backend && npm ci && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 18
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: PORT
+        value: 5000
+    healthCheckPath: /api/health
+
+  # 프론트엔드 서비스
+  - type: web
+    name: ahp-frontend
     env: node
     buildCommand: npm ci && npm run build
     startCommand: node server.js
@@ -11,4 +29,13 @@ services:
         value: false
       - key: GENERATE_SOURCEMAP
         value: false
+      - key: REACT_APP_API_URL
+        value: https://ahp-backend.onrender.com
     healthCheckPath: /
+
+# 데이터베이스
+databases:
+  - name: ahp-database
+    databaseName: ahp_db
+    user: ahp_user
+    plan: free
