@@ -1,21 +1,20 @@
-FROM node:18-alpine as build
+# Node.js 기반 배포용 Dockerfile
+FROM node:18-alpine
 
 WORKDIR /app
 
+# 의존성 설치
 COPY package*.json ./
+RUN npm ci --only=production
 
-RUN npm install
-
+# 앱 파일 복사
 COPY . .
 
+# 빌드
 RUN npm run build
 
-FROM nginx:alpine
+# 포트 설정
+EXPOSE 3000
 
-COPY --from=build /app/build /usr/share/nginx/html
-
-COPY nginx.conf /etc/nginx/nginx.conf
-
-EXPOSE 80
-
-CMD ["nginx", "-g", "daemon off;"]
+# Express 서버 실행
+CMD ["node", "server.js"]
