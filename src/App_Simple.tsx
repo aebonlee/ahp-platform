@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import Layout from './components/layout/Layout';
 import PersonalServiceDashboard from './components/admin/PersonalServiceDashboard';
-import { DEMO_USER } from './data/demoData';
+import { DEMO_USER, DEMO_PROJECTS } from './data/demoData';
 
 function App() {
   const [user, setUser] = useState<any>(null);
   const [activeTab, setActiveTab] = useState('personal-service');
+  const [projects, setProjects] = useState<any[]>(DEMO_PROJECTS);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(DEMO_PROJECTS[0].id);
   const [isInitializing, setIsInitializing] = useState(true);
 
   // 간단한 초기화
@@ -15,6 +17,7 @@ function App() {
     // URL 파라미터 확인
     const urlParams = new URLSearchParams(window.location.search);
     const tabFromUrl = urlParams.get('tab');
+    const projectFromUrl = urlParams.get('project');
     
     // 데모 사용자 설정
     const demoUser = {
@@ -31,7 +34,9 @@ function App() {
       setActiveTab(tabFromUrl);
     }
     
-    // 프로젝트 ID는 PersonalServiceDashboard 내부에서 처리
+    if (projectFromUrl && DEMO_PROJECTS.find(p => p.id === projectFromUrl)) {
+      setSelectedProjectId(projectFromUrl);
+    }
     
     // 초기화 완료
     setTimeout(() => {
