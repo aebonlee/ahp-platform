@@ -53,18 +53,26 @@ function App() {
   const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
   const [showApiErrorModal, setShowApiErrorModal] = useState(false);
   const [isNavigationReady, setIsNavigationReady] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   // 초기 로딩 및 백엔드 연결 체크
   useEffect(() => {
     const isProduction = process.env.NODE_ENV === 'production';
     
-    if (isProduction) {
-      console.log('🎯 프로덕션 환경 - 데모 모드 활성화');
-      activateDemoMode();
-      setIsNavigationReady(true);
-    } else {
-      checkBackendAndInitialize();
-    }
+    const initializeApp = async () => {
+      setIsInitializing(true);
+      
+      if (isProduction) {
+        console.log('🎯 프로덕션 환경 - 데모 모드 활성화');
+        await activateDemoMode();
+      } else {
+        await checkBackendAndInitialize();
+      }
+      
+      setIsInitializing(false);
+    };
+    
+    initializeApp();
     
     if (!isProduction) {
       const intervalId = setInterval(() => {
@@ -76,7 +84,7 @@ function App() {
       return () => clearInterval(intervalId);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [backendStatus]);
+  }, []);
   
   // 브라우저 내비게이션 처리 (뒤로가기/앞으로가기)
   useEffect(() => {
@@ -155,8 +163,12 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isNavigationReady]);
 
-  const activateDemoMode = () => {
+  const activateDemoMode = async () => {
     console.log('🎯 데모 모드 강제 활성화 - AI 개발 활용 방안 AHP 분석');
+    
+    // 약간의 지연을 추가하여 초기화 과정을 안정화
+    await new Promise(resolve => setTimeout(resolve, 300));
+    
     setBackendStatus('unavailable');
     setIsDemoMode(true);
     setUser({
@@ -1313,6 +1325,20 @@ function App() {
           onRetry={handleApiRetry}
           onUseDemoMode={handleUseDemoMode}
         />
+      </div>
+    );
+  }
+
+  // 초기화 중 로딩 화면
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
+        <div className="text-center text-white">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+          <h2 className="text-xl font-semibold mb-2">AHP for Paper</h2>
+          <p className="text-blue-100">연구 논문을 위한 AHP 의사결정 분석 시스템</p>
+          <p className="text-sm text-blue-200 mt-2">시스템을 초기화하고 있습니다...</p>
+        </div>
       </div>
     );
   }
