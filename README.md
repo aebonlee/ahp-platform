@@ -33,9 +33,11 @@ npm run deploy
 - Production: https://ahp-ihvr.onrender.com
 - Development: http://localhost:5000
 
+## 배포 URL
+- Live Service: https://aebonlee.github.io/AHP
+
 ## 라이센스
 MIT License
 
 ## 문의
 - 개발자: aebonlee
-- 이메일: [이메일 주소]

@@ -51,6 +51,7 @@
     "autoprefixer": "^10.4.21",
     "gh-pages": "^6.3.0",
     "postcss": "^8.5.6",
+    "static-eval": "^2.1.1",
     "tailwindcss": "^3.4.17"
   }
 }
