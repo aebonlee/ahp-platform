@@ -1,4 +1,4 @@
-name: Deploy to Render
+name: Deploy Backend to Render
 
 on:
   push:
@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Deploy Full Stack App
+  deploy-backend:
+    name: Deploy Backend to Render
     runs-on: ubuntu-latest
     
     steps:
@@ -20,11 +20,6 @@ jobs:
         node-version: '18'
         cache: 'npm'
         
-    - name: Install and build frontend
-      run: |
-        npm ci
-        npm run build
-        
     - name: Install and build backend
       run: |
         cd backend
@@ -33,17 +28,11 @@ jobs:
         
     - name: Notify deployment start
       run: |
-        echo "🚀 Deployment started for commit ${{ github.sha }}"
-        echo "Frontend will be deployed to GitHub Pages"
+        echo "🚀 Backend deployment started for commit ${{ github.sha }}"
         echo "Backend will be deployed to Render.com via webhook"
-        
-    - name: Deploy to GitHub Pages
-      uses: peaceiris/actions-gh-pages@v3
-      with:
-        github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./build
         
     - name: Trigger Render deployment
       run: |
         echo "Render.com will automatically deploy from this GitHub push"
         echo "Check deployment status at: https://dashboard.render.com"
+        echo "API URL: https://ahp-forpaper.onrender.com"
