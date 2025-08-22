@@ -2,7 +2,7 @@
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 
   (process.env.NODE_ENV === 'development' 
     ? 'http://localhost:5000' 
-    : 'https://ahp-backend.onrender.com');
+    : 'https://ahp-forpaper.onrender.com');
 
 // API 엔드포인트
 export const API_ENDPOINTS = {
