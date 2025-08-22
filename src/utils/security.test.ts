@@ -103,14 +103,13 @@ describe('Security Utils', () => {
 
   describe('generateCSRFToken', () => {
     beforeAll(() => {
-      // Mock crypto for Node.js environment
-      let counter = 0;
+      // Mock crypto for Node.js environment with proper random values
       Object.defineProperty(global, 'crypto', {
         value: {
           getRandomValues: jest.fn((array) => {
             for (let i = 0; i < array.length; i++) {
-              array[i] = (Math.floor(Math.random() * 256) + counter) % 256;
-              counter++;
+              // Use Math.random to ensure different values each time
+              array[i] = Math.floor(Math.random() * 256);
             }
             return array;
           }),
@@ -126,6 +125,16 @@ describe('Security Utils', () => {
     });
 
     it('should generate unique tokens', () => {
+      // Mock with different values for each call
+      let callCount = 0;
+      (global.crypto.getRandomValues as jest.Mock).mockImplementation((array) => {
+        for (let i = 0; i < array.length; i++) {
+          array[i] = (i + callCount * 100) % 256;
+        }
+        callCount++;
+        return array;
+      });
+      
       const token1 = generateCSRFToken();
       const token2 = generateCSRFToken();
       expect(token1).not.toBe(token2);

@@ -38,21 +38,22 @@ describe('Modal', () => {
       </Modal>
     );
 
-    const closeButton = screen.getByText('×');
+    const closeButton = screen.getByRole('button', { name: /close/i });
     await userEvent.click(closeButton);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
 
   it('calls onClose when backdrop is clicked', () => {
-    render(
+    const { container } = render(
       <Modal isOpen={true} onClose={mockOnClose} title="Test Modal">
         <p>Modal content</p>
       </Modal>
     );
 
-    const backdrop = screen.getByRole('presentation');
-    fireEvent.click(backdrop);
+    // Click on the backdrop (the outer div with overflow-y-auto)
+    const backdrop = container.querySelector('.fixed.inset-0.z-50.overflow-y-auto');
+    fireEvent.click(backdrop!);
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });
