@@ -27,19 +27,21 @@
     "npm": ">=8.0.0"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "node backend/dist/index.js",
+    "start:frontend": "react-scripts start",
+    "build": "cd backend && npm ci && npm run build",
+    "build:frontend": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build:frontend",
     "deploy": "gh-pages -d build",
     "backend:install": "cd backend && npm install",
     "backend:build": "cd backend && npm run build",
     "backend:start": "cd backend && npm start",
     "backend:dev": "cd backend && npm run dev",
-    "dev:all": "concurrently \"npm run backend:dev\" \"npm start\"",
+    "dev:all": "concurrently \"npm run backend:dev\" \"npm run start:frontend\"",
     "install:all": "npm install && npm run backend:install",
-    "build:all": "npm run build && npm run backend:build"
+    "build:all": "npm run build:frontend && npm run backend:build"
   },
   "eslintConfig": {
     "extends": [
