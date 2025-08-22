@@ -45,15 +45,18 @@ describe('Modal', () => {
   });
 
   it('calls onClose when backdrop is clicked', () => {
-    const { container } = render(
+    render(
       <Modal isOpen={true} onClose={mockOnClose} title="Test Modal">
         <p>Modal content</p>
       </Modal>
     );
 
-    // Click on the backdrop (the outer div with overflow-y-auto)
-    const backdrop = container.querySelector('.fixed.inset-0.z-50.overflow-y-auto');
-    fireEvent.click(backdrop!);
+    // Get the backdrop overlay div and trigger event properly
+    const dialog = screen.getByRole('dialog');
+    const backdrop = dialog.parentElement?.parentElement; // Get the outer container
+    if (backdrop) {
+      fireEvent.click(backdrop);
+    }
 
     expect(mockOnClose).toHaveBeenCalledTimes(1);
   });

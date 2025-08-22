@@ -125,11 +125,12 @@ describe('Security Utils', () => {
     });
 
     it('should generate unique tokens', () => {
-      // Mock with different values for each call
+      // Mock with properly different values for each call
       let callCount = 0;
       (global.crypto.getRandomValues as jest.Mock).mockImplementation((array) => {
+        const baseValue = callCount * 17 + 42; // Ensure different starting values
         for (let i = 0; i < array.length; i++) {
-          array[i] = (i + callCount * 100) % 256;
+          array[i] = (baseValue + i * 3) % 256;
         }
         callCount++;
         return array;
