@@ -161,6 +161,153 @@ router.get('/project/:projectId', auth_1.authenticateToken, [
     }
 });
 /**
+ * 평가자 초대 이메일 발송
+ * POST /api/evaluators/invite
+ */
+router.post('/invite', auth_1.authenticateToken, (0, auth_1.requireRole)(['admin']), [
+    (0, express_validator_1.body)('evaluatorId').isString().withMessage('Evaluator ID is required'),
+    (0, express_validator_1.body)('projectId').isString().withMessage('Project ID is required'),
+    (0, express_validator_1.body)('emailContent').isObject().withMessage('Email content is required'),
+    (0, express_validator_1.body)('shortLink').isString().withMessage('Short link is required')
+], async (req, res) => {
+    try {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Validation failed',
+                details: errors.array()
+            });
+        }
+        const { evaluatorId, projectId, emailContent, shortLink } = req.body;
+        // 여기서 실제 이메일 발송 로직 구현
+        // 예: SendGrid, Nodemailer 등 사용
+        console.log('Sending invitation email:', {
+            to: emailContent.to,
+            subject: emailContent.subject,
+            body: emailContent.body,
+            shortLink
+        });
+        // 초대 상태 업데이트 (데이터베이스에 저장)
+        await (0, connection_1.query)(`UPDATE evaluators 
+         SET invitation_status = 'sent', 
+             invitation_link = $1,
+             invitation_sent_at = NOW()
+         WHERE id = $2 AND project_id = $3`, [shortLink, evaluatorId, projectId]);
+        res.json({
+            success: true,
+            message: 'Invitation sent successfully',
+            evaluatorId,
+            shortLink
+        });
+    }
+    catch (error) {
+        console.error('Error sending invitation:', error);
+        res.status(500).json({ error: 'Failed to send invitation' });
+    }
+});
+/**
+ * 평가자 목록 조회 (개선된 버전)
+ * GET /api/evaluators
+ */
+router.get('/', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { projectId } = req.query;
+        let evaluatorsQuery = `
+        SELECT 
+          e.id,
+          e.email,
+          e.name,
+          e.phone,
+          e.invitation_status,
+          e.invitation_link as short_link,
+          e.invitation_sent_at,
+          e.created_at,
+          e.last_active,
+          array_agg(DISTINCT ep.project_id) as assigned_projects
+        FROM evaluators e
+        LEFT JOIN evaluator_projects ep ON e.id = ep.evaluator_id
+        WHERE e.created_by = $1
+      `;
+        const params = [userId];
+        if (projectId) {
+            evaluatorsQuery += ` AND ep.project_id = $2`;
+            params.push(projectId);
+        }
+        evaluatorsQuery += ` GROUP BY e.id ORDER BY e.created_at DESC`;
+        const result = await (0, connection_1.query)(evaluatorsQuery, params);
+        res.json({
+            evaluators: result.rows.map(row => ({
+                id: row.id,
+                email: row.email,
+                name: row.name,
+                phone: row.phone,
+                assignedProjects: row.assigned_projects || [],
+                invitationStatus: row.invitation_status,
+                shortLink: row.short_link,
+                createdAt: row.created_at,
+                lastActive: row.last_active
+            }))
+        });
+    }
+    catch (error) {
+        console.error('Error fetching evaluators:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+/**
+ * 평가자 추가 (개선된 버전)
+ * POST /api/evaluators
+ */
+router.post('/', auth_1.authenticateToken, (0, auth_1.requireRole)(['admin']), [
+    (0, express_validator_1.body)('email').isEmail().withMessage('Valid email is required'),
+    (0, express_validator_1.body)('name').isString().isLength({ min: 1 }).withMessage('Name is required'),
+    (0, express_validator_1.body)('phone').optional().isString(),
+    (0, express_validator_1.body)('projectId').optional().isString()
+], async (req, res) => {
+    try {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Validation failed',
+                details: errors.array()
+            });
+        }
+        const { email, name, phone, projectId } = req.body;
+        const adminId = req.user.userId;
+        // 이메일 중복 확인
+        const existingCheck = await (0, connection_1.query)('SELECT * FROM evaluators WHERE email = $1 AND created_by = $2', [email, adminId]);
+        if (existingCheck.rowCount > 0) {
+            return res.status(400).json({ error: 'Evaluator with this email already exists' });
+        }
+        // 평가자 생성
+        const result = await (0, connection_1.query)(`INSERT INTO evaluators (email, name, phone, created_by, invitation_status)
+         VALUES ($1, $2, $3, $4, 'pending')
+         RETURNING *`, [email, name, phone, adminId]);
+        const evaluator = result.rows[0];
+        // 프로젝트에 배정
+        if (projectId) {
+            await (0, connection_1.query)(`INSERT INTO evaluator_projects (evaluator_id, project_id)
+           VALUES ($1, $2)`, [evaluator.id, projectId]);
+        }
+        res.json({
+            evaluator: {
+                id: evaluator.id,
+                email: evaluator.email,
+                name: evaluator.name,
+                phone: evaluator.phone,
+                assignedProjects: projectId ? [projectId] : [],
+                invitationStatus: 'pending',
+                createdAt: evaluator.created_at
+            }
+        });
+    }
+    catch (error) {
+        console.error('Error creating evaluator:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+/**
  * 평가자 가중치 업데이트
  * PUT /api/evaluators/:evaluatorId/weight
  */

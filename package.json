@@ -2,7 +2,7 @@
   "name": "ahp-decision-system",
   "version": "2.0.0",
   "private": true,
-  "homepage": "https://aebonlee.github.io/AHP/",
+  "homepage": "https://aebonlee.github.io/AHP_forPaper/",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.6.4",
@@ -15,7 +15,7 @@
     "express": "^4.21.2",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
-    "react-scripts": "5.0.1",
+    "react-scripts": "^5.0.1",
     "recharts": "^3.1.2",
     "typescript": "^4.9.5",
     "web-vitals": "^2.1.4",

@@ -68,7 +68,7 @@ app.use(express_1.default.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/', (req, res) => {
     res.json({
         message: 'AHP Decision System API',
-        version: '1.0.0',
+        version: '1.6.2',
         endpoints: {
             health: '/api/health',
             auth: '/api/auth',

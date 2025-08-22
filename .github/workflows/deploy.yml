@@ -1,0 +1,49 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy Full Stack App
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install and build frontend
+      run: |
+        npm ci
+        npm run build
+        
+    - name: Install and build backend
+      run: |
+        cd backend
+        npm ci
+        npm run build
+        
+    - name: Notify deployment start
+      run: |
+        echo "🚀 Deployment started for commit ${{ github.sha }}"
+        echo "Frontend will be deployed to GitHub Pages"
+        echo "Backend will be deployed to Render.com via webhook"
+        
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./build
+        
+    - name: Trigger Render deployment
+      run: |
+        echo "Render.com will automatically deploy from this GitHub push"
+        echo "Check deployment status at: https://dashboard.render.com"
