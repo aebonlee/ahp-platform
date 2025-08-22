@@ -1,67 +1,1333 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import Layout from './components/layout/Layout';
+import LoginForm from './components/auth/LoginForm';
+import RegisterForm from './components/auth/RegisterForm';
+import HomePage from './components/home/HomePage';
+// import WelcomeDashboard from './components/admin/WelcomeDashboard'; // 더 이상 사용하지 않음
+import Card from './components/common/Card';
+import ApiErrorModal from './components/common/ApiErrorModal';
+import PairwiseComparison from './components/comparison/PairwiseComparison';
+import ResultsDashboard from './components/results/ResultsDashboard';
+import LandingPage from './components/admin/LandingPage';
+import EnhancedSuperAdminDashboard from './components/admin/EnhancedSuperAdminDashboard';
 import PersonalServiceDashboard from './components/admin/PersonalServiceDashboard';
-import { DEMO_USER } from './data/demoData';
+import ModelBuilding from './components/admin/ModelBuilding';
+import EvaluationResults from './components/admin/EvaluationResults';
+import ProjectCompletion from './components/admin/ProjectCompletion';
+import UserManagement from './components/admin/UserManagement';
+import ProjectSelection from './components/evaluator/ProjectSelection';
+import PairwiseEvaluation from './components/evaluator/PairwiseEvaluation';
+import DirectInputEvaluation from './components/evaluator/DirectInputEvaluation';
+import UserGuideOverview from './components/guide/UserGuideOverview';
+import { API_BASE_URL } from './config/api';
+import { 
+  DEMO_USER, 
+  DEMO_PROJECTS, 
+  DEMO_CRITERIA,
+  DEMO_ALTERNATIVES
+  // isBackendAvailable, DEMO_LOGIN_CREDENTIALS - 현재 미사용 (데모 모드 강제 활성화)
+} from './data/demoData';
 
 function App() {
-  const [user, setUser] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState('personal-service');
-  const [isInitializing, setIsInitializing] = useState(true);
+  const [user, setUser] = useState<{
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    role: 'super_admin' | 'admin' | 'evaluator';
+    admin_type?: 'super' | 'personal'; // 관리자 유형 구분
+    canSwitchModes?: boolean; // 모드 전환 가능 여부
+  } | null>(null);
+  const [activeTab, setActiveTab] = useState('home');
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [loginError, setLoginError] = useState('');
+  const [registerMode, setRegisterMode] = useState<'service' | 'admin' | null>(null);
+  const [projects, setProjects] = useState<any[]>([]);
+  const [users, setUsers] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
+  const [selectedProjectTitle, setSelectedProjectTitle] = useState<string>('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [selectedEvaluationMethod, setSelectedEvaluationMethod] = useState<'pairwise' | 'direct'>('pairwise');
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
+  const [showApiErrorModal, setShowApiErrorModal] = useState(false);
+  const [isNavigationReady, setIsNavigationReady] = useState(false);
 
-  // 간단한 초기화
+  // 초기 로딩 및 백엔드 연결 체크
   useEffect(() => {
-    console.log('🚀 앱 초기화 시작');
+    const isProduction = process.env.NODE_ENV === 'production';
     
-    // URL 파라미터 확인
+    if (isProduction) {
+      console.log('🎯 프로덕션 환경 - 데모 모드 활성화');
+      activateDemoMode();
+      setIsNavigationReady(true);
+    } else {
+      checkBackendAndInitialize();
+    }
+    
+    if (!isProduction) {
+      const intervalId = setInterval(() => {
+        if (backendStatus === 'available') {
+          checkApiConnection();
+        }
+      }, 5 * 60 * 1000);
+
+      return () => clearInterval(intervalId);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [backendStatus]);
+  
+  // 브라우저 내비게이션 처리 (뒤로가기/앞으로가기)
+  useEffect(() => {
+    if (!isNavigationReady) return;
+    
+    const handlePopState = (event: PopStateEvent) => {
+      const state = event.state;
+      if (state && state.tab) {
+        console.log(`🔙 브라우저 내비게이션: ${state.tab}`);
+        setActiveTab(state.tab);
+        if (state.projectId) {
+          setSelectedProjectId(state.projectId);
+          setSelectedProjectTitle(state.projectTitle || '');
+        }
+      }
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isNavigationReady]);
+  
+  // 탭 변경 시 URL 업데이트
+  useEffect(() => {
+    if (!isNavigationReady || !user) return;
+    
+    const currentState = {
+      tab: activeTab,
+      projectId: selectedProjectId,
+      projectTitle: selectedProjectTitle
+    };
+    
+    // URL에 상태 반영 (브라우저 히스토리 관리)
+    const url = new URL(window.location.href);
+    url.searchParams.set('tab', activeTab);
+    if (selectedProjectId) {
+      url.searchParams.set('project', selectedProjectId);
+    } else {
+      url.searchParams.delete('project');
+    }
+    
+    window.history.pushState(currentState, '', url.toString());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeTab, selectedProjectId, selectedProjectTitle, user, isNavigationReady]);
+  
+  // 페이지 새로고침 시 URL에서 상태 복원
+  useEffect(() => {
+    if (!user || !isNavigationReady) return;
+    
     const urlParams = new URLSearchParams(window.location.search);
     const tabFromUrl = urlParams.get('tab');
+    const projectFromUrl = urlParams.get('project');
     
-    // 데모 사용자 설정
-    const demoUser = {
+    if (tabFromUrl) {
+      // welcome 탭은 새로운 통합 대시보드로 리다이렉트
+      if (tabFromUrl === 'welcome') {
+        setActiveTab('personal-service');
+        console.log(`🔄 welcome 탭을 personal-service로 리다이렉트`);
+        // URL도 업데이트
+        const newUrl = new URL(window.location.href);
+        newUrl.searchParams.set('tab', 'personal-service');
+        window.history.replaceState({}, '', newUrl.toString());
+      } else if (protectedTabs.includes(tabFromUrl)) {
+        setActiveTab(tabFromUrl);
+        console.log(`🔄 URL에서 탭 복원: ${tabFromUrl}`);
+      }
+    }
+    
+    if (projectFromUrl) {
+      setSelectedProjectId(projectFromUrl);
+      console.log(`🔄 URL에서 프로젝트 복원: ${projectFromUrl}`);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, isNavigationReady]);
+
+  const activateDemoMode = () => {
+    console.log('🎯 데모 모드 강제 활성화 - AI 개발 활용 방안 AHP 분석');
+    setBackendStatus('unavailable');
+    setIsDemoMode(true);
+    setUser({
       ...DEMO_USER,
       id: '1',
       email: 'admin@ahp-system.com',
       admin_type: 'personal'
-    };
-    
-    setUser(demoUser);
-    
-    // URL 파라미터 기반 상태 설정
-    if (tabFromUrl && tabFromUrl !== 'welcome') {
-      setActiveTab(tabFromUrl);
-    }
-    
-    // 프로젝트 ID는 PersonalServiceDashboard 내부에서 처리
-    
-    // 초기화 완료
-    setTimeout(() => {
-      console.log('✅ 앱 초기화 완료');
-      setIsInitializing(false);
-    }, 100);
-  }, []);
+    });
+    setProjects(DEMO_PROJECTS);
+    setSelectedProjectId(DEMO_PROJECTS[0].id);
+    setActiveTab('personal-service'); // welcome에서 personal-service로 변경
+    setIsNavigationReady(true);
+    console.log('✅ 데모 데이터 설정 완료');
+  };
 
-  // 초기화 로딩 화면
-  if (isInitializing) {
+  const checkBackendAndInitialize = async () => {
+    try {
+      setBackendStatus('checking');
+      console.log('🔍 백엔드 연결 확인 중...');
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(`${API_BASE_URL}/api/health`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        console.log('✅ 백엔드 연결 성공');
+        setBackendStatus('available');
+        setIsDemoMode(false);
+        setShowApiErrorModal(false);
+        setIsNavigationReady(true);
+        
+        const token = localStorage.getItem('token');
+        if (token) {
+          validateToken(token);
+        }
+      } else {
+        fallbackToDemoMode();
+      }
+    } catch (error) {
+      fallbackToDemoMode();
+    }
+  };
+
+  const fallbackToDemoMode = () => {
+    setBackendStatus('unavailable');
+    setShowApiErrorModal(false);
+    activateDemoMode();
+  };
+
+  // API 연결 상태 체크 (백그라운드에서 실행)
+  const checkApiConnection = async () => {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3초 타임아웃
+      
+      const response = await fetch(`${API_BASE_URL}/api/health`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+        },
+        signal: controller.signal
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        console.log('⚠️ API 연결 끊김 - 데모 모드로 전환');
+        fallbackToDemoMode();
+      }
+    } catch (error) {
+      // 백그라운드 체크에서는 조용히 실패 처리
+      console.log('❌ API 연결 체크 실패 (무시):', error instanceof Error ? error.message : error);
+    }
+  };
+
+  const validateToken = async (token: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setUser(data.user);
+        // 프로젝트 목록 로드
+        fetchProjects();
+      } else {
+        localStorage.removeItem('token');
+        localStorage.removeItem('refreshToken');
+      }
+    } catch (error) {
+      console.error('Token validation failed:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('refreshToken');
+    }
+  };
+
+  const handleRegister = async (data: {
+    email: string;
+    password: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+  }) => {
+    setLoginLoading(true);
+    setLoginError('');
+
+    try {
+      if (isDemoMode) {
+        // 데모 모드에서는 회원가입 후 바로 로그인 처리
+        const newUser = {
+          id: `user-${Date.now()}`,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          role: data.role === 'evaluator' ? 'admin' : 'super_admin',
+          admin_type: data.role === 'evaluator' ? 'personal' : undefined,
+        };
+
+        setUser(newUser as any);
+        setRegisterMode(null);
+        
+        // 회원가입 후 적절한 페이지로 리다이렉트
+        if (data.role === 'evaluator') {
+          setActiveTab('personal-service');
+        } else {
+          setActiveTab('personal-service'); // welcome에서 personal-service로 변경
+        }
+        
+        console.log('✅ 회원가입 성공:', newUser);
+        return;
+      }
+
+      // 실제 백엔드가 있을 때의 회원가입 처리
+      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('회원가입에 실패했습니다.');
+      }
+
+      await response.json();
+      
+      // 회원가입 성공 후 자동 로그인
+      await handleLogin(data.email, data.password, data.role);
+      
+    } catch (error: any) {
+      console.error('Registration failed:', error);
+      setLoginError(error.message || '회원가입 중 오류가 발생했습니다.');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogin = async (email: string, password: string, role?: string) => {
+    setLoginLoading(true);
+    setLoginError('');
+
+    try {
+      if (isDemoMode) {
+        // 실제 운영 계정 설정
+        let authenticatedUser: any = null;
+        
+        // 시스템 관리자 계정 (숨김 처리) - 모드 전환 가능
+        if (email === 'aebon@naver.com' && password === 'zzang31') {
+          authenticatedUser = {
+            id: 'super-admin-1',
+            first_name: '시스템',
+            last_name: '관리자',
+            email: 'aebon@naver.com',
+            role: 'super_admin',
+            admin_type: undefined, // 초기에는 모드 선택 필요
+            canSwitchModes: true // 모드 전환 가능 플래그
+          };
+        }
+        // 서비스 사용자 계정 (프로젝트 관리) - 바로 서비스 모드
+        else if (email === 'test@ahp.com' && password === 'ahptester') {
+          authenticatedUser = {
+            id: 'service-user-1',
+            first_name: 'AHP',
+            last_name: '테스터',
+            email: 'test@ahp.com',
+            role: 'admin', // 서비스 계정은 바로 admin으로
+            admin_type: 'personal', // 바로 개인 서비스로
+            canSwitchModes: false // 모드 전환 불가
+          };
+        }
+        // 데모 계정 (공개용)
+        else if (email === 'demo@ahp-system.com' && password === 'demo123') {
+          authenticatedUser = {
+            ...DEMO_USER,
+            role: role === 'admin' ? 'admin' : 'evaluator',
+            admin_type: role === 'admin' ? 'personal' : undefined
+          };
+        } else {
+          throw new Error('인증 실패: 올바른 계정 정보를 입력하세요');
+        }
+        
+        if (authenticatedUser) {
+          setUser(authenticatedUser);
+          setProjects(DEMO_PROJECTS);
+          setSelectedProjectId(DEMO_PROJECTS[0].id);
+          console.log('✅ 로그인 성공 - 역할:', authenticatedUser.role);
+          return;
+        }
+      } else {
+        // PostgreSQL 백엔드 로그인
+        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        });
+
+        const data = await response.json();
+        
+        if (response.ok) {
+          localStorage.setItem('token', data.token);
+          if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+          }
+          setUser(data.user);
+          console.log('✅ PostgreSQL 백엔드 로그인 성공');
+          // 프로젝트 목록 로드
+          await fetchProjects();
+        } else {
+          throw new Error(data.message || '로그인에 실패했습니다.');
+        }
+      }
+    } catch (error) {
+      setLoginError(error instanceof Error ? error.message : 'Login failed');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  const handleLogout = () => {
+    // 토큰 및 저장된 데이터 정리
+    localStorage.removeItem('token');
+    localStorage.removeItem('refreshToken');
+    localStorage.removeItem('lastActiveTab');
+    localStorage.removeItem('selectedProjectId');
+    
+    // 상태 초기화
+    setUser(null);
+    setActiveTab('home');
+    setSelectedProjectId(null);
+    setSelectedProjectTitle('');
+    setProjects([]);
+    setUsers([]);
+    setLoginError('');
+    setRegisterMode(null);
+    
+    console.log('✅ 로그아웃 완료 - 모든 상태 초기화됨');
+  };
+
+  // 보호된 탭 목록을 useMemo로 메모이제이션
+  const protectedTabs = useMemo(() => [
+    'welcome', 'super-admin', 'personal-service', 'my-projects', 
+    'project-creation', 'model-builder', 'evaluator-management', 
+    'progress-monitoring', 'results-analysis', 'paper-management', 'export-reports', 
+    'workshop-management', 'decision-support-system', 'personal-settings', 
+    'user-guide', 'dashboard', 'users', 'projects', 'monitoring', 'database', 'audit', 
+    'settings', 'backup', 'system', 'landing', 'model-building', 
+    'evaluation-results', 'project-completion', 'personal-projects', 
+    'personal-users', 'results', 'evaluator-dashboard', 'pairwise-evaluation', 
+    'direct-evaluation', 'evaluator-status', 'evaluations', 'progress'
+  ], []);
+
+  // 사용자 상태 저장 및 복원
+  useEffect(() => {
+    if (user) {
+      // 마지막 활성 탭 저장
+      const lastTab = localStorage.getItem('lastActiveTab');
+      
+      if (lastTab && protectedTabs.includes(lastTab)) {
+        setActiveTab(lastTab);
+      } else {
+        // 기본 탭 설정
+        if (user.role === 'super_admin' && !user.admin_type) {
+          setActiveTab('personal-service'); // welcome에서 personal-service로 변경
+        } else if (user.role === 'super_admin' && user.admin_type === 'super') {
+          setActiveTab('super-admin');
+        } else if (user.role === 'admin' && user.admin_type === 'personal') {
+          setActiveTab('personal-service');
+        } else if (user.role === 'admin') {
+          setActiveTab('personal-service'); // welcome에서 personal-service로 변경
+        } else if (user.role === 'evaluator') {
+          setActiveTab('evaluator-dashboard');
+        } else {
+          setActiveTab('personal-service'); // welcome에서 personal-service로 변경
+        }
+      }
+      
+      // 선택된 프로젝트 복원
+      const savedProjectId = localStorage.getItem('selectedProjectId');
+      if (savedProjectId && !selectedProjectId) {
+        setSelectedProjectId(savedProjectId);
+      }
+    }
+  }, [user, protectedTabs, selectedProjectId]);
+  
+  // 탭 변경 시 저장
+  useEffect(() => {
+    if (user && activeTab && protectedTabs.includes(activeTab)) {
+      localStorage.setItem('lastActiveTab', activeTab);
+    }
+  }, [activeTab, user, protectedTabs]);
+  
+  // 프로젝트 선택 시 저장
+  useEffect(() => {
+    if (selectedProjectId) {
+      localStorage.setItem('selectedProjectId', selectedProjectId);
+    }
+  }, [selectedProjectId]);
+
+  // 관리자 유형 선택 핸들러 (더 이상 사용하지 않음 - 통합 대시보드로 대체)
+  // const handleAdminTypeSelect = (adminType: 'super' | 'personal') => {
+  //   if (user) {
+  //     setUser({
+  //       ...user,
+  //       admin_type: adminType
+  //     });
+  //     
+  //     if (adminType === 'super') {
+  //       setActiveTab('super-admin');
+  //     } else {
+  //       setActiveTab('personal-service');
+  //     }
+  //   }
+  // };
+
+  // 시스템 관리자 모드 전환 핸들러
+  const handleModeSwitch = (targetMode: 'super' | 'personal') => {
+    if (user && user.canSwitchModes) {
+      setUser({
+        ...user,
+        admin_type: targetMode
+      });
+      
+      if (targetMode === 'super') {
+        setActiveTab('super-admin');
+      } else {
+        setActiveTab('personal-service');
+      }
+    }
+  };
+
+  // API 오류 모달 핸들러들
+  const handleApiRetry = () => {
+    setShowApiErrorModal(false);
+    checkBackendAndInitialize();
+  };
+
+  const handleUseDemoMode = () => {
+    setShowApiErrorModal(false);
+    activateDemoMode();
+  };
+
+  const handleCloseApiError = () => {
+    setShowApiErrorModal(false);
+    // 기본적으로 데모 모드로 전환
+    activateDemoMode();
+  };
+
+  const fetchProjects = useCallback(async () => {
+    if (isDemoMode) {
+      // 데모 모드에서는 이미 로드된 DEMO_PROJECTS 유지
+      console.log('데모 모드: 샘플 프로젝트 데이터 사용 중');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/projects`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Filter out old sample projects on frontend as well
+        const filteredProjects = (data.projects || []).filter((project: any) => 
+          !['스마트폰 선택 평가', '직원 채용 평가', '투자 포트폴리오 선택'].includes(project.title)
+        );
+        setProjects(filteredProjects);
+      }
+    } catch (error) {
+      console.error('Failed to fetch projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [isDemoMode]);
+
+  const fetchUsers = useCallback(async () => {
+    if (isDemoMode) {
+      // 데모 모드에서는 샘플 사용자 데이터 사용
+      const demoUsers = [
+        {
+          id: '1',
+          email: 'admin@ahp-system.com',
+          first_name: '관리자',
+          last_name: '시스템',
+          role: 'admin',
+          created_at: '2024-01-01T00:00:00Z',
+          last_login: '2024-01-15T10:30:00Z',
+          status: 'active'
+        },
+        {
+          id: '2',
+          email: 'evaluator1@example.com',
+          first_name: '평가자',
+          last_name: '김',
+          role: 'evaluator',
+          created_at: '2024-01-02T00:00:00Z',
+          last_login: '2024-01-14T15:20:00Z',
+          status: 'active'
+        },
+        {
+          id: '3',
+          email: 'evaluator2@example.com',
+          first_name: '평가자',
+          last_name: '이',
+          role: 'evaluator',
+          created_at: '2024-01-03T00:00:00Z',
+          status: 'inactive'
+        }
+      ];
+      setUsers(demoUsers);
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/users`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUsers(data.users || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch users:', error);
+    } finally {
+      setLoading(false);
+    }
+  }, [isDemoMode]);
+
+  // 사용자 관리 함수들
+  const createUser = async (userData: any) => {
+    if (isDemoMode) {
+      // 데모 모드에서는 로컬 상태에 추가
+      const newUser = {
+        ...userData,
+        id: Date.now().toString(),
+        created_at: new Date().toISOString(),
+        last_login: undefined
+      };
+      setUsers(prev => [...prev, newUser]);
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 시뮬레이션
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/users`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '사용자 생성에 실패했습니다.');
+    }
+
+    await fetchUsers(); // 목록 새로고침
+  };
+
+  const updateUser = async (userId: string, userData: any) => {
+    if (isDemoMode) {
+      // 데모 모드에서는 로컬 상태 업데이트
+      setUsers(prev => prev.map(user => 
+        user.id === userId ? { ...user, ...userData } : user
+      ));
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 시뮬레이션
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '사용자 수정에 실패했습니다.');
+    }
+
+    await fetchUsers(); // 목록 새로고침
+  };
+
+  const deleteUser = async (userId: string) => {
+    if (isDemoMode) {
+      // 데모 모드에서는 로컬 상태에서 제거
+      setUsers(prev => prev.filter(user => user.id !== userId));
+      await new Promise(resolve => setTimeout(resolve, 1000)); // 시뮬레이션
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '사용자 삭제에 실패했습니다.');
+    }
+
+    await fetchUsers(); // 목록 새로고침
+  };
+
+  const createSampleProject = async () => {
+    if (isDemoMode) {
+      // 데모 모드에서는 이미 DEMO_PROJECTS가 로드되어 있음
+      console.log('데모 모드에서 샘플 프로젝트가 이미 로드되어 있습니다.');
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/projects`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: '샘플 AHP 프로젝트',
+          description: 'AHP 의사결정 분석을 위한 샘플 프로젝트입니다.',
+          objective: '최적의 대안을 선택하기 위한 다기준 의사결정'
+        }),
+      });
+
+      if (response.ok) {
+        fetchProjects();
+      }
+    } catch (error) {
+      console.error('Failed to create sample project:', error);
+    }
+  };
+
+  // 효율적인 탭 전환 함수
+  const changeTab = useCallback((newTab: string, projectId?: string, projectTitle?: string) => {
+    setActiveTab(newTab);
+    if (projectId) {
+      setSelectedProjectId(projectId);
+      setSelectedProjectTitle(projectTitle || '');
+      localStorage.setItem('selectedProjectId', projectId);
+      localStorage.setItem('selectedProjectTitle', projectTitle || '');
+    }
+    localStorage.setItem('lastActiveTab', newTab);
+    console.log(`📦 탭 전환: ${newTab}${projectId ? ` (프로젝트: ${projectTitle})` : ''}`);
+  }, []);
+  
+  // Navigation handlers
+  const handleLoginClick = () => {
+    changeTab('login');
+    setRegisterMode(null);
+  };
+
+  const handleRegisterClick = () => {
+    setRegisterMode('service');
+    changeTab('register');
+  };
+
+  const handleBackToLogin = () => {
+    changeTab('login');
+    setRegisterMode(null);
+    setLoginError('');
+  };
+
+  // Workflow handlers with improved navigation
+  const handleGetStarted = () => {
+    changeTab('personal-projects');
+  };
+
+
+  const handleModelFinalized = () => {
+    changeTab('evaluation-results');
+  };
+
+  const handleAdminEvaluationComplete = () => {
+    changeTab('project-completion');
+  };
+
+  const handleProjectStatusChange = (status: 'terminated' | 'completed') => {
+    console.log(`📊 프로젝트 ${selectedProjectId} 상태 변경: ${status}`);
+    changeTab('personal-projects');
+    setSelectedProjectId(null);
+    setSelectedProjectTitle('');
+    localStorage.removeItem('selectedProjectId');
+    localStorage.removeItem('selectedProjectTitle');
+  };
+
+  const handleProjectSelect = (projectId: string, projectTitle: string) => {
+    setSelectedProjectId(projectId);
+    setSelectedProjectTitle(projectTitle);
+    localStorage.setItem('selectedProjectId', projectId);
+    localStorage.setItem('selectedProjectTitle', projectTitle);
+    console.log(`📋 프로젝트 선택됨: ${projectTitle}`);
+  };
+
+  // Evaluator workflow handlers
+  const handleEvaluatorProjectSelect = (projectId: string, projectTitle: string, evaluationMethod: 'pairwise' | 'direct') => {
+    setSelectedProjectId(projectId);
+    setSelectedProjectTitle(projectTitle);
+    setSelectedEvaluationMethod(evaluationMethod);
+    
+    const targetTab = evaluationMethod === 'pairwise' ? 'pairwise-evaluation' : 'direct-evaluation';
+    changeTab(targetTab, projectId, projectTitle);
+  };
+
+  const handleEvaluatorEvaluationComplete = () => {
+    changeTab('evaluator-dashboard');
+    setSelectedProjectId(null);
+    setSelectedProjectTitle('');
+    localStorage.removeItem('selectedProjectId');
+    localStorage.removeItem('selectedProjectTitle');
+    console.log('✅ 평가자 평가 완료');
+  };
+
+  useEffect(() => {
+    if (user && activeTab === 'personal-projects') {
+      if (isDemoMode) {
+        // 데모 모드에서는 DEMO_PROJECTS 강제 설정
+        console.log('🔧 프로젝트 탭 활성화 - 데모 데이터 강제 설정');
+        setProjects(DEMO_PROJECTS);
+      } else {
+        fetchProjects();
+      }
+    } else if (user && activeTab === 'personal-users' && user.role === 'admin') {
+      fetchUsers();
+    }
+  }, [user, activeTab, isDemoMode, fetchProjects, fetchUsers]);
+
+
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'home':
+        return <HomePage onLoginClick={handleLoginClick} />;
+        
+      case 'login':
+        return (
+          <LoginForm
+            onLogin={handleLogin}
+            onRegister={handleRegisterClick}
+            loading={loginLoading}
+            error={loginError}
+          />
+        );
+
+      case 'register':
+        if (!registerMode) return null;
+        return (
+          <RegisterForm
+            onRegister={handleRegister}
+            onBackToLogin={handleBackToLogin}
+            loading={loginLoading}
+            error={loginError}
+            mode={registerMode}
+          />
+        );
+
+      case 'welcome':
+        if (!user) return null;
+        // welcome 탭을 personal-service로 리다이렉트
+        setActiveTab('personal-service');
+        return (
+          <PersonalServiceDashboard 
+            user={user}
+            activeTab='personal-service'
+            onTabChange={setActiveTab}
+          />
+        );
+
+      case 'super-admin':
+      case 'dashboard':
+      case 'users':
+      case 'projects':
+      case 'monitoring':
+      case 'database':
+      case 'audit':
+      case 'settings':
+      case 'backup':
+      case 'system':
+        if (!user) return null;
+        return (
+          <EnhancedSuperAdminDashboard 
+            user={{
+              id: user.id || '1',
+              first_name: user.first_name || '',
+              last_name: user.last_name || '',
+              email: user.email || '',
+              role: 'super_admin' as const,
+              subscription: undefined,
+              parentAdminId: undefined,
+              createdBy: undefined,
+              isActive: true,
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString()
+            }}
+            activeTab={activeTab === 'super-admin' ? 'overview' : activeTab}
+            onTabChange={setActiveTab}
+          />
+        );
+
+      case 'user-guide':
+        if (!user) return null;
+        return (
+          <UserGuideOverview 
+            onNavigateToService={() => setActiveTab('personal-service')}
+          />
+        );
+
+      case 'personal-service':
+      case 'my-projects':
+      case 'project-creation':
+      case 'model-builder':
+      case 'evaluator-management':
+      case 'progress-monitoring':
+      case 'results-analysis':
+      case 'paper-management':
+      case 'export-reports':
+      case 'workshop-management':
+      case 'decision-support-system':
+      case 'personal-settings':
+        if (!user) return null;
+        return (
+          <PersonalServiceDashboard 
+            user={user}
+            activeTab={activeTab}
+            onTabChange={setActiveTab}
+          />
+        );
+
+      case 'landing':
+        if (!user) return null;
+        return (
+          <LandingPage 
+            user={user}
+            onGetStarted={handleGetStarted}
+          />
+        );
+
+      case 'model-building':
+        if (!selectedProjectId) {
+          return (
+            <Card title="모델 구축">
+              <div className="text-center py-8">
+                <p className="text-gray-500">프로젝트를 먼저 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveTab('personal-projects')}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  프로젝트 목록으로 이동
+                </button>
+              </div>
+            </Card>
+          );
+        }
+        return (
+          <ModelBuilding
+            projectId={selectedProjectId}
+            projectTitle={selectedProjectTitle}
+            onModelFinalized={handleModelFinalized}
+            onBack={() => setActiveTab('personal-projects')}
+          />
+        );
+
+      case 'evaluation-results':
+        if (!selectedProjectId) {
+          return (
+            <Card title="평가 결과">
+              <div className="text-center py-8">
+                <p className="text-gray-500">프로젝트를 먼저 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveTab('personal-projects')}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  프로젝트 목록으로 이동
+                </button>
+              </div>
+            </Card>
+          );
+        }
+        return (
+          <EvaluationResults
+            projectId={selectedProjectId}
+            projectTitle={selectedProjectTitle}
+            onBack={() => setActiveTab('model-building')}
+            onComplete={handleAdminEvaluationComplete}
+          />
+        );
+
+      case 'project-completion':
+        if (!selectedProjectId) {
+          return (
+            <Card title="프로젝트 완료">
+              <div className="text-center py-8">
+                <p className="text-gray-500">프로젝트를 먼저 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveTab('personal-projects')}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  프로젝트 목록으로 이동
+                </button>
+              </div>
+            </Card>
+          );
+        }
+        return (
+          <ProjectCompletion
+            projectId={selectedProjectId}
+            projectTitle={selectedProjectTitle}
+            onBack={() => setActiveTab('evaluation-results')}
+            onProjectStatusChange={handleProjectStatusChange}
+          />
+        );
+
+      case 'personal-projects':
+        console.log('🔍 프로젝트 관리 렌더링 - 현재 프로젝트:', projects);
+        console.log('📊 데모 모드:', isDemoMode, '프로젝트 수:', projects.length);
+        return (
+          <Card title="프로젝트 관리">
+            {loading ? (
+              <div className="text-center py-4">데이터 로딩 중...</div>
+            ) : (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h4 className="font-medium">내 프로젝트 ({projects.length}개)</h4>
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setActiveTab('project-creation')}
+                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+                    >
+                      새 프로젝트 생성
+                    </button>
+                    {!isDemoMode && (
+                      <button
+                        onClick={createSampleProject}
+                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                      >
+                        샘플 프로젝트 생성
+                      </button>
+                    )}
+                  </div>
+                </div>
+                
+                {projects.length === 0 ? (
+                  <div className="text-gray-500 text-center py-8">
+                    프로젝트가 없습니다. 새 프로젝트를 생성해보세요.
+                  </div>
+                ) : (
+                  <div className="grid gap-4">
+                    {projects.map((project: any) => (
+                      <div key={project.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                        <h5 className="font-medium text-lg">{project.title}</h5>
+                        <p className="text-gray-600 text-sm mt-1">{project.description}</p>
+                        <div className="flex justify-between items-center mt-3">
+                          <span className="text-xs text-gray-500">
+                            평가자: {project.evaluator_count}명 | 상태: {project.status}
+                          </span>
+                          <div className="flex space-x-2">
+                            <button
+                              onClick={() => {
+                                handleProjectSelect(project.id, project.title);
+                                setActiveTab('model-building');
+                              }}
+                              className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                            >
+                              모델 구성
+                            </button>
+                            <span className="text-xs text-gray-500">
+                              {new Date(project.created_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </Card>
+        );
+        
+      case 'personal-users':
+        if (!user) return null;
+        return user.role !== 'admin' ? (
+          <Card title="접근 권한 없음">
+            <div className="text-center py-8">
+              <div className="text-red-500 text-lg mb-2">❌</div>
+              <div className="text-red-600 font-medium">관리자만 접근 가능합니다.</div>
+            </div>
+          </Card>
+        ) : (
+          <UserManagement
+            users={users}
+            loading={loading}
+            onCreateUser={createUser}
+            onUpdateUser={updateUser}
+            onDeleteUser={deleteUser}
+            onRefresh={fetchUsers}
+          />
+        );
+        
+      case 'results':
+        if (!selectedProjectId) {
+          return (
+            <Card title="결과 대시보드">
+              <div className="text-center py-8">
+                <p className="text-gray-500">프로젝트를 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveTab('personal-projects')}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  프로젝트 목록으로 이동
+                </button>
+              </div>
+            </Card>
+          );
+        }
+        return (
+          <ResultsDashboard 
+            projectId={selectedProjectId} 
+            projectTitle={isDemoMode ? DEMO_PROJECTS[0].title : 'AHP 프로젝트'}
+            demoMode={isDemoMode}
+          />
+        );
+        
+      case 'evaluator-dashboard':
+        if (!user) return null;
+        return (
+          <ProjectSelection
+            evaluatorId={user.first_name + user.last_name}
+            onProjectSelect={handleEvaluatorProjectSelect}
+          />
+        );
+
+      case 'pairwise-evaluation':
+        if (!selectedProjectId) {
+          return (
+            <Card title="쌍대비교 평가">
+              <div className="text-center py-8">
+                <p className="text-gray-500">프로젝트를 먼저 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveTab('evaluator-dashboard')}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  프로젝트 선택으로 이동
+                </button>
+              </div>
+            </Card>
+          );
+        }
+        return (
+          <PairwiseEvaluation
+            projectId={selectedProjectId}
+            projectTitle={selectedProjectTitle}
+            onComplete={handleEvaluatorEvaluationComplete}
+            onBack={() => setActiveTab('evaluator-dashboard')}
+          />
+        );
+
+      case 'direct-evaluation':
+        if (!selectedProjectId) {
+          return (
+            <Card title="직접입력 평가">
+              <div className="text-center py-8">
+                <p className="text-gray-500">프로젝트를 먼저 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveTab('evaluator-dashboard')}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  프로젝트 선택으로 이동
+                </button>
+              </div>
+            </Card>
+          );
+        }
+        return (
+          <DirectInputEvaluation
+            projectId={selectedProjectId}
+            projectTitle={selectedProjectTitle}
+            onComplete={handleEvaluatorEvaluationComplete}
+            onBack={() => setActiveTab('evaluator-dashboard')}
+          />
+        );
+
+      case 'evaluator-status':
+        return (
+          <Card title="평가자 대시보드">
+            <div className="space-y-4">
+              <div className="bg-purple-50 border border-purple-200 rounded p-4">
+                <h5 className="font-medium text-purple-800">👤 내 평가 현황</h5>
+                <p className="text-purple-700 text-sm mt-1">
+                  할당된 프로젝트의 평가 진행 상황을 확인합니다.
+                </p>
+              </div>
+              <div className="text-gray-600">
+                <p>평가자 기능:</p>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>할당된 프로젝트 목록</li>
+                  <li>평가 완료율 확인</li>
+                  <li>미완료 쌍대비교 알림</li>
+                  <li>개인 평가 결과 미리보기</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+        );
+        
+      case 'evaluations':
+        if (!selectedProjectId) {
+          return (
+            <Card title="쌍대비교 평가">
+              <div className="text-center py-8">
+                <p className="text-gray-500">프로젝트를 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveTab('personal-projects')}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  프로젝트 목록으로 이동
+                </button>
+              </div>
+            </Card>
+          );
+        }
+        return (
+          <PairwiseComparison 
+            projectId={selectedProjectId} 
+            criteria={isDemoMode ? DEMO_CRITERIA : []}
+            alternatives={isDemoMode ? DEMO_ALTERNATIVES : []}
+            demoMode={isDemoMode}
+          />
+        );
+        
+      case 'progress':
+        return (
+          <Card title="진행 상황">
+            <div className="space-y-4">
+              <div className="bg-indigo-50 border border-indigo-200 rounded p-4">
+                <h5 className="font-medium text-indigo-800">📈 프로젝트 진행률</h5>
+                <p className="text-indigo-700 text-sm mt-1">
+                  각 단계별 완료 상황을 추적합니다.
+                </p>
+              </div>
+              <div className="text-gray-600">
+                <p>추적 항목:</p>
+                <ul className="list-disc list-inside mt-2 space-y-1 text-sm">
+                  <li>모델 구축 완료율</li>
+                  <li>평가자별 응답률</li>
+                  <li>쌍대비교 완료 현황</li>
+                  <li>일관성 검증 상태</li>
+                  <li>최종 결과 생성 여부</li>
+                </ul>
+              </div>
+            </div>
+          </Card>
+        );
+        
+      default:
+        return (
+          <Card title="환영합니다">
+            <div className="text-center py-8">
+              <h3 className="text-xl font-medium text-gray-900 mb-4">
+                AHP 의사결정 지원 시스템에 오신 것을 환영합니다!
+              </h3>
+              <p className="text-gray-600">
+                다기준 의사결정 분석을 위한 전문 도구입니다.
+              </p>
+            </div>
+          </Card>
+        );
+    }
+  };
+
+
+  const needsLayout = user && protectedTabs.includes(activeTab);
+
+  if (needsLayout) {
     return (
-      <div className="min-h-screen bg-gradient-hero flex items-center justify-center">
-        <div className="text-center text-white">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <h2 className="text-xl font-semibold mb-2">AHP for Paper</h2>
-          <p className="text-blue-100">연구 논문을 위한 AHP 의사결정 분석 시스템</p>
-        </div>
+      <div className="min-h-screen bg-gray-50">
+        <Layout
+          user={user}
+          activeTab={activeTab}
+          onTabChange={changeTab}
+          onLogout={handleLogout}
+          onModeSwitch={handleModeSwitch}
+        >
+          {renderContent()}
+        </Layout>
+        <ApiErrorModal
+          isVisible={showApiErrorModal}
+          onClose={handleCloseApiError}
+          onRetry={handleApiRetry}
+          onUseDemoMode={handleUseDemoMode}
+        />
       </div>
     );
   }
 
-  // 메인 렌더링
+  // 홈페이지나 로그인 페이지는 Layout 없이 렌더링
   return (
-    <Layout user={user} activeTab={activeTab} onTabChange={setActiveTab}>
-      <PersonalServiceDashboard 
-        user={user}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
+    <div className="min-h-screen bg-gray-50">
+      {renderContent()}
+      <ApiErrorModal
+        isVisible={showApiErrorModal}
+        onClose={handleCloseApiError}
+        onRetry={handleApiRetry}
+        onUseDemoMode={handleUseDemoMode}
       />
-    </Layout>
+    </div>
   );
 }
 

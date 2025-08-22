@@ -1,9 +1,15 @@
-name: Deploy to GitHub Pages (Alternative)
+name: Deploy to GitHub Pages
 
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
+
+# GitHub Pages 배포 권한 설정
+permissions:
+  contents: read
+  pages: write
+  id-token: write
 
 jobs:
   build-and-deploy:
@@ -33,4 +39,4 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
-          cname: false
+          force_orphan: true
