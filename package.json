@@ -27,9 +27,9 @@
     "npm": ">=8.0.0"
   },
   "scripts": {
-    "start": "node backend/dist/index.js",
+    "start": "cd backend && npm start",
     "start:frontend": "react-scripts start",
-    "build": "cd backend && npm ci && npm run build",
+    "build": "cd backend && npm install && npm run build",
     "build:frontend": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",

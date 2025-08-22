@@ -3,8 +3,9 @@ services:
   - type: web
     name: ahp-forpaper
     env: node
-    buildCommand: cd backend && npm ci && npm run build
-    startCommand: cd backend && npm start
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
     envVars:
       - key: NODE_VERSION
         value: 18
