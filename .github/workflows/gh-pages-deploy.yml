@@ -38,7 +38,7 @@ jobs:
       - name: Build application
         run: npm run build:frontend
         env:
-          PUBLIC_URL: /AHP_forPaper
+          PUBLIC_URL: /AHP-decision-system
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
