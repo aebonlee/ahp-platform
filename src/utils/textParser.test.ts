@@ -1,4 +1,6 @@
 // Simple test for text parser utility
+export {};
+
 describe('textParser basic tests', () => {
   it('should exist as a module', () => {
     // This is a minimal test to increase coverage

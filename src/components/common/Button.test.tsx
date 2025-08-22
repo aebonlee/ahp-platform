@@ -37,11 +37,10 @@ describe('Button', () => {
 
   it('handles click events', async () => {
     const handleClick = jest.fn();
-    const user = userEvent.setup();
     
     render(<Button onClick={handleClick}>Click me</Button>);
     
-    await user.click(screen.getByRole('button'));
+    await userEvent.click(screen.getByRole('button'));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 
@@ -115,23 +114,21 @@ describe('Button', () => {
 
   it('handles keyboard events', async () => {
     const handleClick = jest.fn();
-    const user = userEvent.setup();
     
     render(<Button onClick={handleClick}>Keyboard Test</Button>);
     
     const button = screen.getByRole('button');
     button.focus();
-    await user.keyboard('{Enter}');
+    await userEvent.keyboard('{Enter}');
     
     expect(handleClick).toHaveBeenCalled();
   });
 
   it('maintains focus after click', async () => {
-    const user = userEvent.setup();
     render(<Button>Focus Test</Button>);
     
     const button = screen.getByRole('button');
-    await user.click(button);
+    await userEvent.click(button);
     
     expect(button).toHaveFocus();
   });

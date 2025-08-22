@@ -1,4 +1,6 @@
 // Simple test for messages constants
+export {};
+
 describe('Messages constants tests', () => {
   it('should handle message constants', () => {
     const messages = {

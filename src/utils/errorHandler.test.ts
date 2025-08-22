@@ -1,130 +1,125 @@
-import { handleApiError, formatErrorMessage, logError } from './errorHandler';
+import AHPErrorHandler from './errorHandler';
 
-// Mock console.error
-const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+// Simple test for error handler utility
+export {};
 
-describe('errorHandler', () => {
-  beforeEach(() => {
-    consoleSpy.mockClear();
+describe('AHPErrorHandler', () => {
+  describe('validatePairwiseInput', () => {
+    it('should validate matrix size mismatch', () => {
+      const matrix = [[1, 2], [0.5, 1]];
+      const elements = ['A', 'B', 'C']; // Mismatched size
+      
+      const errors = AHPErrorHandler.validatePairwiseInput(matrix, elements);
+      
+      expect(Array.isArray(errors)).toBe(true);
+      expect(errors.length).toBeGreaterThan(0);
+      const sizeError = errors.find(e => e.code === 'MATRIX_SIZE_MISMATCH');
+      expect(sizeError).toBeDefined();
+    });
+
+    it('should validate too many elements', () => {
+      const elements = new Array(10).fill(0).map((_, i) => `Element${i}`);
+      const matrix = elements.map(() => elements.map(() => 1));
+      
+      const errors = AHPErrorHandler.validatePairwiseInput(matrix, elements);
+      
+      const tooManyError = errors.find(e => e.code === 'TOO_MANY_ELEMENTS');
+      expect(tooManyError).toBeDefined();
+    });
+
+    it('should validate too few elements', () => {
+      const matrix = [[1]];
+      const elements = ['A'];
+      
+      const errors = AHPErrorHandler.validatePairwiseInput(matrix, elements);
+      
+      const tooFewError = errors.find(e => e.code === 'TOO_FEW_ELEMENTS');
+      expect(tooFewError).toBeDefined();
+    });
+
+    it('should pass valid input', () => {
+      const matrix = [[1, 2], [0.5, 1]];
+      const elements = ['A', 'B'];
+      
+      const errors = AHPErrorHandler.validatePairwiseInput(matrix, elements);
+      
+      expect(errors.length).toBe(0);
+    });
   });
 
-  afterAll(() => {
-    consoleSpy.mockRestore();
+  describe('validateDirectInput', () => {
+    it('should validate empty values', () => {
+      const values = [
+        { alternativeId: 'A', value: 5 },
+        { alternativeId: 'B', value: null as any },
+      ] as Array<{alternativeId: string, value: number}>;
+      
+      const errors = AHPErrorHandler.validateDirectInput(values);
+      
+      const emptyError = errors.find(e => e.code === 'EMPTY_VALUES');
+      expect(emptyError).toBeDefined();
+    });
+
+    it('should validate non-positive values', () => {
+      const values = [
+        { alternativeId: 'A', value: 5 },
+        { alternativeId: 'B', value: -1 },
+      ];
+      
+      const errors = AHPErrorHandler.validateDirectInput(values);
+      
+      const nonPositiveError = errors.find(e => e.code === 'NON_POSITIVE_DIRECT_VALUE');
+      expect(nonPositiveError).toBeDefined();
+    });
+
+    it('should pass valid input', () => {
+      const values = [
+        { alternativeId: 'A', value: 5 },
+        { alternativeId: 'B', value: 3 },
+      ];
+      
+      const errors = AHPErrorHandler.validateDirectInput(values);
+      
+      expect(errors.length).toBe(0);
+    });
   });
 
-  describe('handleApiError', () => {
-    it('should handle network errors', () => {
-      const networkError = new Error('Network error');
-      const result = handleApiError(networkError);
-
-      expect(result.type).toBe('network');
-      expect(result.message).toContain('네트워크 연결');
-      expect(consoleSpy).toHaveBeenCalled();
-    });
-
-    it('should handle validation errors', () => {
-      const validationError = { status: 400, message: 'Validation failed' };
-      const result = handleApiError(validationError);
-
-      expect(result.type).toBe('validation');
-      expect(result.message).toContain('입력 데이터');
-    });
-
-    it('should handle authentication errors', () => {
-      const authError = { status: 401, message: 'Unauthorized' };
-      const result = handleApiError(authError);
-
-      expect(result.type).toBe('authentication');
-      expect(result.message).toContain('인증이 필요');
-    });
-
+  describe('handleNetworkError', () => {
     it('should handle server errors', () => {
       const serverError = { status: 500, message: 'Internal server error' };
-      const result = handleApiError(serverError);
-
-      expect(result.type).toBe('server');
+      
+      const result = AHPErrorHandler.handleNetworkError(serverError);
+      
+      expect(result.type).toBe('network');
+      expect(result.code).toBe('SERVER_ERROR');
       expect(result.message).toContain('서버 오류');
     });
 
-    it('should handle unknown errors', () => {
-      const unknownError = { status: 999, message: 'Unknown error' };
-      const result = handleApiError(unknownError);
-
-      expect(result.type).toBe('unknown');
-      expect(result.message).toBe('Unknown error');
-    });
-
-    it('should handle string errors', () => {
-      const stringError = 'Something went wrong';
-      const result = handleApiError(stringError);
-
-      expect(result.type).toBe('unknown');
-      expect(result.message).toBe(stringError);
+    it('should handle timeout errors', () => {
+      const timeoutError = { status: 408, message: 'Timeout' };
+      
+      const result = AHPErrorHandler.handleNetworkError(timeoutError);
+      
+      expect(result.type).toBe('network');
+      expect(result.code).toBe('TIMEOUT');
+      expect(result.message).toContain('시간이 초과');
     });
   });
 
-  describe('formatErrorMessage', () => {
-    it('should format error messages properly', () => {
-      const error = { type: 'validation', message: 'Test error' };
-      const formatted = formatErrorMessage(error);
-
-      expect(formatted).toContain('Test error');
-      expect(typeof formatted).toBe('string');
-    });
-
-    it('should handle undefined errors', () => {
-      const formatted = formatErrorMessage(undefined);
+  describe('processErrors', () => {
+    it('should process errors correctly', () => {
+      const errors = [
+        { type: 'validation' as const, code: 'TEST', message: 'Test error', suggestions: ['Fix this'] },
+        { type: 'network' as const, code: 'NET', message: 'Network error', suggestions: ['Check connection'] }
+      ];
       
-      expect(formatted).toContain('알 수 없는 오류');
-    });
-
-    it('should handle null errors', () => {
-      const formatted = formatErrorMessage(null);
+      const result = AHPErrorHandler.processErrors(errors);
       
-      expect(formatted).toContain('알 수 없는 오류');
-    });
-  });
-
-  describe('logError', () => {
-    it('should log errors with context', () => {
-      const error = new Error('Test error');
-      const context = { userId: 1, action: 'test' };
-
-      logError(error, context);
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Error logged:'),
-        expect.objectContaining({
-          error: error.message,
-          context
-        })
-      );
-    });
-
-    it('should log errors without context', () => {
-      const error = new Error('Test error');
-
-      logError(error);
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Error logged:'),
-        expect.objectContaining({
-          error: error.message
-        })
-      );
-    });
-
-    it('should handle string errors', () => {
-      const error = 'String error';
-
-      logError(error);
-
-      expect(consoleSpy).toHaveBeenCalledWith(
-        expect.stringContaining('Error logged:'),
-        expect.objectContaining({
-          error
-        })
-      );
+      expect(result).toHaveProperty('isValid');
+      expect(result).toHaveProperty('criticalErrors');
+      expect(result).toHaveProperty('warnings');
+      expect(result).toHaveProperty('suggestions');
+      expect(Array.isArray(result.suggestions)).toBe(true);
     });
   });
 });

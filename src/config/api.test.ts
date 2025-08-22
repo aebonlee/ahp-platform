@@ -1,4 +1,6 @@
 // Simple test for API configuration
+export {};
+
 describe('API configuration tests', () => {
   it('should handle environment variables', () => {
     // Test environment detection
