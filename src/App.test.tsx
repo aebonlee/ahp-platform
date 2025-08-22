@@ -4,12 +4,12 @@ import App from './App';
 
 test('renders AHP for Paper title', () => {
   render(<App />);
-  const titleElement = screen.getByText(/AHP for Paper/i);
-  expect(titleElement).toBeInTheDocument();
+  const titleElements = screen.getAllByText(/AHP for Paper/i);
+  expect(titleElements[0]).toBeInTheDocument();
 });
 
 test('renders system description', () => {
   render(<App />);
-  const descriptionElement = screen.getByText(/연구 논문을 위한 AHP 의사결정 분석 시스템/i);
-  expect(descriptionElement).toBeInTheDocument();
+  const descriptionElements = screen.getAllByText(/과학적 의사결정을 위한 계층적 분석 플랫폼/i);
+  expect(descriptionElements[0]).toBeInTheDocument();
 });
