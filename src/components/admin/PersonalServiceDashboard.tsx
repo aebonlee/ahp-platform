@@ -2995,68 +2995,68 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
       </div>
 
-      {/* Navigation Menu - Compact 2 Row Layout */}
-      <div className="bg-white rounded-lg border border-gray-200 p-4 sm:p-6">
-        <div className="space-y-3">
-          {/* First Row - Core Functions (6 items) */}
-          <div className="grid grid-cols-3 sm:grid-cols-6 gap-2 sm:gap-3">
+      {/* Navigation Menu - Enhanced 2 Row Layout */}
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 shadow-sm">
+        <div className="space-y-4">
+          {/* First Row - Core Project Functions (6 items) */}
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
             {[
-              { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계를 한눈에 확인' },
-              { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '생성한 모든 프로젝트 관리 및 편집' },
-              { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새로운 AHP 분석 프로젝트 생성' },
-              { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안을 설정하여 모델 구성' },
-              { id: 'evaluators', label: '평가자 관리', icon: '👥', tooltip: '평가 참여자 초대 및 권한 관리' },
-              { id: 'survey-links', label: '설문 링크', icon: '🔗', tooltip: '평가자별 설문 링크 생성 및 관리' },
-              { id: 'monitoring', label: '진행률', icon: '📈', tooltip: '평가 진행 상황 실시간 모니터링' }
+              { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계를 한눈에 확인', color: 'blue' },
+              { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '생성한 모든 프로젝트 관리 및 편집', color: 'green' },
+              { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새로운 AHP 분석 프로젝트 생성', color: 'purple' },
+              { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안을 설정하여 모델 구성', color: 'orange' },
+              { id: 'evaluators', label: '평가자 관리', icon: '👥', tooltip: '평가 참여자 초대 및 권한 관리', color: 'pink' },
+              { id: 'monitoring', label: '진행률 확인', icon: '📈', tooltip: '평가 진행 상황 실시간 모니터링', color: 'indigo' }
             ].map((item) => (
               <div key={item.id} className="relative group">
                 <button
                   onClick={() => handleTabChange(item.id)}
                   aria-label={item.label}
-                  className={`w-full p-2 sm:p-3 rounded-lg border transition-all duration-200 text-center hover:scale-105 ${
+                  className={`w-full p-3 lg:p-4 rounded-xl border-2 transition-all duration-300 text-center hover:scale-105 hover:shadow-lg transform ${
                     activeMenu === item.id
-                      ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm'
+                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-lg scale-105`
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <div className="text-lg sm:text-xl mb-1">{item.icon}</div>
-                  <div className="font-medium text-xs sm:text-sm leading-tight">{item.label}</div>
+                  <div className="text-xl lg:text-2xl mb-2">{item.icon}</div>
+                  <div className="font-semibold text-xs lg:text-sm leading-tight">{item.label}</div>
                 </button>
-                {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                {/* Enhanced Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-20 shadow-lg">
                   {item.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Second Row - Analysis & Management (5 items) */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+          {/* Second Row - Analysis & Management (6 items) */}
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
             {[
-              { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과와 순위 확인' },
-              { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기' },
-              { id: 'workshop', label: '워크숍', icon: '🎯', tooltip: '협업 의사결정 워크숍 관리' },
-              { id: 'decision-support', label: '의사결정', icon: '🧠', tooltip: '과학적 의사결정 지원 도구' },
-              { id: 'settings', label: '설정', icon: '⚙️', tooltip: '개인 계정 및 환경 설정' }
+              { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과와 순위 확인', color: 'cyan' },
+              { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기', color: 'emerald' },
+              { id: 'survey-links', label: '설문 링크', icon: '🔗', tooltip: '평가자별 설문 링크 생성 및 관리', color: 'amber' },
+              { id: 'workshop', label: '워크숍', icon: '🎯', tooltip: '협업 의사결정 워크숍 관리', color: 'red' },
+              { id: 'decision-support', label: '의사결정 지원', icon: '🧠', tooltip: '과학적 의사결정 지원 도구', color: 'violet' },
+              { id: 'settings', label: '설정', icon: '⚙️', tooltip: '개인 계정 및 환경 설정', color: 'slate' }
             ].map((item) => (
               <div key={item.id} className="relative group">
                 <button
                   onClick={() => handleTabChange(item.id)}
                   aria-label={item.label}
-                  className={`w-full p-2 sm:p-3 rounded-lg border transition-all duration-200 text-center hover:scale-105 ${
+                  className={`w-full p-3 lg:p-4 rounded-xl border-2 transition-all duration-300 text-center hover:scale-105 hover:shadow-lg transform ${
                     activeMenu === item.id
-                      ? 'border-blue-500 bg-blue-50 text-blue-700 shadow-md'
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50 hover:shadow-sm'
+                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-lg scale-105`
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
                   }`}
                 >
-                  <div className="text-lg sm:text-xl mb-1">{item.icon}</div>
-                  <div className="font-medium text-xs sm:text-sm leading-tight">{item.label}</div>
+                  <div className="text-xl lg:text-2xl mb-2">{item.icon}</div>
+                  <div className="font-semibold text-xs lg:text-sm leading-tight">{item.label}</div>
                 </button>
-                {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
+                {/* Enhanced Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-20 shadow-lg">
                   {item.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
                 </div>
               </div>
             ))}
