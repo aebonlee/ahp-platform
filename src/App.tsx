@@ -390,6 +390,16 @@ function App() {
           setUser(authenticatedUser);
           setProjects(DEMO_PROJECTS);
           setSelectedProjectId(DEMO_PROJECTS[0].id);
+          
+          // 로그인 성공 후 적절한 화면으로 전환
+          if (authenticatedUser.role === 'evaluator') {
+            setActiveTab('evaluator-dashboard');
+          } else if (authenticatedUser.role === 'super_admin') {
+            setActiveTab('super-admin');
+          } else {
+            setActiveTab('personal-service');
+          }
+          
           console.log('✅ 로그인 성공 - 역할:', authenticatedUser.role);
           return;
         }
