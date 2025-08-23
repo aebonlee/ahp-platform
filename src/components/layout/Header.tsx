@@ -153,7 +153,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
-      <div className="w-full px-12" style={{ marginLeft: '50px', marginRight: '50px' }}>
+      <div className="w-full" style={{ paddingLeft: '50px', paddingRight: '50px' }}>
         <div className="flex items-center justify-between h-18 py-2">
           {/* 왼쪽 로고 영역 */}
           <div className="flex-shrink-0">
@@ -201,59 +201,95 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                       variant="secondary"
                       size="md"
                       icon="⭐"
-                      className="relative"
+                      className="relative bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 border-yellow-200 text-yellow-800 shadow-md transition-all duration-300 hover:shadow-lg"
                     >
-                      <span>즐겨찾기</span>
+                      <span className="font-semibold">즐겨찾기</span>
                       {favorites.length > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                        <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
                           {favorites.length}
                         </span>
                       )}
                     </UnifiedButton>
                   }
-                  title="즐겨찾기 메뉴"
+                  title="⭐ 내 즐겨찾기 메뉴"
                   content={
-                    <div className="space-y-4 w-80">
+                    <div className="space-y-5 w-96">
                       {favorites.length === 0 ? (
-                        <div className="text-center py-8 text-gray-500">
-                          <span className="text-4xl mb-4 block">⭐</span>
-                          <p>즐겨찾기가 비어있습니다</p>
-                          <p className="text-sm mt-2">현재 페이지에서 ⭐ 버튼을 클릭하여 추가해보세요</p>
+                        <div className="text-center py-12 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-dashed border-yellow-300">
+                          <div className="text-6xl mb-4 animate-bounce">⭐</div>
+                          <h3 className="text-lg font-bold text-gray-700 mb-2">즐겨찾기가 비어있습니다</h3>
+                          <p className="text-sm text-gray-600 mb-4 leading-relaxed">자주 사용하는 메뉴를 즐겨찾기에 추가하여<br/>빠르게 접근해보세요</p>
+                          <div className="bg-white p-4 rounded-lg shadow-sm border border-yellow-200 inline-block">
+                            <p className="text-xs text-yellow-700 flex items-center gap-2">
+                              <span>💡</span>
+                              현재 페이지에서 <span className="bg-yellow-200 px-1 rounded">⭐</span> 버튼을 클릭하여 추가
+                            </p>
+                          </div>
                         </div>
                       ) : (
                         <>
-                          <div className="bg-blue-50 p-3 rounded-lg">
-                            <h4 className="font-semibold text-blue-900 mb-2">내 즐겨찾기 ({favorites.length})</h4>
-                            <p className="text-sm text-blue-700">자주 사용하는 메뉴를 빠르게 접근하세요</p>
+                          <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-4 rounded-xl border border-blue-200 shadow-sm">
+                            <div className="flex items-center justify-between mb-2">
+                              <h4 className="font-bold text-blue-900 flex items-center gap-2">
+                                <span className="text-xl">⭐</span>
+                                내 즐겨찾기
+                              </h4>
+                              <span className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+                                {favorites.length}개
+                              </span>
+                            </div>
+                            <p className="text-sm text-blue-700 font-medium">자주 사용하는 메뉴를 빠르게 접근하세요</p>
                           </div>
-                          <div className="space-y-2 max-h-64 overflow-y-auto">
-                            {favorites.map((fav) => (
-                              <div key={fav.id} className="flex items-center justify-between p-3 bg-white border rounded-lg hover:shadow-sm">
+                          <div className="space-y-3 max-h-72 overflow-y-auto custom-scrollbar">
+                            {favorites.map((fav, index) => (
+                              <div 
+                                key={fav.id} 
+                                className="group flex items-center justify-between p-4 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl hover:shadow-lg hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 transition-all duration-300 transform hover:scale-[1.02]"
+                                style={{ animationDelay: `${index * 0.1}s` }}
+                              >
                                 <button
                                   onClick={() => {
                                     if (onTabChange) onTabChange(fav.tab);
                                   }}
-                                  className="flex items-center space-x-3 flex-1 text-left hover:text-blue-600"
+                                  className="flex items-center space-x-3 flex-1 text-left"
                                 >
-                                  <span className="text-lg">{fav.icon}</span>
-                                  <span className="font-medium">{fav.label}</span>
+                                  <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
+                                    <span className="text-lg">{fav.icon}</span>
+                                  </div>
+                                  <div className="flex-1">
+                                    <span className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors duration-300">
+                                      {fav.label}
+                                    </span>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                      즐겨찾기 #{index + 1}
+                                    </p>
+                                  </div>
                                 </button>
-                                <UnifiedButton
-                                  variant="danger"
-                                  size="sm"
-                                  onClick={() => removeFromFavorites(fav.id)}
-                                  icon="🗑️"
-                                >
-                                  
-                                </UnifiedButton>
+                                <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                  <UnifiedButton
+                                    variant="danger"
+                                    size="sm"
+                                    onClick={() => removeFromFavorites(fav.id)}
+                                    icon="🗑️"
+                                    className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110"
+                                  >
+                                    
+                                  </UnifiedButton>
+                                </div>
                               </div>
                             ))}
+                          </div>
+                          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200">
+                            <p className="text-sm text-green-700 flex items-center gap-2">
+                              <span>✨</span>
+                              즐겨찾기를 활용하여 업무 효율성을 높여보세요!
+                            </p>
                           </div>
                         </>
                       )}
                     </div>
                   }
-                  width="md"
+                  width="lg"
                 />
 
                 {/* 현재 페이지 즐겨찾기 토글 */}
@@ -273,6 +309,12 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                       }
                     }}
                     icon={isCurrentTabFavorite() ? "⭐" : "☆"}
+                    className={`transition-all duration-300 transform hover:scale-110 ${
+                      isCurrentTabFavorite() 
+                        ? 'bg-gradient-to-r from-yellow-100 to-amber-100 border-yellow-300 text-yellow-700 shadow-md hover:shadow-lg animate-pulse' 
+                        : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600'
+                    }`}
+                    title={isCurrentTabFavorite() ? "즐겨찾기에서 제거" : "즐겨찾기에 추가"}
                   >
                     
                   </UnifiedButton>
@@ -327,7 +369,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                           size="sm"
                           icon="ℹ️"
                         >
-                          
+                          <span className="hidden sm:inline">세션확인</span>
                         </UnifiedButton>
                       }
                       title="세션 상세 정보"
@@ -403,7 +445,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
 
           {/* 오른쪽 사용자 정보 및 로그아웃 영역 */}
           {user && (
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-4" style={{ marginRight: '50px' }}>
               {/* 사용자 정보 */}
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
