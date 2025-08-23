@@ -168,6 +168,18 @@ AHP Research Platform은 **데스크톱 중심의 반응형 설계**를 채택�
 }
 ```
 
+#### 4. `.section-padding`
+섹션 패딩 및 배경 통일
+
+```css
+.section-padding {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+  background-color: var(--bg-primary);
+  transition: background-color 0.3s var(--transition-luxury);
+}
+```
+
 ### 🎭 전용 페이지 레이아웃
 
 #### `.page-evaluator`
@@ -400,6 +412,17 @@ className="text-gray-900"
     콘텐츠
   </div>
 </div>
+```
+
+#### 3. 배경색 일관성 보장
+```tsx
+// ❌ 배경색 누락
+<main className="flex-1">
+  <div className="section-padding">
+
+// ✅ 명시적 배경색 적용
+<main style={{ backgroundColor: 'var(--bg-primary)' }}>
+  <div className="section-padding"> // 자동으로 배경색 적용
 ```
 
 ## 🧪 테스트 가이드
