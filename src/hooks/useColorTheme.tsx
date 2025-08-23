@@ -120,6 +120,19 @@ export const useColorTheme = () => {
     // Update AHP specific colors
     root.style.setProperty('--ahp-primary', palette.primary);
     
+    // Update semantic theme colors
+    root.style.setProperty('--interactive-primary', palette.primary);
+    root.style.setProperty('--interactive-primary-hover', palette.hover);
+    root.style.setProperty('--interactive-primary-light', palette.light);
+    root.style.setProperty('--interactive-secondary', palette.secondary);
+    
+    root.style.setProperty('--favorite-bg', palette.light);
+    root.style.setProperty('--favorite-border', palette.primary);
+    root.style.setProperty('--favorite-text', palette.secondary);
+    root.style.setProperty('--favorite-hover-bg', palette.primary);
+    
+    root.style.setProperty('--user-avatar-bg', `linear-gradient(135deg, ${palette.primary}, ${palette.secondary})`);
+    
     // For dark mode adjustments
     if (root.getAttribute('data-theme') === 'dark') {
       // Brighten colors slightly for dark mode

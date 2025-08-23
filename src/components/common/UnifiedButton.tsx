@@ -34,7 +34,7 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
       background: 'linear-gradient(135deg, var(--gold-primary), var(--gold-secondary))',
       color: 'white',
       borderColor: 'var(--gold-primary)',
-      borderRadius: 'var(--radius-md)',
+      borderRadius: '12px',
       boxShadow: 'var(--shadow-sm)',
       fontFamily: 'Inter, system-ui, sans-serif'
     },
@@ -42,7 +42,7 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
       background: 'var(--bg-elevated)',
       color: 'var(--text-primary)',
       borderColor: 'var(--border-medium)',
-      borderRadius: 'var(--radius-md)',
+      borderRadius: '12px',
       boxShadow: 'var(--shadow-sm)',
       fontFamily: 'Inter, system-ui, sans-serif'
     },
@@ -50,7 +50,7 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
       background: 'var(--color-info)',
       color: 'white',
       borderColor: 'var(--color-info)',
-      borderRadius: 'var(--radius-md)',
+      borderRadius: '12px',
       boxShadow: 'var(--shadow-sm)',
       fontFamily: 'Inter, system-ui, sans-serif'
     },
@@ -58,7 +58,7 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
       background: 'var(--color-success)',
       color: 'white',
       borderColor: 'var(--color-success)',
-      borderRadius: 'var(--radius-md)',
+      borderRadius: '12px',
       boxShadow: 'var(--shadow-sm)',
       fontFamily: 'Inter, system-ui, sans-serif'
     },
@@ -66,7 +66,7 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
       background: 'var(--color-warning)',
       color: 'white', 
       borderColor: 'var(--color-warning)',
-      borderRadius: 'var(--radius-md)',
+      borderRadius: '12px',
       boxShadow: 'var(--shadow-sm)',
       fontFamily: 'Inter, system-ui, sans-serif'
     },
@@ -74,7 +74,7 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
       background: 'var(--color-danger)',
       color: 'white',
       borderColor: 'var(--color-danger)',
-      borderRadius: 'var(--radius-md)',
+      borderRadius: '12px',
       boxShadow: 'var(--shadow-sm)',
       fontFamily: 'Inter, system-ui, sans-serif'
     }

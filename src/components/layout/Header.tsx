@@ -94,9 +94,31 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
   };
 
   const getTimeColor = () => {
-    if (remainingTime > 10) return 'bg-green-100 text-green-800 border-green-200';
-    if (remainingTime > 5) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-    return 'bg-red-100 text-red-800 border-red-200';
+    if (remainingTime > 10) return 'session-good';
+    if (remainingTime > 5) return 'session-warning';
+    return 'session-danger';
+  };
+
+  const getTimeStyle = () => {
+    if (remainingTime > 10) {
+      return {
+        backgroundColor: 'var(--session-good-bg)',
+        color: 'var(--session-good-text)',
+        borderColor: 'var(--session-good-border)'
+      };
+    }
+    if (remainingTime > 5) {
+      return {
+        backgroundColor: 'var(--session-warning-bg)',
+        color: 'var(--session-warning-text)',
+        borderColor: 'var(--session-warning-border)'
+      };
+    }
+    return {
+      backgroundColor: 'var(--session-danger-bg)',
+      color: 'var(--session-danger-text)',
+      borderColor: 'var(--session-danger-border)'
+    };
   };
 
   const getTimeIcon = () => {
@@ -244,11 +266,25 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                       variant="secondary"
                       size="md"
                       icon="⭐"
-                      className="relative bg-gradient-to-r from-yellow-50 to-orange-50 hover:from-yellow-100 hover:to-orange-100 border-yellow-200 text-yellow-800 shadow-md transition-all duration-300 hover:shadow-lg"
+                      className="relative shadow-md transition-all duration-300 hover:shadow-lg"
+                      style={{
+                        background: 'linear-gradient(135deg, var(--favorite-bg), var(--accent-light))',
+                        borderColor: 'var(--favorite-border)',
+                        color: 'var(--favorite-text)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.background = 'var(--favorite-hover-bg)';
+                        e.currentTarget.style.color = 'var(--favorite-hover-text)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.background = 'linear-gradient(135deg, var(--favorite-bg), var(--accent-light))';
+                        e.currentTarget.style.color = 'var(--favorite-text)';
+                      }}
                     >
                       <span className="font-semibold">즐겨찾기</span>
                       {favorites.length > 0 && (
-                        <span className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse">
+                        <span className="absolute -top-1 -right-1 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse"
+                              style={{ background: 'linear-gradient(135deg, var(--status-danger-bg), var(--accent-secondary))' }}>
                           {favorites.length}
                         </span>
                       )}
@@ -258,36 +294,63 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                   content={
                     <div className="space-y-5 w-96">
                       {favorites.length === 0 ? (
-                        <div className="text-center py-12 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border-2 border-dashed border-yellow-300">
+                        <div className="text-center py-12 rounded-xl border-2 border-dashed"
+                             style={{
+                               background: 'linear-gradient(135deg, var(--favorite-bg), transparent)',
+                               borderColor: 'var(--favorite-border)'
+                             }}>
                           <div className="text-6xl mb-4 animate-bounce">⭐</div>
-                          <h3 className="text-lg font-bold text-gray-700 mb-2">즐겨찾기가 비어있습니다</h3>
-                          <p className="text-sm text-gray-600 mb-4 leading-relaxed">자주 사용하는 메뉴를 즐겨찾기에 추가하여<br/>빠르게 접근해보세요</p>
-                          <div className="bg-white p-4 rounded-lg shadow-sm border border-yellow-200 inline-block">
-                            <p className="text-xs text-yellow-700 flex items-center gap-2">
+                          <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>즐겨찾기가 비어있습니다</h3>
+                          <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>자주 사용하는 메뉴를 즐겨찾기에 추가하여<br/>빠르게 접근해보세요</p>
+                          <div className="p-4 rounded-lg shadow-sm border inline-block"
+                               style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--favorite-border)' }}>
+                            <p className="text-xs flex items-center gap-2" style={{ color: 'var(--favorite-text)' }}>
                               <span>💡</span>
-                              현재 페이지에서 <span className="bg-yellow-200 px-1 rounded">⭐</span> 버튼을 클릭하여 추가
+                              현재 페이지에서 <span className="px-1 rounded" style={{ backgroundColor: 'var(--favorite-bg)' }}>⭐</span> 버튼을 클릭하여 추가
                             </p>
                           </div>
                         </div>
                       ) : (
                         <>
-                          <div className="bg-gradient-to-r from-blue-50 via-indigo-50 to-purple-50 p-4 rounded-xl border border-blue-200 shadow-sm">
+                          <div className="p-4 rounded-xl border shadow-sm"
+                               style={{
+                                 background: 'linear-gradient(135deg, var(--status-info-light), var(--interactive-primary-light))',
+                                 borderColor: 'var(--interactive-primary)'
+                               }}>
                             <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-bold text-blue-900 flex items-center gap-2">
+                              <h4 className="font-bold flex items-center gap-2"
+                                  style={{ color: 'var(--interactive-secondary)' }}>
                                 <span className="text-xl">⭐</span>
                                 내 즐겨찾기
                               </h4>
-                              <span className="bg-blue-200 text-blue-800 px-3 py-1 rounded-full text-sm font-bold">
+                              <span className="px-3 py-1 rounded-full text-sm font-bold"
+                                    style={{ 
+                                      backgroundColor: 'var(--interactive-primary-light)',
+                                      color: 'var(--interactive-secondary)'
+                                    }}>
                                 {favorites.length}개
                               </span>
                             </div>
-                            <p className="text-sm text-blue-700 font-medium">자주 사용하는 메뉴를 빠르게 접근하세요</p>
+                            <p className="text-sm font-medium" style={{ color: 'var(--interactive-secondary)' }}>자주 사용하는 메뉴를 빠르게 접근하세요</p>
                           </div>
                           <div className="space-y-3 max-h-72 overflow-y-auto custom-scrollbar">
                             {favorites.map((fav, index) => (
                               <div 
                                 key={fav.id} 
-                                className="group flex items-center justify-between p-4 bg-gradient-to-r from-white to-gray-50 border border-gray-200 rounded-xl hover:shadow-lg hover:from-blue-50 hover:to-indigo-50 hover:border-blue-300 transition-all duration-300 transform hover:scale-[1.02]"
+                                className="group flex items-center justify-between p-4 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
+                                style={{
+                                  background: 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))',
+                                  borderColor: 'var(--border-light)',
+                                  border: '1px solid'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.background = 'linear-gradient(135deg, var(--interactive-primary-light), var(--accent-light))';
+                                  e.currentTarget.style.borderColor = 'var(--interactive-primary)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.background = 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))';
+                                  e.currentTarget.style.borderColor = 'var(--border-light)';
+                                }}
                                 style={{ animationDelay: `${index * 0.1}s` }}
                               >
                                 <button
@@ -296,14 +359,21 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                                   }}
                                   className="flex items-center space-x-3 flex-1 text-left"
                                 >
-                                  <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
+                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300"
+                                       style={{ background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' }}>
                                     <span className="text-lg">{fav.icon}</span>
                                   </div>
                                   <div className="flex-1">
-                                    <span className="font-semibold text-gray-900 group-hover:text-blue-700 transition-colors duration-300">
+                                    <span className="font-semibold transition-colors duration-300"
+                                          style={{ 
+                                            color: 'var(--text-primary)',
+                                            '--hover-color': 'var(--interactive-secondary)'
+                                          }}
+                                          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--interactive-secondary)'}
+                                          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-primary)'}>
                                       {fav.label}
                                     </span>
-                                    <p className="text-xs text-gray-500 mt-1">
+                                    <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
                                       즐겨찾기 #{index + 1}
                                     </p>
                                   </div>

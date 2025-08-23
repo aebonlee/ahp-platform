@@ -64,13 +64,13 @@
   --header-height: 72px;             /* Header height (4.5rem) */
   
   /* === Border Radius (12px system) === */
-  --radius-xs:  6px;
-  --radius-sm:  8px;
+  --radius-xs:  12px;  /* Unified radius */
+  --radius-sm:  12px;  /* Unified radius */
   --radius-md:  12px;  /* Primary radius */
-  --radius-lg:  16px;
-  --radius-xl:  20px;
-  --radius-2xl: 24px;
-  --radius-3xl: 32px;
+  --radius-lg:  12px;  /* Unified radius */
+  --radius-xl:  12px;  /* Unified radius */
+  --radius-2xl: 12px;  /* Unified radius */
+  --radius-3xl: 12px;  /* Unified radius */
 
   /* === Spacing Scale === */
   --space-0: 0;
@@ -143,6 +143,61 @@
   --accent-focus:     rgba(59, 130, 246, 0.35);
   --accent-rgb:       59, 130, 246;
   --shadow-accent:    0 4px 20px rgba(59, 130, 246, 0.25);
+
+  /* === Semantic Theme Colors === */
+  /* Status Colors */
+  --status-success-bg:     var(--color-success);
+  --status-success-light:  rgba(95, 141, 106, 0.1);
+  --status-success-border: rgba(95, 141, 106, 0.3);
+  --status-success-text:   #2d5a37;
+  
+  --status-warning-bg:     var(--color-warning);
+  --status-warning-light:  rgba(196, 154, 74, 0.1);
+  --status-warning-border: rgba(196, 154, 74, 0.3);
+  --status-warning-text:   #8b5f2a;
+  
+  --status-danger-bg:      var(--color-danger);
+  --status-danger-light:   rgba(166, 90, 90, 0.1);
+  --status-danger-border:  rgba(166, 90, 90, 0.3);
+  --status-danger-text:    #7a3434;
+  
+  --status-info-bg:        var(--color-info);
+  --status-info-light:     rgba(107, 138, 166, 0.1);
+  --status-info-border:    rgba(107, 138, 166, 0.3);
+  --status-info-text:      #3d5a73;
+
+  /* Interactive Colors - Theme Adaptive */
+  --interactive-primary:     var(--accent-primary);
+  --interactive-primary-hover: var(--accent-hover);
+  --interactive-primary-light: var(--accent-light);
+  --interactive-secondary:   var(--accent-secondary);
+  
+  /* Favorite Colors - Theme Adaptive */
+  --favorite-bg:           var(--accent-light);
+  --favorite-border:       var(--accent-primary);
+  --favorite-text:         var(--accent-secondary);
+  --favorite-hover-bg:     var(--accent-primary);
+  --favorite-hover-text:   white;
+  --favorite-inactive-bg:  var(--bg-elevated);
+  --favorite-inactive-border: var(--border-light);
+  --favorite-inactive-text: var(--text-muted);
+
+  /* Session Status Colors */
+  --session-good-bg:       var(--status-success-light);
+  --session-good-text:     var(--status-success-text);
+  --session-good-border:   var(--status-success-border);
+  
+  --session-warning-bg:    var(--status-warning-light);
+  --session-warning-text:  var(--status-warning-text);
+  --session-warning-border: var(--status-warning-border);
+  
+  --session-danger-bg:     var(--status-danger-light);
+  --session-danger-text:   var(--status-danger-text);
+  --session-danger-border: var(--status-danger-border);
+
+  /* User Avatar Colors - Theme Adaptive */
+  --user-avatar-bg:        linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --user-avatar-text:      white;
 
   /* === Legacy Compatibility (for existing components) === */
   --accent-gold:   var(--accent-primary);
@@ -218,6 +273,12 @@
   --gold-primary:   #D4B569;   /* Brighter gold for dark backgrounds */
   --gold-secondary: #B59A4D;   /* Adjusted secondary gold */
   --gold-light:     #F0E0B0;   /* Light gold for dark mode */
+
+  /* Dark mode semantic colors adjusted */
+  --status-success-text:   #4ade80;
+  --status-warning-text:   #fbbf24;
+  --status-danger-text:    #f87171;
+  --status-info-text:      #60a5fa;
   
   /* Legacy compatibility */
   --bg:            var(--bg-primary);
@@ -473,18 +534,35 @@
 }
 
 @layer utilities {
+  /* === Universal Border Radius Override === */
+  .rounded,
+  .rounded-sm,
+  .rounded-md,
+  .rounded-lg,
+  .rounded-xl,
+  .rounded-2xl,
+  .rounded-3xl,
+  .rounded-full {
+    border-radius: 12px !important;
+  }
+  
+  /* Keep rounded-full as circle */
+  .rounded-full {
+    border-radius: 9999px !important;
+  }
+
   /* === Legacy Theme Utility Classes (Backward Compatibility) === */
   .theme-surface {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
+    border-radius: 12px;
   }
   
   .theme-surface-elevated {
     background-color: var(--bg-secondary);
     background-image: linear-gradient(var(--ahp-surface-elevated), var(--ahp-surface-elevated));
     border: 1px solid var(--border-light);
-    border-radius: var(--radius-md);
+    border-radius: 12px;
     box-shadow: var(--shadow-md);
   }
   
