@@ -19,6 +19,8 @@ export interface ProjectData {
   workflow_stage: 'creating' | 'waiting' | 'evaluating' | 'completed';
   created_at?: string;
   updated_at?: string;
+  criteria_count?: number;
+  alternatives_count?: number;
 }
 
 // 기준 관련 타입

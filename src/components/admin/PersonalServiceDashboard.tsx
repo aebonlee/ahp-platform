@@ -213,102 +213,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setProjects(convertedProjects);
       }
       
-      setLoading(false);
-      return;
-      
-      const token = localStorage.getItem('token');
-      
-      // 토큰이 없으면 로그인 필요 (개발 모드에서만)
-      if (!token) {
-        console.log('No token found, authentication required');
-        setProjects([]);
-        setError('로그인이 필요합니다.');
-        setLoading(false);
-        setTimeout(() => {
-          if (process.env.NODE_ENV !== 'production') {
-            window.location.href = '/';
-          }
-        }, 2000);
-        return;
-      }
-
-      // 토큰 유효성 검사 (개발 모드에서만)
-      if (!isTokenValid(token)) {
-        console.log('Invalid token, authentication required');
-        localStorage.removeItem('token');
-        setProjects([]);
-        setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        setLoading(false);
-        setTimeout(() => {
-          if (process.env.NODE_ENV !== 'production') {
-            window.location.href = '/';
-          }
-        }, 2000);
-        return;
-      }
-
-      // 백엔드 서버 연결 (타임아웃 설정)
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 타임아웃
-      
-      const response = await fetch(`${API_BASE_URL}/api/projects`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        signal: controller.signal
-      });
-      
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const data = await response.json();
-        const formattedProjects = data.projects.map((project: any) => ({
-          id: project.id.toString(),
-          title: project.title || project.name,
-          description: project.description || '',
-          objective: project.objective || '',
-          status: project.status || 'draft',
-          evaluation_mode: project.evaluation_mode || 'practical',
-          workflow_stage: project.workflow_stage || 'creating',
-          created_at: project.created_at ? new Date(project.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          last_modified: project.updated_at ? new Date(project.updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          evaluator_count: project.evaluator_count || 0,
-          completion_rate: (project.completion_rate || 0) || 0,
-          criteria_count: project.criteria_count || 0,
-          alternatives_count: project.alternatives_count || 0,
-          evaluation_method: project.evaluation_method || 'pairwise'
-        }));
-        setProjects(formattedProjects);
-        
-        // localStorage에 백업 저장 (선택적)
-        localStorage.setItem('ahp_projects_backup', JSON.stringify(formattedProjects));
-        
-        console.log('Projects loaded successfully:', formattedProjects.length);
-      } else if (response.status === 401) {
-        // 인증 실패
-        console.error('Authentication failed');
-        localStorage.removeItem('token');
-        setProjects([]);
-        setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        setTimeout(() => {
-          if (process.env.NODE_ENV !== 'production') {
-            window.location.href = '/';
-          }
-        }, 2000);
-      } else {
-        // 서버 오류
-        console.error('Failed to fetch projects:', response.status);
-        setError('프로젝트를 불러오는데 실패했습니다.');
-        setProjects([]);
-      }
+      console.log(`✅ ${convertedProjects.length}개 프로젝트 로드 완료`);
     } catch (error: any) {
       console.error('Error loading projects:', error);
-      if (error.name === 'AbortError') {
-        setError('서버 응답 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
-      } else {
-        setError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
-      }
+      setError('프로젝트를 불러오는데 실패했습니다.');
       setProjects([]);
     } finally {
       setLoading(false);
@@ -347,39 +255,16 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   const handleDeleteProject = async (projectId: string) => {
     if (window.confirm('정말로 이 프로젝트를 삭제하시겠습니까? 모든 관련 데이터가 삭제됩니다.')) {
       try {
-        // 프로덕션 환경(GitHub Pages)에서는 데모 모드로 처리
-        const isDemoMode = process.env.NODE_ENV === 'production';
+        // dataService를 사용하여 프로젝트 삭제 (자동으로 온라인/오프라인 모드 처리)
+        console.log('🗑️ 프로젝트 삭제:', projectId);
+        const success = await dataService.deleteProject(projectId);
         
-        if (isDemoMode) {
-          console.log('📊 데모 모드에서 프로젝트 삭제');
+        if (success) {
           const updatedProjects = projects.filter(p => p.id !== projectId);
           setProjects(updatedProjects);
-          console.log('Project deleted successfully:', projectId);
-          return;
-        }
-
-        const token = localStorage.getItem('token');
-        if (!token) {
-          alert('로그인이 필요합니다.');
-          return;
-        }
-
-        const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}`, {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
-          const updatedProjects = projects.filter(p => p.id !== projectId);
-          setProjects(updatedProjects);
-          // localStorage에 백업 저장
-          localStorage.setItem('ahp_projects_backup', JSON.stringify(updatedProjects));
-          console.log('Project deleted successfully:', projectId);
+          console.log('✅ Project deleted successfully:', projectId);
         } else {
-          const errorData = await response.json();
-          alert(errorData.error || '프로젝트 삭제에 실패했습니다.');
+          alert('프로젝트 삭제에 실패했습니다.');
         }
       } catch (error) {
         console.error('Project deletion error:', error);
@@ -507,113 +392,63 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     setError(null);
 
     try {
-      const token = localStorage.getItem('token');
+      // dataService를 사용하여 프로젝트 생성 (자동으로 온라인/오프라인 모드 처리)
+      const projectData: Omit<ProjectData, 'id'> = {
+        title: projectForm.title,
+        description: projectForm.description,
+        objective: projectForm.objective || '',
+        status: 'draft',
+        evaluation_mode: projectForm.evaluation_mode || 'practical',
+        workflow_stage: 'creating',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      };
+
+      console.log('Creating project with dataService:', projectData);
+      const createdProject = await dataService.createProject(projectData);
       
-      // 토큰이 없으면 로그인 필요
-      if (!token) {
-        setError('로그인이 필요합니다.');
-        setLoading(false);
-        setTimeout(() => {
-          if (process.env.NODE_ENV !== 'production') {
-            window.location.href = '/';
-          }
-        }, 2000);
-        return;
+      if (!createdProject) {
+        throw new Error('프로젝트 생성에 실패했습니다.');
       }
 
-      // 토큰 유효성 검사
-      if (!isTokenValid(token)) {
-        localStorage.removeItem('token');
-        setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        setLoading(false);
-        setTimeout(() => {
-          if (process.env.NODE_ENV !== 'production') {
-            window.location.href = '/';
-          }
-        }, 2000);
-        return;
-      }
+      // UserProject 형식으로 변환
+      const newProject: UserProject = {
+        id: createdProject.id || '',
+        title: createdProject.title,
+        description: createdProject.description || '',
+        objective: createdProject.objective || '',
+        status: createdProject.status || 'draft',
+        evaluation_mode: createdProject.evaluation_mode || 'practical',
+        workflow_stage: createdProject.workflow_stage || 'creating',
+        created_at: createdProject.created_at ? new Date(createdProject.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        last_modified: new Date().toISOString().split('T')[0],
+        evaluator_count: 0,
+        completion_rate: 0,
+        criteria_count: createdProject.criteria_count || 0,
+        alternatives_count: createdProject.alternatives_count || 0,
+        evaluation_method: projectForm.evaluation_method || 'pairwise'
+      };
 
-      // 백엔드 서버 연결 (타임아웃 설정)
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30초 타임아웃
+      const updatedProjects = [...projects, newProject];
+      setProjects(updatedProjects);
+      setSelectedProjectId(newProject.id || '');
       
-      const response = await fetch(`${API_BASE_URL}/api/projects`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          title: projectForm.title,
-          description: projectForm.description,
-          objective: projectForm.objective,
-          evaluationMode: projectForm.evaluation_mode
-        }),
-        signal: controller.signal
-      });
+      console.log('Project created successfully:', newProject);
+      setError(null);
       
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const data = await response.json();
-        const newProject: UserProject = {
-          id: data.project.id.toString(),
-          title: data.project.title,
-          description: data.project.description || '',
-          objective: data.project.objective || '',
-          status: data.project.status || 'draft',
-          evaluation_mode: data.project.evaluation_mode || 'practical',
-          workflow_stage: data.project.workflow_stage || 'creating',
-          created_at: data.project.created_at ? new Date(data.project.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-          last_modified: new Date().toISOString().split('T')[0],
-          evaluator_count: 0,
-          completion_rate: 0,
-          criteria_count: 0,
-          alternatives_count: 0,
-          evaluation_method: projectForm.evaluation_method
-        };
-
-        const updatedProjects = [...projects, newProject];
-        setProjects(updatedProjects);
-        setSelectedProjectId(newProject.id || '');
-        
-        // localStorage에 백업 저장 (선택적)
-        localStorage.setItem('ahp_projects_backup', JSON.stringify(updatedProjects));
-        
-        console.log('Project created successfully:', newProject);
-        setError(null);
-        
-        // 템플렛에 따라 기본 데이터 설정
-        if (projectTemplate !== 'blank') {
-          setCurrentStep('criteria');
-          handleTabChange('model-builder');
-        } else {
-          handleTabChange('projects');
-        }
-
-        resetProjectForm();
-      } else if (response.status === 401) {
-        // 토큰 만료
-        localStorage.removeItem('token');
-        setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        setTimeout(() => {
-          if (process.env.NODE_ENV !== 'production') {
-            window.location.href = '/';
-          }
-        }, 2000);
+      // 템플렛에 따라 기본 데이터 설정
+      if (projectTemplate !== 'blank') {
+        setCurrentStep('criteria');
+        handleTabChange('model-builder');
       } else {
-        // 서버 오류
-        const errorData = await response.json();
-        setError(errorData.error || '프로젝트 생성에 실패했습니다.');
+        handleTabChange('projects');
       }
+
+      resetProjectForm();
     } catch (error: any) {
       console.error('Project creation error:', error);
-      if (error.name === 'AbortError') {
-        setError('서버 응답 시간이 초과되었습니다. 잠시 후 다시 시도해주세요.');
-      } else {
-        setError('서버 연결에 실패했습니다. 잠시 후 다시 시도해주세요.');
-      }
+      // dataService가 자동으로 오프라인 모드로 처리하므로 에러 메시지를 사용자 친화적으로 변경
+      setError(error.message || '프로젝트 생성 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
