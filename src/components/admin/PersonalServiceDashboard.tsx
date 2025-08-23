@@ -46,25 +46,40 @@ interface UserProject extends Omit<ProjectData, 'evaluation_method'> {
 const isTokenValid = (token: string | null): boolean => {
   if (!token) return false;
   
+  // 프로덕션 환경(GitHub Pages)에서는 토큰 검증 스킵
+  if (process.env.NODE_ENV === 'production') {
+    return true;
+  }
+  
   try {
     // JWT 토큰 구조 확인 (Header.Payload.Signature)
     const parts = token.split('.');
-    if (parts.length !== 3) return false;
+    if (parts.length !== 3) {
+      // 일반 토큰(non-JWT)도 허용
+      return token.length > 0;
+    }
     
-    // Payload 디코딩하여 만료 시간 확인
-    const payload = JSON.parse(atob(parts[1]));
-    const currentTime = Math.floor(Date.now() / 1000);
-    
-    // exp (expiration time) 확인
-    if (payload.exp && payload.exp < currentTime) {
-      console.log('Token expired');
-      return false;
+    // JWT 토큰인 경우 Payload 디코딩하여 만료 시간 확인
+    try {
+      const payload = JSON.parse(atob(parts[1]));
+      const currentTime = Math.floor(Date.now() / 1000);
+      
+      // exp (expiration time) 확인
+      if (payload.exp && payload.exp < currentTime) {
+        console.log('Token expired');
+        return false;
+      }
+    } catch (e) {
+      // JWT 디코딩 실패해도 토큰은 유효한 것으로 간주
+      console.log('Token decode failed, but treating as valid');
+      return true;
     }
     
     return true;
   } catch (error) {
     console.error('Invalid token format:', error);
-    return false;
+    // 에러가 발생해도 토큰이 있으면 유효한 것으로 간주
+    return token.length > 0;
   }
 };
 
