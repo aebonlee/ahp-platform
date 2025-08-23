@@ -35,13 +35,14 @@ interface UserProject {
   id: string;
   title: string;
   description: string;
-  objective: string;
+  objective?: string;
   status: 'draft' | 'active' | 'completed';
-  evaluation_mode: EvaluationMode;
-  workflow_stage: WorkflowStage;
+  evaluation_mode?: EvaluationMode;
+  workflow_stage?: WorkflowStage;
   created_at: string;
-  evaluator_count: number;
-  completion_rate: number;
+  updated_at?: string;
+  evaluator_count?: number;
+  completion_rate?: number;
   criteria_count: number;
   alternatives_count: number;
   last_modified: string;
@@ -184,9 +185,18 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             id: 'demo-project-1',
             title: 'AI 개발 활용 방안 AHP 분석',
             description: '인공지능 기술의 개발 및 활용 방안에 대한 의사결정 분석',
-            status: 'active',
+            objective: 'AI 기술 도입의 최적 방안 선정',
+            status: 'active' as const,
+            evaluation_mode: 'practical' as const,
+            workflow_stage: 'creating' as const,
             created_at: '2024-01-01T00:00:00Z',
-            updated_at: '2024-01-01T00:00:00Z'
+            updated_at: '2024-01-01T00:00:00Z',
+            evaluator_count: 0,
+            completion_rate: 0,
+            criteria_count: 4,
+            alternatives_count: 3,
+            last_modified: '2024-01-01',
+            evaluation_method: 'pairwise' as const
           }
         ]);
         setLoading(false);
@@ -203,9 +213,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setLoading(false);
         setTimeout(() => {
           if (process.env.NODE_ENV !== 'production') {
-            if (process.env.NODE_ENV !== 'production') {
             window.location.href = '/';
-          }
           }
         }, 2000);
         return;
@@ -220,9 +228,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setLoading(false);
         setTimeout(() => {
           if (process.env.NODE_ENV !== 'production') {
-            if (process.env.NODE_ENV !== 'production') {
             window.location.href = '/';
-          }
           }
         }, 2000);
         return;
@@ -255,7 +261,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           created_at: project.created_at ? new Date(project.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
           last_modified: project.updated_at ? new Date(project.updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
           evaluator_count: project.evaluator_count || 0,
-          completion_rate: project.completion_rate || 0,
+          completion_rate: (project.completion_rate || 0) || 0,
           criteria_count: project.criteria_count || 0,
           alternatives_count: project.alternatives_count || 0,
           evaluation_method: project.evaluation_method || 'pairwise'
@@ -274,9 +280,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
         setTimeout(() => {
           if (process.env.NODE_ENV !== 'production') {
-            if (process.env.NODE_ENV !== 'production') {
             window.location.href = '/';
-          }
           }
         }, 2000);
       } else {
@@ -319,10 +323,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     setProjectForm({
       title: project.title,
       description: project.description,
-      objective: project.objective,
+      objective: project.objective || '',
       evaluation_method: project.evaluation_method,
-      evaluation_mode: project.evaluation_mode,
-      workflow_stage: project.workflow_stage
+      evaluation_mode: project.evaluation_mode || 'practical',
+      workflow_stage: project.workflow_stage || 'creating'
     });
     setIsProjectFormOpen(true);
   };
@@ -377,9 +381,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setLoading(false);
         setTimeout(() => {
           if (process.env.NODE_ENV !== 'production') {
-            if (process.env.NODE_ENV !== 'production') {
             window.location.href = '/';
-          }
           }
         }, 2000);
         return;
@@ -537,9 +539,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setLoading(false);
         setTimeout(() => {
           if (process.env.NODE_ENV !== 'production') {
-            if (process.env.NODE_ENV !== 'production') {
             window.location.href = '/';
-          }
           }
         }, 2000);
         return;
@@ -552,9 +552,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setLoading(false);
         setTimeout(() => {
           if (process.env.NODE_ENV !== 'production') {
-            if (process.env.NODE_ENV !== 'production') {
             window.location.href = '/';
-          }
           }
         }, 2000);
         return;
@@ -625,9 +623,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
         setTimeout(() => {
           if (process.env.NODE_ENV !== 'production') {
-            if (process.env.NODE_ENV !== 'production') {
             window.location.href = '/';
-          }
           }
         }, 2000);
       } else {
@@ -706,7 +702,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             <div>
               <p className="text-sm font-medium text-orange-600">평균 진행률</p>
               <p className="text-2xl font-bold text-orange-900">
-                {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + p.completion_rate, 0) / projects.length) : 0}%
+                {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.completion_rate || 0), 0) / projects.length) : 0}%
               </p>
             </div>
             <div className="p-3 bg-orange-500 rounded-full">
@@ -800,7 +796,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           </div>
           <div className="text-center p-4 bg-green-50 rounded-lg">
             <div className="text-2xl font-bold text-green-600">
-              {projects.reduce((sum, p) => sum + p.evaluator_count, 0)}
+              {projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0)}
             </div>
             <div className="text-sm text-gray-600">사용자 배포</div>
             <div className="text-xs text-gray-500">/ 월 50명</div>
@@ -901,14 +897,14 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       <div className="w-12 bg-gray-200 rounded-full h-1.5">
                         <div 
                           className={`h-1.5 rounded-full ${
-                            project.completion_rate >= 80 ? 'bg-green-500' :
-                            project.completion_rate >= 50 ? 'bg-blue-500' :
+                            (project.completion_rate || 0) >= 80 ? 'bg-green-500' :
+                            (project.completion_rate || 0) >= 50 ? 'bg-blue-500' :
                             'bg-yellow-500'
                           }`}
-                          style={{ width: `${project.completion_rate}%` }}
+                          style={{ width: `${(project.completion_rate || 0)}%` }}
                         />
                       </div>
-                      <span>{project.completion_rate}%</span>
+                      <span>{(project.completion_rate || 0)}%</span>
                     </div>
                   </div>
                 </div>
@@ -1154,7 +1150,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         case 'date':
           return new Date(b.last_modified).getTime() - new Date(a.last_modified).getTime();
         case 'progress':
-          return b.completion_rate - a.completion_rate;
+          return (b.completion_rate || 0) - (a.completion_rate || 0);
         case 'status':
           return a.status.localeCompare(b.status);
         default:
@@ -1204,7 +1200,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             <div>
               <p className="text-sm font-medium text-orange-600">평균 진행률</p>
               <p className="text-2xl font-bold text-orange-900">
-                {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + p.completion_rate, 0) / projects.length) : 0}%
+                {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.completion_rate || 0), 0) / projects.length) : 0}%
               </p>
             </div>
             <div className="p-3 bg-orange-500 rounded-full">
@@ -1474,22 +1470,22 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     <div className="mb-4">
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-sm font-medium text-gray-700">진행률</span>
-                        <span className="text-sm text-gray-600">{project.completion_rate}%</span>
+                        <span className="text-sm text-gray-600">{(project.completion_rate || 0)}%</span>
                       </div>
                       <div className="w-full bg-gray-200 rounded-full h-2">
                         <div 
                           className={`h-2 rounded-full transition-all duration-300 ${
-                            project.completion_rate >= 80 ? 'bg-green-500' :
-                            project.completion_rate >= 50 ? 'bg-blue-500' :
-                            project.completion_rate >= 25 ? 'bg-yellow-500' : 'bg-gray-400'
+                            (project.completion_rate || 0) >= 80 ? 'bg-green-500' :
+                            (project.completion_rate || 0) >= 50 ? 'bg-blue-500' :
+                            (project.completion_rate || 0) >= 25 ? 'bg-yellow-500' : 'bg-gray-400'
                           }`}
-                          style={{ width: `${project.completion_rate}%` }}
+                          style={{ width: `${(project.completion_rate || 0)}%` }}
                         />
                       </div>
                     </div>
 
                     {/* 워크플로우 상태 */}
-                    <WorkflowStageIndicator currentStage={project.workflow_stage} />
+                    <WorkflowStageIndicator currentStage={project.workflow_stage || 'creating'} />
                   </div>
 
                   {/* 프로젝트 통계 */}
@@ -1606,15 +1602,15 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                               <div className="w-16 bg-gray-200 rounded-full h-2">
                                 <div 
                                   className={`h-2 rounded-full transition-all duration-300 ${
-                                    project.completion_rate >= 80 ? 'bg-green-500' :
-                                    project.completion_rate >= 50 ? 'bg-blue-500' :
-                                    project.completion_rate >= 25 ? 'bg-yellow-500' : 'bg-gray-400'
+                                    (project.completion_rate || 0) >= 80 ? 'bg-green-500' :
+                                    (project.completion_rate || 0) >= 50 ? 'bg-blue-500' :
+                                    (project.completion_rate || 0) >= 25 ? 'bg-yellow-500' : 'bg-gray-400'
                                   }`}
-                                  style={{ width: `${project.completion_rate}%` }}
+                                  style={{ width: `${(project.completion_rate || 0)}%` }}
                                 />
                               </div>
                               <span className="text-sm font-medium text-gray-600">
-                                {project.completion_rate}%
+                                {(project.completion_rate || 0)}%
                               </span>
                             </div>
                           </div>
@@ -2089,7 +2085,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             <div className="text-xs text-gray-600">참여자</div>
                           </div>
                           <div className="text-center p-2 bg-green-50 rounded">
-                            <div className="font-bold text-green-600">{project.completion_rate}%</div>
+                            <div className="font-bold text-green-600">{(project.completion_rate || 0)}%</div>
                             <div className="text-xs text-gray-600">완료율</div>
                           </div>
                         </div>
@@ -2209,7 +2205,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                         {project.status === 'active' ? '진행중' : '완료'}
                       </span>
                       <span className="text-xs text-gray-500">
-                        완료율: {project.completion_rate}%
+                        완료율: {(project.completion_rate || 0)}%
                       </span>
                     </div>
                   </button>
@@ -2823,7 +2819,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                           <div className="text-sm text-gray-600">평가자</div>
                         </div>
                         <div className="text-center p-3 bg-orange-50 rounded-lg">
-                          <div className="text-lg font-bold text-orange-600">{project.completion_rate}%</div>
+                          <div className="text-lg font-bold text-orange-600">{(project.completion_rate || 0)}%</div>
                           <div className="text-sm text-gray-600">완료율</div>
                         </div>
                       </div>
