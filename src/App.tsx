@@ -341,7 +341,7 @@ function App() {
           };
         }
         // 서비스 사용자 계정 (프로젝트 관리) - 바로 서비스 모드
-        else if (email === 'test@ahp.com' && password === 'ahptester') {
+        else if (email === 'test@ahp.com' && (password === 'ahptester' || password === 'tester@')) {
           authenticatedUser = {
             id: 'service-user-1',
             first_name: 'AHP',
