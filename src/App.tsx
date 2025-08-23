@@ -134,6 +134,64 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, selectedProjectId, selectedProjectTitle, user, isNavigationReady]);
   
+  // 페이지 로드 시 세션 복구 시도
+  useEffect(() => {
+    const restoreSessionOnLoad = () => {
+      const token = sessionService.getToken();
+      
+      if (token && sessionService.isSessionValid()) {
+        console.log('🔄 페이지 새로고침 - 세션 복구 시도');
+        
+        // 데모 모드에서 세션 복구
+        if (isDemoMode || process.env.NODE_ENV === 'production') {
+          // 저장된 사용자 정보가 있는지 확인
+          const savedUserData = localStorage.getItem('saved_user_data');
+          
+          if (savedUserData) {
+            try {
+              const userData = JSON.parse(savedUserData);
+              setUser(userData);
+              setProjects(DEMO_PROJECTS);
+              setSelectedProjectId(DEMO_PROJECTS[0].id);
+              
+              // 저장된 탭 정보가 있으면 복원
+              const savedTab = localStorage.getItem('current_tab');
+              if (savedTab && protectedTabs.includes(savedTab)) {
+                setActiveTab(savedTab);
+                console.log(`✅ 세션 및 탭 복구 완료: ${savedTab}`);
+              } else {
+                // 사용자 역할에 따른 기본 탭
+                if (userData.role === 'evaluator') {
+                  setActiveTab('evaluator-dashboard');
+                } else if (userData.role === 'super_admin') {
+                  setActiveTab('super-admin');
+                } else {
+                  setActiveTab('personal-service');
+                }
+                console.log(`✅ 세션 복구 및 기본 탭 설정 완료`);
+              }
+              
+              return;
+            } catch (error) {
+              console.error('사용자 데이터 파싱 오류:', error);
+              localStorage.removeItem('saved_user_data');
+            }
+          }
+        }
+      } else {
+        // 세션이 만료된 경우 저장된 데이터 정리
+        localStorage.removeItem('saved_user_data');
+        localStorage.removeItem('current_tab');
+        console.log('⚠️ 세션 만료 - 저장된 데이터 정리');
+      }
+    };
+
+    // 백엔드 초기화가 완료된 후에 세션 복구 실행
+    if (isNavigationReady) {
+      restoreSessionOnLoad();
+    }
+  }, [isDemoMode, isNavigationReady]);
+
   // 페이지 새로고침 시 URL에서 상태 복원
   useEffect(() => {
     if (!user || !isNavigationReady) return;
@@ -392,20 +450,27 @@ function App() {
           const demoToken = `demo_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
           sessionService.startSession(demoToken);
           
+          // 사용자 데이터 저장 (새로고침 시 복구용)
+          localStorage.setItem('saved_user_data', JSON.stringify(authenticatedUser));
+          
           setUser(authenticatedUser);
           setProjects(DEMO_PROJECTS);
           setSelectedProjectId(DEMO_PROJECTS[0].id);
           
           // 로그인 성공 후 적절한 화면으로 전환
+          let targetTab = '';
           if (authenticatedUser.role === 'evaluator') {
-            setActiveTab('evaluator-dashboard');
+            targetTab = 'evaluator-dashboard';
           } else if (authenticatedUser.role === 'super_admin') {
-            setActiveTab('super-admin');
+            targetTab = 'super-admin';
           } else {
-            setActiveTab('personal-service');
+            targetTab = 'personal-service';
           }
           
-          console.log('✅ 로그인 성공 - 역할:', authenticatedUser.role);
+          setActiveTab(targetTab);
+          localStorage.setItem('current_tab', targetTab);
+          
+          console.log('✅ 로그인 성공 - 역할:', authenticatedUser.role, '탭:', targetTab);
           return;
         }
       } else {
@@ -424,11 +489,27 @@ function App() {
           // 백엔드 로그인 성공 시 세션 시작
           sessionService.startSession(data.token);
           
+          // 사용자 데이터 저장 (새로고침 시 복구용)
+          localStorage.setItem('saved_user_data', JSON.stringify(data.user));
+          
           localStorage.setItem('token', data.token);
           if (data.refreshToken) {
             localStorage.setItem('refreshToken', data.refreshToken);
           }
           setUser(data.user);
+          
+          // 기본 탭 설정 및 저장
+          let targetTab = '';
+          if (data.user.role === 'evaluator') {
+            targetTab = 'evaluator-dashboard';
+          } else if (data.user.role === 'super_admin') {
+            targetTab = 'super-admin';
+          } else {
+            targetTab = 'personal-service';
+          }
+          setActiveTab(targetTab);
+          localStorage.setItem('current_tab', targetTab);
+          
           console.log('✅ PostgreSQL 백엔드 로그인 성공');
           // 프로젝트 목록 로드
           await fetchProjects();
@@ -444,11 +525,16 @@ function App() {
   };
 
   const handleLogout = () => {
+    // 세션 서비스를 통한 로그아웃
+    sessionService.logout();
+    
     // 토큰 및 저장된 데이터 정리
     localStorage.removeItem('token');
     localStorage.removeItem('refreshToken');
     localStorage.removeItem('lastActiveTab');
     localStorage.removeItem('selectedProjectId');
+    localStorage.removeItem('saved_user_data');
+    localStorage.removeItem('current_tab');
     
     // 상태 초기화
     setUser(null);
@@ -460,7 +546,7 @@ function App() {
     setLoginError('');
     setRegisterMode(null);
     
-    console.log('✅ 로그아웃 완료 - 모든 상태 초기화됨');
+    console.log('✅ 로그아웃 완료 - 모든 상태 및 세션 데이터 정리됨');
   };
 
   // 보호된 탭 목록을 useMemo로 메모이제이션
