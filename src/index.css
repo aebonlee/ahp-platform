@@ -59,9 +59,17 @@
   --border-focus:   var(--gold-primary); /* Focus ring color */
 
   /* === Layout System === */
-  --container-max-width: 1200px;     /* Main content container */
+  --container-max-width: 1600px;     /* Wider main content container */
+  --container-content-width: 1400px; /* Content area within container */
   --sidebar-width: 280px;            /* Sidebar width */
   --header-height: 72px;             /* Header height (4.5rem) */
+  
+  /* === Responsive Breakpoints === */
+  --breakpoint-sm: 640px;   /* Mobile */
+  --breakpoint-md: 768px;   /* Tablet */
+  --breakpoint-lg: 1024px;  /* Desktop */
+  --breakpoint-xl: 1280px;  /* Large Desktop */
+  --breakpoint-2xl: 1536px; /* Extra Large Desktop */
   
   /* === Border Radius (12px system) === */
   --radius-xs:  12px;  /* Unified radius */
@@ -99,14 +107,14 @@
   --shadow-focus: 0 0 0 3px rgba(200, 169, 104, 0.35);
 
   /* === Typography Scale === */
-  --font-size-xs:   0.75rem;   /* 12px */
-  --font-size-sm:   0.875rem;  /* 14px */
-  --font-size-base: 1rem;      /* 16px */
-  --font-size-lg:   1.125rem;  /* 18px */
-  --font-size-xl:   1.25rem;   /* 20px */
-  --font-size-2xl:  1.5rem;    /* 24px */
-  --font-size-3xl:  1.875rem;  /* 30px */
-  --font-size-4xl:  2.25rem;   /* 36px */
+  --font-size-xs:   0.8125rem; /* 13px - Slightly larger for better readability */
+  --font-size-sm:   0.9375rem; /* 15px - Improved small text */
+  --font-size-base: 1.0625rem; /* 17px - More comfortable base size */
+  --font-size-lg:   1.1875rem; /* 19px - Better medium text */
+  --font-size-xl:   1.375rem;  /* 22px - Clearer large text */
+  --font-size-2xl:  1.625rem;  /* 26px - Better heading size */
+  --font-size-3xl:  2rem;      /* 32px - Prominent headings */
+  --font-size-4xl:  2.5rem;    /* 40px - Large headings */
   
   --line-height-tight: 1.25;
   --line-height-snug:  1.375;
@@ -549,6 +557,196 @@
   /* Keep rounded-full as circle */
   .rounded-full {
     border-radius: 9999px !important;
+  }
+
+  /* === Responsive Container System === */
+  .container-responsive {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Mobile First Approach */
+  @media (min-width: 640px) {
+    .container-responsive {
+      max-width: 640px;
+      padding-left: 1.5rem;
+      padding-right: 1.5rem;
+    }
+  }
+
+  @media (min-width: 768px) {
+    .container-responsive {
+      max-width: 768px;
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-responsive {
+      max-width: 1024px;
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container-responsive {
+      max-width: var(--container-content-width);
+      padding-left: 3rem;
+      padding-right: 3rem;
+    }
+  }
+
+  @media (min-width: 1536px) {
+    .container-responsive {
+      max-width: var(--container-max-width);
+      padding-left: 4rem;
+      padding-right: 4rem;
+    }
+  }
+
+  /* === Content Width Utilities === */
+  .content-width {
+    max-width: var(--container-content-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  .content-width-full {
+    max-width: var(--container-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  /* === Typography Utilities === */
+  .text-responsive {
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
+  }
+
+  @media (min-width: 768px) {
+    .text-responsive {
+      font-size: var(--font-size-base);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .text-responsive {
+      font-size: var(--font-size-lg);
+    }
+  }
+
+  /* === Spacing Utilities === */
+  .section-padding {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
+  @media (min-width: 768px) {
+    .section-padding {
+      padding-top: 2.5rem;
+      padding-bottom: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-padding {
+      padding-top: 3rem;
+      padding-bottom: 3rem;
+    }
+  }
+
+  /* === Page Layout Utilities === */
+  .page-container {
+    min-height: calc(100vh - var(--header-height));
+    background-color: var(--bg-primary);
+    padding: 2rem 1rem;
+  }
+
+  @media (min-width: 768px) {
+    .page-container {
+      padding: 3rem 2rem;
+    }
+  }
+
+  .page-content {
+    max-width: var(--container-content-width);
+    margin: 0 auto;
+    background-color: var(--bg-secondary);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    border: 1px solid var(--border-light);
+  }
+
+  @media (min-width: 768px) {
+    .page-content {
+      padding: 3rem;
+    }
+  }
+
+  .page-header {
+    margin-bottom: 2.5rem;
+    text-align: center;
+  }
+
+  .page-title {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-extrabold);
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+    line-height: var(--line-height-tight);
+  }
+
+  .page-subtitle {
+    font-size: var(--font-size-lg);
+    color: var(--text-secondary);
+    line-height: var(--line-height-relaxed);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* === Card System Enhancement === */
+  .card-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    .card-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .card-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .card-enhanced {
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow-sm);
+    transition: var(--transition-luxury);
+  }
+
+  .card-enhanced:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-2px);
+    border-color: var(--accent-primary);
   }
 
   /* === Legacy Theme Utility Classes (Backward Compatibility) === */

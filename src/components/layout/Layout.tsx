@@ -106,14 +106,10 @@ const Layout: React.FC<LayoutProps> = ({
         <main className="flex-1 transition-luxury" 
               style={{
                 marginLeft: user ? (sidebarCollapsed ? '4rem' : 'var(--sidebar-width)') : '0',
-                paddingTop: 'var(--space-8)',
-                paddingBottom: 'var(--space-8)',
-                paddingLeft: 'var(--space-6)',
-                paddingRight: 'var(--space-6)',
                 minHeight: 'calc(100vh - var(--header-height))',
                 transition: 'margin-left 0.3s ease'
               }}>
-          <div className="mx-auto" style={{ maxWidth: 'var(--container-max-width)' }}>
+          <div className="content-width-full section-padding">
             {children}
           </div>
         </main>
