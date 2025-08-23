@@ -575,6 +575,7 @@
     margin-right: auto;
     padding-left: 1rem;
     padding-right: 1rem;
+    background-color: transparent; /* 부모 배경색 상속 */
   }
 
   /* Mobile - Tablet optimized for evaluators */
@@ -660,6 +661,8 @@
   .section-padding {
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
+    background-color: var(--bg-primary);
+    transition: background-color 0.3s var(--transition-luxury);
   }
 
   @media (min-width: 768px) {
@@ -679,15 +682,17 @@
   /* === Unified Page Layout System === */
   .page-wrapper {
     min-height: calc(100vh - var(--header-height));
-    background-color: var(--bg-primary);
+    background-color: var(--bg-primary) !important;
     padding: 0;
+    transition: background-color 0.3s var(--transition-luxury);
   }
 
   .page-container {
     width: 100%;
     min-height: calc(100vh - var(--header-height));
-    background-color: var(--bg-primary);
+    background-color: var(--bg-primary) !important;
     padding: 2rem 1rem;
+    transition: background-color 0.3s var(--transition-luxury);
   }
 
   .page-content {
@@ -724,8 +729,9 @@
 
   /* === Specialized Page Layouts === */
   .page-evaluator {
-    background-color: var(--bg-primary);
+    background-color: var(--bg-primary) !important;
     min-height: calc(100vh - var(--header-height));
+    transition: background-color 0.3s var(--transition-luxury);
   }
 
   .page-evaluator .page-content {

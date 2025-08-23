@@ -107,7 +107,8 @@ const Layout: React.FC<LayoutProps> = ({
               style={{
                 marginLeft: user ? (sidebarCollapsed ? '4rem' : 'var(--sidebar-width)') : '0',
                 minHeight: 'calc(100vh - var(--header-height))',
-                transition: 'margin-left 0.3s ease'
+                backgroundColor: 'var(--bg-primary)',
+                transition: 'margin-left 0.3s ease, background-color 0.3s var(--transition-luxury)'
               }}>
           <div className="container-adaptive section-padding">
             {children}
