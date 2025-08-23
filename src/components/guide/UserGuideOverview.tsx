@@ -366,9 +366,9 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
                   <p className="text-sm text-green-600 mt-2">✓ 우수한 일관성 (0.1 미만)</p>
                 </div>
                 <div className="text-sm text-gray-600 space-y-1">
-                  <p>• CR < 0.1: 일관성 우수</p>
-                  <p>• CR < 0.2: 일관성 양호</p>
-                  <p>• CR ≥ 0.2: 재평가 필요</p>
+                  <p>• CR &lt; 0.1: 일관성 우수</p>
+                  <p>• CR &lt; 0.2: 일관성 양호</p>
+                  <p>• CR &gt;= 0.2: 재평가 필요</p>
                 </div>
               </div>
             </div>
