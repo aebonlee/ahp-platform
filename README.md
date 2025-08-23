@@ -9,6 +9,9 @@
 
 AHP(Analytic Hierarchy Process) 의사결정 분석 시스템은 복잡한 의사결정 문제를 체계적으로 분석하기 위한 웹 기반 플랫폼입니다. 학술 연구 및 실무에서 활용 가능한 전문적인 AHP 분석 도구를 제공합니다.
 
+> 🎉 **최신 업데이트 (2025-08-23)**: PersonalServiceDashboard 완전 리팩터링으로 UI/UX 혁신 달성!  
+> 📋 [전체 개발 로그 보기](./docs/COMPREHENSIVE_DEVELOPMENT_LOG_2025-08-23.md)
+
 ### 🎯 주요 특징
 
 - **계층적 의사결정 구조**: 5단계까지 지원하는 유연한 계층 구조
