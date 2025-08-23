@@ -3048,46 +3048,80 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
       </div>
 
-      {/* Navigation Menu - Enhanced 2 Row Layout */}
-      <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl border border-gray-200 p-6 shadow-sm">
+      {/* Navigation Menu - Stable 4x3 Grid Layout */}
+      <div className="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/50 rounded-2xl border border-gray-200 p-6 shadow-sm">
+        <div className="mb-4">
+          <h2 className="text-lg font-bold text-gray-800 mb-1">서비스 메뉴</h2>
+          <p className="text-sm text-gray-600">AHP 의사결정 분석의 모든 기능을 한 곳에서</p>
+        </div>
+        
         <div className="space-y-4">
-          {/* First Row - Core Project Functions (6 items) */}
-          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* First Row - Core Functions (4 items) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계를 한눈에 확인', color: 'blue' },
-              { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '생성한 모든 프로젝트 관리 및 편집', color: 'green' },
-              { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새로운 AHP 분석 프로젝트 생성', color: 'purple' },
-              { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안을 설정하여 모델 구성', color: 'orange' },
-              { id: 'evaluators', label: '평가자 관리', icon: '👥', tooltip: '평가 참여자 초대 및 권한 관리', color: 'pink' },
-              { id: 'monitoring', label: '진행률 확인', icon: '📈', tooltip: '평가 진행 상황 실시간 모니터링', color: 'indigo' }
+              { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계를 한눈에 확인', color: 'blue', priority: 'high' },
+              { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '생성한 모든 프로젝트 관리 및 편집', color: 'green', priority: 'high' },
+              { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새로운 AHP 분석 프로젝트 생성', color: 'purple', priority: 'high' },
+              { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안을 설정하여 모델 구성', color: 'orange', priority: 'high' }
             ].map((item) => (
               <div key={item.id} className="relative group">
                 <button
                   onClick={() => handleTabChange(item.id)}
                   aria-label={item.label}
-                  className={`w-full p-3 lg:p-4 rounded-xl border-2 transition-all duration-300 text-center hover:scale-105 hover:shadow-lg transform ${
+                  className={`w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform ${
                     activeMenu === item.id
-                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-lg scale-105`
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-xl scale-[1.02] ring-2 ring-${item.color}-200`
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 shadow-sm'
                   }`}
                 >
-                  <div className="text-xl lg:text-2xl mb-2">{item.icon}</div>
-                  <div className="font-semibold text-xs lg:text-sm leading-tight">{item.label}</div>
+                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
+                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
+                  {item.priority === 'high' && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
+                  )}
                 </button>
                 {/* Enhanced Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-20 shadow-lg">
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-xl">
                   {item.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Second Row - Analysis & Management (6 items) */}
-          <div className="grid grid-cols-3 lg:grid-cols-6 gap-3">
+          {/* Second Row - Management & Analysis (4 items) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
+              { id: 'evaluators', label: '평가자 관리', icon: '👥', tooltip: '평가 참여자 초대 및 권한 관리', color: 'pink' },
+              { id: 'monitoring', label: '진행률 확인', icon: '📈', tooltip: '평가 진행 상황 실시간 모니터링', color: 'indigo' },
               { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과와 순위 확인', color: 'cyan' },
-              { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기', color: 'emerald' },
+              { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기', color: 'emerald' }
+            ].map((item) => (
+              <div key={item.id} className="relative group">
+                <button
+                  onClick={() => handleTabChange(item.id)}
+                  aria-label={item.label}
+                  className={`w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform ${
+                    activeMenu === item.id
+                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-xl scale-[1.02] ring-2 ring-${item.color}-200`
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 shadow-sm'
+                  }`}
+                >
+                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
+                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
+                </button>
+                {/* Enhanced Tooltip */}
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-xl">
+                  {item.tooltip}
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Third Row - Advanced Features (4 items) */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {[
               { id: 'survey-links', label: '설문 링크', icon: '🔗', tooltip: '평가자별 설문 링크 생성 및 관리', color: 'amber' },
               { id: 'workshop', label: '워크숍', icon: '🎯', tooltip: '협업 의사결정 워크숍 관리', color: 'red' },
               { id: 'decision-support', label: '의사결정 지원', icon: '🧠', tooltip: '과학적 의사결정 지원 도구', color: 'violet' },
@@ -3097,19 +3131,19 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <button
                   onClick={() => handleTabChange(item.id)}
                   aria-label={item.label}
-                  className={`w-full p-3 lg:p-4 rounded-xl border-2 transition-all duration-300 text-center hover:scale-105 hover:shadow-lg transform ${
+                  className={`w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform ${
                     activeMenu === item.id
-                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-lg scale-105`
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
+                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-xl scale-[1.02] ring-2 ring-${item.color}-200`
+                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 shadow-sm'
                   }`}
                 >
-                  <div className="text-xl lg:text-2xl mb-2">{item.icon}</div>
-                  <div className="font-semibold text-xs lg:text-sm leading-tight">{item.label}</div>
+                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
+                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
                 </button>
                 {/* Enhanced Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-800 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-20 shadow-lg">
+                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-xl">
                   {item.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-800"></div>
+                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
                 </div>
               </div>
             ))}
