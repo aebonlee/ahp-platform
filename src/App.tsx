@@ -102,7 +102,7 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isNavigationReady]);
   
-  // 탭 변경 시 URL 업데이트
+  // 탭 변경 시 URL 업데이트 (GitHub Pages 호환)
   useEffect(() => {
     if (!isNavigationReady || !user) return;
     
@@ -112,16 +112,17 @@ function App() {
       projectTitle: selectedProjectTitle
     };
     
-    // URL에 상태 반영 (브라우저 히스토리 관리)
-    const url = new URL(window.location.href);
-    url.searchParams.set('tab', activeTab);
+    // 상대 경로로 URL 처리 (GitHub Pages 호환)
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('tab', activeTab);
     if (selectedProjectId) {
-      url.searchParams.set('project', selectedProjectId);
+      urlParams.set('project', selectedProjectId);
     } else {
-      url.searchParams.delete('project');
+      urlParams.delete('project');
     }
     
-    window.history.pushState(currentState, '', url.toString());
+    const newPath = window.location.pathname + '?' + urlParams.toString();
+    window.history.pushState(currentState, '', newPath);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, selectedProjectId, selectedProjectTitle, user, isNavigationReady]);
   
@@ -133,19 +134,9 @@ function App() {
     const tabFromUrl = urlParams.get('tab');
     const projectFromUrl = urlParams.get('project');
     
-    if (tabFromUrl) {
-      // welcome 탭은 새로운 통합 대시보드로 리다이렉트
-      if (tabFromUrl === 'welcome') {
-        setActiveTab('personal-service');
-        console.log(`🔄 welcome 탭을 personal-service로 리다이렉트`);
-        // URL도 업데이트
-        const newUrl = new URL(window.location.href);
-        newUrl.searchParams.set('tab', 'personal-service');
-        window.history.replaceState({}, '', newUrl.toString());
-      } else if (protectedTabs.includes(tabFromUrl)) {
-        setActiveTab(tabFromUrl);
-        console.log(`🔄 URL에서 탭 복원: ${tabFromUrl}`);
-      }
+    if (tabFromUrl && protectedTabs.includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+      console.log(`🔄 URL에서 탭 복원: ${tabFromUrl}`);
     }
     
     if (projectFromUrl) {
@@ -444,30 +435,32 @@ function App() {
     'direct-evaluation', 'evaluator-status', 'evaluations', 'progress'
   ], []);
 
-  // 사용자 상태 저장 및 복원
+  // 사용자 상태 저장 및 복원 (자동 리다이렉션 제거)
   useEffect(() => {
     if (user) {
-      // 마지막 활성 탭 저장
-      const lastTab = localStorage.getItem('lastActiveTab');
+      // URL에서 탭 정보가 있으면 우선 사용
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabFromUrl = urlParams.get('tab');
       
+      if (tabFromUrl && protectedTabs.includes(tabFromUrl)) {
+        setActiveTab(tabFromUrl);
+        return;
+      }
+      
+      // URL에 탭이 없으면 마지막 활성 탭 복원
+      const lastTab = localStorage.getItem('lastActiveTab');
       if (lastTab && protectedTabs.includes(lastTab)) {
         setActiveTab(lastTab);
-      } else {
-        // 기본 탭 설정
-        if (user.role === 'super_admin' && !user.admin_type) {
-          setActiveTab('personal-service'); // welcome에서 personal-service로 변경
-        } else if (user.role === 'super_admin' && user.admin_type === 'super') {
-          setActiveTab('super-admin');
-        } else if (user.role === 'admin' && user.admin_type === 'personal') {
-          setActiveTab('personal-service');
-        } else if (user.role === 'admin') {
-          setActiveTab('personal-service'); // welcome에서 personal-service로 변경
-        } else if (user.role === 'evaluator') {
-          setActiveTab('evaluator-dashboard');
-        } else {
-          setActiveTab('personal-service'); // welcome에서 personal-service로 변경
-        }
+        return;
       }
+      
+      // 둘 다 없으면 기본 탭 설정 (자동 이동 최소화)
+      if (user.role === 'super_admin' && user.admin_type === 'super') {
+        setActiveTab('super-admin');
+      } else if (user.role === 'evaluator') {
+        setActiveTab('evaluator-dashboard');
+      }
+      // 다른 경우에는 현재 탭 유지 (자동 이동하지 않음)
       
       // 선택된 프로젝트 복원
       const savedProjectId = localStorage.getItem('selectedProjectId');
@@ -881,12 +874,10 @@ function App() {
 
       case 'welcome':
         if (!user) return null;
-        // welcome 탭을 personal-service로 리다이렉트
-        setActiveTab('personal-service');
         return (
           <PersonalServiceDashboard 
             user={user}
-            activeTab='personal-service'
+            activeTab='welcome'
             onTabChange={setActiveTab}
           />
         );
