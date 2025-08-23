@@ -135,9 +135,18 @@
   --transition-slow:   350ms ease;
   --transition-luxury: 250ms cubic-bezier(0.4, 0, 0.2, 1);
 
+  /* === Dynamic Color System === */
+  --accent-primary:   #C8A968; /* Will be updated by ColorTheme hook */
+  --accent-secondary: #A98C4B;
+  --accent-light:     #E5D5AA;
+  --accent-hover:     #B59A4D;
+  --accent-focus:     rgba(200, 169, 104, 0.35);
+  --accent-rgb:       200, 169, 104;
+  --shadow-accent:    0 4px 20px rgba(200, 169, 104, 0.25);
+
   /* === Legacy Compatibility (for existing components) === */
-  --accent-gold:   var(--gold-primary);
-  --accent-gold-2: var(--gold-secondary);
+  --accent-gold:   var(--accent-primary);
+  --accent-gold-2: var(--accent-secondary);
   --accent-ivory:  var(--ivory);
   --info:    var(--color-info);
   --success: var(--color-success);
@@ -160,9 +169,15 @@
   --shadow-md:     var(--shadow-md);
   --shadow-lg:     var(--shadow-lg);
   --focus:         var(--shadow-focus);
-  --ahp-primary:   var(--gold-primary);
+  --ahp-primary:   var(--accent-primary);
   --ahp-secondary: var(--gray-650);
   --ahp-surface-elevated: rgba(244, 241, 234, 0.5);
+  
+  /* Map gold variables to dynamic accent */
+  --gold-primary:   var(--accent-primary);
+  --gold-secondary: var(--accent-secondary);
+  --gold-light:     var(--accent-light);
+  --shadow-gold:    var(--shadow-accent);
 }
 
 /* ============================================================================

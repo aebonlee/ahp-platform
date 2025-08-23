@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import UnifiedButton from '../common/UnifiedButton';
 import LayerPopup from '../common/LayerPopup';
+import ColorThemeSelector from '../common/ColorThemeSelector';
 import sessionService from '../../services/sessionService';
 import { useTheme } from '../../hooks/useTheme';
+import { useColorTheme } from '../../hooks/useColorTheme';
 
 interface HeaderProps {
   user?: {
@@ -31,6 +33,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
   const [showFavoriteModal, setShowFavoriteModal] = useState(false);
   
   const { theme, resolvedTheme, toggleTheme } = useTheme();
+  const { currentTheme } = useColorTheme();
 
   useEffect(() => {
     // 세션 상태 확인 및 시간 업데이트
@@ -377,6 +380,11 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                     <span>{item.label}</span>
                   </button>
                 ))}
+              </div>
+
+              {/* 컬러 템플릿 선택기 */}
+              <div className="flex items-center">
+                <ColorThemeSelector />
               </div>
 
               {/* 테마 토글 버튼 */}
