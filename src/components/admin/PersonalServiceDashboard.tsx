@@ -17,6 +17,8 @@ import DecisionSupportSystem from '../decision/DecisionSupportSystem';
 import PaperManagement from '../paper/PaperManagement';
 import ProjectSelector from '../project/ProjectSelector';
 import { API_BASE_URL } from '../../config/api';
+import dataService from '../../services/dataService';
+import type { ProjectData } from '../../services/dataService';
 
 interface PersonalServiceProps {
   user: {
@@ -31,16 +33,7 @@ interface PersonalServiceProps {
   onTabChange?: (tab: string) => void;
 }
 
-interface UserProject {
-  id: string;
-  title: string;
-  description: string;
-  objective?: string;
-  status: 'draft' | 'active' | 'completed';
-  evaluation_mode?: EvaluationMode;
-  workflow_stage?: WorkflowStage;
-  created_at: string;
-  updated_at?: string;
+interface UserProject extends Omit<ProjectData, 'evaluation_method'> {
   evaluator_count?: number;
   completion_rate?: number;
   criteria_count: number;
@@ -174,34 +167,54 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     setError(null);
     
     try {
-      // 프로덕션 환경(GitHub Pages)에서는 데모 모드로 처리
-      const isDemoMode = process.env.NODE_ENV === 'production';
+      console.log('📊 통합 데이터 서비스에서 프로젝트 로드');
       
-      if (isDemoMode) {
-        console.log('📊 데모 모드에서 프로젝트 로드');
-        // 데모 데이터 사용
-        setProjects([
-          {
-            id: 'demo-project-1',
-            title: 'AI 개발 활용 방안 AHP 분석',
-            description: '인공지능 기술의 개발 및 활용 방안에 대한 의사결정 분석',
-            objective: 'AI 기술 도입의 최적 방안 선정',
-            status: 'active' as const,
-            evaluation_mode: 'practical' as const,
-            workflow_stage: 'creating' as const,
-            created_at: '2024-01-01T00:00:00Z',
-            updated_at: '2024-01-01T00:00:00Z',
+      // 통합 데이터 서비스 사용 (자동으로 온라인/오프라인 모드 처리)
+      const projectsData = await dataService.getProjects();
+      
+      // ProjectData를 UserProject로 변환
+      const convertedProjects: UserProject[] = projectsData.map((project: ProjectData) => ({
+        ...project,
+        evaluator_count: 0, // TODO: 평가자 수 계산
+        completion_rate: 0, // TODO: 완료율 계산  
+        criteria_count: 0, // TODO: 기준 수 계산
+        alternatives_count: 0, // TODO: 대안 수 계산
+        last_modified: project.updated_at ? new Date(project.updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+        evaluation_method: 'pairwise' as const // 기본값
+      }));
+      
+      // 빈 프로젝트 목록인 경우 샘플 프로젝트 생성
+      if (convertedProjects.length === 0) {
+        console.log('📝 샘플 프로젝트 생성');
+        const sampleProject = await dataService.createProject({
+          title: 'AI 개발 활용 방안 AHP 분석',
+          description: '인공지능 기술의 개발 및 활용 방안에 대한 의사결정 분석',
+          objective: 'AI 기술 도입의 최적 방안 선정',
+          status: 'draft',
+          evaluation_mode: 'practical',
+          workflow_stage: 'creating'
+        });
+        
+        if (sampleProject) {
+          const sampleUserProject: UserProject = {
+            ...sampleProject,
             evaluator_count: 0,
             completion_rate: 0,
-            criteria_count: 4,
-            alternatives_count: 3,
-            last_modified: '2024-01-01',
+            criteria_count: 0,
+            alternatives_count: 0,
+            last_modified: new Date().toISOString().split('T')[0],
             evaluation_method: 'pairwise' as const
-          }
-        ]);
-        setLoading(false);
-        return;
+          };
+          setProjects([sampleUserProject]);
+        } else {
+          setProjects([]);
+        }
+      } else {
+        setProjects(convertedProjects);
       }
+      
+      setLoading(false);
+      return;
       
       const token = localStorage.getItem('token');
       
@@ -385,188 +398,72 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     setError(null);
 
     try {
-      // 프로덕션 환경(GitHub Pages)에서는 데모 모드로 처리
-      const isDemoMode = process.env.NODE_ENV === 'production';
+      console.log('💾 통합 데이터 서비스로 프로젝트 저장');
       
-      if (isDemoMode) {
-        console.log('📊 데모 모드에서 프로젝트 저장');
-        // 데모 모드에서는 로컬 상태로만 처리
-        const newProject = {
-          id: `demo-project-${Date.now()}`,
+      if (editingProject) {
+        // 편집 모드 - 프로젝트 수정
+        const updatedProject = await dataService.updateProject(editingProject.id!, {
           title: projectForm.title,
           description: projectForm.description,
           objective: projectForm.objective,
-          status: 'active' as const,
           evaluation_mode: projectForm.evaluation_mode,
-          workflow_stage: projectForm.workflow_stage,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          evaluator_count: 0,
-          completion_rate: 0,
-          criteria_count: 0,
-          alternatives_count: 0,
-          last_modified: new Date().toISOString().split('T')[0],
-          evaluation_method: projectForm.evaluation_method
-        };
+          workflow_stage: projectForm.workflow_stage
+        });
         
-        if (editingProject) {
-          // 편집 모드
+        if (updatedProject) {
+          const updatedUserProject: UserProject = {
+            ...updatedProject,
+            evaluator_count: editingProject.evaluator_count || 0,
+            completion_rate: editingProject.completion_rate || 0,
+            criteria_count: editingProject.criteria_count || 0,
+            alternatives_count: editingProject.alternatives_count || 0,
+            last_modified: new Date().toISOString().split('T')[0],
+            evaluation_method: projectForm.evaluation_method
+          };
+          
           const updatedProjects = projects.map(p => 
-            p.id === editingProject.id ? { ...newProject, id: editingProject.id } : p
+            p.id === editingProject.id ? updatedUserProject : p
           );
           setProjects(updatedProjects);
-        } else {
-          // 생성 모드
-          const updatedProjects = [...projects, newProject];
-          setProjects(updatedProjects);
-          setSelectedProjectId(newProject.id);
-        }
-        
-        console.log('✅ 데모 모드에서 프로젝트 저장 완료');
-        resetProjectForm();
-        setLoading(false);
-        return;
-      }
-
-      // 개발 모드에서만 백엔드 호출
-      console.log('🔧 개발 모드에서 백엔드 API 호출');
-      const token = localStorage.getItem('token');
-      if (!isTokenValid(token)) {
-        localStorage.removeItem('token');
-        setError('로그인이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.');
-        setLoading(false);
-        setTimeout(() => {
-          window.location.href = '/';
-        }, 2000);
-        return;
-      }
-
-      if (editingProject) {
-        // 편집 모드 - PUT 요청
-        const response = await fetch(`${API_BASE_URL}/api/projects/${editingProject.id}`, {
-          method: 'PUT',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            title: projectForm.title,
-            description: projectForm.description,
-            objective: projectForm.objective,
-            evaluationMode: projectForm.evaluation_mode,
-            workflowStage: projectForm.workflow_stage
-          })
-        });
-
-        if (response.ok) {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const data = await response.json();
-          const updatedProject: UserProject = {
-            ...editingProject,
-            title: projectForm.title,
-            description: projectForm.description,
-            objective: projectForm.objective,
-            evaluation_mode: projectForm.evaluation_mode,
-            workflow_stage: projectForm.workflow_stage,
-            evaluation_method: projectForm.evaluation_method,
-            last_modified: new Date().toISOString().split('T')[0]
-          };
-          const updatedProjects = projects.map(p => p.id === editingProject.id ? updatedProject : p);
-          setProjects(updatedProjects);
-          // localStorage에 백업 저장
-          localStorage.setItem('ahp_projects_backup', JSON.stringify(updatedProjects));
-        } else if (response.status === 401) {
-          // 토큰이 만료되었거나 유효하지 않음
-          localStorage.removeItem('token');
-          setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
-          if (process.env.NODE_ENV !== 'production') {
-            window.location.href = '/';
-          }
+          console.log('✅ 프로젝트 수정 완료');
         } else {
           throw new Error('프로젝트 수정에 실패했습니다.');
         }
       } else {
-        // 생성 모드 - POST 요청
-        const response = await fetch(`${API_BASE_URL}/api/projects`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            title: projectForm.title,
-            description: projectForm.description,
-            objective: projectForm.objective,
-            evaluationMode: projectForm.evaluation_mode
-          })
+        // 생성 모드 - 새 프로젝트 생성
+        const newProject = await dataService.createProject({
+          title: projectForm.title,
+          description: projectForm.description,
+          objective: projectForm.objective,
+          status: 'draft', // 초기 상태는 draft
+          evaluation_mode: projectForm.evaluation_mode,
+          workflow_stage: projectForm.workflow_stage
         });
-
-        if (response.ok) {
-          const data = await response.json();
-          const newProject: UserProject = {
-            id: data.project.id.toString(),
-            title: data.project.title,
-            description: data.project.description || '',
-            objective: data.project.objective || '',
-            status: data.project.status || 'draft',
-            evaluation_mode: data.project.evaluation_mode || 'practical',
-            workflow_stage: data.project.workflow_stage || 'creating',
-            created_at: data.project.created_at ? new Date(data.project.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-            last_modified: new Date().toISOString().split('T')[0],
+        
+        if (newProject) {
+          const newUserProject: UserProject = {
+            ...newProject,
             evaluator_count: 0,
             completion_rate: 0,
             criteria_count: 0,
             alternatives_count: 0,
+            last_modified: new Date().toISOString().split('T')[0],
             evaluation_method: projectForm.evaluation_method
           };
-          const updatedProjects = [...projects, newProject];
+          
+          const updatedProjects = [...projects, newUserProject];
           setProjects(updatedProjects);
-          setSelectedProjectId(newProject.id);
-          // localStorage에 백업 저장
-          localStorage.setItem('ahp_projects_backup', JSON.stringify(updatedProjects));
-          console.log('Project created successfully:', newProject);
-        } else if (response.status === 401) {
-          // 토큰이 만료되었거나 유효하지 않음
-          localStorage.removeItem('token');
-          setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
-          // 로그인 페이지로 리다이렉트하거나 재로그인 모달 표시
-          if (process.env.NODE_ENV !== 'production') {
-            window.location.href = '/';
-          }
+          setSelectedProjectId(newProject.id || '');
+          console.log('✅ 새 프로젝트 생성 완료');
         } else {
-          const errorData = await response.json();
-          throw new Error(errorData.error || '프로젝트 생성에 실패했습니다.');
+          throw new Error('프로젝트 생성에 실패했습니다.');
         }
       }
+      
       resetProjectForm();
     } catch (error) {
       console.error('Project save error:', error);
-      // 프로덕션 환경에서는 에러를 무시하고 기본 동작 수행
-      if (process.env.NODE_ENV === 'production') {
-        console.log('🔄 프로덕션에서 에러 발생, 데모 모드로 처리');
-        // 기본 프로젝트 생성
-        const fallbackProject = {
-          id: `demo-project-${Date.now()}`,
-          title: projectForm.title || '새 프로젝트',
-          description: projectForm.description || '',
-          objective: projectForm.objective || '',
-          status: 'active' as const,
-          evaluation_mode: 'practical' as const,
-          workflow_stage: 'creating' as const,
-          created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          evaluator_count: 0,
-          completion_rate: 0,
-          criteria_count: 0,
-          alternatives_count: 0,
-          last_modified: new Date().toISOString().split('T')[0],
-          evaluation_method: 'pairwise' as const
-        };
-        setProjects([...projects, fallbackProject]);
-        resetProjectForm();
-      } else {
-        setError(error instanceof Error ? error.message : '프로젝트 저장 중 오류가 발생했습니다.');
-      }
+      setError(error instanceof Error ? error.message : '프로젝트 저장 중 오류가 발생했습니다.');
     } finally {
       setLoading(false);
     }
@@ -679,7 +576,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
         const updatedProjects = [...projects, newProject];
         setProjects(updatedProjects);
-        setSelectedProjectId(newProject.id);
+        setSelectedProjectId(newProject.id || '');
         
         // localStorage에 백업 저장 (선택적)
         localStorage.setItem('ahp_projects_backup', JSON.stringify(updatedProjects));
@@ -990,7 +887,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div className="flex space-x-2 ml-4">
                   <button
                     onClick={() => {
-                      setSelectedProjectId(project.id);
+                      setSelectedProjectId(project.id || '');
                       handleTabChange('model-builder');
                     }}
                     className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -1000,7 +897,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   </button>
                   <button
                     onClick={() => {
-                      setSelectedProjectId(project.id);
+                      setSelectedProjectId(project.id || '');
                       handleTabChange('analysis');
                     }}
                     className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
@@ -1156,7 +1053,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   };
 
   const handleProjectSelect = (project: UserProject) => {
-    setActiveProject(project.id);
+    setActiveProject(project.id || null);
     setShowProjectSelector(false);
     
     if (projectSelectorConfig) {
@@ -1608,7 +1505,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedProjectId(project.id);
+                            setSelectedProjectId(project.id || '');
                             handleTabChange('model-builder');
                           }}
                           className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -1618,7 +1515,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedProjectId(project.id);
+                            setSelectedProjectId(project.id || '');
                             handleTabChange('analysis');
                           }}
                           className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
@@ -1627,7 +1524,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                           📊
                         </button>
                         <button
-                          onClick={() => handleDeleteProject(project.id)}
+                          onClick={() => handleDeleteProject(project.id || '')}
                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="삭제"
                         >
@@ -1731,7 +1628,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                           </button>
                           <button
                             onClick={() => {
-                              setSelectedProjectId(project.id);
+                              setSelectedProjectId(project.id || '');
                               handleTabChange('model-builder');
                             }}
                             className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -1741,7 +1638,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                           </button>
                           <button
                             onClick={() => {
-                              setSelectedProjectId(project.id);
+                              setSelectedProjectId(project.id || '');
                               handleTabChange('analysis');
                             }}
                             className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
@@ -1750,7 +1647,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             📊
                           </button>
                           <button
-                            onClick={() => handleDeleteProject(project.id)}
+                            onClick={() => handleDeleteProject(project.id || '')}
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="삭제"
                           >
@@ -2272,7 +2169,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 {projects.filter(p => p.status === 'active' || p.status === 'completed').map(project => (
                   <button
                     key={project.id}
-                    onClick={() => setSelectedProjectId(project.id)}
+                    onClick={() => setSelectedProjectId(project.id || '')}
                     className="p-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-left"
                   >
                     <h4 className="font-medium">{project.title}</h4>

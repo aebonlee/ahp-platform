@@ -118,22 +118,28 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
     }
   };
 
-  const handleSaveEdit = () => {
+  const handleSaveEdit = async () => {
     if (!editingId || !validateAlternative(editingAlternative.name, editingId)) {
       return;
     }
 
-    const updatedAlternatives = alternatives.map(alt => 
-      alt.id === editingId 
-        ? { ...alt, name: editingAlternative.name, description: editingAlternative.description }
-        : alt
-    );
-    
-    setAlternatives(updatedAlternatives);
-    saveProjectAlternatives(updatedAlternatives);
-    setEditingId(null);
-    setEditingAlternative({ name: '', description: '' });
-    setErrors({});
+    try {
+      const updatedAlternatives = alternatives.map(alt => 
+        alt.id === editingId 
+          ? { ...alt, name: editingAlternative.name, description: editingAlternative.description }
+          : alt
+      );
+      
+      setAlternatives(updatedAlternatives);
+      await saveProjectAlternatives(updatedAlternatives);
+      setEditingId(null);
+      setEditingAlternative({ name: '', description: '' });
+      setErrors({});
+      console.log('✅ 대안 수정 완료:', editingId);
+    } catch (error) {
+      console.error('Failed to save alternative edit:', error);
+      setErrors({ general: '대안 수정 중 오류가 발생했습니다.' });
+    }
   };
 
   const handleCancelEdit = () => {

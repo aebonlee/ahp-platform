@@ -5,6 +5,8 @@ import Input from '../common/Input';
 import HierarchyTreeVisualization from '../common/HierarchyTreeVisualization';
 import BulkCriteriaInput from '../criteria/BulkCriteriaInput';
 import { DEMO_CRITERIA, DEMO_SUB_CRITERIA } from '../../data/demoData';
+import dataService from '../../services/dataService';
+import type { CriteriaData } from '../../services/dataService';
 
 interface Criterion {
   id: string;
@@ -195,21 +197,44 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onCo
     setErrors({});
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleDeleteCriterion = (id: string) => {
-    const filter = (items: Criterion[]): Criterion[] => {
-      return items.filter(item => {
-        if (item.id === id) return false;
-        if (item.children) {
-          item.children = filter(item.children);
-        }
-        return true;
-      });
-    };
-    
-    const updatedCriteria = filter(criteria);
-    setCriteria(updatedCriteria);
-    saveProjectCriteria(updatedCriteria);
+  const handleDeleteCriterion = async (id: string) => {
+    try {
+      console.log('🗑️ 기준 삭제:', id);
+      
+      // 데이터 서비스에서 삭제 (샘플 데이터가 아닌 경우에만)
+      if (!id.startsWith('sample-') && !id.startsWith('new-')) {
+        await dataService.deleteCriteria(id);
+      }
+      
+      const filter = (items: Criterion[]): Criterion[] => {
+        return items.filter(item => {
+          if (item.id === id) return false;
+          if (item.children) {
+            item.children = filter(item.children);
+          }
+          return true;
+        });
+      };
+      
+      const updatedCriteria = filter(criteria);
+      setCriteria(updatedCriteria);
+      console.log('✅ 기준 삭제 완료:', id);
+    } catch (error) {
+      console.error('Failed to delete criterion:', error);
+      // 오류 발생 시도 로컬에서는 삭제
+      const filter = (items: Criterion[]): Criterion[] => {
+        return items.filter(item => {
+          if (item.id === id) return false;
+          if (item.children) {
+            item.children = filter(item.children);
+          }
+          return true;
+        });
+      };
+      
+      const updatedCriteria = filter(criteria);
+      setCriteria(updatedCriteria);
+    }
   };
 
 
