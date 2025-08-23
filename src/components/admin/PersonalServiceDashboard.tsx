@@ -7,10 +7,8 @@ import EvaluatorAssignment from './EvaluatorAssignment';
 import EnhancedEvaluatorManagement from './EnhancedEvaluatorManagement';
 import SurveyLinkManager from './SurveyLinkManager';
 import ModelFinalization from './ModelFinalization';
-import SubscriptionDashboard from '../subscription/SubscriptionDashboard';
 import WorkflowStageIndicator, { WorkflowStage } from '../workflow/WorkflowStageIndicator';
 import { EvaluationMode } from '../evaluation/EvaluationModeSelector';
-import { ExtendedUser } from '../../types/subscription';
 import PaymentSystem from '../payment/PaymentSystem';
 import WorkshopManagement from '../workshop/WorkshopManagement';
 import DecisionSupportSystem from '../decision/DecisionSupportSystem';
@@ -684,39 +682,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
       </div>
 
-      {/* 구독 현황 및 결제 정보 */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">구독 현황</h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="text-center p-4 bg-blue-50 rounded-lg">
-            <div className="text-2xl font-bold text-blue-600">{projects.length}</div>
-            <div className="text-sm text-gray-600">프로젝트 생성</div>
-            <div className="text-xs text-gray-500">/ 월 10개</div>
-          </div>
-          <div className="text-center p-4 bg-green-50 rounded-lg">
-            <div className="text-2xl font-bold text-green-600">
-              {projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0)}
-            </div>
-            <div className="text-sm text-gray-600">사용자 배포</div>
-            <div className="text-xs text-gray-500">/ 월 50명</div>
-          </div>
-          <div className="text-center p-4 bg-purple-50 rounded-lg">
-            <div className="text-2xl font-bold text-purple-600">
-              {projects.reduce((sum, p) => sum + p.criteria_count + p.alternatives_count, 0)}
-            </div>
-            <div className="text-sm text-gray-600">모델 요소</div>
-            <div className="text-xs text-gray-500">기준 + 대안</div>
-          </div>
-          <div className="text-center p-4 bg-orange-50 rounded-lg">
-            <button 
-              onClick={() => handleTabChange('payment')}
-              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-medium py-2 px-4 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-md hover:shadow-lg">
-              💳 추가 결제
-            </button>
-            <div className="text-xs text-gray-500 mt-2">용량 확장</div>
-          </div>
-        </div>
-      </div>
 
       {/* 빠른 시작 및 추가 기능 */}
       <div className="bg-white border border-gray-200 rounded-lg p-6">
@@ -2485,9 +2450,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                     <span className="text-4xl mr-3">⚙️</span>
-                    개인 설정 및 구독 관리
+                    개인 설정
                   </h1>
-                  <p className="text-gray-600 mt-2">계정 정보, 구독 플랜, 개인 환경설정을 관리합니다</p>
+                  <p className="text-gray-600 mt-2">계정 정보, 보안 설정, 개인 환경설정을 관리합니다</p>
                 </div>
               </div>
             </div>
@@ -2496,10 +2461,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          {/* 구독 관리 대시보드 */}
-          <SubscriptionDashboard 
-            user={user as ExtendedUser}
-          />
           {/* 개인 설정 */}
           {renderPersonalSettings()}
         </div>
@@ -2827,10 +2788,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   <div className="flex items-center justify-between">
                     <div>
                       <h1 className="text-2xl font-bold text-gray-900">
-                        💳 요금제 및 결제
+                        💳 결제 관리
                       </h1>
                       <p className="text-gray-600 mt-1">
-                        프로젝트 규모에 맞는 요금제를 선택하세요
+                        구독 결제 내역 및 플랜 변경을 관리하세요
                       </p>
                     </div>
                     <Button 
@@ -2883,60 +2844,42 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       >
         <div className="space-y-6">
           {/* 환영 메시지 */}
-          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-            <div className="text-center lg:text-left space-y-4 flex-1">
-              <div 
-                className="inline-block p-4 rounded-lg shadow-sm"
-                style={{
-                  background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                  color: 'white'
-                }}
-              >
-                <h1 className="text-2xl font-bold mb-2">
-                  환영합니다, AHP 테스터님! 🎉
-                </h1>
-                <p className="font-medium opacity-90">
-                  개인 AHP 의사결정 분석 서비스를 시작하세요
-                </p>
-              </div>
-              <p 
-                className="max-w-2xl lg:mx-0 mx-auto"
-                style={{ color: 'var(--text-secondary)' }}
-              >
-                복잡한 의사결정을 체계적으로 분석하고, 객관적인 결과를 얻을 수 있습니다.
+          <div className="text-center space-y-4">
+            <div 
+              className="inline-block p-4 rounded-lg shadow-sm"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                color: 'white'
+              }}
+            >
+              <h1 className="text-2xl font-bold mb-2">
+                환영합니다, {user.first_name} {user.last_name}님! 🎉
+              </h1>
+              <p className="font-medium opacity-90">
+                개인 AHP 의사결정 분석 서비스를 시작하세요
               </p>
             </div>
-            <div className="text-center lg:text-right">
-              <button 
-                className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-lg"
-                style={{
-                  background: 'linear-gradient(135deg, var(--status-success-bg), var(--accent-secondary))',
-                  color: 'white'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.05)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)';
-                }}
-              >
-                요금제 업그레이드
-              </button>
-            </div>
+            <p 
+              className="max-w-2xl mx-auto"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              복잡한 의사결정을 체계적으로 분석하고, 객관적인 결과를 얻을 수 있습니다.
+            </p>
           </div>
 
-          {/* 현재 요금제 정보 */}
+          {/* 통합된 요금제 및 사용량 정보 */}
           <div 
-            className="p-4 rounded-lg border"
+            className="p-6 rounded-lg border space-y-4"
             style={{
               background: 'linear-gradient(135deg, var(--status-success-light), var(--bg-secondary))',
               borderColor: 'var(--status-success-border)'
             }}
           >
+            {/* 플랜 정보 헤더 */}
             <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
-              <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-4">
                 <span 
-                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                  className="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold"
                   style={{
                     backgroundColor: 'var(--status-success-bg)',
                     color: 'white'
@@ -2944,31 +2887,86 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 >
                   💎 프리미엄 플랜
                 </span>
-                <span 
-                  className="text-sm font-medium"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  월 ₩29,000
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm flex-1 lg:ml-6">
-                <div className="flex items-center space-x-2">
-                  <span style={{ color: 'var(--accent-primary)' }}>📋</span>
+                <div className="flex flex-col">
                   <span 
-                    className="font-medium"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    프로젝트:
-                  </span>
-                  <span 
-                    className="font-bold"
+                    className="text-lg font-bold"
                     style={{ color: 'var(--accent-primary)' }}
                   >
-                    {projects.length}/50
+                    월 ₩29,000
                   </span>
+                  <span 
+                    className="text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    전문 연구자용 플랜
+                  </span>
+                </div>
+              </div>
+              
+              <div className="flex space-x-2">
+                <button 
+                  onClick={() => handleTabChange('payment')}
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-lg"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                    color: 'white'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.05)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  💳 결제 관리
+                </button>
+                <button 
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-lg border"
+                  style={{
+                    backgroundColor: 'transparent',
+                    color: 'var(--accent-primary)',
+                    borderColor: 'var(--accent-primary)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-light)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                >
+                  📈 플랜 업그레이드
+                </button>
+              </div>
+            </div>
+
+            {/* 사용량 현황 - 3개 계열로 분류 */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              
+              {/* 1. 프로젝트 계열 */}
+              <div className="space-y-3">
+                <h4 
+                  className="text-sm font-semibold flex items-center"
+                  style={{ color: 'var(--accent-primary)' }}
+                >
+                  <span className="mr-2">📋</span>프로젝트 관리
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span 
+                      className="text-xs font-medium"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      프로젝트 수
+                    </span>
+                    <span 
+                      className="text-sm font-bold"
+                      style={{ color: 'var(--accent-primary)' }}
+                    >
+                      {projects.length}/50
+                    </span>
+                  </div>
                   <div 
-                    className="flex-1 rounded-full h-2 ml-2"
+                    className="w-full rounded-full h-2"
                     style={{ backgroundColor: 'var(--bg-elevated)' }}
                   >
                     <div 
@@ -2979,23 +2977,43 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       }}
                     ></div>
                   </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span style={{ color: 'var(--text-muted)' }}>모델 요소</span>
+                    <span 
+                      style={{ color: 'var(--accent-primary)' }}
+                      className="font-medium"
+                    >
+                      {projects.reduce((sum, p) => sum + p.criteria_count + p.alternatives_count, 0)}개
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span style={{ color: 'var(--accent-secondary)' }}>👥</span>
-                  <span 
-                    className="font-medium"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    평가자:
-                  </span>
-                  <span 
-                    className="font-bold"
-                    style={{ color: 'var(--accent-secondary)' }}
-                  >
-                    12/100
-                  </span>
+              </div>
+
+              {/* 2. 협업 계열 */}
+              <div className="space-y-3">
+                <h4 
+                  className="text-sm font-semibold flex items-center"
+                  style={{ color: 'var(--accent-secondary)' }}
+                >
+                  <span className="mr-2">👥</span>협업 관리
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span 
+                      className="text-xs font-medium"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      평가자 수
+                    </span>
+                    <span 
+                      className="text-sm font-bold"
+                      style={{ color: 'var(--accent-secondary)' }}
+                    >
+                      12/100
+                    </span>
+                  </div>
                   <div 
-                    className="flex-1 rounded-full h-2 ml-2"
+                    className="w-full rounded-full h-2"
                     style={{ backgroundColor: 'var(--bg-elevated)' }}
                   >
                     <div 
@@ -3006,23 +3024,43 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       }}
                     ></div>
                   </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span style={{ color: 'var(--text-muted)' }}>활성 평가자</span>
+                    <span 
+                      style={{ color: 'var(--accent-secondary)' }}
+                      className="font-medium"
+                    >
+                      {projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0)}명
+                    </span>
+                  </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <span style={{ color: 'var(--status-success-bg)' }}>💾</span>
-                  <span 
-                    className="font-medium"
-                    style={{ color: 'var(--text-secondary)' }}
-                  >
-                    저장용량:
-                  </span>
-                  <span 
-                    className="font-bold"
-                    style={{ color: 'var(--status-success-text)' }}
-                  >
-                    2.3GB/10GB
-                  </span>
+              </div>
+
+              {/* 3. 리소스 계열 */}
+              <div className="space-y-3">
+                <h4 
+                  className="text-sm font-semibold flex items-center"
+                  style={{ color: 'var(--status-success-bg)' }}
+                >
+                  <span className="mr-2">💾</span>리소스 사용
+                </h4>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span 
+                      className="text-xs font-medium"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      저장용량
+                    </span>
+                    <span 
+                      className="text-sm font-bold"
+                      style={{ color: 'var(--status-success-text)' }}
+                    >
+                      2.3GB/10GB
+                    </span>
+                  </div>
                   <div 
-                    className="flex-1 rounded-full h-2 ml-2"
+                    className="w-full rounded-full h-2"
                     style={{ backgroundColor: 'var(--bg-elevated)' }}
                   >
                     <div 
@@ -3033,7 +3071,36 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       }}
                     ></div>
                   </div>
+                  <div className="flex items-center justify-between text-xs">
+                    <span style={{ color: 'var(--text-muted)' }}>API 호출</span>
+                    <span 
+                      style={{ color: 'var(--status-success-bg)' }}
+                      className="font-medium"
+                    >
+                      847/5000회
+                    </span>
+                  </div>
                 </div>
+              </div>
+            </div>
+
+            {/* 플랜 혜택 요약 */}
+            <div 
+              className="p-3 rounded-lg border-dashed border-2 bg-white/50"
+              style={{ borderColor: 'var(--accent-light)' }}
+            >
+              <div className="flex items-center justify-between text-xs">
+                <div className="flex items-center space-x-4">
+                  <span style={{ color: 'var(--text-muted)' }}>
+                    ✨ 무제한 AHP 분석 • 🔄 실시간 협업 • 📊 고급 리포트 • 🎯 우선 지원
+                  </span>
+                </div>
+                <span 
+                  className="font-medium"
+                  style={{ color: 'var(--accent-primary)' }}
+                >
+                  다음 갱신: 2025-09-23
+                </span>
               </div>
             </div>
           </div>
