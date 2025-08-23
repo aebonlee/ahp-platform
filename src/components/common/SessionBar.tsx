@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import UnifiedButton from './UnifiedButton';
+import LayerPopup from './LayerPopup';
 import sessionService from '../../services/sessionService';
 
 const SessionBar: React.FC = () => {
   const [remainingTime, setRemainingTime] = useState<number>(0);
-  const [showSessionInfo, setShowSessionInfo] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -44,107 +44,173 @@ const SessionBar: React.FC = () => {
   return (
     <>
       <div className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-12">
-            {/* 세션 상태 표시 */}
-            <div className="flex items-center space-x-4">
-              <div className={`px-3 py-1 rounded-lg text-sm font-medium border flex items-center space-x-2 ${getTimeColor()}`}>
-                <span>{getTimeIcon()}</span>
-                <span>세션: {remainingTime}분 남음</span>
-              </div>
-              
-              {remainingTime <= 5 && (
-                <div className="text-sm text-red-600 font-medium animate-pulse">
-                  ⚠️ 곧 자동 로그아웃됩니다
-                </div>
-              )}
-            </div>
+        <div className="flex items-center justify-between h-14 px-4">
+          {/* 로고 영역 */}
+          <div className="flex items-center" style={{ marginLeft: '50px' }}>
+            <img 
+              src="/logo192.svg" 
+              alt="AHP Platform" 
+              className="h-8 w-8 mr-3"
+              onError={(e) => {
+                // SVG 로드 실패 시 PNG로 대체
+                const target = e.target as HTMLImageElement;
+                target.src = '/logo192.png';
+              }}
+            />
+            <div className="text-lg font-bold text-gray-900">AHP Platform</div>
+          </div>
 
-            {/* 세션 컨트롤 버튼들 */}
-            <div className="flex items-center space-x-2">
-              <UnifiedButton
-                variant="info"
-                size="sm"
-                onClick={() => {
-                  sessionService.extendSession();
-                  // 즉시 UI 업데이트
-                  setRemainingTime(30);
-                }}
-                icon="⏰"
-              >
-                연장하기
-              </UnifiedButton>
-              
-              <UnifiedButton
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowSessionInfo(!showSessionInfo)}
-                icon="ℹ️"
-              >
-                세션정보
-              </UnifiedButton>
-              
-              <UnifiedButton
-                variant="danger"
-                size="sm"
-                onClick={() => {
+          {/* 중앙 세션 상태 표시 */}
+          <div className="flex items-center space-x-4">
+            <div className={`px-4 py-2 rounded-lg text-sm font-medium border flex items-center space-x-2 ${getTimeColor()}`}>
+              <span>{getTimeIcon()}</span>
+              <span>세션: {remainingTime}분 남음</span>
+            </div>
+            
+            {remainingTime <= 5 && (
+              <div className="text-sm text-red-600 font-medium animate-pulse">
+                ⚠️ 곧 자동 로그아웃됩니다
+              </div>
+            )}
+          </div>
+
+          {/* 오른쪽 세션 컨트롤 버튼들 */}
+          <div className="flex items-center space-x-2">
+            <UnifiedButton
+              variant="info"
+              size="sm"
+              onClick={() => {
+                sessionService.extendSession();
+                // 즉시 UI 업데이트
+                setRemainingTime(30);
+              }}
+              icon="⏰"
+            >
+              연장하기
+            </UnifiedButton>
+            
+            <LayerPopup
+              trigger={
+                <UnifiedButton
+                  variant="secondary"
+                  size="sm"
+                  icon="ℹ️"
+                >
+                  세션정보
+                </UnifiedButton>
+              }
+              title="세션 상세 정보"
+              content={
+                <div className="space-y-6">
+                  {/* 세션 상태 요약 */}
+                  <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                    <div className="flex items-center justify-between mb-3">
+                      <h4 className="font-semibold text-blue-900">현재 세션 상태</h4>
+                      <div className={`px-3 py-1 rounded-full text-sm font-medium ${getTimeColor()}`}>
+                        {getTimeIcon()} {remainingTime}분 남음
+                      </div>
+                    </div>
+                    <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div 
+                        className={`h-3 rounded-full transition-all duration-500 ${
+                          remainingTime > 10 ? 'bg-green-500' :
+                          remainingTime > 5 ? 'bg-yellow-500' :
+                          'bg-red-500'
+                        }`}
+                        style={{ width: `${Math.max(0, (remainingTime / 30) * 100)}%` }}
+                      ></div>
+                    </div>
+                    <p className="text-sm text-blue-700 mt-2">
+                      {remainingTime > 10 ? '세션이 안정적으로 유지되고 있습니다.' :
+                       remainingTime > 5 ? '세션이 곧 만료됩니다. 연장을 고려하세요.' :
+                       '세션이 곧 만료됩니다! 즉시 연장하세요.'}
+                    </p>
+                  </div>
+
+                  {/* 상세 정보 */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white p-4 rounded-lg border">
+                      <div className="text-gray-600 text-sm mb-1">로그인 시간</div>
+                      <div className="font-medium text-gray-900">
+                        {localStorage.getItem('login_time') ? 
+                          new Date(parseInt(localStorage.getItem('login_time') || '0')).toLocaleString() : 
+                          '정보 없음'
+                        }
+                      </div>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg border">
+                      <div className="text-gray-600 text-sm mb-1">마지막 활동</div>
+                      <div className="font-medium text-gray-900">
+                        {localStorage.getItem('last_activity') ? 
+                          new Date(parseInt(localStorage.getItem('last_activity') || '0')).toLocaleString() : 
+                          '정보 없음'
+                        }
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 도움말 */}
+                  <div className="bg-gray-50 p-4 rounded-lg">
+                    <div className="flex items-start space-x-2">
+                      <span className="text-blue-600 text-lg">💡</span>
+                      <div>
+                        <div className="font-medium text-gray-900 mb-2">세션 관리 가이드</div>
+                        <ul className="space-y-2 text-sm text-gray-700">
+                          <li className="flex items-start space-x-2">
+                            <span className="text-green-600 mt-0.5">✓</span>
+                            <span>페이지 새로고침(F5) 시에도 30분 이내라면 세션 유지</span>
+                          </li>
+                          <li className="flex items-start space-x-2">
+                            <span className="text-green-600 mt-0.5">✓</span>
+                            <span>클릭, 키보드, 스크롤 활동으로 자동 갱신</span>
+                          </li>
+                          <li className="flex items-start space-x-2">
+                            <span className="text-orange-600 mt-0.5">⚠</span>
+                            <span>5분 전 자동 경고 알림 표시</span>
+                          </li>
+                          <li className="flex items-start space-x-2">
+                            <span className="text-blue-600 mt-0.5">⏰</span>
+                            <span>연장하기 버튼으로 30분 추가 연장 가능</span>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* 빠른 액션 */}
+                  <div className="flex justify-center">
+                    <UnifiedButton
+                      variant="info"
+                      size="md"
+                      onClick={() => {
+                        sessionService.extendSession();
+                        setRemainingTime(30);
+                      }}
+                      icon="⏰"
+                    >
+                      지금 30분 연장하기
+                    </UnifiedButton>
+                  </div>
+                </div>
+              }
+              width="lg"
+            />
+            
+            <UnifiedButton
+              variant="danger"
+              size="sm"
+              onClick={() => {
+                if (window.confirm('정말 로그아웃하시겠습니까?')) {
                   sessionService.logout();
                   window.location.reload();
-                }}
-                icon="🚪"
-              >
-                로그아웃
-              </UnifiedButton>
-            </div>
+                }
+              }}
+              icon="🚪"
+            >
+              로그아웃
+            </UnifiedButton>
           </div>
         </div>
-
-        {/* 세션 정보 패널 */}
-        {showSessionInfo && (
-          <div className="border-t border-gray-200 bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <h4 className="font-semibold text-gray-900 mb-3">세션 상세 정보</h4>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                <div className="bg-white p-3 rounded-lg border">
-                  <div className="text-gray-600 mb-1">로그인 시간</div>
-                  <div className="font-medium text-gray-900">
-                    {localStorage.getItem('login_time') ? 
-                      new Date(parseInt(localStorage.getItem('login_time') || '0')).toLocaleString() : 
-                      '정보 없음'
-                    }
-                  </div>
-                </div>
-                <div className="bg-white p-3 rounded-lg border">
-                  <div className="text-gray-600 mb-1">마지막 활동</div>
-                  <div className="font-medium text-gray-900">
-                    {localStorage.getItem('last_activity') ? 
-                      new Date(parseInt(localStorage.getItem('last_activity') || '0')).toLocaleString() : 
-                      '정보 없음'
-                    }
-                  </div>
-                </div>
-                <div className="bg-white p-3 rounded-lg border">
-                  <div className="text-gray-600 mb-1">자동 로그아웃</div>
-                  <div className="font-medium text-gray-900">{remainingTime}분 후</div>
-                </div>
-              </div>
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-start space-x-2">
-                  <span className="text-blue-600">💡</span>
-                  <div className="text-sm text-blue-700">
-                    <div className="font-medium mb-1">세션 관리 팁</div>
-                    <ul className="space-y-1 text-xs">
-                      <li>• 페이지를 새로고침(F5)해도 30분 이내라면 세션이 유지됩니다</li>
-                      <li>• 클릭, 키보드 입력, 스크롤 등의 활동이 감지되면 마지막 활동 시간이 업데이트됩니다</li>
-                      <li>• 자동 로그아웃 5분 전에 경고 알림이 표시됩니다</li>
-                      <li>• 연장하기 버튼을 누르면 30분이 추가로 연장됩니다</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </>
   );
