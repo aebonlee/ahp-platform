@@ -243,7 +243,9 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                                   size="sm"
                                   onClick={() => removeFromFavorites(fav.id)}
                                   icon="🗑️"
-                                />
+                                >
+                                  
+                                </UnifiedButton>
                               </div>
                             ))}
                           </div>
@@ -271,7 +273,9 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                       }
                     }}
                     icon={isCurrentTabFavorite() ? "⭐" : "☆"}
-                  />
+                  >
+                    
+                  </UnifiedButton>
                 )}
               </div>
 
@@ -322,7 +326,9 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                           variant="secondary"
                           size="sm"
                           icon="ℹ️"
-                        />
+                        >
+                          
+                        </UnifiedButton>
                       }
                       title="세션 상세 정보"
                       content={
