@@ -1,6 +1,6 @@
 {
   "name": "ahp-decision-system",
-  "version": "2.1.1",
+  "version": "2.2.0",
   "private": true,
   "homepage": "https://aebonlee.github.io/ahp-research-platform/",
   "dependencies": {
