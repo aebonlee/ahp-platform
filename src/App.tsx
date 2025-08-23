@@ -325,11 +325,14 @@ function App() {
 
     try {
       if (isDemoMode) {
+        console.log('🔍 데모 모드 로그인 시도:', { email, password: password ? '***' : 'empty' });
+        
         // 실제 운영 계정 설정
         let authenticatedUser: any = null;
         
         // 시스템 관리자 계정 (숨김 처리) - 모드 전환 가능
         if (email === 'aebon@naver.com' && password === 'zzang31') {
+          console.log('✅ 시스템 관리자 계정 인증 성공');
           authenticatedUser = {
             id: 'super-admin-1',
             first_name: '시스템',
@@ -342,6 +345,7 @@ function App() {
         }
         // 서비스 사용자 계정 (프로젝트 관리) - 바로 서비스 모드
         else if (email === 'test@ahp.com' && (password === 'ahptester' || password === 'tester@')) {
+          console.log('✅ 서비스 사용자 계정 인증 성공');
           authenticatedUser = {
             id: 'service-user-1',
             first_name: 'AHP',
@@ -354,13 +358,16 @@ function App() {
         }
         // 데모 계정 (공개용)
         else if (email === 'demo@ahp-system.com' && password === 'demo123') {
+          console.log('✅ 데모 계정 인증 성공');
           authenticatedUser = {
             ...DEMO_USER,
             role: role === 'admin' ? 'admin' : 'evaluator',
             admin_type: role === 'admin' ? 'personal' : undefined
           };
         } else {
-          throw new Error('인증 실패: 올바른 계정 정보를 입력하세요');
+          console.log('❌ 인증 실패 - 일치하는 계정이 없습니다');
+          console.log('입력된 정보:', { email, password: password ? '***' : 'empty' });
+          throw new Error(`인증 실패: 올바른 계정 정보를 입력하세요.\n사용 가능한 계정:\n- test@ahp.com / tester@ (또는 ahptester)\n- demo@ahp-system.com / demo123`);
         }
         
         if (authenticatedUser) {
