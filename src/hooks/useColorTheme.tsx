@@ -82,7 +82,7 @@ const colorPalettes: Record<ColorTheme, ColorPalette> = {
 export const useColorTheme = () => {
   const [currentTheme, setCurrentTheme] = useState<ColorTheme>(() => {
     const saved = localStorage.getItem('colorTheme') as ColorTheme;
-    return saved || 'gold';
+    return saved || 'blue';
   });
 
   // Apply color theme to CSS variables

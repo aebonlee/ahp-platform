@@ -191,6 +191,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
             <button
               onClick={handleLogoClick}
               className="flex items-center space-x-4 hover:opacity-90 transition-luxury focus-luxury rounded-lg p-3 group"
+              style={{ marginLeft: '50px', marginTop: '5px' }}
             >
               {/* AHP 로고 아이콘 */}
               <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
@@ -515,16 +516,29 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                   </span>
                 </div>
                 <div className="hidden md:flex flex-col">
-                  <span className="text-base font-bold text-gray-900">
+                  <span className="text-base font-bold"
+                        style={{ 
+                          fontFamily: 'Inter, system-ui, sans-serif',
+                          color: 'var(--text-primary)',
+                          fontSize: 'var(--font-size-base)',
+                          fontWeight: 'var(--font-weight-bold)'
+                        }}>
                     {user.first_name} {user.last_name}
                   </span>
                   <div className="flex items-center space-x-2">
-                    <span className="text-sm text-gray-500 capitalize">
+                    <span className="text-sm font-medium"
+                          style={{ color: 'var(--text-secondary)' }}>
                       {user.role === 'super_admin' ? '시스템 관리자' : 
                        user.role === 'admin' ? '관리자' : '평가자'}
                     </span>
                     {user.admin_type && (
-                      <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-semibold">
+                      <span className="text-xs px-3 py-1 rounded-full font-semibold transition-luxury"
+                            style={{
+                              backgroundColor: 'var(--accent-light)',
+                              color: 'var(--accent-secondary)',
+                              border: '1px solid var(--accent-primary)',
+                              borderRadius: 'var(--radius-md)'
+                            }}>
                         {user.admin_type === 'super' ? '시스템' : '개인서비스'}
                       </span>
                     )}

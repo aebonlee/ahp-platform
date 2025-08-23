@@ -136,13 +136,13 @@
   --transition-luxury: 250ms cubic-bezier(0.4, 0, 0.2, 1);
 
   /* === Dynamic Color System === */
-  --accent-primary:   #C8A968; /* Will be updated by ColorTheme hook */
-  --accent-secondary: #A98C4B;
-  --accent-light:     #E5D5AA;
-  --accent-hover:     #B59A4D;
-  --accent-focus:     rgba(200, 169, 104, 0.35);
-  --accent-rgb:       200, 169, 104;
-  --shadow-accent:    0 4px 20px rgba(200, 169, 104, 0.25);
+  --accent-primary:   #3B82F6; /* Will be updated by ColorTheme hook - Default Ocean Blue */
+  --accent-secondary: #2563EB;
+  --accent-light:     #93C5FD;
+  --accent-hover:     #1D4ED8;
+  --accent-focus:     rgba(59, 130, 246, 0.35);
+  --accent-rgb:       59, 130, 246;
+  --shadow-accent:    0 4px 20px rgba(59, 130, 246, 0.25);
 
   /* === Legacy Compatibility (for existing components) === */
   --accent-gold:   var(--accent-primary);
