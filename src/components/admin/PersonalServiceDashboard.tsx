@@ -426,6 +426,86 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     }
   };
 
+  // 요금제 데이터 정의
+  const pricingPlans = {
+    subscription: [
+      {
+        id: 'basic',
+        name: 'Basic',
+        description: '개인/연구자용',
+        color: 'green',
+        icon: '🟢',
+        monthly: 19,
+        yearly: 190,
+        projects: 3,
+        evaluators: 10,
+        features: ['기본 설문 생성 및 AHP 계산', '자동 일관성 검증', 'PDF/Excel 보고서 다운로드']
+      },
+      {
+        id: 'pro',
+        name: 'Pro',
+        description: '연구팀/기관용',
+        color: 'blue',
+        icon: '🔵',
+        monthly: 99,
+        yearly: 990,
+        projects: 20,
+        evaluators: 100,
+        features: ['Basic 기능 포함', '협업 기능(팀 단위 계정 관리)', '커스터마이징 보고서 & API 연동', '우선 기술 지원']
+      },
+      {
+        id: 'enterprise',
+        name: 'Enterprise',
+        description: '대규모 기관/공공 프로젝트용',
+        color: 'purple',
+        icon: '🟣',
+        monthly: '맞춤 견적',
+        yearly: '맞춤 견적',
+        projects: '무제한',
+        evaluators: '무제한',
+        features: ['Pro 기능 포함', '온프레미스 설치 또는 전용 클라우드', '보안/권한 관리 강화', '전담 기술 지원 매니저']
+      }
+    ],
+    oneTime: [
+      {
+        id: 'single',
+        name: 'Single Project Pack',
+        description: '단일 프로젝트용',
+        color: 'yellow',
+        icon: '🟡',
+        price: 49,
+        projects: 1,
+        evaluators: 30,
+        duration: '3개월',
+        target: '대학원 논문, 단기 과제, 학술 발표 준비'
+      },
+      {
+        id: 'team',
+        name: 'Team Project Pack',
+        description: '소규모 연구팀 단기 이용',
+        color: 'orange',
+        icon: '🟠',
+        price: 149,
+        projects: 1,
+        evaluators: 100,
+        duration: '6개월',
+        target: '기업·기관 연구과제, 단일 컨설팅 프로젝트'
+      },
+      {
+        id: 'institution',
+        name: 'Institution Pack',
+        description: '기관 단위 단기 프로젝트',
+        color: 'red',
+        icon: '🔴',
+        price: 499,
+        projects: 1,
+        evaluators: '무제한',
+        duration: '12개월',
+        target: '공공기관·대규모 연구 프로젝트 단위 사용'
+      }
+    ]
+  };
+
   const renderOverview = () => (
     <div className="space-y-6">
 
@@ -514,6 +594,314 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         ))}
       </div>
 
+      {/* 📊 AHP 연구 플랫폼 종합 요금제 소개 */}
+      <div 
+        className="p-8 rounded-xl border-2 transition-all duration-300"
+        style={{
+          background: 'linear-gradient(135deg, var(--bg-elevated), var(--accent-light))',
+          borderColor: 'var(--accent-secondary)',
+          boxShadow: 'var(--shadow-xl)'
+        }}
+      >
+        <div className="text-center mb-8">
+          <h2 
+            className="text-2xl lg:text-3xl font-bold mb-2 flex items-center justify-center"
+            style={{ color: 'var(--accent-secondary)' }}
+          >
+            <span className="mr-3">📊</span>
+            AHP 연구 플랫폼 종합 요금제
+          </h2>
+          <p 
+            className="text-lg"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            연구 규모와 목적에 맞는 최적의 플랜을 선택하세요
+          </p>
+        </div>
+
+        {/* 정기 구독제 섹션 */}
+        <div className="mb-10">
+          <h3 
+            className="text-xl font-bold mb-6 text-center"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            🔄 정기 구독제 (Subscription Plans)
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {pricingPlans.subscription.map((plan) => (
+              <div
+                key={plan.id}
+                className="p-6 rounded-xl border-2 transition-all duration-300 hover:scale-105"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderColor: plan.id === 'pro' ? 'var(--accent-primary)' : 'rgba(255, 255, 255, 0.3)',
+                  backdropFilter: 'blur(10px)',
+                  boxShadow: plan.id === 'pro' ? 'var(--shadow-xl)' : 'var(--shadow-md)'
+                }}
+              >
+                <div className="text-center mb-4">
+                  <div className="text-3xl mb-2">{plan.icon}</div>
+                  <h4 
+                    className="text-xl font-bold mb-1"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {plan.name}
+                  </h4>
+                  <p 
+                    className="text-sm mb-3"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {plan.description}
+                  </p>
+                  <div className="mb-4">
+                    {typeof plan.monthly === 'number' ? (
+                      <>
+                        <div 
+                          className="text-2xl font-bold"
+                          style={{ color: 'var(--accent-primary)' }}
+                        >
+                          ${plan.monthly} <span className="text-sm font-normal">/월</span>
+                        </div>
+                        <div 
+                          className="text-sm"
+                          style={{ color: 'var(--text-muted)' }}
+                        >
+                          연간: ${plan.yearly} (2개월 할인)
+                        </div>
+                      </>
+                    ) : (
+                      <div 
+                        className="text-xl font-bold"
+                        style={{ color: 'var(--accent-primary)' }}
+                      >
+                        {plan.monthly}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="space-y-2 mb-6">
+                  <div 
+                    className="flex justify-between text-sm"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    <span>프로젝트 수:</span>
+                    <span 
+                      className="font-medium"
+                      style={{ color: 'var(--accent-primary)' }}
+                    >
+                      {plan.projects}개
+                    </span>
+                  </div>
+                  <div 
+                    className="flex justify-between text-sm"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    <span>평가자 인원:</span>
+                    <span 
+                      className="font-medium"
+                      style={{ color: 'var(--accent-primary)' }}
+                    >
+                      {plan.evaluators}명
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-2 mb-6">
+                  <h5 
+                    className="text-sm font-bold"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    포함 기능:
+                  </h5>
+                  <ul className="space-y-1">
+                    {plan.features.map((feature, index) => (
+                      <li 
+                        key={index}
+                        className="text-xs flex items-start"
+                        style={{ color: 'var(--text-secondary)' }}
+                      >
+                        <span className="mr-2 text-green-500">✓</span>
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <button
+                  onClick={() => handleTabChange('payment')}
+                  className={`w-full py-3 px-4 rounded-lg font-medium transition-all duration-300 ${
+                    plan.id === 'pro' ? 'text-white' : ''
+                  }`}
+                  style={{
+                    backgroundColor: plan.id === 'pro' ? 'var(--accent-primary)' : 'var(--bg-secondary)',
+                    color: plan.id === 'pro' ? 'white' : 'var(--text-primary)',
+                    borderColor: plan.id === 'pro' ? 'var(--accent-primary)' : 'var(--border-light)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (plan.id !== 'pro') {
+                      e.currentTarget.style.backgroundColor = 'var(--accent-light)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (plan.id !== 'pro') {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                    }
+                  }}
+                >
+                  {plan.id === 'pro' ? '🌟 추천 플랜' : '플랜 선택'}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 단회차 요금제 섹션 */}
+        <div className="mb-8">
+          <h3 
+            className="text-xl font-bold mb-6 text-center"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            💰 단회차 요금제 (One-Time Plans)
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {pricingPlans.oneTime.map((plan) => (
+              <div
+                key={plan.id}
+                className="p-6 rounded-xl border-2 transition-all duration-300 hover:scale-105"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                  borderColor: 'rgba(255, 255, 255, 0.3)',
+                  backdropFilter: 'blur(10px)'
+                }}
+              >
+                <div className="text-center mb-4">
+                  <div className="text-3xl mb-2">{plan.icon}</div>
+                  <h4 
+                    className="text-lg font-bold mb-1"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    {plan.name}
+                  </h4>
+                  <p 
+                    className="text-sm mb-3"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {plan.description}
+                  </p>
+                  <div 
+                    className="text-2xl font-bold mb-2"
+                    style={{ color: 'var(--accent-primary)' }}
+                  >
+                    ${plan.price}
+                  </div>
+                  <div 
+                    className="text-sm"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    사용 기간: {plan.duration}
+                  </div>
+                </div>
+
+                <div className="space-y-2 mb-4">
+                  <div 
+                    className="flex justify-between text-sm"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    <span>프로젝트 수:</span>
+                    <span 
+                      className="font-medium"
+                      style={{ color: 'var(--accent-primary)' }}
+                    >
+                      {plan.projects}개
+                    </span>
+                  </div>
+                  <div 
+                    className="flex justify-between text-sm"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    <span>평가자 인원:</span>
+                    <span 
+                      className="font-medium"
+                      style={{ color: 'var(--accent-primary)' }}
+                    >
+                      {plan.evaluators}명
+                    </span>
+                  </div>
+                </div>
+
+                <div className="mb-6">
+                  <h5 
+                    className="text-sm font-bold mb-2"
+                    style={{ color: 'var(--text-primary)' }}
+                  >
+                    대상:
+                  </h5>
+                  <p 
+                    className="text-xs leading-relaxed"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    {plan.target}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => handleTabChange('payment')}
+                  className="w-full py-3 px-4 rounded-lg font-medium transition-all duration-300"
+                  style={{
+                    backgroundColor: 'var(--bg-secondary)',
+                    color: 'var(--text-primary)',
+                    borderColor: 'var(--border-light)'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--accent-light)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                  }}
+                >
+                  플랜 구매
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 추가 옵션 */}
+        <div className="text-center">
+          <h3 
+            className="text-lg font-bold mb-4"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            🔧 추가 옵션 (Add-ons)
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+            {[
+              { label: '추가 평가자', price: '$20 (50명 단위)' },
+              { label: '추가 프로젝트', price: '$30 (1개) / $120 (5개)' },
+              { label: '데이터 보관 연장', price: '$50/년 (최대 5년)' },
+              { label: '커스텀 보고서', price: '$100/회' }
+            ].map((addon, index) => (
+              <div 
+                key={index}
+                className="p-3 rounded-lg"
+                style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                <div 
+                  className="font-medium mb-1"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {addon.label}
+                </div>
+                <div className="text-xs">{addon.price}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
       {/* 빠른 시작 및 빠른 접근 통합 - 하단에 크게 배치 */}
       <div 
@@ -2765,14 +3153,14 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   className="text-2xl font-light mb-1"
                   style={{ color: 'var(--text-primary)' }}
                 >
-                  Premium Plan
+                  Pro Plan 🔵
                 </div>
                 <div className="flex items-center justify-center space-x-2">
                   <span 
                     className="text-3xl font-bold"
                     style={{ color: 'var(--accent-primary)' }}
                   >
-                    ₩29,000
+                    $99
                   </span>
                   <span 
                     className="text-sm font-medium"
@@ -2785,7 +3173,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   className="text-xs uppercase tracking-wide mt-1"
                   style={{ color: 'var(--text-muted)' }}
                 >
-                  Professional Research
+                  연구팀/기관용 (20개 프로젝트, 100명 평가자)
                 </div>
               </div>
             </div>
