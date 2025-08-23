@@ -339,7 +339,8 @@ function App() {
         nodeEnv: process.env.NODE_ENV
       });
       
-      if (isDemoMode) {
+      // 프로덕션 환경이거나 백엔드가 불가능한 경우 데모 모드로 처리
+      if (isDemoMode || process.env.NODE_ENV === 'production' || backendStatus === 'unavailable') {
         console.log('✅ 데모 모드에서 로그인 처리 중');
         
         // 실제 운영 계정 설정
