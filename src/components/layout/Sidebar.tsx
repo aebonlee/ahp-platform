@@ -79,12 +79,30 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
   const menuItems = getMenuItems();
 
   return (
-    <div className={`bg-gray-800 text-white transition-all duration-300 ${
-      isCollapsed ? 'w-16' : 'w-64'
-    } min-h-screen`}>
-      <div className="p-4">
+    <div className={`fixed left-0 h-full transition-luxury z-40 scrollbar-luxury overflow-y-auto ${
+      isCollapsed ? 'w-16' : ''
+    }`}
+         style={{
+           top: 'var(--header-height)',
+           width: isCollapsed ? '4rem' : 'var(--sidebar-width)',
+           backgroundColor: 'var(--bg-secondary)',
+           borderRight: '1px solid var(--border-light)',
+           boxShadow: 'var(--shadow-md)',
+           fontFamily: 'Inter, Pretendard, system-ui, sans-serif',
+           minHeight: 'calc(100vh - var(--header-height))'
+         }}>
+      <div style={{ padding: 'var(--space-6)' }}>
         {!isCollapsed && (
-          <h2 className="text-lg font-semibold mb-6 text-gray-100">
+          <h2 className="font-bold mb-6"
+              style={{
+                fontSize: 'var(--font-size-lg)',
+                fontWeight: 'var(--font-weight-bold)',
+                color: 'var(--text-primary)',
+                fontFamily: 'Inter, system-ui, sans-serif',
+                borderBottom: '2px solid var(--gold-primary)',
+                paddingBottom: 'var(--space-3)',
+                marginBottom: 'var(--space-6)'
+              }}>
             {userRole === 'admin' 
               ? (adminType === 'super' ? '총괄 관리자' : adminType === 'personal' ? '개인 서비스' : '관리자')
               : '평가자'
@@ -92,9 +110,10 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
           </h2>
         )}
         
-        <nav className="space-y-2">
+        <nav style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           {menuItems.map((item) => {
             const isModeSwitch = item.id.startsWith('mode-switch-');
+            const isActive = activeTab === item.id;
             const handleClick = () => {
               if (isModeSwitch && onModeSwitch) {
                 if (item.id === 'mode-switch-to-personal') {
@@ -111,17 +130,70 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
               <button
                 key={item.id}
                 onClick={handleClick}
-                className={`w-full flex items-center px-3 py-2 rounded-lg text-left transition-colors duration-200 ${
-                  activeTab === item.id
-                    ? 'bg-primary-600 text-white'
-                    : isModeSwitch
-                    ? 'text-gray-300 hover:bg-orange-600 hover:text-white'
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
-                }`}
+                className="w-full flex items-center text-left transition-luxury group hover:scale-105"
+                style={{
+                  padding: 'var(--space-3) var(--space-4)',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: isActive 
+                    ? 'var(--gold-primary)' 
+                    : isModeSwitch 
+                    ? 'var(--bg-elevated)' 
+                    : 'transparent',
+                  color: isActive 
+                    ? 'white' 
+                    : isModeSwitch 
+                    ? 'var(--color-warning)' 
+                    : 'var(--text-secondary)',
+                  border: '1px solid',
+                  borderColor: isActive 
+                    ? 'var(--gold-primary)' 
+                    : isModeSwitch 
+                    ? 'var(--color-warning)' 
+                    : 'transparent',
+                  fontWeight: 'var(--font-weight-medium)',
+                  boxShadow: isActive ? 'var(--shadow-gold)' : 'var(--shadow-xs)'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = isModeSwitch 
+                      ? 'var(--color-warning)' 
+                      : 'var(--bg-elevated)';
+                    e.currentTarget.style.color = isModeSwitch 
+                      ? 'white' 
+                      : 'var(--text-primary)';
+                    e.currentTarget.style.borderColor = isModeSwitch 
+                      ? 'var(--color-warning)' 
+                      : 'var(--border-medium)';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.backgroundColor = isModeSwitch 
+                      ? 'var(--bg-elevated)' 
+                      : 'transparent';
+                    e.currentTarget.style.color = isModeSwitch 
+                      ? 'var(--color-warning)' 
+                      : 'var(--text-secondary)';
+                    e.currentTarget.style.borderColor = isModeSwitch 
+                      ? 'var(--color-warning)' 
+                      : 'transparent';
+                    e.currentTarget.style.boxShadow = 'var(--shadow-xs)';
+                  }
+                }}
               >
-                <span className="text-lg mr-3">{item.icon}</span>
+                <span className="text-xl mr-3" style={{ fontSize: 'var(--font-size-lg)' }}>
+                  {item.icon}
+                </span>
                 {!isCollapsed && (
-                  <span className="font-medium">{item.label}</span>
+                  <span className="font-semibold" 
+                        style={{ 
+                          fontFamily: 'Inter, system-ui, sans-serif',
+                          fontSize: 'var(--font-size-sm)',
+                          fontWeight: 'var(--font-weight-semibold)'
+                        }}>
+                    {item.label}
+                  </span>
                 )}
               </button>
             );

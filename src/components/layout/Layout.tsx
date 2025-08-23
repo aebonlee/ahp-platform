@@ -49,7 +49,7 @@ const Layout: React.FC<LayoutProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-primary)', fontFamily: 'Pretendard, Inter, system-ui, sans-serif' }}>
       <Header 
         user={user} 
         onLogout={onLogout} 
@@ -73,20 +73,45 @@ const Layout: React.FC<LayoutProps> = ({
             
             <button
               onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className="fixed top-20 left-2 z-10 bg-gray-800 text-white p-2 rounded-md hover:bg-gray-700 transition-colors duration-200"
-              style={{ left: sidebarCollapsed ? '4rem' : '16rem' }}
+              className="fixed z-10 p-3 rounded-lg transition-luxury focus-luxury hover:scale-105"
+              style={{
+                top: 'calc(var(--header-height) + 1rem)',
+                left: sidebarCollapsed ? '5rem' : 'calc(var(--sidebar-width) + 1rem)',
+                backgroundColor: 'var(--bg-elevated)',
+                color: 'var(--text-primary)',
+                border: '1px solid var(--border-light)',
+                boxShadow: 'var(--shadow-md)',
+                borderRadius: 'var(--radius-md)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--gold-primary)';
+                e.currentTarget.style.color = 'white';
+                e.currentTarget.style.borderColor = 'var(--gold-primary)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-gold)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                e.currentTarget.style.color = 'var(--text-primary)';
+                e.currentTarget.style.borderColor = 'var(--border-light)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+              }}
             >
-              <span className="text-sm">
+              <span className="text-base font-medium">
                 {sidebarCollapsed ? '→' : '←'}
               </span>
             </button>
           </>
         )}
         
-        <main className={`flex-1 p-6 transition-all duration-300 ${
-          user ? 'ml-0' : 'ml-0'
-        }`}>
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 transition-luxury" 
+              style={{
+                paddingTop: 'var(--space-8)',
+                paddingBottom: 'var(--space-8)',
+                paddingLeft: 'var(--space-6)',
+                paddingRight: 'var(--space-6)',
+                minHeight: 'calc(100vh - var(--header-height))'
+              }}>
+          <div className="container-luxury" style={{ maxWidth: 'var(--container-max-width)' }}>
             {children}
           </div>
         </main>

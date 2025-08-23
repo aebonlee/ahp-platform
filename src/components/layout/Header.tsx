@@ -173,20 +173,21 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
   };
 
   return (
-    <header className="theme-surface sticky top-0 z-50 transition-all duration-300" 
+    <header className="sticky top-0 z-50 transition-luxury backdrop-blur-sm" 
             style={{ 
-              backgroundColor: 'var(--surface)', 
-              borderBottom: '1px solid var(--border)',
-              boxShadow: 'var(--shadow-sm)'
+              backgroundColor: 'var(--bg-secondary)',
+              borderBottom: '1px solid var(--border-light)',
+              boxShadow: 'var(--shadow-md)',
+              height: 'var(--header-height)',
+              fontFamily: 'Inter, Pretendard, system-ui, sans-serif'
             }}>
-      <div className="w-full" style={{ paddingLeft: '50px', paddingRight: '50px' }}>
-        <div className="flex items-center justify-between h-18 py-2">
+      <div className="container-luxury w-full max-w-none">
+        <div className="flex items-center justify-between h-full" style={{ height: 'var(--header-height)' }}>
           {/* 왼쪽 로고 영역 */}
           <div className="flex-shrink-0">
             <button
               onClick={handleLogoClick}
-              className="flex items-center space-x-4 hover:opacity-80 transition-all duration-200 theme-focus rounded-xl p-3"
-              style={{ borderRadius: 'var(--radius-md)' }}
+              className="flex items-center space-x-4 hover:opacity-90 transition-luxury focus-luxury rounded-lg p-3 group"
             >
               {/* AHP 로고 아이콘 */}
               <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"

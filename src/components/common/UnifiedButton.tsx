@@ -21,7 +21,7 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
   icon,
   title
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium transition-all duration-300 theme-focus disabled:opacity-50 disabled:cursor-not-allowed border';
+  const baseClasses = 'inline-flex items-center justify-center font-medium transition-luxury focus-luxury disabled:opacity-50 disabled:cursor-not-allowed border';
   
   const sizeClasses = {
     sm: 'min-w-[80px] px-3 py-2 text-sm',
@@ -31,46 +31,52 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
 
   const variantStyles = {
     primary: {
-      background: 'var(--accent-gold)',
+      background: 'linear-gradient(135deg, var(--gold-primary), var(--gold-secondary))',
       color: 'white',
-      borderColor: 'var(--accent-gold)',
+      borderColor: 'var(--gold-primary)',
       borderRadius: 'var(--radius-md)',
-      boxShadow: 'var(--shadow-sm)'
+      boxShadow: 'var(--shadow-sm)',
+      fontFamily: 'Inter, system-ui, sans-serif'
     },
     secondary: {
-      background: 'var(--surface-2)',
-      color: 'var(--text-1)',
-      borderColor: 'var(--border)',
+      background: 'var(--bg-elevated)',
+      color: 'var(--text-primary)',
+      borderColor: 'var(--border-medium)',
       borderRadius: 'var(--radius-md)',
-      boxShadow: 'var(--shadow-sm)'
+      boxShadow: 'var(--shadow-sm)',
+      fontFamily: 'Inter, system-ui, sans-serif'
     },
     info: {
-      background: 'var(--info)',
+      background: 'var(--color-info)',
       color: 'white',
-      borderColor: 'var(--info)',
+      borderColor: 'var(--color-info)',
       borderRadius: 'var(--radius-md)',
-      boxShadow: 'var(--shadow-sm)'
+      boxShadow: 'var(--shadow-sm)',
+      fontFamily: 'Inter, system-ui, sans-serif'
     },
     success: {
-      background: 'var(--success)',
+      background: 'var(--color-success)',
       color: 'white',
-      borderColor: 'var(--success)',
+      borderColor: 'var(--color-success)',
       borderRadius: 'var(--radius-md)',
-      boxShadow: 'var(--shadow-sm)'
+      boxShadow: 'var(--shadow-sm)',
+      fontFamily: 'Inter, system-ui, sans-serif'
     },
     warning: {
-      background: 'var(--warning)',
+      background: 'var(--color-warning)',
       color: 'white', 
-      borderColor: 'var(--warning)',
+      borderColor: 'var(--color-warning)',
       borderRadius: 'var(--radius-md)',
-      boxShadow: 'var(--shadow-sm)'
+      boxShadow: 'var(--shadow-sm)',
+      fontFamily: 'Inter, system-ui, sans-serif'
     },
     danger: {
-      background: 'var(--danger)',
+      background: 'var(--color-danger)',
       color: 'white',
-      borderColor: 'var(--danger)',
+      borderColor: 'var(--color-danger)',
       borderRadius: 'var(--radius-md)',
-      boxShadow: 'var(--shadow-sm)'
+      boxShadow: 'var(--shadow-sm)',
+      fontFamily: 'Inter, system-ui, sans-serif'
     }
   };
 
@@ -88,13 +94,18 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
   const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled) {
       const element = e.currentTarget;
-      element.style.transform = 'translateY(-1px)';
-      element.style.boxShadow = 'var(--shadow-md)';
+      element.style.transform = 'translateY(-2px) scale(1.02)';
       
       if (variant === 'primary') {
-        element.style.background = 'var(--accent-gold-2)';
+        element.style.background = 'linear-gradient(135deg, var(--gold-secondary), #8F7A3D)';
+        element.style.boxShadow = 'var(--shadow-gold)';
       } else if (variant === 'secondary') {
-        element.style.background = 'var(--accent-ivory)';
+        element.style.background = 'var(--bg-subtle)';
+        element.style.borderColor = 'var(--border-strong)';
+        element.style.boxShadow = 'var(--shadow-md)';
+      } else {
+        element.style.boxShadow = 'var(--shadow-lg)';
+        element.style.filter = 'brightness(1.1)';
       }
     }
   };
@@ -102,24 +113,34 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
   const handleMouseLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (!disabled) {
       const element = e.currentTarget;
-      element.style.transform = 'translateY(0)';
+      element.style.transform = 'translateY(0) scale(1)';
       element.style.boxShadow = variantStyles[variant].boxShadow;
       element.style.background = variantStyles[variant].background;
+      element.style.filter = 'none';
+      
+      if (variant === 'secondary') {
+        element.style.borderColor = 'var(--border-medium)';
+      }
     }
   };
 
   return (
     <button
       className={buttonClasses}
-      style={buttonStyle}
+      style={{
+        ...buttonStyle,
+        fontWeight: 'var(--font-weight-semibold)',
+        cursor: disabled ? 'not-allowed' : 'pointer',
+        userSelect: 'none'
+      }}
       onClick={onClick}
       disabled={disabled}
       title={title}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {icon && <span className="mr-2">{icon}</span>}
-      {children}
+      {icon && <span className="mr-2 text-lg">{icon}</span>}
+      <span className="font-semibold">{children}</span>
     </button>
   );
 };
