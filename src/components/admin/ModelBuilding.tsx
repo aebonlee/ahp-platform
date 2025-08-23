@@ -70,6 +70,7 @@ const ModelBuilding: React.FC<ModelBuildingProps> = ({
         return (
           <CriteriaManagement
             projectId={projectId}
+            projectTitle={projectTitle}
             onComplete={() => handleStepComplete('criteria')}
           />
         );

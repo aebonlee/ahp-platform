@@ -4,9 +4,6 @@ import Button from '../common/Button';
 import Input from '../common/Input';
 import HierarchyTreeVisualization from '../common/HierarchyTreeVisualization';
 import BulkCriteriaInput from '../criteria/BulkCriteriaInput';
-import { DEMO_CRITERIA, DEMO_SUB_CRITERIA } from '../../data/demoData';
-import dataService from '../../services/dataService';
-import type { CriteriaData } from '../../services/dataService';
 
 interface Criterion {
   id: string;
@@ -20,11 +17,12 @@ interface Criterion {
 
 interface CriteriaManagementProps {
   projectId: string;
+  projectTitle?: string;
   onComplete: () => void;
   onCriteriaChange?: (criteriaCount: number) => void;
 }
 
-const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onComplete, onCriteriaChange }) => {
+const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, projectTitle, onComplete, onCriteriaChange }) => {
   // DEMO_CRITERIA와 DEMO_SUB_CRITERIA를 조합하여 완전한 계층구조 생성
   const [criteria, setCriteria] = useState<Criterion[]>([]);
   const [layoutMode, setLayoutMode] = useState<'vertical' | 'horizontal'>('vertical');
@@ -197,44 +195,23 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onCo
     setErrors({});
   };
 
-  const handleDeleteCriterion = async (id: string) => {
-    try {
-      console.log('🗑️ 기준 삭제:', id);
-      
-      // 데이터 서비스에서 삭제 (샘플 데이터가 아닌 경우에만)
-      if (!id.startsWith('sample-') && !id.startsWith('new-')) {
-        await dataService.deleteCriteria(id);
-      }
-      
-      const filter = (items: Criterion[]): Criterion[] => {
-        return items.filter(item => {
-          if (item.id === id) return false;
-          if (item.children) {
-            item.children = filter(item.children);
-          }
-          return true;
-        });
-      };
-      
-      const updatedCriteria = filter(criteria);
-      setCriteria(updatedCriteria);
-      console.log('✅ 기준 삭제 완료:', id);
-    } catch (error) {
-      console.error('Failed to delete criterion:', error);
-      // 오류 발생 시도 로컬에서는 삭제
-      const filter = (items: Criterion[]): Criterion[] => {
-        return items.filter(item => {
-          if (item.id === id) return false;
-          if (item.children) {
-            item.children = filter(item.children);
-          }
-          return true;
-        });
-      };
-      
-      const updatedCriteria = filter(criteria);
-      setCriteria(updatedCriteria);
-    }
+  const handleDeleteCriterion = (id: string) => {
+    console.log('🗑️ 기준 삭제:', id);
+    
+    const filter = (items: Criterion[]): Criterion[] => {
+      return items.filter(item => {
+        if (item.id === id) return false;
+        if (item.children) {
+          item.children = filter(item.children);
+        }
+        return true;
+      });
+    };
+    
+    const updatedCriteria = filter(criteria);
+    setCriteria(updatedCriteria);
+    saveProjectCriteria(updatedCriteria);
+    console.log('✅ 기준 삭제 완료:', id);
   };
 
 
@@ -278,36 +255,46 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onCo
     }
   };
 
-  const handleLoadDemoData = () => {
+  const handleLoadTemplateData = () => {
     if (criteria.length > 0) {
-      if (!window.confirm('⚠️ 기존 데이터가 있습니다. 데모 데이터로 교체하시겠습니까?')) {
+      if (!window.confirm('⚠️ 기존 데이터가 있습니다. 템플릿으로 교체하시겠습니까?')) {
         return;
       }
     }
     
-    // 데모 데이터를 컴포넌트 형식으로 변환
-    const combinedCriteria = [
-      ...DEMO_CRITERIA.map(c => ({
-        id: c.id,
-        name: c.name,
-        description: c.description,
-        parent_id: c.parent_id,
-        level: c.level,
-        weight: c.weight
-      })),
-      ...DEMO_SUB_CRITERIA.map(c => ({
-        id: c.id,
-        name: c.name,
-        description: c.description,
-        parent_id: c.parent_id,
-        level: c.level,
-        weight: c.weight
-      }))
+    // 기본 AHP 템플릿 구조
+    const timestamp = Date.now();
+    const goalId = `template_goal_${timestamp}`;
+    
+    const templateCriteria: Criterion[] = [
+      {
+        id: goalId,
+        name: '프로젝트 목표',
+        description: '최종 달성하고자 하는 목표를 입력하세요',
+        parent_id: null,
+        level: 1
+      },
+      {
+        id: `template_c1_${timestamp + 1}`,
+        name: '기준 1',
+        description: '첫 번째 평가 기준',
+        parent_id: goalId,
+        level: 2
+      },
+      {
+        id: `template_c2_${timestamp + 2}`,
+        name: '기준 2', 
+        description: '두 번째 평가 기준',
+        parent_id: goalId,
+        level: 2
+      }
     ];
-    setCriteria(combinedCriteria);
-    saveProjectCriteria(combinedCriteria);
+    
+    setCriteria(templateCriteria);
+    saveProjectCriteria(templateCriteria);
     setNewCriterion({ name: '', description: '', parentId: '' });
     setErrors({});
+    alert('✅ 기본 템플릿이 로드되었습니다. 필요에 따라 수정하세요.');
   };
 
   const handleBulkImport = (importedCriteria: Criterion[]) => {
@@ -388,6 +375,8 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onCo
                 <li>기준 설명을 명확히 작성하여 평가자의 이해를 돕습니다</li>
                 <li>비슷한 성격의 기준들은 하나의 상위 기준으로 그룹화하세요</li>
                 <li>측정 가능한 기준과 주관적 기준을 적절히 균형있게 구성하세요</li>
+                <li>🗑️ 버튼으로 개별 기준을 삭제할 수 있습니다</li>
+                <li>📝 기본 템플릿을 활용하여 빠르게 시작할 수 있습니다</li>
               </ul>
             </div>
           </div>
@@ -409,11 +398,12 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onCo
         <div className="space-y-6">
           <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
             <div>
-              <h4 className="font-medium text-blue-900 mb-2">📋 AHP 계층 구조 가이드</h4>
+              <h4 className="font-medium text-blue-900 mb-2">📋 프로젝트 기준 설정 가이드</h4>
               <ul className="text-sm text-blue-700 space-y-1">
+                <li>• 프로젝트 목표에 맞는 평가 기준을 계층적으로 구성</li>
                 <li>• 1레벨(목표) → 2레벨(기준) → 3레벨(대안) 순서로 추가</li>
-                <li>• 필요시 4-5레벨까지 하위 기준 세분화 가능</li>
-                <li>• 기준명은 중복될 수 없으며, 최대 5단계까지 지원</li>
+                <li>• 기준명은 중복될 수 없으며, 최대 5단계까지 세분화 가능</li>
+                <li>• 개별 기준 삭제는 🗑️ 버튼을 클릭하여 수행</li>
               </ul>
             </div>
             <div className="flex space-x-2">
@@ -497,10 +487,10 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onCo
                 <Button 
                   variant="outline" 
                   size="sm"
-                  onClick={handleLoadDemoData}
+                  onClick={handleLoadTemplateData}
                   className="text-blue-600 border-blue-300 hover:bg-blue-50 ml-2"
                 >
-                  📝 데모 데이터
+                  📝 기본 템플릿
                 </Button>
                 <Button 
                   variant="outline" 
@@ -524,7 +514,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onCo
             </div>
             <HierarchyTreeVisualization
               nodes={getFlatCriteriaForVisualization(criteria)}
-              title="AI 개발 활용 방안 기준 계층구조"
+              title={`${projectTitle || 'AHP 프로젝트'} 기준 계층구조`}
               showWeights={true}
               interactive={true}
               layout={layoutMode}
@@ -533,6 +523,11 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, onCo
                 console.log('선택된 기준:', node);
                 // 추후 편집 모드 구현 가능
               }}
+              onNodeDelete={(node) => {
+                // TreeNode를 id로 변환하여 삭제 함수 호출
+                handleDeleteCriterion(node.id);
+              }}
+              allowDelete={true}
             />
           </div>
 

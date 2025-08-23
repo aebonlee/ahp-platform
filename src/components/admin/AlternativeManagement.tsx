@@ -192,12 +192,13 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
       <Card title="2-2단계 — 대안추가">
         <div className="space-y-6">
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <h4 className="font-medium text-green-900 mb-2">📝 대안 관리 가이드</h4>
+            <h4 className="font-medium text-green-900 mb-2">📝 프로젝트 대안 설정 가이드</h4>
             <ul className="text-sm text-green-700 space-y-1">
-              <li>• 비교 평가할 모든 대안을 추가하세요</li>
+              <li>• 프로젝트 목표에 맞는 비교 대안을 추가하세요</li>
               <li>• 대안명은 중복될 수 없습니다</li>
-              <li>• 순서 조정을 통해 평가 순서를 결정할 수 있습니다</li>
-              <li>• 최소 2개 이상의 대안이 필요합니다</li>
+              <li>• ↑↓ 버튼으로 평가 순서를 조정할 수 있습니다</li>
+              <li>• ✏️ 버튼으로 대안을 수정, 🗑️ 버튼으로 삭제할 수 있습니다</li>
+              <li>• 대안이 없는 경우 기준 간 중요도 비교만으로 분석 가능합니다</li>
             </ul>
           </div>
 
@@ -371,8 +372,16 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
           {/* Action Buttons */}
           <div className="flex justify-between items-center pt-6 border-t">
             <div className="text-sm text-gray-600">
-              {alternatives.length < 2 && (
-                <span className="text-orange-600">⚠️ 최소 2개 이상의 대안이 필요합니다.</span>
+              {alternatives.length === 0 && (
+                <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-blue-600">💡</span>
+                    <div>
+                      <div className="font-medium text-blue-900">대안 없이 진행하기</div>
+                      <div className="text-sm text-blue-700">기준 간 중요도 비교만으로도 AHP 분석이 가능합니다.</div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
             <div className="flex space-x-3">
@@ -382,7 +391,6 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
               <Button
                 variant="primary"
                 onClick={onComplete}
-                disabled={alternatives.length < 2}
               >
                 다음 단계로
               </Button>

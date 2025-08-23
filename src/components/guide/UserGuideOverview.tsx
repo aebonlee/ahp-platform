@@ -13,6 +13,8 @@ interface UserGuideOverviewProps {
 const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToService }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [layoutMode, setLayoutMode] = useState<'vertical' | 'horizontal'>('vertical');
+  const [stepOrder, setStepOrder] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [draggedStep, setDraggedStep] = useState<number | null>(null);
 
   // 데모 데이터 조합
   const demoCriteria = [
@@ -116,32 +118,50 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
               <h4 className="text-lg font-semibold text-gray-800">표시 방식 선택</h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Tooltip content="기준들을 세로로 나열하여 표시합니다. 계층구조를 명확하게 보기 좋습니다.">
-                  <UnifiedButton
-                    variant={layoutMode === 'vertical' ? 'primary' : 'secondary'}
-                    size="lg"
+                  <div className={`w-full h-20 rounded-xl border-2 transition-all duration-200 cursor-pointer hover:shadow-md ${
+                    layoutMode === 'vertical' 
+                      ? 'bg-blue-50 border-blue-500 text-blue-900' 
+                      : 'bg-white border-gray-200 hover:border-gray-300 text-gray-700'
+                  }`}
                     onClick={() => setLayoutMode('vertical')}
-                    icon="📋"
-                    className="w-full h-16"
                   >
-                    <div className="flex flex-col">
-                      <span className="text-base font-semibold">세로형 레이아웃</span>
-                      <span className="text-xs text-gray-500">계층구조 중심</span>
+                    <div className="flex items-center justify-center h-full p-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl">📋</span>
+                        <div className="flex flex-col text-left">
+                          <span className={`text-lg font-bold ${layoutMode === 'vertical' ? 'text-blue-900' : 'text-gray-900'}`}>
+                            세로형 레이아웃
+                          </span>
+                          <span className={`text-sm font-medium ${layoutMode === 'vertical' ? 'text-blue-700' : 'text-gray-600'}`}>
+                            계층구조 중심
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </UnifiedButton>
+                  </div>
                 </Tooltip>
                 <Tooltip content="기준들을 가로로 펼쳐서 표시합니다. 전체 구조를 한눈에 보기 좋습니다.">
-                  <UnifiedButton
-                    variant={layoutMode === 'horizontal' ? 'success' : 'secondary'}
-                    size="lg"
+                  <div className={`w-full h-20 rounded-xl border-2 transition-all duration-200 cursor-pointer hover:shadow-md ${
+                    layoutMode === 'horizontal' 
+                      ? 'bg-green-50 border-green-500 text-green-900' 
+                      : 'bg-white border-gray-200 hover:border-gray-300 text-gray-700'
+                  }`}
                     onClick={() => setLayoutMode('horizontal')}
-                    icon="📊"
-                    className="w-full h-16"
                   >
-                    <div className="flex flex-col">
-                      <span className="text-base font-semibold">가로형 레이아웃</span>
-                      <span className="text-xs text-gray-500">전체 조망 중심</span>
+                    <div className="flex items-center justify-center h-full p-4">
+                      <div className="flex items-center space-x-3">
+                        <span className="text-2xl">📊</span>
+                        <div className="flex flex-col text-left">
+                          <span className={`text-lg font-bold ${layoutMode === 'horizontal' ? 'text-green-900' : 'text-gray-900'}`}>
+                            가로형 레이아웃
+                          </span>
+                          <span className={`text-sm font-medium ${layoutMode === 'horizontal' ? 'text-green-700' : 'text-gray-600'}`}>
+                            전체 조망 중심
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </UnifiedButton>
+                  </div>
                 </Tooltip>
               </div>
             </div>
@@ -555,40 +575,132 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
     }
   ];
 
+  // 드래그 앤 드롭 핸들러들
+  const handleDragStart = (e: React.DragEvent, stepId: number) => {
+    setDraggedStep(stepId);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/html', stepId.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, targetStepId: number) => {
+    e.preventDefault();
+    
+    if (draggedStep && draggedStep !== targetStepId) {
+      const newOrder = [...stepOrder];
+      const draggedIndex = newOrder.indexOf(draggedStep);
+      const targetIndex = newOrder.indexOf(targetStepId);
+      
+      // 배열에서 요소 이동
+      newOrder.splice(draggedIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedStep);
+      
+      setStepOrder(newOrder);
+    }
+    
+    setDraggedStep(null);
+  };
+
+  const handleDragEnd = () => {
+    setDraggedStep(null);
+  };
+
+  // 정렬된 단계 데이터 가져오기
+  const getOrderedSteps = () => {
+    return stepOrder.map(stepId => guideSteps.find(step => step.id === stepId)!);
+  };
+
   const currentStepData = guideSteps.find(step => step.id === currentStep);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto space-y-8 p-4 md:p-6 lg:p-8">
         {/* Header */}
-        <div className="text-center space-y-6 py-8">
-          <div className="inline-block p-6 lg:p-8 bg-gradient-to-br from-blue-100 via-purple-100 to-pink-100 rounded-2xl shadow-lg">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
-              📚 AHP 의사결정 지원 시스템
-            </h1>
-            <h2 className="text-xl md:text-2xl font-semibold text-blue-800 mb-3">
-              완전한 사용 가이드
-            </h2>
-            <p className="text-base md:text-lg text-gray-700 max-w-2xl mx-auto leading-relaxed">
-              샘플 데이터를 통해 AHP 분석의 전체 프로세스를 체험해보세요.<br/>
-              단계별로 자세한 설명과 실제 예시를 확인할 수 있습니다.
-            </p>
+        <div className="text-center space-y-8 py-12">
+          <div className="relative inline-block">
+            {/* 배경 장식 요소들 */}
+            <div className="absolute -top-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-2xl"></div>
+            <div className="absolute -bottom-6 -right-6 w-40 h-40 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl"></div>
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl"></div>
+            
+            {/* 메인 컨텐츠 */}
+            <div className="relative bg-white/90 backdrop-blur-sm border border-white/20 shadow-2xl rounded-3xl p-8 lg:p-12 max-w-4xl mx-auto">
+              {/* 아이콘과 타이틀 */}
+              <div className="flex items-center justify-center mb-6">
+                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg mr-6">
+                  <span className="text-4xl text-white">📚</span>
+                </div>
+                <div className="text-left">
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 leading-tight">
+                    AHP 의사결정 지원 시스템
+                  </h1>
+                </div>
+              </div>
+              
+              {/* 서브타이틀 */}
+              <div className="mb-8">
+                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
+                  <span className="inline-block px-6 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl border border-blue-200">
+                    완전한 사용 가이드
+                  </span>
+                </h2>
+              </div>
+              
+              {/* 설명 텍스트 */}
+              <div className="space-y-4">
+                <p className="text-xl md:text-2xl font-semibold text-gray-700 leading-relaxed">
+                  샘플 데이터를 통해 AHP 분석의 
+                  <span className="text-blue-600 font-bold"> 전체 프로세스</span>를 체험해보세요
+                </p>
+                <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                  단계별로 자세한 설명과 실제 예시를 확인하며, 
+                  전문적인 의사결정 분석 방법론을 완벽하게 마스터할 수 있습니다
+                </p>
+              </div>
+              
+              {/* 특징 배지들 */}
+              <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
+                <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 rounded-full text-sm font-semibold border border-green-200">
+                  <span className="mr-2">✨</span>
+                  실제 예시 데이터
+                </span>
+                <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 rounded-full text-sm font-semibold border border-blue-200">
+                  <span className="mr-2">📊</span>
+                  단계별 상세 가이드
+                </span>
+                <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full text-sm font-semibold border border-purple-200">
+                  <span className="mr-2">🎯</span>
+                  전문적인 분석 도구
+                </span>
+              </div>
+            </div>
           </div>
         </div>
 
         {/* Step Navigation */}
         <Card className="shadow-lg">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between mb-8 gap-4">
-            <h2 className="text-2xl font-bold text-gray-900">단계별 가이드</h2>
+            <div className="flex flex-col lg:flex-row items-start lg:items-center gap-4">
+              <h2 className="text-2xl font-bold text-gray-900">단계별 가이드</h2>
+              <div className="flex items-center bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+                <span className="text-blue-600 mr-2">🔄</span>
+                <span className="text-sm font-medium text-blue-700">드래그하여 순서 변경 가능</span>
+              </div>
+            </div>
             <div className="flex items-center space-x-3">
               <span className="text-base font-medium text-gray-700">진행도:</span>
               <div className="flex space-x-2">
-                {guideSteps.map(step => (
+                {getOrderedSteps().map((step, index) => (
                   <div
                     key={step.id}
                     className={`w-10 h-3 rounded-full transition-all duration-300 ${
                       step.id <= currentStep ? 'bg-blue-500' : 'bg-gray-200'
                     }`}
+                    title={`${index + 1}단계: ${step.title.split(':')[1]?.trim()}`}
                   />
                 ))}
               </div>
@@ -599,23 +711,53 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-3 md:gap-4 mb-8">
-            {guideSteps.map(step => (
-              <Tooltip key={step.id} content={step.tooltip}>
-                <button
+            {getOrderedSteps().map((step, index) => (
+              <Tooltip key={step.id} content={`${step.tooltip}\n\n💡 팁: 드래그하여 순서를 변경할 수 있습니다.`}>
+                <div
+                  draggable
+                  onDragStart={(e) => handleDragStart(e, step.id)}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, step.id)}
+                  onDragEnd={handleDragEnd}
                   onClick={() => setCurrentStep(step.id)}
-                  className={`p-4 md:p-5 rounded-xl text-center transition-all duration-200 transform hover:scale-105 ${
+                  className={`relative p-4 md:p-5 rounded-xl text-center transition-all duration-200 transform cursor-move select-none ${
+                    draggedStep === step.id
+                      ? 'opacity-50 scale-95 rotate-2'
+                      : 'hover:scale-105'
+                  } ${
                     currentStep === step.id
                       ? 'bg-blue-100 border-2 border-blue-500 text-blue-900 shadow-lg'
-                      : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100 hover:shadow-md'
+                      : 'bg-white border-2 border-gray-200 text-gray-600 hover:bg-gray-50 hover:shadow-md hover:border-gray-300'
                   }`}
                 >
-                  <div className="text-base md:text-lg font-bold mb-2">
+                  {/* 드래그 핸들 표시 */}
+                  <div className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">
+                    <span className="text-sm">⋮⋮</span>
+                  </div>
+                  
+                  {/* 순서 번호 */}
+                  <div className={`absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                    currentStep === step.id
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-gray-300 text-gray-600'
+                  }`}>
+                    {index + 1}
+                  </div>
+
+                  <div className="text-base md:text-lg font-bold mb-2 mt-4">
                     {step.title.split(':')[0]}
                   </div>
                   <div className="text-sm md:text-base opacity-80 font-medium">
                     {step.title.split(':')[1]?.trim()}
                   </div>
-                </button>
+                  
+                  {/* 드래그 상태 표시 */}
+                  {draggedStep === step.id && (
+                    <div className="absolute inset-0 bg-blue-200 opacity-30 rounded-xl flex items-center justify-center">
+                      <span className="text-2xl">🔄</span>
+                    </div>
+                  )}
+                </div>
               </Tooltip>
             ))}
           </div>
@@ -640,8 +782,13 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
               <UnifiedButton
                 variant="secondary"
                 size="lg"
-                onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-                disabled={currentStep === 1}
+                onClick={() => {
+                  const currentIndex = stepOrder.indexOf(currentStep);
+                  if (currentIndex > 0) {
+                    setCurrentStep(stepOrder[currentIndex - 1]);
+                  }
+                }}
+                disabled={stepOrder.indexOf(currentStep) === 0}
                 icon="←"
               >
                 이전 단계
@@ -669,20 +816,23 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-semibold text-gray-900">단계별 목록</h4>
-                      {guideSteps.map((step, index) => (
+                      <h4 className="font-semibold text-gray-900">단계별 목록 (사용자 정렬 순서)</h4>
+                      {getOrderedSteps().map((step, index) => (
                         <div 
                           key={step.id}
                           className={`p-2 rounded-lg flex items-center ${
-                            index + 1 === currentStep 
+                            step.id === currentStep 
                               ? 'bg-blue-100 text-blue-900' 
-                              : index + 1 < currentStep 
+                              : stepOrder.indexOf(step.id) < stepOrder.indexOf(currentStep)
                               ? 'bg-green-100 text-green-900'
                               : 'bg-gray-100 text-gray-600'
                           }`}
                         >
+                          <span className="mr-2 text-xs bg-gray-200 px-2 py-1 rounded-full font-bold">
+                            {index + 1}
+                          </span>
                           <span className="mr-2">
-                            {index + 1 < currentStep ? '✅' : index + 1 === currentStep ? '🔄' : '⏳'}
+                            {stepOrder.indexOf(step.id) < stepOrder.indexOf(currentStep) ? '✅' : step.id === currentStep ? '🔄' : '⏳'}
                           </span>
                           <span className="text-sm">{step.title}</span>
                         </div>
@@ -693,11 +843,16 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
                 width="md"
               />
 
-              {currentStep < guideSteps.length ? (
+              {stepOrder.indexOf(currentStep) < stepOrder.length - 1 ? (
                 <UnifiedButton
                   variant="primary"
                   size="lg"
-                  onClick={() => setCurrentStep(Math.min(guideSteps.length, currentStep + 1))}
+                  onClick={() => {
+                    const currentIndex = stepOrder.indexOf(currentStep);
+                    if (currentIndex < stepOrder.length - 1) {
+                      setCurrentStep(stepOrder[currentIndex + 1]);
+                    }
+                  }}
                   icon="→"
                 >
                   다음 단계
@@ -717,29 +872,62 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
         )}
 
         {/* Quick Access */}
-        <Card title="빠른 단계 이동" className="bg-gradient-to-r from-gray-50 to-blue-50 shadow-lg">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {[
-              { step: 1, icon: "🎯", title: "프로젝트 생성", desc: "새 프로젝트 만들기", color: "blue" },
-              { step: 2, icon: "📋", title: "기준 설정", desc: "평가 기준 정의", color: "green" },
-              { step: 4, icon: "⚖️", title: "쌍대비교", desc: "중요도 평가", color: "purple" },
-              { step: 5, icon: "📊", title: "결과 분석", desc: "최종 결과 확인", color: "yellow" }
-            ].map(item => (
-              <Tooltip key={item.step} content={item.desc}>
-                <button
-                  onClick={() => setCurrentStep(item.step)}
-                  className={`flex flex-col items-center space-y-3 p-4 md:p-6 bg-white rounded-xl hover:shadow-md transition-all duration-200 border-2 transform hover:scale-105 ${
-                    currentStep === item.step 
-                      ? `border-${item.color}-500 bg-${item.color}-50` 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                >
-                  <span className="text-2xl md:text-3xl">{item.icon}</span>
-                  <span className="text-base md:text-lg font-bold text-gray-900">{item.title}</span>
-                  <span className="text-sm text-gray-600 text-center">{item.desc}</span>
-                </button>
-              </Tooltip>
-            ))}
+        <Card className="bg-gradient-to-r from-gray-50 to-blue-50 shadow-lg">
+          <div className="mb-6">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">빠른 단계 이동</h3>
+            <p className="text-sm text-gray-600">현재 설정된 단계 순서에 따라 표시됩니다</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {getOrderedSteps().map((step, index) => {
+              const stepConfig = {
+                1: { icon: "🎯", title: "프로젝트 생성", desc: "새 프로젝트 만들기", color: "blue" },
+                2: { icon: "📋", title: "기준 설정", desc: "평가 기준 정의", color: "green" },
+                3: { icon: "🔀", title: "대안 설정", desc: "선택 대안 구성", color: "orange" },
+                4: { icon: "⚖️", title: "쌍대비교", desc: "중요도 평가", color: "purple" },
+                5: { icon: "📊", title: "결과 분석", desc: "최종 결과 확인", color: "yellow" }
+              }[step.id] || { icon: "❓", title: "단계", desc: "설명", color: "gray" };
+              
+              return (
+                <Tooltip key={step.id} content={`${index + 1}번째: ${stepConfig.desc}`}>
+                  <button
+                    onClick={() => setCurrentStep(step.id)}
+                    className={`relative flex flex-col items-center space-y-3 p-4 md:p-6 bg-white rounded-xl hover:shadow-md transition-all duration-200 border-2 transform hover:scale-105 ${
+                      currentStep === step.id 
+                        ? `border-${stepConfig.color}-500 bg-${stepConfig.color}-50` 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                  >
+                    {/* 순서 번호 */}
+                    <div className={`absolute top-2 left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      currentStep === step.id
+                        ? `bg-${stepConfig.color}-500 text-white`
+                        : 'bg-gray-300 text-gray-600'
+                    }`}>
+                      {index + 1}
+                    </div>
+                    
+                    <span className="text-2xl md:text-3xl mt-4">{stepConfig.icon}</span>
+                    <span className="text-base md:text-lg font-bold text-gray-900">{stepConfig.title}</span>
+                    <span className="text-sm text-gray-600 text-center">{stepConfig.desc}</span>
+                  </button>
+                </Tooltip>
+              );
+            })}
+          </div>
+          
+          {/* 순서 리셋 버튼 */}
+          <div className="mt-6 flex justify-center">
+            <UnifiedButton
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setStepOrder([1, 2, 3, 4, 5]);
+                setCurrentStep(1);
+              }}
+              icon="🔄"
+            >
+              순서 초기화
+            </UnifiedButton>
           </div>
         </Card>
       </div>

@@ -16,8 +16,10 @@ interface HierarchyTreeVisualizationProps {
   showWeights?: boolean;
   interactive?: boolean;
   onNodeClick?: (node: TreeNode) => void;
+  onNodeDelete?: (node: TreeNode) => void;
   layout?: 'vertical' | 'horizontal';
   onLayoutChange?: (layout: 'vertical' | 'horizontal') => void;
+  allowDelete?: boolean;
 }
 
 const HierarchyTreeVisualization: React.FC<HierarchyTreeVisualizationProps> = ({
@@ -26,8 +28,10 @@ const HierarchyTreeVisualization: React.FC<HierarchyTreeVisualizationProps> = ({
   showWeights = false,
   interactive = false,
   onNodeClick,
+  onNodeDelete,
   layout = 'vertical',
-  onLayoutChange
+  onLayoutChange,
+  allowDelete = false
 }) => {
   // 노드를 계층구조로 변환
   const buildHierarchy = (flatNodes: TreeNode[]): TreeNode[] => {
@@ -121,11 +125,27 @@ const HierarchyTreeVisualization: React.FC<HierarchyTreeVisualizationProps> = ({
                     <div className="text-xs opacity-75 mt-1">{node.description}</div>
                   )}
                 </div>
-                {showWeights && node.weight && (
-                  <div className="text-xs font-mono bg-white bg-opacity-50 px-2 py-1 rounded">
-                    {(node.weight * 100).toFixed(1)}%
-                  </div>
-                )}
+                <div className="flex items-center space-x-2">
+                  {showWeights && node.weight && (
+                    <div className="text-xs font-mono bg-white bg-opacity-50 px-2 py-1 rounded">
+                      {(node.weight * 100).toFixed(1)}%
+                    </div>
+                  )}
+                  {allowDelete && onNodeDelete && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (window.confirm(`"${node.name}" 기준을 삭제하시겠습니까?\n\n⚠️ 하위 기준들도 함께 삭제됩니다.`)) {
+                          onNodeDelete(node);
+                        }
+                      }}
+                      className="p-1 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-md transition-colors duration-200"
+                      title={`${node.name} 삭제`}
+                    >
+                      <span className="text-sm">🗑️</span>
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
             {hasChildren && (
@@ -158,13 +178,28 @@ const HierarchyTreeVisualization: React.FC<HierarchyTreeVisualizationProps> = ({
         {/* 노드 박스 */}
         <div 
           className={`
-            p-3 rounded-lg border-2 transition-all duration-200 min-w-[120px] text-center
+            relative p-3 rounded-lg border-2 transition-all duration-200 min-w-[120px] text-center
             ${getNodeColor(node.level)}
             ${isClickable ? 'cursor-pointer hover:shadow-md hover:scale-105' : ''}
             ${hasChildren ? 'font-medium' : ''}
           `}
           onClick={() => isClickable && onNodeClick!(node)}
         >
+          {allowDelete && onNodeDelete && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (window.confirm(`"${node.name}" 기준을 삭제하시겠습니까?\n\n⚠️ 하위 기준들도 함께 삭제됩니다.`)) {
+                  onNodeDelete(node);
+                }
+              }}
+              className="absolute top-1 right-1 p-1 text-red-500 hover:text-red-700 hover:bg-red-100 rounded-md transition-colors duration-200"
+              title={`${node.name} 삭제`}
+            >
+              <span className="text-xs">🗑️</span>
+            </button>
+          )}
+          
           <div className="flex flex-col items-center space-y-1">
             <span className="text-lg">{getNodeIcon(node)}</span>
             <div className="font-medium text-sm">{node.name}</div>
