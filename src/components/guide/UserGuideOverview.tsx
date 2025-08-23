@@ -112,27 +112,35 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
               <span className="text-2xl mr-3">🌳</span>
               기준 계층구조 시각화
             </h4>
-            <div className="flex items-center space-x-3">
-              <span className="text-base font-medium text-gray-700">표시 방식:</span>
-              <div className="flex bg-gray-100 rounded-xl p-1">
-                <Tooltip content="기준들을 세로로 나열하여 표시합니다. 계층구조를 명확하게 볼 수 있습니다.">
+            <div className="space-y-4">
+              <h4 className="text-lg font-semibold text-gray-800">표시 방식 선택</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Tooltip content="기준들을 세로로 나열하여 표시합니다. 계층구조를 명확하게 보기 좋습니다.">
                   <UnifiedButton
                     variant={layoutMode === 'vertical' ? 'primary' : 'secondary'}
-                    size="sm"
+                    size="lg"
                     onClick={() => setLayoutMode('vertical')}
                     icon="📋"
+                    className="w-full h-16"
                   >
-                    세로형
+                    <div className="flex flex-col">
+                      <span className="text-base font-semibold">세로형 레이아웃</span>
+                      <span className="text-xs text-gray-500">계층구조 중심</span>
+                    </div>
                   </UnifiedButton>
                 </Tooltip>
-                <Tooltip content="기준들을 가로로 펼쳐서 표시합니다. 전체적인 구조를 한눈에 볼 수 있습니다.">
+                <Tooltip content="기준들을 가로로 펼쳐서 표시합니다. 전체 구조를 한눈에 보기 좋습니다.">
                   <UnifiedButton
                     variant={layoutMode === 'horizontal' ? 'success' : 'secondary'}
-                    size="sm"
+                    size="lg"
                     onClick={() => setLayoutMode('horizontal')}
                     icon="📊"
+                    className="w-full h-16"
                   >
-                    가로형
+                    <div className="flex flex-col">
+                      <span className="text-base font-semibold">가로형 레이아웃</span>
+                      <span className="text-xs text-gray-500">전체 조망 중심</span>
+                    </div>
                   </UnifiedButton>
                 </Tooltip>
               </div>
