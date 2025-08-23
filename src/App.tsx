@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import sessionService from './services/sessionService';
 import Layout from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
@@ -387,6 +388,10 @@ function App() {
         }
         
         if (authenticatedUser) {
+          // 세션 시작 (토큰 생성)
+          const demoToken = `demo_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+          sessionService.startSession(demoToken);
+          
           setUser(authenticatedUser);
           setProjects(DEMO_PROJECTS);
           setSelectedProjectId(DEMO_PROJECTS[0].id);
@@ -416,6 +421,9 @@ function App() {
         const data = await response.json();
         
         if (response.ok) {
+          // 백엔드 로그인 성공 시 세션 시작
+          sessionService.startSession(data.token);
+          
           localStorage.setItem('token', data.token);
           if (data.refreshToken) {
             localStorage.setItem('refreshToken', data.refreshToken);

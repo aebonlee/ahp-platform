@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
+import UnifiedButton from '../common/UnifiedButton';
+import sessionService from '../../services/sessionService';
 import CriteriaManagement from './CriteriaManagement';
 import AlternativeManagement from './AlternativeManagement';
 import EvaluatorAssignment from './EvaluatorAssignment';
@@ -42,8 +44,13 @@ interface UserProject extends Omit<ProjectData, 'evaluation_method'> {
   evaluation_method: 'pairwise' | 'direct' | 'mixed'; // 레거시 호환성
 }
 
-// 토큰 유효성 검사 유틸리티 함수
+// 세션 서비스 기반 토큰 유효성 검사
 const isTokenValid = (token: string | null): boolean => {
+  return sessionService.isSessionValid();
+};
+
+// 레거시 토큰 검증 (호환성 유지)
+const legacyTokenValid = (token: string | null): boolean => {
   if (!token) return false;
   
   // 프로덕션 환경(GitHub Pages)에서는 토큰 검증 스킵
@@ -92,6 +99,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<'overview' | 'projects' | 'criteria' | 'alternatives' | 'evaluators' | 'finalize'>('overview');
+  const [remainingTime, setRemainingTime] = useState<number>(0);
+  const [showSessionInfo, setShowSessionInfo] = useState(false);
   const [isProjectFormOpen, setIsProjectFormOpen] = useState(false);
   const [editingProject, setEditingProject] = useState<UserProject | null>(null);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -166,6 +175,16 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   useEffect(() => {
     loadProjects();
+    
+    // 세션 시간 업데이트
+    const updateSessionTime = () => {
+      setRemainingTime(sessionService.getRemainingTime());
+    };
+    
+    updateSessionTime();
+    const interval = setInterval(updateSessionTime, 60000); // 1분마다 업데이트
+    
+    return () => clearInterval(interval);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -473,19 +492,92 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <div className="space-y-6">
       {/* 통합된 환영 헤더 */}
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
-        <div className="text-center space-y-4">
-          <div className="inline-block p-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg shadow-sm">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              환영합니다, {user.first_name} {user.last_name}님! 🎉
-            </h1>
-            <p className="text-blue-600 font-medium">
-              개인 AHP 의사결정 분석 서비스를 시작하세요
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          <div className="text-center lg:text-left space-y-4 flex-1">
+            <div className="inline-block p-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg shadow-sm">
+              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                환영합니다, {user.first_name} {user.last_name}님! 🎉
+              </h1>
+              <p className="text-blue-600 font-medium">
+                개인 AHP 의사결정 분석 서비스를 시작하세요
+              </p>
+            </div>
+            <p className="text-gray-600 max-w-2xl lg:mx-0 mx-auto">
+              복잡한 의사결정을 체계적으로 분석하고, 객관적인 결과를 얻을 수 있습니다.
             </p>
           </div>
-          <p className="text-gray-600 max-w-2xl mx-auto">
-            복잡한 의사결정을 체계적으로 분석하고, 객관적인 결과를 얻을 수 있습니다.
-          </p>
+          
+          {/* Session Status and Controls */}
+          <div className="flex flex-col items-center lg:items-end space-y-3">
+            <div className={`px-4 py-2 rounded-lg text-sm font-medium flex items-center space-x-2 ${
+              remainingTime > 10 ? 'bg-green-100 text-green-800' :
+              remainingTime > 5 ? 'bg-yellow-100 text-yellow-800' :
+              'bg-red-100 text-red-800'
+            }`}>
+              <span>🕒</span>
+              <span>세션: {remainingTime}분 남음</span>
+            </div>
+            
+            <div className="flex items-center space-x-2">
+              <UnifiedButton
+                variant="info"
+                size="sm"
+                onClick={() => sessionService.extendSession()}
+                icon="⏰"
+              >
+                연장하기
+              </UnifiedButton>
+              
+              <UnifiedButton
+                variant="secondary"
+                size="sm"
+                onClick={() => setShowSessionInfo(!showSessionInfo)}
+                icon="ℹ️"
+              >
+                세션정보
+              </UnifiedButton>
+              
+              <UnifiedButton
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  sessionService.logout();
+                  window.location.reload();
+                }}
+                icon="🚪"
+              >
+                로그아웃
+              </UnifiedButton>
+            </div>
+          </div>
         </div>
+        
+        {/* Session Info Panel */}
+        {showSessionInfo && (
+          <div className="mt-6 p-4 bg-white rounded-lg border border-blue-200">
+            <h4 className="font-semibold text-gray-900 mb-3">세션 정보</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div>
+                <span className="text-gray-600">로그인 시간:</span>
+                <div className="font-medium">{new Date(parseInt(localStorage.getItem('login_time') || '0')).toLocaleString()}</div>
+              </div>
+              <div>
+                <span className="text-gray-600">마지막 활동:</span>
+                <div className="font-medium">{new Date(parseInt(localStorage.getItem('last_activity') || '0')).toLocaleString()}</div>
+              </div>
+              <div>
+                <span className="text-gray-600">자동 로그아웃:</span>
+                <div className="font-medium">{remainingTime}분 후</div>
+              </div>
+            </div>
+            <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+              <p className="text-xs text-blue-700">
+                💡 <strong>팁:</strong> 페이지를 새로고침해도 30분 이내라면 세션이 유지됩니다. 
+                활동이 없으면 5분 전에 연장 알림이 표시됩니다.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 프로젝트 현황 대시보드 */}
