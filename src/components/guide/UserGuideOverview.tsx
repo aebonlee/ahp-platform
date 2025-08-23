@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Card from '../common/Card';
-import Button from '../common/Button';
 import Tooltip from '../common/Tooltip';
+import LayerPopup from '../common/LayerPopup';
+import UnifiedButton from '../common/UnifiedButton';
 import HierarchyTreeVisualization from '../common/HierarchyTreeVisualization';
 import { DEMO_CRITERIA, DEMO_SUB_CRITERIA, DEMO_ALTERNATIVES, DEMO_PROJECTS } from '../../data/demoData';
 
@@ -115,28 +116,24 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
               <span className="text-base font-medium text-gray-700">표시 방식:</span>
               <div className="flex bg-gray-100 rounded-xl p-1">
                 <Tooltip content="기준들을 세로로 나열하여 표시합니다. 계층구조를 명확하게 볼 수 있습니다.">
-                  <button
+                  <UnifiedButton
+                    variant={layoutMode === 'vertical' ? 'primary' : 'secondary'}
+                    size="sm"
                     onClick={() => setLayoutMode('vertical')}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                      layoutMode === 'vertical' 
-                        ? 'bg-blue-500 text-white shadow-md' 
-                        : 'text-gray-600 hover:bg-gray-200'
-                    }`}
+                    icon="📋"
                   >
-                    📋 세로형
-                  </button>
+                    세로형
+                  </UnifiedButton>
                 </Tooltip>
                 <Tooltip content="기준들을 가로로 펼쳐서 표시합니다. 전체적인 구조를 한눈에 볼 수 있습니다.">
-                  <button
+                  <UnifiedButton
+                    variant={layoutMode === 'horizontal' ? 'success' : 'secondary'}
+                    size="sm"
                     onClick={() => setLayoutMode('horizontal')}
-                    className={`px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${
-                      layoutMode === 'horizontal' 
-                        ? 'bg-green-500 text-white shadow-md' 
-                        : 'text-gray-600 hover:bg-gray-200'
-                    }`}
+                    icon="📊"
                   >
-                    📊 가로형
-                  </button>
+                    가로형
+                  </UnifiedButton>
                 </Tooltip>
               </div>
             </div>
@@ -217,11 +214,33 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
                     <span className="text-sm font-medium text-orange-600 bg-orange-100 px-3 py-1 rounded-full">
                       대안 {index + 1}
                     </span>
-                    <Tooltip content={`${alt.name}에 대한 상세 정보를 확인할 수 있습니다.`}>
-                      <button className="text-orange-600 hover:text-orange-800 transition-colors">
-                        <span className="text-lg">ℹ️</span>
-                      </button>
-                    </Tooltip>
+                    <LayerPopup
+                      trigger={
+                        <UnifiedButton variant="info" size="sm" icon="ℹ️">
+                          상세정보
+                        </UnifiedButton>
+                      }
+                      title={`${alt.name} 상세 정보`}
+                      content={
+                        <div className="space-y-4">
+                          <div className="bg-orange-50 p-4 rounded-lg">
+                            <h4 className="font-semibold text-orange-900 mb-2">대안 설명</h4>
+                            <p className="text-orange-800">{alt.description}</p>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="bg-blue-50 p-3 rounded-lg">
+                              <h5 className="font-medium text-blue-900 mb-1">장점</h5>
+                              <p className="text-sm text-blue-800">높은 성능과 안정성을 제공합니다.</p>
+                            </div>
+                            <div className="bg-red-50 p-3 rounded-lg">
+                              <h5 className="font-medium text-red-900 mb-1">단점</h5>
+                              <p className="text-sm text-red-800">상대적으로 높은 비용이 필요합니다.</p>
+                            </div>
+                          </div>
+                        </div>
+                      }
+                      width="lg"
+                    />
                   </div>
                 </div>
               ))}
@@ -610,41 +629,80 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
 
             {/* Navigation Buttons */}
             <div className="flex flex-col md:flex-row justify-between items-center mt-10 pt-8 border-t gap-4">
-              <Tooltip content={currentStep === 1 ? "첫 번째 단계입니다" : "이전 단계로 돌아갑니다"}>
-                <Button
-                  variant="outline"
-                  onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-                  disabled={currentStep === 1}
-                  className="text-base px-6 py-3"
-                >
-                  ← 이전 단계
-                </Button>
-              </Tooltip>
+              <UnifiedButton
+                variant="secondary"
+                size="lg"
+                onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+                disabled={currentStep === 1}
+                icon="←"
+              >
+                이전 단계
+              </UnifiedButton>
 
-              <div className="text-lg font-medium text-gray-600">
-                {currentStep} / {guideSteps.length} 단계
-              </div>
+              <LayerPopup
+                trigger={
+                  <div className="text-lg font-medium text-blue-600 cursor-pointer hover:text-blue-800 transition-colors">
+                    {currentStep} / {guideSteps.length} 단계 📋
+                  </div>
+                }
+                title="가이드 진행 상황"
+                content={
+                  <div className="space-y-4">
+                    <div className="bg-blue-50 p-4 rounded-lg">
+                      <h4 className="font-semibold text-blue-900 mb-2">현재 진행 상황</h4>
+                      <div className="w-full bg-gray-200 rounded-full h-3 mb-2">
+                        <div 
+                          className="bg-blue-600 h-3 rounded-full transition-all duration-500" 
+                          style={{ width: `${(currentStep / guideSteps.length) * 100}%` }}
+                        ></div>
+                      </div>
+                      <p className="text-sm text-blue-800">
+                        {currentStep}단계 / 총 {guideSteps.length}단계 ({Math.round((currentStep / guideSteps.length) * 100)}% 완료)
+                      </p>
+                    </div>
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-gray-900">단계별 목록</h4>
+                      {guideSteps.map((step, index) => (
+                        <div 
+                          key={step.id}
+                          className={`p-2 rounded-lg flex items-center ${
+                            index + 1 === currentStep 
+                              ? 'bg-blue-100 text-blue-900' 
+                              : index + 1 < currentStep 
+                              ? 'bg-green-100 text-green-900'
+                              : 'bg-gray-100 text-gray-600'
+                          }`}
+                        >
+                          <span className="mr-2">
+                            {index + 1 < currentStep ? '✅' : index + 1 === currentStep ? '🔄' : '⏳'}
+                          </span>
+                          <span className="text-sm">{step.title}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                }
+                width="md"
+              />
 
               {currentStep < guideSteps.length ? (
-                <Tooltip content="다음 단계로 진행합니다">
-                  <Button
-                    variant="primary"
-                    onClick={() => setCurrentStep(Math.min(guideSteps.length, currentStep + 1))}
-                    className="text-base px-6 py-3"
-                  >
-                    다음 단계 →
-                  </Button>
-                </Tooltip>
+                <UnifiedButton
+                  variant="primary"
+                  size="lg"
+                  onClick={() => setCurrentStep(Math.min(guideSteps.length, currentStep + 1))}
+                  icon="→"
+                >
+                  다음 단계
+                </UnifiedButton>
               ) : (
-                <Tooltip content="가이드를 마치고 실제 서비스를 시작합니다">
-                  <Button
-                    variant="primary"
-                    onClick={onNavigateToService}
-                    className="bg-green-600 hover:bg-green-700 text-base px-8 py-3 text-lg font-semibold"
-                  >
-                    실제 서비스 시작하기 🚀
-                  </Button>
-                </Tooltip>
+                <UnifiedButton
+                  variant="success"
+                  size="lg"
+                  onClick={onNavigateToService}
+                  icon="🚀"
+                >
+                  실제 서비스 시작하기
+                </UnifiedButton>
               )}
             </div>
           </Card>
