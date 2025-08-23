@@ -8,6 +8,7 @@ interface UnifiedButtonProps {
   disabled?: boolean;
   className?: string;
   icon?: React.ReactNode;
+  title?: string;
 }
 
 const UnifiedButton: React.FC<UnifiedButtonProps> = ({
@@ -17,7 +18,8 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
   onClick,
   disabled = false,
   className = '',
-  icon
+  icon,
+  title
 }) => {
   const baseClasses = 'inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
@@ -48,6 +50,7 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
       className={buttonClasses}
       onClick={onClick}
       disabled={disabled}
+      title={title}
     >
       {icon && <span className="mr-2">{icon}</span>}
       {children}
