@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import UnifiedButton from '../common/UnifiedButton';
 import LayerPopup from '../common/LayerPopup';
 import sessionService from '../../services/sessionService';
+import { useTheme } from '../../hooks/useTheme';
 
 interface HeaderProps {
   user?: {
@@ -28,6 +29,8 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [favorites, setFavorites] = useState<FavoriteMenuItem[]>([]);
   const [showFavoriteModal, setShowFavoriteModal] = useState(false);
+  
+  const { theme, resolvedTheme, toggleTheme } = useTheme();
 
   useEffect(() => {
     // 세션 상태 확인 및 시간 업데이트
@@ -151,18 +154,47 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
     return items;
   };
 
+  const getThemeIcon = () => {
+    switch (theme) {
+      case 'light': return '☀️';
+      case 'dark': return '🌙';
+      case 'system': return '💻';
+      default: return '💻';
+    }
+  };
+
+  const getThemeLabel = () => {
+    switch (theme) {
+      case 'light': return '라이트 모드';
+      case 'dark': return '다크 모드';  
+      case 'system': return '시스템 설정';
+      default: return '시스템 설정';
+    }
+  };
+
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+    <header className="theme-surface sticky top-0 z-50 transition-all duration-300" 
+            style={{ 
+              backgroundColor: 'var(--surface)', 
+              borderBottom: '1px solid var(--border)',
+              boxShadow: 'var(--shadow-sm)'
+            }}>
       <div className="w-full" style={{ paddingLeft: '50px', paddingRight: '50px' }}>
         <div className="flex items-center justify-between h-18 py-2">
           {/* 왼쪽 로고 영역 */}
           <div className="flex-shrink-0">
             <button
               onClick={handleLogoClick}
-              className="flex items-center space-x-4 hover:opacity-80 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-xl p-3"
+              className="flex items-center space-x-4 hover:opacity-80 transition-all duration-200 theme-focus rounded-xl p-3"
+              style={{ borderRadius: 'var(--radius-md)' }}
             >
               {/* AHP 로고 아이콘 */}
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 via-purple-500 to-cyan-500 rounded-xl flex items-center justify-center shadow-lg">
+              <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
+                   style={{ 
+                     background: `linear-gradient(135deg, var(--accent-gold), var(--accent-gold-2))`,
+                     borderRadius: 'var(--radius-md)',
+                     boxShadow: 'var(--shadow-md)'
+                   }}>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <circle cx="12" cy="8" r="2" fill="white"/>
                   <circle cx="8" cy="14" r="1.5" fill="white"/>
@@ -180,10 +212,16 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                 </svg>
               </div>
               <div className="flex flex-col items-start">
-                <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-cyan-600 leading-tight">
+                <h1 className="text-2xl font-black leading-tight"
+                    style={{ 
+                      background: `linear-gradient(135deg, var(--accent-gold), var(--accent-gold-2))`,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text'
+                    }}>
                   AHP for Paper
                 </h1>
-                <p className="text-sm text-gray-600 font-medium leading-tight">
+                <p className="text-sm font-medium leading-tight theme-text-muted">
                   연구 논문을 위한 AHP 분석
                 </p>
               </div>
@@ -338,6 +376,20 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                     <span>{item.label}</span>
                   </button>
                 ))}
+              </div>
+
+              {/* 테마 토글 버튼 */}
+              <div className="flex items-center">
+                <UnifiedButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={toggleTheme}
+                  icon={getThemeIcon()}
+                  className="transition-all duration-300"
+                  title={getThemeLabel()}
+                >
+                  <span className="hidden sm:inline">{getThemeLabel()}</span>
+                </UnifiedButton>
               </div>
 
               {/* 세션 상태 */}
