@@ -482,21 +482,133 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   const renderOverview = () => (
     <div className="space-y-6">
-      {/* 통합된 환영 헤더 */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6">
+      {/* 현재 요금제 정보 */}
+      <div 
+        className="card-enhanced p-5"
+        style={{
+          background: 'linear-gradient(135deg, var(--status-success-light), var(--accent-light))',
+          borderColor: 'var(--status-success-border)'
+        }}
+      >
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div className="text-center lg:text-left space-y-4 flex-1">
-            <div className="inline-block p-4 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-lg shadow-sm">
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
-                환영합니다, {user.first_name} {user.last_name}님! 🎉
-              </h1>
-              <p className="text-blue-600 font-medium">
-                개인 AHP 의사결정 분석 서비스를 시작하세요
-              </p>
+          <div className="space-y-3">
+            <div className="flex items-center space-x-2">
+              <span 
+                className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                style={{
+                  backgroundColor: 'var(--status-success-bg)',
+                  color: 'white'
+                }}
+              >
+                💎 프리미엄 플랜
+              </span>
+              <span 
+                className="text-sm"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                월 ₩29,000
+              </span>
             </div>
-            <p className="text-gray-600 max-w-2xl lg:mx-0 mx-auto">
-              복잡한 의사결정을 체계적으로 분석하고, 객관적인 결과를 얻을 수 있습니다.
-            </p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+              <div className="flex items-center space-x-2">
+                <span style={{ color: 'var(--accent-primary)' }}>📋</span>
+                <span 
+                  className="font-medium"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  프로젝트:
+                </span>
+                <span 
+                  className="font-bold"
+                  style={{ color: 'var(--accent-primary)' }}
+                >
+                  {projects.length}/50
+                </span>
+                <div 
+                  className="flex-1 rounded-full h-2 ml-2"
+                  style={{ backgroundColor: 'var(--bg-elevated)' }}
+                >
+                  <div 
+                    className="h-2 rounded-full transition-all duration-300"
+                    style={{ 
+                      width: `${Math.min((projects.length / 50) * 100, 100)}%`,
+                      backgroundColor: 'var(--accent-primary)'
+                    }}
+                  ></div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span style={{ color: 'var(--accent-secondary)' }}>👥</span>
+                <span 
+                  className="font-medium"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  평가자:
+                </span>
+                <span 
+                  className="font-bold"
+                  style={{ color: 'var(--accent-secondary)' }}
+                >
+                  12/100
+                </span>
+                <div 
+                  className="flex-1 rounded-full h-2 ml-2"
+                  style={{ backgroundColor: 'var(--bg-elevated)' }}
+                >
+                  <div 
+                    className="h-2 rounded-full transition-all duration-300"
+                    style={{ 
+                      width: '12%',
+                      backgroundColor: 'var(--accent-secondary)'
+                    }}
+                  ></div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <span style={{ color: 'var(--status-success-bg)' }}>💾</span>
+                <span 
+                  className="font-medium"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  저장용량:
+                </span>
+                <span 
+                  className="font-bold"
+                  style={{ color: 'var(--status-success-text)' }}
+                >
+                  2.3GB/10GB
+                </span>
+                <div 
+                  className="flex-1 rounded-full h-2 ml-2"
+                  style={{ backgroundColor: 'var(--bg-elevated)' }}
+                >
+                  <div 
+                    className="h-2 rounded-full transition-all duration-300"
+                    style={{ 
+                      width: '23%',
+                      backgroundColor: 'var(--status-success-bg)'
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="text-center lg:text-right">
+            <button 
+              className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-lg"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                color: 'white'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+              }}
+            >
+              요금제 업그레이드
+            </button>
           </div>
         </div>
       </div>
@@ -2812,6 +2924,40 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* 환영 메시지 - 맨 상단 */}
+      <div 
+        className="rounded-lg border p-6"
+        style={{
+          background: 'linear-gradient(135deg, var(--accent-light), var(--bg-elevated))',
+          borderColor: 'var(--accent-primary)',
+          boxShadow: 'var(--shadow-sm)'
+        }}
+      >
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          <div className="text-center lg:text-left space-y-4 flex-1">
+            <div 
+              className="inline-block p-4 rounded-lg shadow-sm"
+              style={{
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                color: 'white'
+              }}
+            >
+              <h1 className="text-2xl font-bold mb-2">
+                환영합니다, AHP 테스터님! 🎉
+              </h1>
+              <p className="font-medium opacity-90">
+                개인 AHP 의사결정 분석 서비스를 시작하세요
+              </p>
+            </div>
+            <p 
+              className="max-w-2xl lg:mx-0 mx-auto"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              복잡한 의사결정을 체계적으로 분석하고, 객관적인 결과를 얻을 수 있습니다.
+            </p>
+          </div>
+        </div>
+      </div>
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -2834,106 +2980,91 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
       </div>
 
-      {/* Navigation Menu - Stable 4x3 Grid Layout */}
-      <div className="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/50 rounded-2xl border border-gray-200 p-6 shadow-sm">
-        <div className="mb-4">
-          <h2 className="text-lg font-bold text-gray-800 mb-1">서비스 메뉴</h2>
-          <p className="text-sm text-gray-600">AHP 의사결정 분석의 모든 기능을 한 곳에서</p>
+      {/* Compact Navigation Menu - 4x3 Grid Layout */}
+      <div 
+        className="card-enhanced p-4"
+        style={{
+          background: 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))',
+          boxShadow: 'var(--shadow-sm)'
+        }}
+      >
+        <div className="mb-3">
+          <h2 
+            className="text-base font-bold mb-1"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            서비스 메뉴
+          </h2>
+          <p 
+            className="text-xs"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            AHP 의사결정 분석의 모든 기능을 한 곳에서
+          </p>
         </div>
         
-        <div className="space-y-4">
-          {/* First Row - Core Functions (4 items) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계를 한눈에 확인', color: 'blue', priority: 'high' },
-              { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '생성한 모든 프로젝트 관리 및 편집', color: 'green', priority: 'high' },
-              { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새로운 AHP 분석 프로젝트 생성', color: 'purple', priority: 'high' },
-              { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안을 설정하여 모델 구성', color: 'orange', priority: 'high' }
-            ].map((item) => (
-              <div key={item.id} className="relative group">
-                <button
-                  onClick={() => handleTabChange(item.id)}
-                  aria-label={item.label}
-                  className={`w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform ${
-                    activeMenu === item.id
-                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-xl scale-[1.02] ring-2 ring-${item.color}-200`
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 shadow-sm'
-                  }`}
-                >
-                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
-                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
-                  {item.priority === 'high' && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></div>
-                  )}
-                </button>
-                {/* Enhanced Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-xl">
-                  {item.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                </div>
+        <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
+          {[
+            { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계', priority: 'high' },
+            { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '프로젝트 관리 및 편집', priority: 'high' },
+            { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새 AHP 프로젝트 생성', priority: 'high' },
+            { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안 설정', priority: 'high' },
+            { id: 'evaluators', label: '평가자', icon: '👥', tooltip: '평가 참여자 관리' },
+            { id: 'monitoring', label: '진행률', icon: '📈', tooltip: '실시간 모니터링' },
+            { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과' },
+            { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF 내보내기' },
+            { id: 'survey-links', label: '설문 링크', icon: '🔗', tooltip: '링크 생성 및 관리' },
+            { id: 'workshop', label: '워크숍', icon: '🎯', tooltip: '협업 의사결정' },
+            { id: 'decision-support', label: '의사결정', icon: '🧠', tooltip: '의사결정 지원 도구' },
+            { id: 'settings', label: '설정', icon: '⚙️', tooltip: '계정 및 환경 설정' }
+          ].map((item) => (
+            <div key={item.id} className="relative group">
+              <button
+                onClick={() => handleTabChange(item.id)}
+                aria-label={item.label}
+                className="w-full p-3 rounded-lg border transition-all duration-200 text-center hover:shadow-md transform hover:scale-[1.02]"
+                style={{
+                  backgroundColor: activeMenu === item.id ? 'var(--accent-light)' : 'var(--bg-secondary)',
+                  borderColor: activeMenu === item.id ? 'var(--accent-primary)' : 'var(--border-light)',
+                  color: activeMenu === item.id ? 'var(--accent-secondary)' : 'var(--text-primary)',
+                  transform: activeMenu === item.id ? 'scale(1.02)' : 'scale(1)',
+                  boxShadow: activeMenu === item.id ? 'var(--shadow-md)' : 'var(--shadow-xs)'
+                }}
+                onMouseEnter={(e) => {
+                  if (activeMenu !== item.id) {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                    e.currentTarget.style.borderColor = 'var(--border-medium)';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (activeMenu !== item.id) {
+                    e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                    e.currentTarget.style.borderColor = 'var(--border-light)';
+                  }
+                }}
+              >
+                <div className="text-xl mb-1">{item.icon}</div>
+                <div className="font-medium text-xs leading-tight">{item.label}</div>
+                {item.priority === 'high' && (
+                  <div 
+                    className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
+                    style={{ backgroundColor: 'var(--status-danger-bg)' }}
+                  ></div>
+                )}
+              </button>
+              {/* Compact Tooltip */}
+              <div 
+                className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-30"
+                style={{ backgroundColor: 'var(--text-primary)' }}
+              >
+                {item.tooltip}
+                <div 
+                  className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent"
+                  style={{ borderTopColor: 'var(--text-primary)' }}
+                ></div>
               </div>
-            ))}
-          </div>
-
-          {/* Second Row - Management & Analysis (4 items) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { id: 'evaluators', label: '평가자 관리', icon: '👥', tooltip: '평가 참여자 초대 및 권한 관리', color: 'pink' },
-              { id: 'monitoring', label: '진행률 확인', icon: '📈', tooltip: '평가 진행 상황 실시간 모니터링', color: 'indigo' },
-              { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과와 순위 확인', color: 'cyan' },
-              { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기', color: 'emerald' }
-            ].map((item) => (
-              <div key={item.id} className="relative group">
-                <button
-                  onClick={() => handleTabChange(item.id)}
-                  aria-label={item.label}
-                  className={`w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform ${
-                    activeMenu === item.id
-                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-xl scale-[1.02] ring-2 ring-${item.color}-200`
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 shadow-sm'
-                  }`}
-                >
-                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
-                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
-                </button>
-                {/* Enhanced Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-xl">
-                  {item.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Third Row - Advanced Features (4 items) */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            {[
-              { id: 'survey-links', label: '설문 링크', icon: '🔗', tooltip: '평가자별 설문 링크 생성 및 관리', color: 'amber' },
-              { id: 'workshop', label: '워크숍', icon: '🎯', tooltip: '협업 의사결정 워크숍 관리', color: 'red' },
-              { id: 'decision-support', label: '의사결정 지원', icon: '🧠', tooltip: '과학적 의사결정 지원 도구', color: 'violet' },
-              { id: 'settings', label: '설정', icon: '⚙️', tooltip: '개인 계정 및 환경 설정', color: 'slate' }
-            ].map((item) => (
-              <div key={item.id} className="relative group">
-                <button
-                  onClick={() => handleTabChange(item.id)}
-                  aria-label={item.label}
-                  className={`w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform ${
-                    activeMenu === item.id
-                      ? `border-${item.color}-400 bg-${item.color}-50 text-${item.color}-700 shadow-xl scale-[1.02] ring-2 ring-${item.color}-200`
-                      : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50 shadow-sm'
-                  }`}
-                >
-                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
-                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
-                </button>
-                {/* Enhanced Tooltip */}
-                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 bg-gray-900 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-xl">
-                  {item.tooltip}
-                  <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
-                </div>
-              </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
