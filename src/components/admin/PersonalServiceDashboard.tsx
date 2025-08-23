@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
-import UnifiedButton from '../common/UnifiedButton';
 import CriteriaManagement from './CriteriaManagement';
 import AlternativeManagement from './AlternativeManagement';
 import EvaluatorAssignment from './EvaluatorAssignment';
@@ -17,7 +16,6 @@ import WorkshopManagement from '../workshop/WorkshopManagement';
 import DecisionSupportSystem from '../decision/DecisionSupportSystem';
 import PaperManagement from '../paper/PaperManagement';
 import ProjectSelector from '../project/ProjectSelector';
-import { API_BASE_URL } from '../../config/api';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
 
@@ -43,56 +41,6 @@ interface UserProject extends Omit<ProjectData, 'evaluation_method'> {
   evaluation_method: 'pairwise' | 'direct' | 'mixed'; // 레거시 호환성
 }
 
-// 토큰 유효성 검사 (세션 서비스 미사용)
-const isTokenValid = (token: string | null): boolean => {
-  if (!token) return false;
-  // 프로덕션 환경에서는 항상 true
-  if (process.env.NODE_ENV === 'production') {
-    return true;
-  }
-  return token.length > 0;
-};
-
-// 레거시 토큰 검증 (호환성 유지)
-const legacyTokenValid = (token: string | null): boolean => {
-  if (!token) return false;
-  
-  // 프로덕션 환경(GitHub Pages)에서는 토큰 검증 스킵
-  if (process.env.NODE_ENV === 'production') {
-    return true;
-  }
-  
-  try {
-    // JWT 토큰 구조 확인 (Header.Payload.Signature)
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      // 일반 토큰(non-JWT)도 허용
-      return token.length > 0;
-    }
-    
-    // JWT 토큰인 경우 Payload 디코딩하여 만료 시간 확인
-    try {
-      const payload = JSON.parse(atob(parts[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
-      
-      // exp (expiration time) 확인
-      if (payload.exp && payload.exp < currentTime) {
-        console.log('Token expired');
-        return false;
-      }
-    } catch (e) {
-      // JWT 디코딩 실패해도 토큰은 유효한 것으로 간주
-      console.log('Token decode failed, but treating as valid');
-      return true;
-    }
-    
-    return true;
-  } catch (error) {
-    console.error('Invalid token format:', error);
-    // 에러가 발생해도 토큰이 있으면 유효한 것으로 간주
-    return token.length > 0;
-  }
-};
 
 const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({ 
   user, 
@@ -2980,91 +2928,145 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
       </div>
 
-      {/* Compact Navigation Menu - 4x3 Grid Layout */}
+      {/* Enhanced Navigation Menu - 2 Rows Layout */}
       <div 
-        className="card-enhanced p-4"
+        className="card-enhanced p-6"
         style={{
           background: 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))',
           boxShadow: 'var(--shadow-sm)'
         }}
       >
-        <div className="mb-3">
+        <div className="mb-4">
           <h2 
-            className="text-base font-bold mb-1"
+            className="text-lg font-bold mb-1"
             style={{ color: 'var(--text-primary)' }}
           >
             서비스 메뉴
           </h2>
           <p 
-            className="text-xs"
+            className="text-sm"
             style={{ color: 'var(--text-secondary)' }}
           >
             AHP 의사결정 분석의 모든 기능을 한 곳에서
           </p>
         </div>
         
-        <div className="grid grid-cols-3 lg:grid-cols-4 gap-3">
-          {[
-            { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계', priority: 'high' },
-            { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '프로젝트 관리 및 편집', priority: 'high' },
-            { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새 AHP 프로젝트 생성', priority: 'high' },
-            { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안 설정', priority: 'high' },
-            { id: 'evaluators', label: '평가자', icon: '👥', tooltip: '평가 참여자 관리' },
-            { id: 'monitoring', label: '진행률', icon: '📈', tooltip: '실시간 모니터링' },
-            { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과' },
-            { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF 내보내기' },
-            { id: 'survey-links', label: '설문 링크', icon: '🔗', tooltip: '링크 생성 및 관리' },
-            { id: 'workshop', label: '워크숍', icon: '🎯', tooltip: '협업 의사결정' },
-            { id: 'decision-support', label: '의사결정', icon: '🧠', tooltip: '의사결정 지원 도구' },
-            { id: 'settings', label: '설정', icon: '⚙️', tooltip: '계정 및 환경 설정' }
-          ].map((item) => (
-            <div key={item.id} className="relative group">
-              <button
-                onClick={() => handleTabChange(item.id)}
-                aria-label={item.label}
-                className="w-full p-3 rounded-lg border transition-all duration-200 text-center hover:shadow-md transform hover:scale-[1.02]"
-                style={{
-                  backgroundColor: activeMenu === item.id ? 'var(--accent-light)' : 'var(--bg-secondary)',
-                  borderColor: activeMenu === item.id ? 'var(--accent-primary)' : 'var(--border-light)',
-                  color: activeMenu === item.id ? 'var(--accent-secondary)' : 'var(--text-primary)',
-                  transform: activeMenu === item.id ? 'scale(1.02)' : 'scale(1)',
-                  boxShadow: activeMenu === item.id ? 'var(--shadow-md)' : 'var(--shadow-xs)'
-                }}
-                onMouseEnter={(e) => {
-                  if (activeMenu !== item.id) {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
-                    e.currentTarget.style.borderColor = 'var(--border-medium)';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (activeMenu !== item.id) {
-                    e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
-                    e.currentTarget.style.borderColor = 'var(--border-light)';
-                  }
-                }}
-              >
-                <div className="text-xl mb-1">{item.icon}</div>
-                <div className="font-medium text-xs leading-tight">{item.label}</div>
-                {item.priority === 'high' && (
-                  <div 
-                    className="absolute -top-1 -right-1 w-2 h-2 rounded-full"
-                    style={{ backgroundColor: 'var(--status-danger-bg)' }}
-                  ></div>
-                )}
-              </button>
-              {/* Compact Tooltip */}
-              <div 
-                className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-30"
-                style={{ backgroundColor: 'var(--text-primary)' }}
-              >
-                {item.tooltip}
+        <div className="space-y-4">
+          {/* First Row - Core Functions (6 items) */}
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계를 한눈에 확인', priority: 'high' },
+              { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '생성한 모든 프로젝트 관리 및 편집', priority: 'high' },
+              { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새로운 AHP 분석 프로젝트 생성', priority: 'high' },
+              { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안을 설정하여 모델 구성', priority: 'high' },
+              { id: 'evaluators', label: '평가자 관리', icon: '👥', tooltip: '평가 참여자 초대 및 권한 관리' },
+              { id: 'monitoring', label: '진행률 확인', icon: '📈', tooltip: '평가 진행 상황 실시간 모니터링' }
+            ].map((item) => (
+              <div key={item.id} className="relative group">
+                <button
+                  onClick={() => handleTabChange(item.id)}
+                  aria-label={item.label}
+                  className="w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform"
+                  style={{
+                    backgroundColor: activeMenu === item.id ? 'var(--accent-light)' : 'var(--bg-secondary)',
+                    borderColor: activeMenu === item.id ? 'var(--accent-primary)' : 'var(--border-light)',
+                    color: activeMenu === item.id ? 'var(--accent-secondary)' : 'var(--text-primary)',
+                    transform: activeMenu === item.id ? 'scale(1.02)' : 'scale(1)',
+                    boxShadow: activeMenu === item.id ? 'var(--shadow-xl)' : 'var(--shadow-sm)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeMenu !== item.id) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                      e.currentTarget.style.borderColor = 'var(--border-medium)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeMenu !== item.id) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                      e.currentTarget.style.borderColor = 'var(--border-light)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                    }
+                  }}
+                >
+                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
+                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
+                  {item.priority === 'high' && (
+                    <div 
+                      className="absolute -top-1 -right-1 w-3 h-3 rounded-full"
+                      style={{ backgroundColor: 'var(--status-danger-bg)' }}
+                    ></div>
+                  )}
+                </button>
+                {/* Enhanced Tooltip */}
                 <div 
-                  className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-2 border-r-2 border-t-2 border-transparent"
-                  style={{ borderTopColor: 'var(--text-primary)' }}
-                ></div>
+                  className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-xl"
+                  style={{ backgroundColor: 'var(--text-primary)' }}
+                >
+                  {item.tooltip}
+                  <div 
+                    className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent"
+                    style={{ borderTopColor: 'var(--text-primary)' }}
+                  ></div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
+
+          {/* Second Row - Advanced Functions (6 items) */}
+          <div className="grid grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과와 순위 확인' },
+              { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기' },
+              { id: 'survey-links', label: '설문 링크', icon: '🔗', tooltip: '평가자별 설문 링크 생성 및 관리' },
+              { id: 'workshop', label: '워크숍', icon: '🎯', tooltip: '협업 의사결정 워크숍 관리' },
+              { id: 'decision-support', label: '의사결정 지원', icon: '🧠', tooltip: '과학적 의사결정 지원 도구' },
+              { id: 'settings', label: '설정', icon: '⚙️', tooltip: '개인 계정 및 환경 설정' }
+            ].map((item) => (
+              <div key={item.id} className="relative group">
+                <button
+                  onClick={() => handleTabChange(item.id)}
+                  aria-label={item.label}
+                  className="w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform"
+                  style={{
+                    backgroundColor: activeMenu === item.id ? 'var(--accent-light)' : 'var(--bg-secondary)',
+                    borderColor: activeMenu === item.id ? 'var(--accent-primary)' : 'var(--border-light)',
+                    color: activeMenu === item.id ? 'var(--accent-secondary)' : 'var(--text-primary)',
+                    transform: activeMenu === item.id ? 'scale(1.02)' : 'scale(1)',
+                    boxShadow: activeMenu === item.id ? 'var(--shadow-xl)' : 'var(--shadow-sm)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeMenu !== item.id) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                      e.currentTarget.style.borderColor = 'var(--border-medium)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeMenu !== item.id) {
+                      e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
+                      e.currentTarget.style.borderColor = 'var(--border-light)';
+                      e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+                    }
+                  }}
+                >
+                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
+                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
+                </button>
+                {/* Enhanced Tooltip */}
+                <div 
+                  className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-3 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none whitespace-nowrap z-30 shadow-xl"
+                  style={{ backgroundColor: 'var(--text-primary)' }}
+                >
+                  {item.tooltip}
+                  <div 
+                    className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent"
+                    style={{ borderTopColor: 'var(--text-primary)' }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
