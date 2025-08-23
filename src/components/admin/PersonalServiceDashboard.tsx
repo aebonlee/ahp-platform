@@ -2834,9 +2834,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* 환영 메시지 + 요금제 정보 통합 */}
-      <div className="space-y-8 py-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
         {/* 환영 메시지 */}
-        <div className="text-center space-y-6">
+        <div className="text-center lg:text-left space-y-6">
           <div className="space-y-3">
             <h1 
               className="text-4xl lg:text-5xl font-light tracking-wide"
@@ -2853,7 +2853,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 {user.first_name} {user.last_name}
               </span>님
             </h1>
-            <div className="flex items-center justify-center space-x-2">
+            <div className="flex items-center justify-center lg:justify-start space-x-2">
               <div 
                 className="w-12 h-0.5 rounded-full"
                 style={{ backgroundColor: 'var(--accent-primary)' }}
@@ -2885,9 +2885,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         {/* 통합된 요금제 및 사용량 정보 */}
         <div className="space-y-6">
           {/* 플랜 정보 헤더 */}
-          <div className="text-center space-y-4">
-            <div className="flex items-center justify-center space-x-6">
-              <div className="text-center">
+          <div className="text-center lg:text-left space-y-4">
+            <div className="flex items-center justify-center lg:justify-start space-x-6">
+              <div className="text-center lg:text-left">
                 <div 
                   className="text-2xl font-light mb-1"
                   style={{ color: 'var(--text-primary)' }}
@@ -2917,7 +2917,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               </div>
             </div>
             
-            <div className="flex justify-center space-x-3">
+            <div className="flex justify-center lg:justify-start space-x-3">
               <button 
                 onClick={() => handleTabChange('payment')}
                 className="px-6 py-2 text-sm font-medium transition-all duration-300 border border-transparent"
