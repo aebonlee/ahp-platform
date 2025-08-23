@@ -79,7 +79,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
   const menuItems = getMenuItems();
 
   return (
-    <div className={`fixed left-0 h-full transition-luxury z-40 scrollbar-luxury overflow-y-auto ${
+    <aside className={`fixed left-0 h-full transition-luxury z-40 scrollbar-luxury overflow-y-auto ${
       isCollapsed ? 'w-16' : ''
     }`}
          style={{
@@ -200,7 +200,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
           })}
         </nav>
       </div>
-    </div>
+    </aside>
   );
 };
 

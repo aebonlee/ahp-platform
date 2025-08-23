@@ -166,38 +166,43 @@
 }
 
 /* ============================================================================
-   Dark Mode - Sophisticated Dark Theme
+   Dark Mode - Sophisticated Dark Theme with Better Readability
    ============================================================================ */
 :root[data-theme="dark"] {
   /* Dark mode surface colors */
   --bg-primary:    #0f0f0f;   /* Deeper black for better contrast */
-  --bg-secondary:  #171717;   /* Card backgrounds */
-  --bg-elevated:   #1f1f1f;   /* Elevated surfaces */
-  --bg-subtle:     #2a2a2a;   /* Subtle backgrounds */
+  --bg-secondary:  #1a1a1a;   /* Slightly lighter card backgrounds */
+  --bg-elevated:   #242424;   /* More visible elevated surfaces */
+  --bg-subtle:     #2e2e2e;   /* Better contrast subtle backgrounds */
   
-  /* Dark mode typography */
-  --text-primary:   #f8f8f8;  /* High contrast white */
-  --text-secondary: #e7e7e7;  /* Secondary text */
-  --text-tertiary:  #c8c8c8;  /* Tertiary text */
-  --text-muted:     #9a9a9a;  /* Muted text */
-  --text-inverse:   #181818;  /* Dark text on light backgrounds */
+  /* Dark mode typography - Enhanced for readability */
+  --text-primary:   #ffffff;  /* Pure white for maximum contrast */
+  --text-secondary: #e8e8e8;  /* Bright secondary text */
+  --text-tertiary:  #d0d0d0;  /* More visible tertiary text */
+  --text-muted:     #a8a8a8;  /* Brighter muted text */
+  --text-inverse:   #0a0a0a;  /* Very dark text on light backgrounds */
   
-  /* Dark mode borders */
-  --border-light:   #2a2a2a;  /* Light borders */
-  --border-medium:  #3a3a3a;  /* Medium borders */
-  --border-strong:  #4a4a4a;  /* Strong borders */
+  /* Dark mode borders - More visible */
+  --border-light:   #333333;  /* More visible light borders */
+  --border-medium:  #404040;  /* Better contrast medium borders */
+  --border-strong:  #555555;  /* Clear strong borders */
   
-  /* Enhanced shadows for dark mode */
-  --shadow-xs:  0 1px 3px rgba(0, 0, 0, 0.3);
-  --shadow-sm:  0 2px 10px rgba(0, 0, 0, 0.5);
-  --shadow-md:  0 8px 30px rgba(0, 0, 0, 0.55);
-  --shadow-lg:  0 16px 50px rgba(0, 0, 0, 0.6);
-  --shadow-xl:  0 24px 70px rgba(0, 0, 0, 0.65);
-  --shadow-2xl: 0 35px 90px rgba(0, 0, 0, 0.7);
+  /* Enhanced shadows for dark mode - More subtle */
+  --shadow-xs:  0 1px 3px rgba(0, 0, 0, 0.4);
+  --shadow-sm:  0 2px 10px rgba(0, 0, 0, 0.6);
+  --shadow-md:  0 8px 30px rgba(0, 0, 0, 0.7);
+  --shadow-lg:  0 16px 50px rgba(0, 0, 0, 0.75);
+  --shadow-xl:  0 24px 70px rgba(0, 0, 0, 0.8);
+  --shadow-2xl: 0 35px 90px rgba(0, 0, 0, 0.85);
   
   /* Dark mode specific overrides */
-  --ahp-surface-elevated: rgba(200, 169, 104, 0.1);
-  --ivory: #2a2a2a; /* Darker ivory substitute */
+  --ahp-surface-elevated: rgba(200, 169, 104, 0.08);
+  --ivory: #2e2e2e; /* Better contrast ivory substitute */
+  
+  /* Gold colors adjusted for dark mode */
+  --gold-primary:   #D4B569;   /* Brighter gold for dark backgrounds */
+  --gold-secondary: #B59A4D;   /* Adjusted secondary gold */
+  --gold-light:     #F0E0B0;   /* Light gold for dark mode */
   
   /* Legacy compatibility */
   --bg:            var(--bg-primary);
@@ -222,29 +227,34 @@
   :root:not([data-theme]) {
     /* Apply dark mode variables when system preference is dark */
     --bg-primary:    #0f0f0f;
-    --bg-secondary:  #171717;
-    --bg-elevated:   #1f1f1f;
-    --bg-subtle:     #2a2a2a;
+    --bg-secondary:  #1a1a1a;
+    --bg-elevated:   #242424;
+    --bg-subtle:     #2e2e2e;
     
-    --text-primary:   #f8f8f8;
-    --text-secondary: #e7e7e7;
-    --text-tertiary:  #c8c8c8;
-    --text-muted:     #9a9a9a;
-    --text-inverse:   #181818;
+    --text-primary:   #ffffff;
+    --text-secondary: #e8e8e8;
+    --text-tertiary:  #d0d0d0;
+    --text-muted:     #a8a8a8;
+    --text-inverse:   #0a0a0a;
     
-    --border-light:   #2a2a2a;
-    --border-medium:  #3a3a3a;
-    --border-strong:  #4a4a4a;
+    --border-light:   #333333;
+    --border-medium:  #404040;
+    --border-strong:  #555555;
     
-    --shadow-xs:  0 1px 3px rgba(0, 0, 0, 0.3);
-    --shadow-sm:  0 2px 10px rgba(0, 0, 0, 0.5);
-    --shadow-md:  0 8px 30px rgba(0, 0, 0, 0.55);
-    --shadow-lg:  0 16px 50px rgba(0, 0, 0, 0.6);
-    --shadow-xl:  0 24px 70px rgba(0, 0, 0, 0.65);
-    --shadow-2xl: 0 35px 90px rgba(0, 0, 0, 0.7);
+    --shadow-xs:  0 1px 3px rgba(0, 0, 0, 0.4);
+    --shadow-sm:  0 2px 10px rgba(0, 0, 0, 0.6);
+    --shadow-md:  0 8px 30px rgba(0, 0, 0, 0.7);
+    --shadow-lg:  0 16px 50px rgba(0, 0, 0, 0.75);
+    --shadow-xl:  0 24px 70px rgba(0, 0, 0, 0.8);
+    --shadow-2xl: 0 35px 90px rgba(0, 0, 0, 0.85);
     
-    --ahp-surface-elevated: rgba(200, 169, 104, 0.1);
-    --ivory: #2a2a2a;
+    --ahp-surface-elevated: rgba(200, 169, 104, 0.08);
+    --ivory: #2e2e2e;
+    
+    /* Gold colors adjusted for dark mode */
+    --gold-primary:   #D4B569;
+    --gold-secondary: #B59A4D;
+    --gold-light:     #F0E0B0;
     
     /* Legacy compatibility */
     --bg:            var(--bg-primary);
@@ -422,7 +432,28 @@
   
   /* Legacy scrollbar class support */
   .custom-scrollbar {
-    @apply scrollbar-luxury;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-medium) var(--bg-elevated);
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: var(--bg-elevated);
+    border-radius: var(--radius-sm);
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, var(--border-light), var(--border-medium));
+    border-radius: var(--radius-sm);
+    transition: var(--transition-normal);
+  }
+  
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, var(--border-medium), var(--border-strong));
   }
 }
 
