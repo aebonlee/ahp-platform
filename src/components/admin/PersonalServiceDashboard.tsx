@@ -173,21 +173,45 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     setError(null);
     
     try {
+      // 프로덕션 환경(GitHub Pages)에서는 데모 모드로 처리
+      const isDemoMode = process.env.NODE_ENV === 'production';
+      
+      if (isDemoMode) {
+        console.log('📊 데모 모드에서 프로젝트 로드');
+        // 데모 데이터 사용
+        setProjects([
+          {
+            id: 'demo-project-1',
+            title: 'AI 개발 활용 방안 AHP 분석',
+            description: '인공지능 기술의 개발 및 활용 방안에 대한 의사결정 분석',
+            status: 'active',
+            created_at: '2024-01-01T00:00:00Z',
+            updated_at: '2024-01-01T00:00:00Z'
+          }
+        ]);
+        setLoading(false);
+        return;
+      }
+      
       const token = localStorage.getItem('token');
       
-      // 토큰이 없으면 로그인 필요
+      // 토큰이 없으면 로그인 필요 (개발 모드에서만)
       if (!token) {
         console.log('No token found, authentication required');
         setProjects([]);
         setError('로그인이 필요합니다.');
         setLoading(false);
         setTimeout(() => {
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
+          }
         }, 2000);
         return;
       }
 
-      // 토큰 유효성 검사
+      // 토큰 유효성 검사 (개발 모드에서만)
       if (!isTokenValid(token)) {
         console.log('Invalid token, authentication required');
         localStorage.removeItem('token');
@@ -195,7 +219,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
         setLoading(false);
         setTimeout(() => {
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
+          }
         }, 2000);
         return;
       }
@@ -245,7 +273,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setProjects([]);
         setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
         setTimeout(() => {
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
+          }
         }, 2000);
       } else {
         // 서버 오류
@@ -344,7 +376,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setError('로그인이 만료되었거나 유효하지 않습니다. 다시 로그인해주세요.');
         setLoading(false);
         setTimeout(() => {
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
+          }
         }, 2000);
         return;
       }
@@ -387,7 +423,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           // 토큰이 만료되었거나 유효하지 않음
           localStorage.removeItem('token');
           setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
         } else {
           throw new Error('프로젝트 수정에 실패했습니다.');
         }
@@ -436,7 +474,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           localStorage.removeItem('token');
           setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
           // 로그인 페이지로 리다이렉트하거나 재로그인 모달 표시
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
         } else {
           const errorData = await response.json();
           throw new Error(errorData.error || '프로젝트 생성에 실패했습니다.');
@@ -496,7 +536,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setError('로그인이 필요합니다.');
         setLoading(false);
         setTimeout(() => {
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
+          }
         }, 2000);
         return;
       }
@@ -507,7 +551,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
         setLoading(false);
         setTimeout(() => {
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
+          }
         }, 2000);
         return;
       }
@@ -576,7 +624,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         localStorage.removeItem('token');
         setError('로그인이 만료되었습니다. 다시 로그인해주세요.');
         setTimeout(() => {
-          window.location.href = '/';
+          if (process.env.NODE_ENV !== 'production') {
+            if (process.env.NODE_ENV !== 'production') {
+            window.location.href = '/';
+          }
+          }
         }, 2000);
       } else {
         // 서버 오류
