@@ -334,6 +334,17 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   const handleDeleteProject = async (projectId: string) => {
     if (window.confirm('정말로 이 프로젝트를 삭제하시겠습니까? 모든 관련 데이터가 삭제됩니다.')) {
       try {
+        // 프로덕션 환경(GitHub Pages)에서는 데모 모드로 처리
+        const isDemoMode = process.env.NODE_ENV === 'production';
+        
+        if (isDemoMode) {
+          console.log('📊 데모 모드에서 프로젝트 삭제');
+          const updatedProjects = projects.filter(p => p.id !== projectId);
+          setProjects(updatedProjects);
+          console.log('Project deleted successfully:', projectId);
+          return;
+        }
+
         const token = localStorage.getItem('token');
         if (!token) {
           alert('로그인이 필요합니다.');
@@ -374,6 +385,48 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     setError(null);
 
     try {
+      // 프로덕션 환경(GitHub Pages)에서는 데모 모드로 처리
+      const isDemoMode = process.env.NODE_ENV === 'production';
+      
+      if (isDemoMode) {
+        console.log('📊 데모 모드에서 프로젝트 저장');
+        // 데모 모드에서는 로컬 상태로만 처리
+        const newProject = {
+          id: `demo-project-${Date.now()}`,
+          title: projectForm.title,
+          description: projectForm.description,
+          objective: projectForm.objective,
+          status: 'active' as const,
+          evaluation_mode: projectForm.evaluation_mode,
+          workflow_stage: projectForm.workflow_stage,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          evaluator_count: 0,
+          completion_rate: 0,
+          criteria_count: 0,
+          alternatives_count: 0,
+          last_modified: new Date().toISOString().split('T')[0],
+          evaluation_method: projectForm.evaluation_method
+        };
+        
+        if (editingProject) {
+          // 편집 모드
+          const updatedProjects = projects.map(p => 
+            p.id === editingProject.id ? { ...newProject, id: editingProject.id } : p
+          );
+          setProjects(updatedProjects);
+        } else {
+          // 생성 모드
+          const updatedProjects = [...projects, newProject];
+          setProjects(updatedProjects);
+          setSelectedProjectId(newProject.id);
+        }
+        
+        resetProjectForm();
+        setLoading(false);
+        return;
+      }
+
       const token = localStorage.getItem('token');
       if (!isTokenValid(token)) {
         localStorage.removeItem('token');
