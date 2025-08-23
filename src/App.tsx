@@ -159,15 +159,16 @@ function App() {
     console.log('🎯 데모 모드 강제 활성화 - AI 개발 활용 방안 AHP 분석');
     setBackendStatus('unavailable');
     setIsDemoMode(true);
-    setUser({
-      ...DEMO_USER,
-      id: '1',
-      email: 'admin@ahp-system.com',
-      admin_type: 'personal'
-    });
+    // 자동 로그인 제거 - 사용자가 직접 로그인하도록
+    // setUser({
+    //   ...DEMO_USER,
+    //   id: '1',
+    //   email: 'admin@ahp-system.com',
+    //   admin_type: 'personal'
+    // });
     setProjects(DEMO_PROJECTS);
-    setSelectedProjectId(DEMO_PROJECTS[0].id);
-    setActiveTab('personal-service'); // welcome에서 personal-service로 변경
+    // setSelectedProjectId(DEMO_PROJECTS[0].id);
+    // setActiveTab('personal-service'); // 자동 이동 제거
     setIsNavigationReady(true);
     console.log('✅ 데모 데이터 설정 완료');
   };
