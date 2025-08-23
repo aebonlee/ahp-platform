@@ -341,7 +341,8 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                                 style={{
                                   background: 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))',
                                   borderColor: 'var(--border-light)',
-                                  border: '1px solid'
+                                  border: '1px solid',
+                                  animationDelay: `${index * 0.1}s`
                                 }}
                                 onMouseEnter={(e) => {
                                   e.currentTarget.style.background = 'linear-gradient(135deg, var(--interactive-primary-light), var(--accent-light))';
@@ -351,7 +352,6 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                                   e.currentTarget.style.background = 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))';
                                   e.currentTarget.style.borderColor = 'var(--border-light)';
                                 }}
-                                style={{ animationDelay: `${index * 0.1}s` }}
                               >
                                 <button
                                   onClick={() => {
@@ -366,9 +366,8 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                                   <div className="flex-1">
                                     <span className="font-semibold transition-colors duration-300"
                                           style={{ 
-                                            color: 'var(--text-primary)',
-                                            '--hover-color': 'var(--interactive-secondary)'
-                                          }}
+                                            color: 'var(--text-primary)'
+                                          } as React.CSSProperties}
                                           onMouseEnter={(e) => e.currentTarget.style.color = 'var(--interactive-secondary)'}
                                           onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-primary)'}>
                                       {fav.label}

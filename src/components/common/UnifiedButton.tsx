@@ -9,6 +9,9 @@ interface UnifiedButtonProps {
   className?: string;
   icon?: React.ReactNode;
   title?: string;
+  style?: React.CSSProperties;
+  onMouseEnter?: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  onMouseLeave?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 }
 
 const UnifiedButton: React.FC<UnifiedButtonProps> = ({
@@ -19,7 +22,10 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
   disabled = false,
   className = '',
   icon,
-  title
+  title,
+  style,
+  onMouseEnter,
+  onMouseLeave
 }) => {
   const baseClasses = 'inline-flex items-center justify-center font-medium transition-luxury focus-luxury disabled:opacity-50 disabled:cursor-not-allowed border';
   
@@ -88,11 +94,14 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
 
   const buttonStyle = {
     ...variantStyles[variant],
+    ...style, // Allow external styles to override
     cursor: disabled ? 'not-allowed' : 'pointer'
   };
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!disabled) {
+    if (onMouseEnter) {
+      onMouseEnter(e);
+    } else if (!disabled) {
       const element = e.currentTarget;
       element.style.transform = 'translateY(-2px) scale(1.02)';
       
@@ -111,7 +120,9 @@ const UnifiedButton: React.FC<UnifiedButtonProps> = ({
   };
 
   const handleMouseLeave = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (!disabled) {
+    if (onMouseLeave) {
+      onMouseLeave(e);
+    } else if (!disabled) {
       const element = e.currentTarget;
       element.style.transform = 'translateY(0) scale(1)';
       element.style.boxShadow = variantStyles[variant].boxShadow;
