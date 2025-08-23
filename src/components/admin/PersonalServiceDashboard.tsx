@@ -621,7 +621,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
             <h3 className="font-bold text-gray-900">새 프로젝트</h3>
             <p className="text-sm text-gray-600">AHP 분석 프로젝트를 생성하세요</p>
-            <Button variant="primary" size="sm" className="w-full">
+            <Button variant="primary" className="w-full p-4 lg:p-5 text-lg lg:text-xl">
               프로젝트 생성
             </Button>
           </div>
@@ -635,7 +635,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
             <h3 className="font-bold text-gray-900">내 프로젝트</h3>
             <p className="text-sm text-gray-600">기존 프로젝트를 관리하세요</p>
-            <Button variant="secondary" size="sm" className="w-full">
+            <Button variant="secondary" className="w-full p-4 lg:p-5 text-lg lg:text-xl">
               프로젝트 보기
             </Button>
           </div>
@@ -649,7 +649,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
             <h3 className="font-bold text-gray-900">평가자 관리</h3>
             <p className="text-sm text-gray-600">평가자를 초대하고 관리하세요</p>
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" className="w-full p-4 lg:p-5 text-lg lg:text-xl">
               평가자 관리
             </Button>
           </div>
@@ -663,7 +663,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
             <h3 className="font-bold text-gray-900">설문 링크</h3>
             <p className="text-sm text-gray-600">단축 링크와 QR 코드 관리</p>
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" className="w-full p-4 lg:p-5 text-lg lg:text-xl">
               링크 관리
             </Button>
           </div>
@@ -677,7 +677,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
             <h3 className="font-bold text-gray-900">결과 분석</h3>
             <p className="text-sm text-gray-600">분석 결과를 확인하세요</p>
-            <Button variant="outline" size="sm" className="w-full">
+            <Button variant="outline" className="w-full p-4 lg:p-5 text-lg lg:text-xl">
               결과 보기
             </Button>
           </div>
@@ -752,10 +752,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               AHP 분석을 통해 복잡한 의사결정을 체계적으로 해결할 수 있습니다.
             </p>
             <div className="flex justify-center space-x-4">
-              <Button variant="primary" onClick={() => handleTabChange('creation')}>
+              <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('creation')}>
                 ➕ 새 프로젝트 생성
               </Button>
-              <Button variant="outline" onClick={() => handleTabChange('user-guide')}>
+              <Button variant="outline" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('user-guide')}>
                 📚 사용자 가이드
               </Button>
             </div>
@@ -844,7 +844,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <Card title="프로젝트 설정">
             <div className="space-y-4">
               <p>프로젝트 기본 정보를 설정하는 단계입니다.</p>
-              <Button variant="primary" onClick={() => setCurrentStep('criteria')}>
+              <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('criteria')}>
                 다음 단계: 기준 설정
               </Button>
             </div>
@@ -859,10 +859,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               onCriteriaChange={handleCriteriaCountUpdate}
             />
             <div className="flex justify-between">
-              <Button variant="secondary" onClick={() => setCurrentStep('projects')}>
+              <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('projects')}>
                 이전
               </Button>
-              <Button variant="primary" onClick={() => setCurrentStep('alternatives')}>
+              <Button variant="primary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('alternatives')}>
                 다음: 대안 설정
               </Button>
             </div>
@@ -877,10 +877,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               onAlternativesChange={handleAlternativesCountUpdate}
             />
             <div className="flex justify-between">
-              <Button variant="secondary" onClick={() => setCurrentStep('criteria')}>
+              <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('criteria')}>
                 이전
               </Button>
-              <Button variant="primary" onClick={() => setCurrentStep('evaluators')}>
+              <Button variant="primary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('evaluators')}>
                 다음: 평가자 배정
               </Button>
             </div>
@@ -891,10 +891,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="space-y-4">
             <EvaluatorAssignment projectId={selectedProjectId} onComplete={() => setCurrentStep('finalize')} />
             <div className="flex justify-between">
-              <Button variant="secondary" onClick={() => setCurrentStep('alternatives')}>
+              <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('alternatives')}>
                 이전
               </Button>
-              <Button variant="primary" onClick={() => setCurrentStep('finalize')}>
+              <Button variant="primary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('finalize')}>
                 다음: 모델 확정
               </Button>
             </div>
@@ -1021,7 +1021,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
               </div>
               <div className="flex space-x-2">
-                <Button variant="primary" onClick={() => handleTabChange('creation')}>
+                <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('creation')}>
                   ➕ 새 프로젝트 생성
                 </Button>
               </div>
@@ -1182,7 +1182,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               </button>
             </div>
 
-            <Button variant="primary" size="sm" onClick={() => setIsProjectFormOpen(true)}>
+            <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setIsProjectFormOpen(true)}>
               ➕ 새 프로젝트
             </Button>
           </div>
@@ -1291,7 +1291,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             AHP 분석을 통해 복잡한 의사결정을 체계적으로 해결할 수 있습니다. 
             지금 바로 새 프로젝트를 생성하여 시작해보세요.
           </p>
-          <Button variant="primary" onClick={() => setIsProjectFormOpen(true)}>
+          <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setIsProjectFormOpen(true)}>
             ➕ 새 프로젝트 생성
           </Button>
           <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
@@ -1319,7 +1319,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <p className="text-gray-600 mb-4">
             다른 검색어를 시도하거나 필터를 조정해보세요.
           </p>
-          <Button variant="secondary" onClick={() => {
+          <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => {
             setSearchTerm('');
             setFilterStatus('all');
           }}>
@@ -2270,7 +2270,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <span className="ml-2 text-sm">차트</span>
               </label>
             </div>
-            <Button variant="primary" className="w-full">
+            <Button variant="primary" className="w-full p-4 lg:p-5 text-lg lg:text-xl">
               📊 Excel 다운로드
             </Button>
           </div>
@@ -2295,7 +2295,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <span className="ml-2 text-sm">상세 분석</span>
               </label>
             </div>
-            <Button variant="primary" className="w-full">
+            <Button variant="primary" className="w-full p-4 lg:p-5 text-lg lg:text-xl">
               📄 PDF 다운로드
             </Button>
           </div>
@@ -2320,7 +2320,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <span className="ml-2 text-sm">결론 및 제안</span>
               </label>
             </div>
-            <Button variant="primary" className="w-full">
+            <Button variant="primary" className="w-full p-4 lg:p-5 text-lg lg:text-xl">
               📺 PPT 다운로드
             </Button>
           </div>
@@ -2385,7 +2385,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
           </div>
           <div className="flex justify-end">
-            <Button variant="primary">
+            <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl">
               맞춤 보고서 생성
             </Button>
           </div>
@@ -2452,10 +2452,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
               </div>
               <div className="flex space-x-2">
-                <Button variant="secondary" onClick={() => handleTabChange('analysis')}>
+                <Button variant="secondary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('analysis')}>
                   📊 고급 분석
                 </Button>
-                <Button variant="secondary" onClick={() => handleTabChange('workshop')}>
+                <Button variant="secondary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('workshop')}>
                   🎯 워크숍
                 </Button>
               </div>
@@ -2565,7 +2565,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">조직/부서</label>
               <input type="text" placeholder="예: 개발팀" className="w-full border border-gray-300 rounded px-3 py-2" />
             </div>
-            <Button variant="primary">
+            <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl">
               정보 업데이트
             </Button>
           </div>
@@ -2585,7 +2585,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
               <input type="password" className="w-full border border-gray-300 rounded px-3 py-2" />
             </div>
-            <Button variant="primary">
+            <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl">
               비밀번호 변경
             </Button>
           </div>
@@ -2725,13 +2725,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     </div>
                   </div>
                   <div className="mt-6 flex space-x-3">
-                    <Button variant="primary" onClick={() => setCurrentStep('criteria')}>
+                    <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('criteria')}>
                       🎯 기준 설정 시작
                     </Button>
-                    <Button variant="secondary" onClick={() => setCurrentStep('alternatives')}>
+                    <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('alternatives')}>
                       📋 대안 관리
                     </Button>
-                    <Button variant="secondary" onClick={() => setCurrentStep('evaluators')}>
+                    <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('evaluators')}>
                       👥 평가자 관리
                     </Button>
                   </div>
@@ -2749,7 +2749,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div className="text-gray-400 text-6xl mb-4">🏗️</div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">모델을 구축할 프로젝트를 선택하세요</h3>
                 <p className="text-gray-600 mb-4">프로젝트를 선택하고 단계별로 모델을 구성해보세요.</p>
-                <Button variant="primary" onClick={() => handleTabChange('projects')}>
+                <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('projects')}>
                   프로젝트 선택하기
                 </Button>
               </div>
@@ -2797,7 +2797,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         return currentStep !== 'overview' ? renderStepContent() : (
           <Card title="모델 구축">
             <p>프로젝트를 선택하고 단계별로 모델을 구성해보세요.</p>
-            <Button variant="secondary" onClick={() => handleTabChange('projects')}>
+            <Button variant="secondary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('projects')}>
               프로젝트 선택하기
             </Button>
           </Card>
@@ -2872,7 +2872,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      {/* 환영 메시지 - 맨 상단 */}
+      {/* 환영 메시지 + 요금제 정보 통합 */}
       <div 
         className="rounded-lg border p-6"
         style={{
@@ -2881,28 +2881,161 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           boxShadow: 'var(--shadow-sm)'
         }}
       >
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          <div className="text-center lg:text-left space-y-4 flex-1">
-            <div 
-              className="inline-block p-4 rounded-lg shadow-sm"
-              style={{
-                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                color: 'white'
-              }}
-            >
-              <h1 className="text-2xl font-bold mb-2">
-                환영합니다, AHP 테스터님! 🎉
-              </h1>
-              <p className="font-medium opacity-90">
-                개인 AHP 의사결정 분석 서비스를 시작하세요
+        <div className="space-y-6">
+          {/* 환영 메시지 */}
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+            <div className="text-center lg:text-left space-y-4 flex-1">
+              <div 
+                className="inline-block p-4 rounded-lg shadow-sm"
+                style={{
+                  background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                  color: 'white'
+                }}
+              >
+                <h1 className="text-2xl font-bold mb-2">
+                  환영합니다, AHP 테스터님! 🎉
+                </h1>
+                <p className="font-medium opacity-90">
+                  개인 AHP 의사결정 분석 서비스를 시작하세요
+                </p>
+              </div>
+              <p 
+                className="max-w-2xl lg:mx-0 mx-auto"
+                style={{ color: 'var(--text-secondary)' }}
+              >
+                복잡한 의사결정을 체계적으로 분석하고, 객관적인 결과를 얻을 수 있습니다.
               </p>
             </div>
-            <p 
-              className="max-w-2xl lg:mx-0 mx-auto"
-              style={{ color: 'var(--text-secondary)' }}
-            >
-              복잡한 의사결정을 체계적으로 분석하고, 객관적인 결과를 얻을 수 있습니다.
-            </p>
+            <div className="text-center lg:text-right">
+              <button 
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 hover:shadow-lg"
+                style={{
+                  background: 'linear-gradient(135deg, var(--status-success-bg), var(--accent-secondary))',
+                  color: 'white'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)';
+                }}
+              >
+                요금제 업그레이드
+              </button>
+            </div>
+          </div>
+
+          {/* 현재 요금제 정보 */}
+          <div 
+            className="p-4 rounded-lg border"
+            style={{
+              background: 'linear-gradient(135deg, var(--status-success-light), var(--bg-secondary))',
+              borderColor: 'var(--status-success-border)'
+            }}
+          >
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
+              <div className="flex items-center space-x-3">
+                <span 
+                  className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium"
+                  style={{
+                    backgroundColor: 'var(--status-success-bg)',
+                    color: 'white'
+                  }}
+                >
+                  💎 프리미엄 플랜
+                </span>
+                <span 
+                  className="text-sm font-medium"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  월 ₩29,000
+                </span>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 text-sm flex-1 lg:ml-6">
+                <div className="flex items-center space-x-2">
+                  <span style={{ color: 'var(--accent-primary)' }}>📋</span>
+                  <span 
+                    className="font-medium"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    프로젝트:
+                  </span>
+                  <span 
+                    className="font-bold"
+                    style={{ color: 'var(--accent-primary)' }}
+                  >
+                    {projects.length}/50
+                  </span>
+                  <div 
+                    className="flex-1 rounded-full h-2 ml-2"
+                    style={{ backgroundColor: 'var(--bg-elevated)' }}
+                  >
+                    <div 
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: `${Math.min((projects.length / 50) * 100, 100)}%`,
+                        backgroundColor: 'var(--accent-primary)'
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span style={{ color: 'var(--accent-secondary)' }}>👥</span>
+                  <span 
+                    className="font-medium"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    평가자:
+                  </span>
+                  <span 
+                    className="font-bold"
+                    style={{ color: 'var(--accent-secondary)' }}
+                  >
+                    12/100
+                  </span>
+                  <div 
+                    className="flex-1 rounded-full h-2 ml-2"
+                    style={{ backgroundColor: 'var(--bg-elevated)' }}
+                  >
+                    <div 
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: '12%',
+                        backgroundColor: 'var(--accent-secondary)'
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span style={{ color: 'var(--status-success-bg)' }}>💾</span>
+                  <span 
+                    className="font-medium"
+                    style={{ color: 'var(--text-secondary)' }}
+                  >
+                    저장용량:
+                  </span>
+                  <span 
+                    className="font-bold"
+                    style={{ color: 'var(--status-success-text)' }}
+                  >
+                    2.3GB/10GB
+                  </span>
+                  <div 
+                    className="flex-1 rounded-full h-2 ml-2"
+                    style={{ backgroundColor: 'var(--bg-elevated)' }}
+                  >
+                    <div 
+                      className="h-2 rounded-full transition-all duration-300"
+                      style={{ 
+                        width: '23%',
+                        backgroundColor: 'var(--status-success-bg)'
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
