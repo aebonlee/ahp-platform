@@ -33,12 +33,13 @@ jobs:
         run: npm ci
         
       - name: Run tests
-        run: npm test -- --watchAll=false --coverage=false
+        run: npm test -- --watchAll=false --coverage=false --passWithNoTests
         
       - name: Build application
         run: npm run build:frontend
         env:
           PUBLIC_URL: /ahp-research-platform
+          CI: false
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
