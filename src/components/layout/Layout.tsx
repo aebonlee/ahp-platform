@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
+import SessionBar from '../common/SessionBar';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -50,6 +51,7 @@ const Layout: React.FC<LayoutProps> = ({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SessionBar />
       <Header 
         user={user} 
         onLogout={onLogout} 
