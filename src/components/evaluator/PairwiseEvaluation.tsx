@@ -125,43 +125,46 @@ const PairwiseEvaluation: React.FC<PairwiseEvaluationProps> = ({
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              단계 2 — 평가하기 / 쌍대비교
-            </h1>
-            <p className="text-gray-600">
-              프로젝트: <span className="font-medium">{projectTitle}</span>
-            </p>
+    <div className="page-evaluator">
+      <div className="page-content content-width-evaluator">
+        <div className="page-header">
+          <h1 className="page-title">
+            단계 2 — 평가하기 / 쌍대비교
+          </h1>
+          <p className="page-subtitle">
+            프로젝트: <span className="font-medium">{projectTitle}</span>
+          </p>
+          <div className="mt-4">
+            <Button variant="secondary" onClick={onBack}>
+              프로젝트 선택으로
+            </Button>
           </div>
-          <Button variant="secondary" onClick={onBack}>
-            프로젝트 선택으로
-          </Button>
         </div>
 
         {/* Progress Indicator */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+        <div className="card-enhanced p-4 mb-6">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm font-medium text-gray-700">전체 진행률</span>
-            <span className="text-sm text-gray-600">
+            <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>전체 진행률</span>
+            <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               {currentMatrixIndex + 1} / {matrices.length} 매트릭스
             </span>
           </div>
-          <div className="w-full bg-gray-200 rounded-full h-3">
+          <div className="w-full rounded-full h-3" style={{ backgroundColor: 'var(--bg-elevated)' }}>
             <div 
-              className="bg-blue-500 h-3 rounded-full transition-all duration-300"
-              style={{ width: `${getProgressPercentage()}%` }}
+              className="h-3 rounded-full transition-all duration-300"
+              style={{ 
+                width: `${getProgressPercentage()}%`,
+                background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))'
+              }}
             />
           </div>
-          <div className="text-xs text-gray-500 mt-1">
+          <div className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
             {getProgressPercentage()}% 완료
           </div>
         </div>
 
         {/* Matrix Navigation */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 mb-6">
+        <div className="card-enhanced p-4 mb-6">
           <div className="flex flex-wrap gap-2">
             {matrices.map((matrix, index) => (
               <button
@@ -172,13 +175,40 @@ const PairwiseEvaluation: React.FC<PairwiseEvaluationProps> = ({
                   }
                 }}
                 disabled={!matrix.completed && index !== currentMatrixIndex}
-                className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  index === currentMatrixIndex
-                    ? 'bg-blue-500 text-white'
-                    : matrix.completed
-                    ? 'bg-green-100 text-green-800 hover:bg-green-200'
-                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                }`}
+                className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+                style={{
+                  backgroundColor: index === currentMatrixIndex 
+                    ? 'var(--accent-primary)'
+                    : matrix.completed 
+                    ? 'var(--status-success-light)'
+                    : 'var(--bg-elevated)',
+                  color: index === currentMatrixIndex 
+                    ? 'white'
+                    : matrix.completed 
+                    ? 'var(--status-success-text)'
+                    : 'var(--text-muted)',
+                  borderColor: index === currentMatrixIndex 
+                    ? 'var(--accent-primary)'
+                    : matrix.completed 
+                    ? 'var(--status-success-border)'
+                    : 'var(--border-light)',
+                  border: '1px solid',
+                  cursor: !matrix.completed && index !== currentMatrixIndex ? 'not-allowed' : 'pointer'
+                }}
+                onMouseEnter={(e) => {
+                  if (matrix.completed || index === currentMatrixIndex) {
+                    if (index !== currentMatrixIndex) {
+                      e.currentTarget.style.backgroundColor = 'var(--status-success-bg)';
+                      e.currentTarget.style.color = 'white';
+                    }
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (index !== currentMatrixIndex && matrix.completed) {
+                    e.currentTarget.style.backgroundColor = 'var(--status-success-light)';
+                    e.currentTarget.style.color = 'var(--status-success-text)';
+                  }
+                }}
               >
                 <span className="mr-2">
                   {matrix.completed ? '✓' : index + 1}
@@ -188,119 +218,137 @@ const PairwiseEvaluation: React.FC<PairwiseEvaluationProps> = ({
             ))}
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main Matrix Area */}
-        <div className="lg:col-span-2">
-          <Card title={currentMatrix?.name || ''}>
-            {currentMatrix && (
-              <div className="space-y-4">
-                <MatrixGrid
-                  items={currentMatrix.items}
-                  values={currentMatrix.values}
-                  onUpdate={handleMatrixUpdate}
-                />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Matrix Area */}
+          <div className="lg:col-span-2">
+            <Card title={currentMatrix?.name || ''}>
+              {currentMatrix && (
+                <div className="space-y-4">
+                  <MatrixGrid
+                    items={currentMatrix.items}
+                    values={currentMatrix.values}
+                    onUpdate={handleMatrixUpdate}
+                  />
 
-                {/* Consistency Ratio */}
-                {currentMatrix.items.length >= 3 && currentMatrix.consistencyRatio !== undefined && (
-                  <div className="mt-4">
-                    <div className={`p-3 rounded-lg border ${
-                      currentMatrix.consistencyRatio <= 0.1 
-                        ? 'bg-green-50 border-green-200' 
-                        : 'bg-orange-50 border-orange-200'
-                    }`}>
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-medium text-gray-700">
-                          비일관성비율 (CR)
-                        </span>
-                        <span className={`font-semibold ${
-                          currentMatrix.consistencyRatio <= 0.1 
-                            ? 'text-green-600' 
-                            : 'text-orange-600'
-                        }`}>
-                          {currentMatrix.consistencyRatio.toFixed(3)}
-                        </span>
-                      </div>
-                      <div className="text-xs text-gray-600 mt-1">
-                        {currentMatrix.consistencyRatio <= 0.1 
-                          ? '✓ 일관성이 양호합니다' 
-                          : '⚠ 일관성을 개선해주세요 (기준: ≤ 0.1)'}
+                  {/* Consistency Ratio */}
+                  {currentMatrix.items.length >= 3 && currentMatrix.consistencyRatio !== undefined && (
+                    <div className="mt-4">
+                      <div className="p-3 rounded-lg border"
+                           style={{
+                             backgroundColor: currentMatrix.consistencyRatio <= 0.1 
+                               ? 'var(--status-success-light)' 
+                               : 'var(--status-warning-light)',
+                             borderColor: currentMatrix.consistencyRatio <= 0.1 
+                               ? 'var(--status-success-border)' 
+                               : 'var(--status-warning-border)'
+                           }}>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                            비일관성비율 (CR)
+                          </span>
+                          <span className="font-semibold"
+                                style={{
+                                  color: currentMatrix.consistencyRatio <= 0.1 
+                                    ? 'var(--status-success-text)' 
+                                    : 'var(--status-warning-text)'
+                                }}>
+                            {currentMatrix.consistencyRatio.toFixed(3)}
+                          </span>
+                        </div>
+                        <div className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
+                          {currentMatrix.consistencyRatio <= 0.1 
+                            ? '✓ 일관성이 양호합니다' 
+                            : '⚠ 일관성을 개선해주세요 (기준: ≤ 0.1)'}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Next Button */}
-                <div className="flex justify-end mt-6">
-                  <Button
-                    onClick={handleMatrixComplete}
-                    variant="primary"
-                    size="lg"
-                    disabled={!isMatrixCompleted()}
+                  {/* Next Button */}
+                  <div className="flex justify-end mt-6">
+                    <Button
+                      onClick={handleMatrixComplete}
+                      variant="primary"
+                      size="lg"
+                      disabled={!isMatrixCompleted()}
+                    >
+                      {currentMatrixIndex === matrices.length - 1 ? '평가 완료' : '다음'}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Card>
+          </div>
+
+          {/* Side Panel */}
+          <div className="lg:col-span-1">
+            <div className="sticky top-6 space-y-4">
+              {/* Help Button */}
+              <Card>
+                <div className="text-center">
+                  <button
+                    onClick={() => setShowHelper(!showHelper)}
+                    className="w-full p-3 rounded-lg transition-all duration-300"
+                    style={{
+                      backgroundColor: 'var(--interactive-primary-light)',
+                      color: 'var(--interactive-secondary)',
+                      border: '1px solid var(--interactive-primary)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--interactive-primary)';
+                      e.currentTarget.style.color = 'white';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--interactive-primary-light)';
+                      e.currentTarget.style.color = 'var(--interactive-secondary)';
+                    }}
                   >
-                    {currentMatrixIndex === matrices.length - 1 ? '평가 완료' : '다음'}
-                  </Button>
+                    <span className="text-2xl">❓</span>
+                    <div className="text-sm font-medium mt-1">
+                      판단 도우미
+                    </div>
+                  </button>
                 </div>
-              </div>
-            )}
-          </Card>
-        </div>
+              </Card>
 
-        {/* Side Panel */}
-        <div className="lg:col-span-1">
-          <div className="sticky top-6 space-y-4">
-            {/* Help Button */}
-            <Card>
-              <div className="text-center">
-                <button
-                  onClick={() => setShowHelper(!showHelper)}
-                  className="w-full p-3 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors"
-                >
-                  <span className="text-2xl">❓</span>
-                  <div className="text-sm font-medium text-blue-900 mt-1">
-                    판단 도우미
+              {/* Judgment Helper Panel */}
+              {showHelper && (
+                <JudgmentHelper 
+                  currentMatrix={currentMatrix}
+                  onClose={() => setShowHelper(false)}
+                />
+              )}
+
+              {/* Scale Reference */}
+              <Card title="쌍대비교 척도">
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between">
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-weight-semibold)' }}>1</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>동등하게 중요</span>
                   </div>
-                </button>
-              </div>
-            </Card>
-
-            {/* Judgment Helper Panel */}
-            {showHelper && (
-              <JudgmentHelper 
-                currentMatrix={currentMatrix}
-                onClose={() => setShowHelper(false)}
-              />
-            )}
-
-            {/* Scale Reference */}
-            <Card title="쌍대비교 척도">
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between">
-                  <span>1</span>
-                  <span>동등하게 중요</span>
+                  <div className="flex justify-between">
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-weight-semibold)' }}>3</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>약간 더 중요</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-weight-semibold)' }}>5</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>중요</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-weight-semibold)' }}>7</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>매우 중요</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span style={{ color: 'var(--text-primary)', fontWeight: 'var(--font-weight-semibold)' }}>9</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>절대적으로 중요</span>
+                  </div>
+                  <div className="text-center mt-2" style={{ color: 'var(--text-muted)' }}>
+                    2, 4, 6, 8은 중간값
+                  </div>
                 </div>
-                <div className="flex justify-between">
-                  <span>3</span>
-                  <span>약간 더 중요</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>5</span>
-                  <span>중요</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>7</span>
-                  <span>매우 중요</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>9</span>
-                  <span>절대적으로 중요</span>
-                </div>
-                <div className="text-gray-500 text-center mt-2">
-                  2, 4, 6, 8은 중간값
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           </div>
         </div>
       </div>

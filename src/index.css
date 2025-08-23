@@ -59,17 +59,19 @@
   --border-focus:   var(--gold-primary); /* Focus ring color */
 
   /* === Layout System === */
-  --container-max-width: 1600px;     /* Wider main content container */
-  --container-content-width: 1400px; /* Content area within container */
+  --container-max-width: 1880px;     /* Max desktop width (under 1980px) */
+  --container-desktop-width: 1600px; /* Standard desktop content width */
+  --container-tablet-width: 1024px;  /* Tablet optimized width */
+  --container-mobile-width: 100%;    /* Mobile full width */
   --sidebar-width: 280px;            /* Sidebar width */
   --header-height: 72px;             /* Header height (4.5rem) */
   
   /* === Responsive Breakpoints === */
-  --breakpoint-sm: 640px;   /* Mobile */
-  --breakpoint-md: 768px;   /* Tablet */
-  --breakpoint-lg: 1024px;  /* Desktop */
-  --breakpoint-xl: 1280px;  /* Large Desktop */
-  --breakpoint-2xl: 1536px; /* Extra Large Desktop */
+  --breakpoint-mobile: 768px;   /* Mobile/Tablet threshold */
+  --breakpoint-tablet: 1024px;  /* Tablet/Desktop threshold */
+  --breakpoint-desktop: 1280px; /* Standard Desktop */
+  --breakpoint-large: 1680px;   /* Large Desktop */
+  --breakpoint-xlarge: 1980px;  /* Extra Large Desktop */
   
   /* === Border Radius (12px system) === */
   --radius-xs:  12px;  /* Unified radius */
@@ -397,8 +399,9 @@
     text-rendering: optimizeLegibility;
     font-feature-settings: 'kern', 'liga', 'clig', 'calt';
     
-    /* Color & Background */
-    background-color: var(--bg-primary);
+    /* Unified Background - Force consistency */
+    background-color: var(--bg-primary) !important;
+    background: var(--bg-primary) !important;
     color: var(--text-primary);
     
     /* Smooth Transitions */
@@ -408,6 +411,12 @@
     /* Enhanced Readability */
     -webkit-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
+  }
+
+  /* Ensure all page backgrounds are consistent */
+  #root {
+    background-color: var(--bg-primary) !important;
+    min-height: 100vh;
   }
   
   /* Headings with Luxury Typography */
@@ -559,8 +568,8 @@
     border-radius: 9999px !important;
   }
 
-  /* === Responsive Container System === */
-  .container-responsive {
+  /* === Enhanced Responsive Container System === */
+  .container-adaptive {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
@@ -568,62 +577,65 @@
     padding-right: 1rem;
   }
 
-  /* Mobile First Approach */
-  @media (min-width: 640px) {
-    .container-responsive {
-      max-width: 640px;
+  /* Mobile - Tablet optimized for evaluators */
+  @media (max-width: 1023px) {
+    .container-adaptive {
+      max-width: var(--container-tablet-width);
       padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
   }
 
-  @media (min-width: 768px) {
-    .container-responsive {
-      max-width: 768px;
-      padding-left: 2rem;
-      padding-right: 2rem;
-    }
-  }
-
-  @media (min-width: 1024px) {
-    .container-responsive {
-      max-width: 1024px;
+  /* Desktop - Standard */
+  @media (min-width: 1024px) and (max-width: 1679px) {
+    .container-adaptive {
+      max-width: var(--container-desktop-width);
       padding-left: 2.5rem;
       padding-right: 2.5rem;
     }
   }
 
-  @media (min-width: 1280px) {
-    .container-responsive {
-      max-width: var(--container-content-width);
+  /* Large Desktop */
+  @media (min-width: 1680px) and (max-width: 1979px) {
+    .container-adaptive {
+      max-width: var(--container-max-width);
       padding-left: 3rem;
       padding-right: 3rem;
     }
   }
 
-  @media (min-width: 1536px) {
-    .container-responsive {
+  /* Extra Large Desktop (1980px+) */
+  @media (min-width: 1980px) {
+    .container-adaptive {
       max-width: var(--container-max-width);
       padding-left: 4rem;
       padding-right: 4rem;
     }
   }
 
-  /* === Content Width Utilities === */
-  .content-width {
-    max-width: var(--container-content-width);
+  /* === Specialized Content Widths === */
+  .content-width-evaluator {
+    max-width: var(--container-tablet-width);
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+
+  .content-width-admin {
+    max-width: var(--container-desktop-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
   }
 
   .content-width-full {
     max-width: var(--container-max-width);
     margin-left: auto;
     margin-right: auto;
-    padding-left: 2rem;
-    padding-right: 2rem;
+    padding-left: 3rem;
+    padding-right: 3rem;
   }
 
   /* === Typography Utilities === */
@@ -664,33 +676,62 @@
     }
   }
 
-  /* === Page Layout Utilities === */
+  /* === Unified Page Layout System === */
+  .page-wrapper {
+    min-height: calc(100vh - var(--header-height));
+    background-color: var(--bg-primary);
+    padding: 0;
+  }
+
   .page-container {
+    width: 100%;
     min-height: calc(100vh - var(--header-height));
     background-color: var(--bg-primary);
     padding: 2rem 1rem;
   }
 
-  @media (min-width: 768px) {
-    .page-container {
-      padding: 3rem 2rem;
-    }
-  }
-
   .page-content {
-    max-width: var(--container-content-width);
-    margin: 0 auto;
+    width: 100%;
     background-color: var(--bg-secondary);
     border-radius: 12px;
     padding: 2rem;
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border-light);
+    margin: 0 auto;
   }
 
-  @media (min-width: 768px) {
+  /* Responsive page content sizing */
+  @media (max-width: 1023px) {
     .page-content {
+      max-width: var(--container-tablet-width);
+      padding: 2rem 1.5rem;
+    }
+  }
+
+  @media (min-width: 1024px) and (max-width: 1679px) {
+    .page-content {
+      max-width: var(--container-desktop-width);
+      padding: 3rem 2.5rem;
+    }
+  }
+
+  @media (min-width: 1680px) {
+    .page-content {
+      max-width: var(--container-max-width);
       padding: 3rem;
     }
+  }
+
+  /* === Specialized Page Layouts === */
+  .page-evaluator {
+    background-color: var(--bg-primary);
+    min-height: calc(100vh - var(--header-height));
+  }
+
+  .page-evaluator .page-content {
+    max-width: var(--container-tablet-width);
+    margin: 0 auto;
+    padding: 2rem;
   }
 
   .page-header {

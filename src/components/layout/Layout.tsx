@@ -109,7 +109,7 @@ const Layout: React.FC<LayoutProps> = ({
                 minHeight: 'calc(100vh - var(--header-height))',
                 transition: 'margin-left 0.3s ease'
               }}>
-          <div className="content-width-full section-padding">
+          <div className="container-adaptive section-padding">
             {children}
           </div>
         </main>
