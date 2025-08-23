@@ -58,11 +58,18 @@ function App() {
   useEffect(() => {
     const isProduction = process.env.NODE_ENV === 'production';
     
+    console.log('🚀 앱 초기화:', { 
+      nodeEnv: process.env.NODE_ENV,
+      isProduction,
+      currentUrl: window.location.href
+    });
+    
     if (isProduction) {
       console.log('🎯 프로덕션 환경 - 데모 모드 활성화');
       activateDemoMode();
       setIsNavigationReady(true);
     } else {
+      console.log('🔧 개발 환경 - 백엔드 연결 확인');
       checkBackendAndInitialize();
     }
     
@@ -324,8 +331,16 @@ function App() {
     setLoginError('');
 
     try {
+      console.log('🔍 로그인 시도:', { 
+        email, 
+        password: password ? '***' : 'empty',
+        isDemoMode,
+        backendStatus,
+        nodeEnv: process.env.NODE_ENV
+      });
+      
       if (isDemoMode) {
-        console.log('🔍 데모 모드 로그인 시도:', { email, password: password ? '***' : 'empty' });
+        console.log('✅ 데모 모드에서 로그인 처리 중');
         
         // 실제 운영 계정 설정
         let authenticatedUser: any = null;
