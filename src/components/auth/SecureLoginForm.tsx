@@ -85,7 +85,9 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
 
   if (mode === 'selection') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden" style={{
+        background: 'linear-gradient(to bottom right, var(--bg-elevated), var(--accent-primary), var(--accent-secondary))'
+      }}>
         {/* Background decoration */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl"></div>
@@ -97,13 +99,19 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
         <div className="max-w-4xl w-full space-y-8 relative z-10">
           <div className="text-center">
             <div className="mb-8">
-              <h1 className="text-6xl font-black text-white mb-4 drop-shadow-lg">
+              <h1 className="text-6xl font-black mb-4 drop-shadow-lg" style={{
+                color: 'var(--text-inverse)'
+              }}>
                 AHP for Paper
               </h1>
-              <p className="text-2xl text-blue-100 font-semibold">
+              <p className="text-2xl font-semibold" style={{
+                color: 'var(--text-inverse)'
+              }}>
                 보안 강화된 의사결정 지원 시스템
               </p>
-              <p className="text-lg text-blue-200 mt-2 font-medium">
+              <p className="text-lg mt-2 font-medium" style={{
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}>
                 Secure Analytic Hierarchy Process Decision Support System
               </p>
             </div>
@@ -120,12 +128,18 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
                     <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/>
                   </svg>
                 </div>
-                <h3 className="text-2xl font-black text-neutral-900 mb-4">서비스 이용</h3>
-                <p className="text-neutral-700 mb-6 leading-relaxed font-medium">
+                <h3 className="text-2xl font-black mb-4" style={{
+                  color: 'var(--text-primary)'
+                }}>서비스 이용</h3>
+                <p className="mb-6 leading-relaxed font-medium" style={{
+                  color: 'var(--text-secondary)'
+                }}>
                   AHP 평가를 수행하고 결과를 분석합니다. 
                   보안 강화된 로그인으로 안전한 평가 환경을 제공합니다.
                 </p>
-                <div className="flex items-center justify-center space-x-2 text-primary-600">
+                <div className="flex items-center justify-center space-x-2" style={{
+                  color: 'var(--accent-primary)'
+                }}>
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                   </svg>
@@ -145,12 +159,18 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
                     <path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"/>
                   </svg>
                 </div>
-                <h3 className="text-2xl font-black text-neutral-900 mb-4">관리자 패널</h3>
-                <p className="text-neutral-700 mb-6 leading-relaxed font-medium">
+                <h3 className="text-2xl font-black mb-4" style={{
+                  color: 'var(--text-primary)'
+                }}>관리자 패널</h3>
+                <p className="mb-6 leading-relaxed font-medium" style={{
+                  color: 'var(--text-secondary)'
+                }}>
                   프로젝트 관리, 사용자 관리, 시스템 설정을 수행합니다.
                   고급 보안 인증이 필요합니다.
                 </p>
-                <div className="flex items-center justify-center space-x-2 text-secondary-600">
+                <div className="flex items-center justify-center space-x-2" style={{
+                  color: 'var(--accent-secondary)'
+                }}>
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clipRule="evenodd" />
                   </svg>
@@ -161,7 +181,9 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
           </div>
 
           <div className="text-center">
-            <p className="text-blue-200 text-sm">
+            <p className="text-sm" style={{
+              color: 'rgba(255, 255, 255, 0.8)'
+            }}>
               🔒 모든 데이터는 암호화되어 안전하게 보호됩니다
             </p>
           </div>
@@ -177,16 +199,24 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
       windowMs={15 * 60 * 1000}
       onRateLimitExceeded={handleRateLimitExceeded}
     >
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8" style={{
+        background: 'linear-gradient(to bottom right, var(--bg-elevated), var(--accent-primary), var(--accent-secondary))'
+      }}>
         <Card className="w-full max-w-md">
           <div className="text-center mb-6">
-            <h2 className="text-3xl font-black text-neutral-900 mb-2">
+            <h2 className="text-3xl font-black mb-2" style={{
+              color: 'var(--text-primary)'
+            }}>
               {mode === 'service' ? '서비스 로그인' : '관리자 로그인'}
             </h2>
-            <p className="text-neutral-600">
+            <p style={{
+              color: 'var(--text-secondary)'
+            }}>
               {mode === 'service' ? '평가를 시작하려면 로그인하세요' : '관리 권한이 필요합니다'}
             </p>
-            <div className="flex items-center justify-center mt-2 text-sm text-blue-600">
+            <div className="flex items-center justify-center mt-2 text-sm" style={{
+              color: 'var(--accent-primary)'
+            }}>
               <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
               </svg>
@@ -269,7 +299,10 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
                 <button
                   type="button"
                   onClick={() => setMode('selection')}
-                  className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                  className="text-sm font-medium transition-colors duration-200"
+                  style={{ color: 'var(--accent-primary)' }}
+                  onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-hover)'}
+                  onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
                 >
                   ← 돌아가기
                 </button>
@@ -279,10 +312,15 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
 
           {onRegister && mode === 'service' && (
             <div className="mt-6 text-center border-t pt-6">
-              <p className="text-neutral-600 text-sm mb-2">계정이 없으신가요?</p>
+              <p className="text-sm mb-2" style={{
+                color: 'var(--text-secondary)'
+              }}>계정이 없으신가요?</p>
               <button
                 onClick={onRegister}
-                className="text-primary-600 hover:text-primary-700 font-semibold text-sm"
+                className="font-semibold text-sm transition-colors duration-200"
+                style={{ color: 'var(--accent-primary)' }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-hover)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
               >
                 회원가입
               </button>
@@ -291,7 +329,9 @@ const SecureLoginFormContent: React.FC<SecureLoginFormProps> = ({
 
           {csrfToken && (
             <div className="mt-4 text-center">
-              <p className="text-xs text-gray-500">
+              <p className="text-xs" style={{
+                color: 'var(--text-muted)'
+              }}>
                 🔐 CSRF 보호 활성화 | 세션 토큰: {csrfToken.substring(0, 8)}...
               </p>
             </div>

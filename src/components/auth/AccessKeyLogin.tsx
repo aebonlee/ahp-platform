@@ -121,26 +121,41 @@ const AccessKeyLogin: React.FC<AccessKeyLoginProps> = ({ onLogin, onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex flex-col justify-center py-12 sm:px-6 lg:px-8" style={{
+      backgroundColor: 'var(--bg-primary)'
+    }}>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">AHP 평가 시스템</h1>
-          <p className="mt-2 text-gray-600">평가자 접속</p>
+          <h1 className="text-3xl font-bold" style={{
+            color: 'var(--text-primary)'
+          }}>AHP 평가 시스템</h1>
+          <p className="mt-2" style={{
+            color: 'var(--text-secondary)'
+          }}>평가자 접속</p>
         </div>
 
         <Card title="접속키로 로그인">
           <div className="space-y-6">
             {/* 안내 메시지 */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h5 className="font-medium text-blue-800 mb-2">🔑 평가자 접속 안내</h5>
-              <p className="text-blue-700 text-sm">
+            <div className="border rounded-lg p-4" style={{
+              backgroundColor: 'var(--accent-light)',
+              borderColor: 'var(--accent-primary)'
+            }}>
+              <h5 className="font-medium mb-2" style={{
+                color: 'var(--accent-primary)'
+              }}>🔑 평가자 접속 안내</h5>
+              <p className="text-sm" style={{
+                color: 'var(--accent-secondary)'
+              }}>
                 관리자로부터 받은 접속키를 입력하여 평가에 참여하세요.
               </p>
             </div>
 
             {/* 접속키 입력 */}
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium" style={{
+                color: 'var(--text-primary)'
+              }}>
                 접속키
               </label>
               <input
@@ -149,20 +164,42 @@ const AccessKeyLogin: React.FC<AccessKeyLoginProps> = ({ onLogin, onBack }) => {
                 onChange={(e) => handleAccessKeyChange(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="예: P001-PROJ1234"
-                className="w-full px-3 py-3 border border-gray-300 rounded-lg text-center text-lg font-mono tracking-wider focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-3 border rounded-lg text-center text-lg font-mono tracking-wider focus:outline-none focus:ring-2"
                 maxLength={20}
-                style={{ textTransform: 'uppercase' }}
+                style={{ 
+                  textTransform: 'uppercase',
+                  backgroundColor: 'var(--bg-secondary)',
+                  borderColor: 'var(--border-medium)',
+                  color: 'var(--text-primary)'
+                }}
+                onFocus={(e) => {
+                  (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--accent-primary)';
+                  (e.currentTarget as HTMLInputElement).style.boxShadow = '0 0 0 2px rgba(var(--accent-rgb), 0.2)';
+                }}
+                onBlur={(e) => {
+                  (e.currentTarget as HTMLInputElement).style.borderColor = 'var(--border-medium)';
+                  (e.currentTarget as HTMLInputElement).style.boxShadow = 'none';
+                }}
               />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs" style={{
+                color: 'var(--text-muted)'
+              }}>
                 형식: [평가자코드]-[프로젝트코드] (예: P001-PROJ1234)
               </p>
             </div>
 
             {/* 접속키 정보 미리보기 */}
             {keyInfo && keyInfo.isValid && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                <h6 className="font-medium text-green-800 mb-2">✅ 접속키 확인됨</h6>
-                <div className="text-sm text-green-700 space-y-1">
+              <div className="border rounded-lg p-4" style={{
+                backgroundColor: 'var(--status-success-light)',
+                borderColor: 'var(--status-success-border)'
+              }}>
+                <h6 className="font-medium mb-2" style={{
+                  color: 'var(--status-success-text)'
+                }}>✅ 접속키 확인됨</h6>
+                <div className="text-sm space-y-1" style={{
+                  color: 'var(--status-success-text)'
+                }}>
                   <p><strong>평가자:</strong> {keyInfo.evaluatorName}</p>
                   <p><strong>프로젝트:</strong> {keyInfo.projectTitle}</p>
                   <p><strong>평가자 코드:</strong> {keyInfo.evaluatorCode}</p>
@@ -172,8 +209,13 @@ const AccessKeyLogin: React.FC<AccessKeyLoginProps> = ({ onLogin, onBack }) => {
 
             {/* 오류 메시지 */}
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <p className="text-red-600 text-sm">❌ {error}</p>
+              <div className="border rounded-lg p-4" style={{
+                backgroundColor: 'var(--status-danger-light)',
+                borderColor: 'var(--status-danger-border)'
+              }}>
+                <p className="text-sm" style={{
+                  color: 'var(--status-danger-text)'
+                }}>❌ {error}</p>
               </div>
             )}
 
@@ -181,7 +223,21 @@ const AccessKeyLogin: React.FC<AccessKeyLoginProps> = ({ onLogin, onBack }) => {
             <button
               onClick={handleLogin}
               disabled={loading || !keyInfo?.isValid}
-              className="w-full bg-blue-500 text-white py-3 px-4 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+              className="w-full py-3 px-4 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-colors duration-200"
+              style={{
+                backgroundColor: 'var(--accent-primary)',
+                color: 'var(--text-inverse)'
+              }}
+              onMouseEnter={(e) => {
+                if (!e.currentTarget.disabled) {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-hover)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!e.currentTarget.disabled) {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-primary)';
+                }
+              }}
             >
               {loading ? (
                 <span className="flex items-center justify-center space-x-2">
@@ -197,7 +253,13 @@ const AccessKeyLogin: React.FC<AccessKeyLoginProps> = ({ onLogin, onBack }) => {
             {onBack && (
               <button
                 onClick={onBack}
-                className="w-full bg-gray-500 text-white py-2 px-4 rounded-lg hover:bg-gray-600"
+                className="w-full py-2 px-4 rounded-lg transition-colors duration-200"
+                style={{
+                  backgroundColor: 'var(--text-muted)',
+                  color: 'var(--text-inverse)'
+                }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--text-tertiary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--text-muted)'}
               >
                 일반 로그인으로 돌아가기
               </button>
@@ -206,30 +268,43 @@ const AccessKeyLogin: React.FC<AccessKeyLoginProps> = ({ onLogin, onBack }) => {
         </Card>
 
         {/* 도움말 */}
-        <div className="mt-8 bg-white rounded-lg shadow p-6">
-          <h5 className="font-medium text-gray-800 mb-3">📋 접속키 사용법</h5>
-          <div className="text-sm text-gray-600 space-y-2">
+        <div className="mt-8 rounded-lg shadow p-6" style={{
+          backgroundColor: 'var(--bg-secondary)'
+        }}>
+          <h5 className="font-medium mb-3" style={{
+            color: 'var(--text-primary)'
+          }}>📋 접속키 사용법</h5>
+          <div className="text-sm space-y-2" style={{
+            color: 'var(--text-secondary)'
+          }}>
             <div className="flex items-start space-x-2">
-              <span className="text-blue-500 font-bold">1.</span>
+              <span className="font-bold" style={{ color: 'var(--accent-primary)' }}>1.</span>
               <span>관리자로부터 받은 접속키를 정확히 입력하세요</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-blue-500 font-bold">2.</span>
+              <span className="font-bold" style={{ color: 'var(--accent-primary)' }}>2.</span>
               <span>접속키는 대소문자를 구분하지 않습니다</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-blue-500 font-bold">3.</span>
+              <span className="font-bold" style={{ color: 'var(--accent-primary)' }}>3.</span>
               <span>접속키가 확인되면 자동으로 해당 프로젝트에 접속됩니다</span>
             </div>
             <div className="flex items-start space-x-2">
-              <span className="text-blue-500 font-bold">4.</span>
+              <span className="font-bold" style={{ color: 'var(--accent-primary)' }}>4.</span>
               <span>문제가 발생하면 관리자에게 문의하세요</span>
             </div>
           </div>
 
-          <div className="mt-4 p-3 bg-gray-50 rounded border">
-            <h6 className="font-medium text-gray-700 mb-1">접속키 예시</h6>
-            <div className="text-sm text-gray-600 font-mono space-y-1">
+          <div className="mt-4 p-3 rounded border" style={{
+            backgroundColor: 'var(--bg-elevated)',
+            borderColor: 'var(--border-light)'
+          }}>
+            <h6 className="font-medium mb-1" style={{
+              color: 'var(--text-primary)'
+            }}>접속키 예시</h6>
+            <div className="text-sm font-mono space-y-1" style={{
+              color: 'var(--text-secondary)'
+            }}>
               <div>P001-PROJ1234 (평가자 P001, 프로젝트 PROJ1234)</div>
               <div>E002-ABC12345 (평가자 E002, 프로젝트 ABC12345)</div>
             </div>

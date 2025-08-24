@@ -66,10 +66,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
 
   if (mode === 'selection') {
     return (
-      <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{
+        backgroundColor: 'var(--bg-primary)'
+      }}>
         {/* 고급스러운 그라디언트 배경 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"></div>
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-600/10 to-cyan-500/20"></div>
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(to bottom right, var(--bg-elevated), var(--accent-primary), var(--accent-secondary))'
+        }}></div>
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(to top right, transparent, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0.2))'
+        }}></div>
         
         {/* 세련된 기하학적 패턴 */}
         <div className="absolute inset-0">
@@ -82,15 +88,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
           {/* 개선된 헤더 디자인 */}
           <div className="text-center">
             <div className="mb-8">
-              <h1 className="text-6xl font-extrabold mb-4">
-                <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
-                  AHP for Paper
-                </span>
+              <h1 className="text-6xl font-extrabold mb-4" style={{
+                color: 'var(--text-inverse)'
+              }}>
+                AHP for Paper
               </h1>
-              <p className="text-2xl text-blue-200 font-light">
+              <p className="text-2xl font-light" style={{
+                color: 'var(--text-inverse)'
+              }}>
                 전문가급 의사결정 지원 시스템
               </p>
-              <p className="text-lg text-blue-300/70 mt-2 font-light">
+              <p className="text-lg mt-2 font-light" style={{
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}>
                 Analytic Hierarchy Process Decision Support System
               </p>
             </div>
@@ -114,30 +124,36 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                   </svg>
                 </div>
                 
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-2xl font-bold mb-4" style={{
+                  color: 'var(--text-inverse)'
+                }}>
                   서비스 이용
                 </h3>
                 
-                <p className="text-blue-100 mb-6 leading-relaxed font-light">
+                <p className="mb-6 leading-relaxed font-light" style={{
+                  color: 'rgba(255, 255, 255, 0.9)'
+                }}>
                   AHP 의사결정 분석을 위한<br />
                   프로젝트 생성 및 평가 서비스
                 </p>
                 
-                <div className="space-y-3 text-sm text-blue-100 mb-6">
+                <div className="space-y-3 text-sm mb-6" style={{
+                  color: 'rgba(255, 255, 255, 0.8)'
+                }}>
                   <div className="flex items-center justify-center">
-                    <span className="text-green-400 mr-2 text-lg">✓</span>
+                    <span className="mr-2 text-lg" style={{ color: '#4ade80' }}>✓</span>
                     <span className="font-light">프로젝트 생성 및 관리</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-green-400 mr-2 text-lg">✓</span>
+                    <span className="mr-2 text-lg" style={{ color: '#4ade80' }}>✓</span>
                     <span className="font-light">평가자 초대 및 설문 진행</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-green-400 mr-2 text-lg">✓</span>
+                    <span className="mr-2 text-lg" style={{ color: '#4ade80' }}>✓</span>
                     <span className="font-light">실시간 결과 분석</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-green-400 mr-2 text-lg">✓</span>
+                    <span className="mr-2 text-lg" style={{ color: '#4ade80' }}>✓</span>
                     <span className="font-light">리포트 생성 및 내보내기</span>
                   </div>
                 </div>
@@ -170,30 +186,36 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                   </svg>
                 </div>
                 
-                <h3 className="text-2xl font-bold text-white mb-4">
+                <h3 className="text-2xl font-bold mb-4" style={{
+                  color: 'var(--text-inverse)'
+                }}>
                   시스템 관리
                 </h3>
                 
-                <p className="text-blue-100 mb-6 leading-relaxed font-light">
+                <p className="mb-6 leading-relaxed font-light" style={{
+                  color: 'rgba(255, 255, 255, 0.9)'
+                }}>
                   시스템 운영 및 사용자 관리를 위한<br />
                   관리자 전용 대시보드
                 </p>
                 
-                <div className="space-y-3 text-sm text-blue-100 mb-6">
+                <div className="space-y-3 text-sm mb-6" style={{
+                  color: 'rgba(255, 255, 255, 0.8)'
+                }}>
                   <div className="flex items-center justify-center">
-                    <span className="text-cyan-400 mr-2 text-lg">✓</span>
+                    <span className="mr-2 text-lg" style={{ color: '#06d6a0' }}>✓</span>
                     <span className="font-light">사용자 및 권한 관리</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-cyan-400 mr-2 text-lg">✓</span>
+                    <span className="mr-2 text-lg" style={{ color: '#06d6a0' }}>✓</span>
                     <span className="font-light">구독 서비스 운영</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-cyan-400 mr-2 text-lg">✓</span>
+                    <span className="mr-2 text-lg" style={{ color: '#06d6a0' }}>✓</span>
                     <span className="font-light">시스템 모니터링</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-cyan-400 mr-2 text-lg">✓</span>
+                    <span className="mr-2 text-lg" style={{ color: '#06d6a0' }}>✓</span>
                     <span className="font-light">운영 통계 및 분석</span>
                   </div>
                 </div>
@@ -211,8 +233,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
           </div>
 
           {/* 개선된 하단 정보 */}
-          <div className="text-center text-blue-200/70 text-sm">
-            <p className="font-light">Powered by Advanced Analytics & Decision Intelligence</p>
+          <div className="text-center text-sm">
+            <p className="font-light" style={{
+              color: 'rgba(255, 255, 255, 0.7)'
+            }}>Powered by Advanced Analytics & Decision Intelligence</p>
           </div>
         </div>
       </div>
@@ -221,16 +245,28 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
 
   // 개선된 로그인 폼 화면 (서비스 또는 관리자)
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{
+      backgroundColor: 'var(--bg-primary)'
+    }}>
       {/* 고급스러운 그라디언트 배경 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"></div>
-      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-600/10 to-cyan-500/20"></div>
+      <div className="absolute inset-0" style={{
+        background: 'linear-gradient(to bottom right, var(--bg-elevated), var(--accent-primary), var(--accent-secondary))'
+      }}></div>
+      <div className="absolute inset-0" style={{
+        background: 'linear-gradient(to top right, transparent, rgba(var(--accent-rgb), 0.1), rgba(var(--accent-rgb), 0.2))'
+      }}></div>
       
       {/* 세련된 기하학적 패턴 */}
       <div className="absolute inset-0">
-        <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-20 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{
+          backgroundColor: 'rgba(var(--accent-rgb), 0.2)'
+        }}></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full blur-3xl animate-pulse delay-1000" style={{
+          backgroundColor: 'rgba(var(--accent-rgb), 0.15)'
+        }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl" style={{
+          backgroundColor: 'rgba(var(--accent-rgb), 0.1)'
+        }}></div>
       </div>
 
       <div className="max-w-lg w-full space-y-8 relative z-10">
