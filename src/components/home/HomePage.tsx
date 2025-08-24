@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../common/Button';
 import ExampleGuide from './ExampleGuide';
+import ThemeSettings from '../common/ThemeSettings';
 
 interface HomePageProps {
   onLoginClick: () => void;
@@ -11,6 +12,8 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Theme Settings */}
+      <ThemeSettings />
       {/* 히어로 섹션 - 깔끔한 미니멀 디자인 */}
       <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
         {/* 서브틀한 패턴 배경 */}
@@ -395,7 +398,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   <Button 
                     variant="primary" 
                     onClick={onLoginClick}
-                    className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border-2 border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 font-semibold rounded-xl"
+                    className="bg-white hover:bg-gray-50 text-emerald-600 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 font-semibold rounded-xl"
                   >
                     직접 시작하기
                     <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -588,7 +591,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                       variant="primary" 
                       size="lg"
                       onClick={() => setActiveView('guide')}
-                      className="bg-white/20 backdrop-blur-sm text-white hover:bg-white/30 border-2 border-white/50 shadow-lg hover:shadow-xl transition-all duration-300 px-12 py-4 text-lg font-semibold rounded-xl"
+                      className="bg-white hover:bg-gray-50 text-emerald-600 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 px-12 py-4 text-lg font-semibold rounded-xl"
                     >
                       이용 가이드 보기
                       <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
