@@ -25,7 +25,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
           <div className="max-w-7xl mx-auto">
             {/* 상단 배지 */}
             <div className="flex justify-center mb-8">
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium">
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
@@ -37,7 +37,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div className="text-center mb-12">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6">
                 복잡한 의사결정을
-                <span className="block text-blue-600">체계적으로 분석하세요</span>
+                <span className="block text-emerald-600">체계적으로 분석하세요</span>
               </h1>
               
               <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -82,8 +82,8 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   onClick={() => setActiveView('intro')}
                   className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeView === 'intro'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-emerald-600 shadow-sm'
+                      : 'text-gray-600 hover:text-emerald-600'
                   }`}
                 >
                   서비스 소개
@@ -92,8 +92,8 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   onClick={() => setActiveView('guide')}
                   className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeView === 'guide'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-emerald-600 shadow-sm'
+                      : 'text-gray-600 hover:text-emerald-600'
                   }`}
                 >
                   이용 가이드
@@ -102,8 +102,8 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   onClick={() => setActiveView('example')}
                   className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeView === 'example'
-                      ? 'bg-white text-blue-600 shadow-sm'
-                      : 'text-gray-600 hover:text-gray-900'
+                      ? 'bg-white text-emerald-600 shadow-sm'
+                      : 'text-gray-600 hover:text-emerald-600'
                   }`}
                 >
                   분석 예시
