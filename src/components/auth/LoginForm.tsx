@@ -3,7 +3,7 @@ import Button from '../common/Button';
 import Input from '../common/Input';
 import Card from '../common/Card';
 
-type LoginMode = 'selection' | 'service' | 'admin' | 'register';
+type LoginMode = 'selection' | 'service' | 'register';
 
 interface LoginFormProps {
   onLogin: (email: string, password: string, role?: string) => Promise<void>;
@@ -43,14 +43,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
     }
 
     try {
-      const role = mode === 'service' ? 'evaluator' : 'admin';
+      // 서비스 로그인 시 역할을 'evaluator'로 설정
+      // 실제 역할(admin/user)은 백엔드에서 이메일 기반으로 결정
+      const role = mode === 'service' ? 'evaluator' : 'user';
       await onLogin(email, password, role);
     } catch (err) {
       console.error('Login failed:', err);
     }
   };
 
-  const handleModeSelect = (selectedMode: 'service' | 'admin' | 'register') => {
+  const handleModeSelect = (selectedMode: 'service' | 'register') => {
     setMode(selectedMode);
     setEmail('');
     setPassword('');
@@ -107,8 +109,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             </div>
           </div>
 
-          {/* 개선된 서비스 선택 카드 - 3가지 옵션 (회원가입, 서비스 이용, 시스템 관리 순서) */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 md:gap-8 max-w-7xl mx-auto px-4 sm:px-6">
+          {/* 개선된 서비스 선택 카드 - 2가지 옵션 (회원가입, 서비스 이용) */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto px-4 sm:px-6">
             {/* 회원가입 카드 (첫 번째) */}
             <Card 
               variant="glass" 
@@ -116,61 +118,61 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
               className="bg-white/15 backdrop-blur-xl border-2 border-white/30 hover:border-purple-400/60 transform hover:scale-105 cursor-pointer hover:bg-white/20 transition-all duration-300 shadow-2xl"
             >
               <div 
-                className="text-center p-6 sm:p-8 lg:p-10"
+                className="text-center p-8 sm:p-10 lg:p-12"
                 onClick={() => handleModeSelect('register')}
               >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 sm:mb-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-2xl">
-                  <svg className="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto mb-8 lg:mb-10 bg-gradient-to-br from-purple-500 to-purple-700 rounded-3xl flex items-center justify-center shadow-2xl">
+                  <svg className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
                 </div>
                 
-                <h3 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6" style={{
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 lg:mb-8" style={{
                   color: '#ffffff',
-                  textShadow: '0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(168, 85, 247, 0.3)',
-                  fontWeight: '800'
+                  textShadow: '0 3px 12px rgba(0,0,0,0.7), 0 0 30px rgba(168, 85, 247, 0.4)',
+                  fontWeight: '900'
                 }}>
                   회원가입
                 </h3>
                 
-                <p className="mb-6 sm:mb-8 leading-relaxed font-medium text-base sm:text-lg" style={{
+                <p className="mb-8 lg:mb-10 leading-relaxed font-medium text-lg sm:text-xl lg:text-2xl" style={{
                   color: '#ffffff',
-                  textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                  textShadow: '0 2px 6px rgba(0,0,0,0.6)',
                   lineHeight: '1.6'
                 }}>
                   연구용 계정을 생성하여<br />
                   전문 AHP 분석을 시작하세요
                 </p>
                 
-                <div className="space-y-3 sm:space-y-4 text-sm sm:text-base mb-6 sm:mb-8" style={{
+                <div className="space-y-4 lg:space-y-5 text-base sm:text-lg lg:text-xl mb-8 lg:mb-10" style={{
                   color: '#ffffff',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+                  textShadow: '0 1px 4px rgba(0,0,0,0.6)'
                 }}>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#c084fc' }}>✓</span>
-                    <span className="font-medium">연구 프로젝트 전용</span>
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#c084fc' }}>✓</span>
+                    <span className="font-semibold">연구 프로젝트 전용 계정</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#c084fc' }}>✓</span>
-                    <span className="font-medium">학술 연구 지원</span>
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#c084fc' }}>✓</span>
+                    <span className="font-semibold">학술 연구 완벽 지원</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#c084fc' }}>✓</span>
-                    <span className="font-medium">가이드 학습 포함</span>
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#c084fc' }}>✓</span>
+                    <span className="font-semibold">가이드 학습 프로그램</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#c084fc' }}>✓</span>
-                    <span className="font-medium">실제 연구 적용 가능</span>
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#c084fc' }}>✓</span>
+                    <span className="font-semibold">실제 연구 즉시 적용</span>
                   </div>
                 </div>
 
                 <Button 
                   variant="primary" 
                   size="lg"
-                  className="w-full text-lg font-bold py-4"
+                  className="w-full text-xl font-bold py-5 lg:py-6"
                   onClick={() => handleModeSelect('register')}
                 >
-                  🎯 회원가입
+                  🎯 회원가입 시작하기
                 </Button>
               </div>
             </Card>
@@ -182,128 +184,61 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
               className="bg-white/15 backdrop-blur-xl border-2 border-white/30 hover:border-blue-400/60 transform hover:scale-105 cursor-pointer hover:bg-white/20 transition-all duration-300 shadow-2xl"
             >
               <div 
-                className="text-center p-6 sm:p-8 lg:p-10"
+                className="text-center p-8 sm:p-10 lg:p-12"
                 onClick={() => handleModeSelect('service')}
               >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 sm:mb-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-2xl">
-                  <svg className="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto mb-8 lg:mb-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl flex items-center justify-center shadow-2xl">
+                  <svg className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                   </svg>
                 </div>
                 
-                <h3 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6" style={{
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 lg:mb-8" style={{
                   color: '#ffffff',
-                  textShadow: '0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(59, 130, 246, 0.3)',
-                  fontWeight: '800'
+                  textShadow: '0 3px 12px rgba(0,0,0,0.7), 0 0 30px rgba(59, 130, 246, 0.4)',
+                  fontWeight: '900'
                 }}>
                   서비스 이용
                 </h3>
                 
-                <p className="mb-6 sm:mb-8 leading-relaxed font-medium text-base sm:text-lg" style={{
+                <p className="mb-8 lg:mb-10 leading-relaxed font-medium text-lg sm:text-xl lg:text-2xl" style={{
                   color: '#ffffff',
-                  textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+                  textShadow: '0 2px 6px rgba(0,0,0,0.6)',
                   lineHeight: '1.6'
                 }}>
-                  AHP 의사결정 분석을 위한<br />
-                  프로젝트 생성 및 평가 서비스
+                  AHP 의사결정 분석 플랫폼<br />
+                  개인/관리자 서비스 이용
                 </p>
                 
-                <div className="space-y-3 sm:space-y-4 text-sm sm:text-base mb-6 sm:mb-8" style={{
+                <div className="space-y-4 lg:space-y-5 text-base sm:text-lg lg:text-xl mb-8 lg:mb-10" style={{
                   color: '#ffffff',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.5)'
+                  textShadow: '0 1px 4px rgba(0,0,0,0.6)'
                 }}>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#60a5fa' }}>✓</span>
-                    <span className="font-medium">프로젝트 생성 및 관리</span>
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#60a5fa' }}>✓</span>
+                    <span className="font-semibold">프로젝트 생성 및 관리</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#60a5fa' }}>✓</span>
-                    <span className="font-medium">평가자 초대 및 설문 진행</span>
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#60a5fa' }}>✓</span>
+                    <span className="font-semibold">평가자 초대 및 설문 진행</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#60a5fa' }}>✓</span>
-                    <span className="font-medium">실시간 결과 분석</span>
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#60a5fa' }}>✓</span>
+                    <span className="font-semibold">실시간 결과 분석</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#60a5fa' }}>✓</span>
-                    <span className="font-medium">리포트 생성 및 내보내기</span>
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#60a5fa' }}>✓</span>
+                    <span className="font-semibold">관리자 권한 자동 인식</span>
                   </div>
                 </div>
 
                 <Button 
                   variant="primary" 
                   size="lg"
-                  className="w-full text-lg font-bold py-4"
+                  className="w-full text-xl font-bold py-5 lg:py-6"
                   onClick={() => handleModeSelect('service')}
                 >
                   🚀 서비스 로그인
-                </Button>
-              </div>
-            </Card>
-
-            {/* 시스템 관리 카드 (세 번째) */}
-            <Card 
-              variant="glass" 
-              hoverable={true} 
-              className="bg-white/15 backdrop-blur-xl border-2 border-white/30 hover:border-green-400/60 transform hover:scale-105 cursor-pointer hover:bg-white/20 transition-all duration-300 shadow-2xl"
-            >
-              <div 
-                className="text-center p-6 sm:p-8 lg:p-10"
-                onClick={() => handleModeSelect('admin')}
-              >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 sm:mb-8 bg-gradient-to-br from-green-500 to-green-700 rounded-2xl flex items-center justify-center shadow-2xl">
-                  <svg className="w-14 h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                  </svg>
-                </div>
-                
-                <h3 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6" style={{
-                  color: '#ffffff',
-                  textShadow: '0 2px 8px rgba(0,0,0,0.6), 0 0 20px rgba(34, 197, 94, 0.3)',
-                  fontWeight: '800'
-                }}>
-                  시스템 관리
-                </h3>
-                
-                <p className="mb-6 sm:mb-8 leading-relaxed font-medium text-base sm:text-lg" style={{
-                  color: '#ffffff',
-                  textShadow: '0 1px 4px rgba(0,0,0,0.5)',
-                  lineHeight: '1.6'
-                }}>
-                  시스템 운영 및 사용자 관리를 위한<br />
-                  관리자 전용 대시보드
-                </p>
-                
-                <div className="space-y-3 sm:space-y-4 text-sm sm:text-base mb-6 sm:mb-8" style={{
-                  color: '#ffffff',
-                  textShadow: '0 1px 3px rgba(0,0,0,0.5)'
-                }}>
-                  <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#4ade80' }}>✓</span>
-                    <span className="font-medium">사용자 및 권한 관리</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#4ade80' }}>✓</span>
-                    <span className="font-medium">구독 서비스 운영</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#4ade80' }}>✓</span>
-                    <span className="font-medium">시스템 모니터링</span>
-                  </div>
-                  <div className="flex items-center justify-center">
-                    <span className="mr-3 text-xl font-bold" style={{ color: '#4ade80' }}>✓</span>
-                    <span className="font-medium">운영 통계 및 분석</span>
-                  </div>
-                </div>
-
-                <Button 
-                  variant="secondary" 
-                  size="lg"
-                  className="w-full text-lg font-bold py-4"
-                  onClick={() => handleModeSelect('admin')}
-                >
-                  ⚙️ 관리자 로그인
                 </Button>
               </div>
             </Card>
@@ -453,7 +388,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                     color: 'var(--text-inverse)',
                     textShadow: '0 1px 3px rgba(0,0,0,0.3)'
                   }}>이미 계정이 있으신가요?</p>
-                  <div className="flex justify-center gap-4">
+                  <div className="flex justify-center">
                     <button
                       type="button"
                       onClick={() => handleModeSelect('service')}
@@ -465,21 +400,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                       onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = '#c4b5fd'}
                       onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-inverse)'}
                     >
-                      서비스 로그인
-                    </button>
-                    <span style={{ color: 'var(--text-inverse)' }}>|</span>
-                    <button
-                      type="button"
-                      onClick={() => handleModeSelect('admin')}
-                      className="font-semibold text-sm transition-colors duration-200"
-                      style={{ 
-                        color: 'var(--text-inverse)',
-                        textShadow: '0 1px 3px rgba(0,0,0,0.3)'
-                      }}
-                      onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = '#c4b5fd'}
-                      onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-inverse)'}
-                    >
-                      관리자 로그인
+                      서비스 로그인하기
                     </button>
                   </div>
                 </div>
@@ -535,25 +456,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
           </button>
           
           <h2 className="text-4xl font-bold mb-4">
-            {mode === 'service' ? (
-              <span className="bg-gradient-to-r from-blue-200 to-cyan-200 bg-clip-text text-transparent">
-                서비스 로그인
-              </span>
-            ) : (
-              <span className="bg-gradient-to-r from-green-200 to-cyan-200 bg-clip-text text-transparent">
-                관리자 로그인
-              </span>
-            )}
+            <span className="bg-gradient-to-r from-blue-200 to-cyan-200 bg-clip-text text-transparent">
+              서비스 로그인
+            </span>
           </h2>
           
           <p className="mt-2 text-lg font-light" style={{
             color: 'var(--text-inverse)',
             textShadow: '0 1px 3px rgba(0,0,0,0.3)'
           }}>
-            {mode === 'service' 
-              ? 'AHP 의사결정 분석 서비스에 로그인하세요'
-              : '시스템 관리 대시보드에 로그인하세요'
-            }
+            AHP 의사결정 분석 서비스에 로그인하세요<br />
+            <span className="text-sm opacity-80">관리자 권한은 이메일 기반으로 자동 인식됩니다</span>
           </p>
         </div>
         
@@ -607,7 +520,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
 
             <Button
               type="submit"
-              variant={mode === 'service' ? 'primary' : 'secondary'}
+              variant="primary"
               size="xl"
               loading={loading}
               disabled={loading}
@@ -623,7 +536,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                 </>
               ) : (
                 <>
-                  {mode === 'service' ? '🚀' : '⚙️'} 로그인
+                  🚀 서비스 로그인
                 </>
               )}
             </Button>
