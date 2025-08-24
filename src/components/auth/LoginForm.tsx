@@ -3,20 +3,29 @@ import Button from '../common/Button';
 import Input from '../common/Input';
 import Card from '../common/Card';
 
-type LoginMode = 'selection' | 'service' | 'register';
+type LoginMode = 'selection' | 'service' | 'register' | 'admin-select';
 
 interface LoginFormProps {
   onLogin: (email: string, password: string, role?: string) => Promise<void>;
   onRegister?: () => void;
   loading?: boolean;
   error?: string;
+  isAdmin?: boolean; // 관리자 권한 여부
+  userEmail?: string; // 로그인한 사용자 이메일
 }
 
-const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = false, error }) => {
+const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = false, error, isAdmin = false, userEmail = '' }) => {
   const [mode, setMode] = useState<LoginMode>('selection');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+
+  // 관리자 권한 확인 후 서비스 선택 모드로 전환
+  React.useEffect(() => {
+    if (isAdmin && mode === 'service') {
+      setMode('admin-select');
+    }
+  }, [isAdmin, mode]);
 
   const validate = (): boolean => {
     const errors: Record<string, string> = {};
@@ -57,6 +66,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
     setEmail('');
     setPassword('');
     setValidationErrors({});
+  };
+
+  // 관리자 서비스 선택 핸들러
+  const handleAdminServiceSelect = (serviceType: 'admin' | 'personal') => {
+    if (serviceType === 'admin') {
+      // 관리자 페이지로 이동하는 로직
+      onLogin(userEmail, '', 'admin');
+    } else {
+      // 개인 서비스로 이동하는 로직  
+      onLogin(userEmail, '', 'evaluator');
+    }
   };
 
   const handleBackToSelection = () => {
@@ -412,7 +432,216 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
     );
   }
 
-  // 개선된 로그인 폼 화면 (서비스 또는 관리자)
+  // 관리자 서비스 선택 화면
+  if (mode === 'admin-select') {
+    return (
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{
+        backgroundColor: 'var(--bg-primary)'
+      }}>
+        {/* 그라디언트 배경 */}
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(to bottom right, var(--bg-elevated), #059669, #047857)'
+        }}></div>
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(to top right, transparent, rgba(5, 150, 105, 0.1), rgba(4, 120, 87, 0.2))'
+        }}></div>
+        
+        {/* 기하학적 패턴 */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-96 h-96 rounded-full blur-3xl animate-pulse" style={{
+            backgroundColor: 'rgba(5, 150, 105, 0.2)'
+          }}></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 rounded-full blur-3xl animate-pulse delay-1000" style={{
+            backgroundColor: 'rgba(4, 120, 87, 0.15)'
+          }}></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl" style={{
+            backgroundColor: 'rgba(6, 182, 212, 0.1)'
+          }}></div>
+        </div>
+
+        <div className="max-w-6xl w-full space-y-8 relative z-10">
+          {/* 헤더 */}
+          <div className="text-center">
+            <h1 className="text-5xl font-bold mb-4" style={{
+              color: '#ffffff',
+              textShadow: '0 3px 12px rgba(0,0,0,0.7), 0 0 30px rgba(5, 150, 105, 0.4)',
+              fontWeight: '900'
+            }}>
+              관리자 서비스 선택
+            </h1>
+            <p className="text-xl font-medium mb-2" style={{
+              color: '#ffffff',
+              textShadow: '0 2px 6px rgba(0,0,0,0.6)'
+            }}>
+              안녕하세요, {userEmail}님
+            </p>
+            <p className="text-lg font-light" style={{
+              color: '#ffffff',
+              textShadow: '0 1px 4px rgba(0,0,0,0.5)',
+              opacity: 0.9
+            }}>
+              이용하실 서비스를 선택해주세요
+            </p>
+          </div>
+
+          {/* 서비스 선택 카드 */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-6xl mx-auto px-4 sm:px-6">
+            {/* 관리자 페이지 카드 */}
+            <Card 
+              variant="glass" 
+              hoverable={true} 
+              className="bg-white/15 backdrop-blur-xl border-2 border-white/30 hover:border-green-400/60 transform hover:scale-105 cursor-pointer hover:bg-white/20 transition-all duration-300 shadow-2xl"
+            >
+              <div 
+                className="text-center p-8 sm:p-10 lg:p-12"
+                onClick={() => handleAdminServiceSelect('admin')}
+              >
+                <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto mb-8 lg:mb-10 bg-gradient-to-br from-green-500 to-green-700 rounded-3xl flex items-center justify-center shadow-2xl">
+                  <svg className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                </div>
+                
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 lg:mb-8" style={{
+                  color: '#ffffff',
+                  textShadow: '0 3px 12px rgba(0,0,0,0.7), 0 0 30px rgba(34, 197, 94, 0.4)',
+                  fontWeight: '900'
+                }}>
+                  관리자 페이지
+                </h3>
+                
+                <p className="mb-8 lg:mb-10 leading-relaxed font-medium text-lg sm:text-xl lg:text-2xl" style={{
+                  color: '#ffffff',
+                  textShadow: '0 2px 6px rgba(0,0,0,0.6)',
+                  lineHeight: '1.6'
+                }}>
+                  시스템 운영 및 사용자 관리를 위한<br />
+                  관리자 전용 대시보드
+                </p>
+                
+                <div className="space-y-4 lg:space-y-5 text-base sm:text-lg lg:text-xl mb-8 lg:mb-10" style={{
+                  color: '#ffffff',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.6)'
+                }}>
+                  <div className="flex items-center justify-center">
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#4ade80' }}>⚙️</span>
+                    <span className="font-semibold">사용자 및 권한 관리</span>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#4ade80' }}>📊</span>
+                    <span className="font-semibold">구독 서비스 운영</span>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#4ade80' }}>📈</span>
+                    <span className="font-semibold">시스템 모니터링</span>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#4ade80' }}>📋</span>
+                    <span className="font-semibold">운영 통계 및 분석</span>
+                  </div>
+                </div>
+
+                <Button 
+                  variant="secondary" 
+                  size="lg"
+                  className="w-full text-xl font-bold py-5 lg:py-6"
+                  onClick={() => handleAdminServiceSelect('admin')}
+                >
+                  🔧 관리자 페이지로 이동
+                </Button>
+              </div>
+            </Card>
+
+            {/* 개인 서비스 카드 */}
+            <Card 
+              variant="glass" 
+              hoverable={true} 
+              className="bg-white/15 backdrop-blur-xl border-2 border-white/30 hover:border-blue-400/60 transform hover:scale-105 cursor-pointer hover:bg-white/20 transition-all duration-300 shadow-2xl"
+            >
+              <div 
+                className="text-center p-8 sm:p-10 lg:p-12"
+                onClick={() => handleAdminServiceSelect('personal')}
+              >
+                <div className="w-24 h-24 sm:w-28 sm:h-28 lg:w-32 lg:h-32 mx-auto mb-8 lg:mb-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-3xl flex items-center justify-center shadow-2xl">
+                  <svg className="w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+                
+                <h3 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-6 lg:mb-8" style={{
+                  color: '#ffffff',
+                  textShadow: '0 3px 12px rgba(0,0,0,0.7), 0 0 30px rgba(59, 130, 246, 0.4)',
+                  fontWeight: '900'
+                }}>
+                  개인 서비스
+                </h3>
+                
+                <p className="mb-8 lg:mb-10 leading-relaxed font-medium text-lg sm:text-xl lg:text-2xl" style={{
+                  color: '#ffffff',
+                  textShadow: '0 2px 6px rgba(0,0,0,0.6)',
+                  lineHeight: '1.6'
+                }}>
+                  개인 연구자로서<br />
+                  AHP 분석 프로젝트 이용
+                </p>
+                
+                <div className="space-y-4 lg:space-y-5 text-base sm:text-lg lg:text-xl mb-8 lg:mb-10" style={{
+                  color: '#ffffff',
+                  textShadow: '0 1px 4px rgba(0,0,0,0.6)'
+                }}>
+                  <div className="flex items-center justify-center">
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#60a5fa' }}>📝</span>
+                    <span className="font-semibold">프로젝트 생성 및 관리</span>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#60a5fa' }}>👥</span>
+                    <span className="font-semibold">평가자 초대 및 설문 진행</span>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#60a5fa' }}>📊</span>
+                    <span className="font-semibold">실시간 결과 분석</span>
+                  </div>
+                  <div className="flex items-center justify-center">
+                    <span className="mr-4 text-2xl lg:text-3xl font-bold" style={{ color: '#60a5fa' }}>📄</span>
+                    <span className="font-semibold">리포트 생성 및 내보내기</span>
+                  </div>
+                </div>
+
+                <Button 
+                  variant="primary" 
+                  size="lg"
+                  className="w-full text-xl font-bold py-5 lg:py-6"
+                  onClick={() => handleAdminServiceSelect('personal')}
+                >
+                  🚀 개인 서비스로 이동
+                </Button>
+              </div>
+            </Card>
+          </div>
+
+          {/* 하단 정보 */}
+          <div className="text-center">
+            <button
+              onClick={() => setMode('selection')}
+              className="inline-flex items-center hover:bg-white/10 px-4 py-2 rounded-lg transition-all duration-200"
+              style={{ 
+                color: '#ffffff',
+                textShadow: '0 1px 3px rgba(0,0,0,0.3)'
+              }}
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              다른 계정으로 로그인
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 개선된 로그인 폼 화면 (서비스)
   return (
     <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{
       backgroundColor: 'var(--bg-primary)'
