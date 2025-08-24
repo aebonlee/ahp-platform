@@ -160,17 +160,30 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       {/* 히어로 섹션 - 잔디 스타일 */}
       <section className="relative pt-24 pb-20 overflow-hidden">
         {/* 배경 그라디언트 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-purple-50"></div>
+        <div className="absolute inset-0" style={{
+          background: `linear-gradient(to bottom right, var(--bg-subtle), var(--bg-primary), var(--bg-elevated))`
+        }}></div>
         
         {/* 애니메이션 도형들 */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{ animationDelay: '2s' }}></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 bg-pink-200 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style={{ animationDelay: '4s' }}></div>
+        <div className="absolute top-20 left-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{
+          backgroundColor: 'var(--accent-primary)'
+        }}></div>
+        <div className="absolute top-40 right-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse" style={{
+          backgroundColor: 'var(--accent-secondary)',
+          animationDelay: '2s'
+        }}></div>
+        <div className="absolute -bottom-8 left-20 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse" style={{
+          backgroundColor: 'var(--accent-light)',
+          animationDelay: '4s'
+        }}></div>
         
         <div className="relative max-w-7xl mx-auto px-6">
           <div className="text-center">
             {/* 배지 */}
-            <div className="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-6">
+            <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium mb-6" style={{
+              backgroundColor: 'var(--accent-light)',
+              color: 'var(--accent-primary)'
+            }}>
               <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
@@ -178,16 +191,18 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             </div>
 
             {/* 메인 타이틀 */}
-            <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight" style={{ color: 'var(--text-primary)' }}>
               복잡한 의사결정을
               <br />
-              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r bg-clip-text text-transparent" style={{
+                backgroundImage: 'linear-gradient(to right, var(--accent-primary), var(--accent-secondary))'
+              }}>
                 체계적으로 분석하세요
               </span>
             </h1>
 
             {/* 서브 타이틀 */}
-            <p className="text-xl text-gray-600 mb-10 max-w-3xl mx-auto">
+            <p className="text-xl mb-10 max-w-3xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
               AHP(Analytic Hierarchy Process) 방법론을 활용하여
               연구의 신뢰성을 높이고 명확한 결론을 도출하세요
             </p>
@@ -196,7 +211,10 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
                 onClick={onLoginClick}
-                className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-all transform hover:scale-105 font-semibold text-lg shadow-lg"
+                className="px-8 py-4 text-white rounded-xl transition-all transform hover:scale-105 font-semibold text-lg shadow-lg"
+                style={{ backgroundColor: 'var(--accent-primary)' }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-hover)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-primary)'}
               >
                 연구 시작하기
                 <svg className="inline-block w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,7 +222,14 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 </svg>
               </button>
               <button
-                className="px-8 py-4 bg-white text-gray-700 rounded-xl hover:bg-gray-50 transition-all font-semibold text-lg border-2 border-gray-200"
+                className="px-8 py-4 rounded-xl transition-all font-semibold text-lg border-2"
+                style={{ 
+                  backgroundColor: 'var(--bg-primary)',
+                  color: 'var(--text-primary)',
+                  borderColor: 'var(--border-medium)'
+                }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-secondary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary)'}
               >
                 가이드 보기
                 <svg className="inline-block w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -214,21 +239,21 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             </div>
 
             {/* 신뢰 지표 */}
-            <div className="mt-12 flex flex-wrap justify-center gap-8 text-gray-600">
+            <div className="mt-12 flex flex-wrap justify-center gap-8" style={{ color: 'var(--text-secondary)' }}>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--accent-primary)' }}>
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>검증된 방법론</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--accent-primary)' }}>
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>실시간 분석</span>
               </div>
               <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--accent-primary)' }}>
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
                 <span>전문가 지원</span>
@@ -239,53 +264,74 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       </section>
 
       {/* 주요 기능 섹션 */}
-      <section id="features" className="py-20 bg-gray-50">
+      <section id="features" className="py-20" style={{ backgroundColor: 'var(--bg-subtle)' }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
               연구에 필요한 모든 기능
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl" style={{ color: 'var(--text-secondary)' }}>
               복잡한 의사결정 문제를 체계적으로 해결하세요
             </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* 기능 카드 1 */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border" style={{
+              backgroundColor: 'var(--bg-primary)',
+              borderColor: 'var(--border-light)'
+            }}>
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6" style={{
+                backgroundColor: 'var(--accent-light)'
+              }}>
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{
+                  color: 'var(--accent-primary)'
+                }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">체계적 계층 구조</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>체계적 계층 구조</h3>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 목표, 기준, 대안을 체계적으로 구조화하여 복잡한 문제를 명확하게 정리합니다
               </p>
             </div>
 
             {/* 기능 카드 2 */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border" style={{
+              backgroundColor: 'var(--bg-primary)',
+              borderColor: 'var(--border-light)'
+            }}>
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6" style={{
+                backgroundColor: 'var(--accent-light)'
+              }}>
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{
+                  color: 'var(--accent-primary)'
+                }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">정량적 분석</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>정량적 분석</h3>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 쌍대비교를 통해 주관적 판단을 객관적 수치로 변환하고 일관성을 검증합니다
               </p>
             </div>
 
             {/* 기능 카드 3 */}
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100">
-              <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border" style={{
+              backgroundColor: 'var(--bg-primary)',
+              borderColor: 'var(--border-light)'
+            }}>
+              <div className="w-14 h-14 rounded-xl flex items-center justify-center mb-6" style={{
+                backgroundColor: 'var(--accent-light)'
+              }}>
+                <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{
+                  color: 'var(--accent-primary)'
+                }}>
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">협업 연구</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>협업 연구</h3>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 여러 전문가의 의견을 수집하고 통합하여 집단 의사결정을 지원합니다
               </p>
             </div>
@@ -294,13 +340,13 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       </section>
 
       {/* 사용 방법 섹션 */}
-      <section id="how-it-works" className="py-20 bg-white">
+      <section id="how-it-works" className="py-20" style={{ backgroundColor: 'var(--bg-primary)' }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-gray-900 mb-4">
+            <h2 className="text-4xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
               간단한 3단계 프로세스
             </h2>
-            <p className="text-xl text-gray-600">
+            <p className="text-xl" style={{ color: 'var(--text-secondary)' }}>
               가이드를 따라 쉽게 연구를 진행하세요
             </p>
           </div>
@@ -309,41 +355,47 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             {/* 단계 1 */}
             <div className="relative">
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4">
+                <div className="w-16 h-16 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4" style={{
+                  backgroundColor: 'var(--accent-primary)'
+                }}>
                   1
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">계층 구조 설계</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>계층 구조 설계</h3>
+                <p style={{ color: 'var(--text-secondary)' }}>
                   연구 목표와 평가 기준, 대안을 체계적으로 구성합니다
                 </p>
               </div>
               {/* 연결선 */}
-              <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gray-300"></div>
+              <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5" style={{ backgroundColor: 'var(--border-medium)' }}></div>
             </div>
 
             {/* 단계 2 */}
             <div className="relative">
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4">
+                <div className="w-16 h-16 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4" style={{
+                  backgroundColor: 'var(--accent-primary)'
+                }}>
                   2
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">쌍대 비교</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>쌍대 비교</h3>
+                <p style={{ color: 'var(--text-secondary)' }}>
                   각 요소들을 1:1로 비교하여 상대적 중요도를 평가합니다
                 </p>
               </div>
               {/* 연결선 */}
-              <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5 bg-gray-300"></div>
+              <div className="hidden md:block absolute top-8 left-1/2 w-full h-0.5" style={{ backgroundColor: 'var(--border-medium)' }}></div>
             </div>
 
             {/* 단계 3 */}
             <div className="relative">
               <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4">
+                <div className="w-16 h-16 text-white rounded-full flex items-center justify-center text-2xl font-bold mb-4" style={{
+                  backgroundColor: 'var(--accent-primary)'
+                }}>
                   3
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">결과 분석</h3>
-                <p className="text-gray-600">
+                <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>결과 분석</h3>
+                <p style={{ color: 'var(--text-secondary)' }}>
                   우선순위와 일관성 비율을 확인하고 최적 대안을 도출합니다
                 </p>
               </div>
@@ -356,17 +408,22 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       <PricingSection onLoginClick={onLoginClick} />
 
       {/* CTA 섹션 */}
-      <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
+      <section className="py-20" style={{
+        background: `linear-gradient(to right, var(--accent-primary), var(--accent-secondary))`
+      }}>
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold text-white mb-6">
             지금 바로 연구를 시작하세요
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl mb-8" style={{ color: 'rgba(255, 255, 255, 0.8)' }}>
             전문적인 AHP 분석으로 연구의 품질을 높이세요
           </p>
           <button
             onClick={onLoginClick}
-            className="px-10 py-4 bg-white text-blue-600 rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 font-semibold text-lg shadow-xl"
+            className="px-10 py-4 text-white rounded-xl transition-all transform hover:scale-105 font-semibold text-lg shadow-xl"
+            style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--accent-primary)' }}
+            onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-secondary)'}
+            onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary)'}
           >
             14일 무료 체험 시작
           </button>
