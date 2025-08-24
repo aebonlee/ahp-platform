@@ -4,7 +4,11 @@ import dataService, { ProjectData } from '../../services/dataService';
 import ProjectSelector from '../project/ProjectSelector';
 import NewProjectModal from '../modals/NewProjectModal';
 import ModelBuilder from '../modals/ModelBuilder';
-import DemographicSurvey from '../survey/DemographicSurvey';
+import SurveyFormBuilder from '../survey/SurveyFormBuilder';
+import MyProjects from './MyProjects';
+import EvaluatorManagement from './EvaluatorManagement';
+import ProjectCreationForm from './ProjectCreationForm';
+import EvaluationResults from './EvaluationResults';
 
 interface User {
   first_name: string;
@@ -43,6 +47,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
+  const [selectedProjectTitle, setSelectedProjectTitle] = useState<string>('');
   const [showNewProjectModal, setShowNewProjectModal] = useState(false);
   const [showModelBuilder, setShowModelBuilder] = useState(false);
   const [currentStep, setCurrentStep] = useState<ModelStep>('overview');
@@ -118,6 +123,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
 
   const handleProjectClick = (project: ProjectData) => {
     setSelectedProjectId(project.id || '');
+    setSelectedProjectTitle(project.title || '');
     setCurrentProject(project);
   };
 
@@ -190,10 +196,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
 
       case 'demographic-survey':
         return (
-          <DemographicSurvey 
-            onSave={(data) => {
-              console.log('설문조사 데이터 저장:', data);
-              alert('설문조사가 저장되었습니다.');
+          <SurveyFormBuilder 
+            onSave={(questions) => {
+              console.log('설문 폼 저장:', questions);
+              alert('설문 폼이 저장되었습니다.');
               setActiveMenu('dashboard');
             }}
             onCancel={() => setActiveMenu('dashboard')}
@@ -202,52 +208,30 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
 
       case 'my-projects':
         return (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                📂 내 프로젝트
-              </h2>
-              <button
-                onClick={() => setShowNewProjectModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                ➕ 새 프로젝트
-              </button>
-            </div>
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>프로젝트 목록이 여기에 표시됩니다.</p>
-            </div>
-          </div>
+          <MyProjects 
+            onProjectSelect={(project) => {
+              setCurrentProject(project);
+              setSelectedProjectId(project.id || '');
+              setActiveMenu('model-builder');
+            }}
+            onCreateNew={() => setShowNewProjectModal(true)}
+          />
         );
 
       case 'project-creation':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              ➕ 새 프로젝트 생성
-            </h2>
-            <div className="text-center py-12">
-              <button
-                onClick={() => setShowNewProjectModal(true)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                프로젝트 생성 시작하기
-              </button>
-            </div>
-          </div>
+          <ProjectCreationForm 
+            onSubmit={(projectData) => {
+              fetchProjects();
+              setActiveMenu('my-projects');
+              alert('프로젝트가 생성되었습니다!');
+            }}
+            onCancel={() => setActiveMenu('dashboard')}
+          />
         );
 
       case 'evaluator-management':
-        return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              👥 평가자 관리
-            </h2>
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>평가자 관리 기능이 여기에 표시됩니다.</p>
-            </div>
-          </div>
-        );
+        return <EvaluatorManagement />;
 
       case 'progress-monitoring':
         return (
@@ -263,14 +247,15 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
 
       case 'results-analysis':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              📊 결과 분석
-            </h2>
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>분석 결과가 여기에 표시됩니다.</p>
-            </div>
-          </div>
+          <EvaluationResults 
+            projectId={selectedProjectId}
+            projectTitle={selectedProjectTitle}
+            onBack={() => setActiveMenu('my-projects')}
+            onComplete={() => {
+              alert('평가가 완료되었습니다!');
+              setActiveMenu('dashboard');
+            }}
+          />
         );
 
       case 'paper-management':
