@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ExampleGuide from './ExampleGuide';
 import ThemeModeToggle from '../common/ThemeModeToggle';
 import ColorThemeButton from '../common/ColorThemeButton';
@@ -9,6 +9,78 @@ interface HomePageProps {
 
 const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
   const [activeView, setActiveView] = useState<'intro' | 'guide' | 'example'>('intro');
+  const [scrollY, setScrollY] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+  const particlesRef = useRef<HTMLDivElement>(null);
+
+  // 스크롤 이벤트 처리
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      setScrollY(currentScrollY);
+      setShowScrollTop(currentScrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // 동적 배경 파티클 애니메이션
+  useEffect(() => {
+    const particles = particlesRef.current;
+    if (!particles) return;
+
+    const createParticle = () => {
+      const particle = document.createElement('div');
+      particle.className = 'absolute rounded-full opacity-20 animate-pulse';
+      particle.style.width = Math.random() * 6 + 2 + 'px';
+      particle.style.height = particle.style.width;
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.top = Math.random() * 100 + '%';
+      particle.style.backgroundColor = 'var(--accent-primary)';
+      particle.style.animationDuration = (Math.random() * 3 + 2) + 's';
+      particle.style.animationDelay = Math.random() * 2 + 's';
+      
+      particles.appendChild(particle);
+      
+      // 10초 후 제거
+      setTimeout(() => {
+        if (particles.contains(particle)) {
+          particles.removeChild(particle);
+        }
+      }, 10000);
+    };
+
+    // 초기 파티클 생성
+    for (let i = 0; i < 15; i++) {
+      setTimeout(createParticle, i * 200);
+    }
+
+    // 3초마다 새 파티클 추가
+    const intervalId = setInterval(createParticle, 3000);
+
+    return () => {
+      clearInterval(intervalId);
+      if (particles) {
+        particles.innerHTML = '';
+      }
+    };
+  }, []);
+
+  // 상단으로 스크롤
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
+
+  // 패럴랙스 효과를 위한 인라인 스타일
+  const parallaxStyle = {
+    transform: `translateY(${scrollY * 0.5}px)`,
+    transition: 'transform 0.1s ease-out'
+  };
 
   return (
     <div className="min-h-screen" style={{
@@ -20,20 +92,89 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
         <ThemeModeToggle />
         <ColorThemeButton />
       </div>
-      {/* 히어로 섹션 - 깔끔한 미니멀 디자인 */}
-      <div className="relative overflow-hidden" 
+
+      {/* Scroll to Top Button */}
+      <button
+        onClick={scrollToTop}
+        className={`fixed bottom-8 right-8 z-40 w-12 h-12 rounded-full shadow-lg transition-all duration-300 ${
+          showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+        }`}
+        style={{
+          backgroundColor: 'var(--accent-primary)',
+          color: 'var(--text-inverse)',
+          border: 'none'
+        }}
+        onMouseEnter={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-hover)';
+          (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1.1)';
+        }}
+        onMouseLeave={(e) => {
+          (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-primary)';
+          (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)';
+        }}
+        aria-label="상단으로 스크롤"
+        title="상단으로 이동"
+      >
+        <svg className="w-6 h-6 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+        </svg>
+      </button>
+      {/* 히어로 섹션 - 동적 배경 효과 */}
+      <div ref={heroRef} className="relative overflow-hidden" 
            style={{
-             background: 'linear-gradient(to bottom, var(--bg-elevated), var(--bg-primary), var(--bg-primary))'
+             background: 'linear-gradient(to bottom, var(--bg-elevated), var(--bg-primary), var(--bg-primary))',
+             minHeight: '100vh'
            }}>
+        {/* 동적 파티클 배경 */}
+        <div ref={particlesRef} className="absolute inset-0 pointer-events-none" style={parallaxStyle}>
+          {/* 파티클들이 자바스크립트로 동적 생성됨 */}
+        </div>
+
+        {/* 움직이는 기하학적 도형들 */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div 
+            className="absolute w-96 h-96 rounded-full blur-3xl opacity-20 animate-pulse"
+            style={{
+              backgroundColor: 'var(--accent-primary)',
+              top: '10%',
+              left: '10%',
+              transform: `translateY(${scrollY * 0.3}px)`,
+              animationDuration: '4s'
+            }}
+          ></div>
+          <div 
+            className="absolute w-80 h-80 rounded-full blur-3xl opacity-15 animate-pulse"
+            style={{
+              backgroundColor: 'var(--accent-secondary)',
+              top: '30%',
+              right: '15%',
+              transform: `translateY(${-scrollY * 0.2}px)`,
+              animationDuration: '6s',
+              animationDelay: '1s'
+            }}
+          ></div>
+          <div 
+            className="absolute w-64 h-64 rounded-full blur-2xl opacity-25"
+            style={{
+              backgroundColor: 'var(--accent-light)',
+              bottom: '20%',
+              left: '20%',
+              transform: `translateY(${scrollY * 0.4}px) rotate(${scrollY * 0.1}deg)`,
+              animation: 'float 8s ease-in-out infinite'
+            }}
+          ></div>
+        </div>
+
         {/* 서브틀한 패턴 배경 */}
         <div className="absolute inset-0 opacity-30">
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 1px 1px, var(--border-light) 1px, transparent 1px)`,
-            backgroundSize: '40px 40px'
+            backgroundSize: '40px 40px',
+            transform: `translateX(${scrollY * 0.1}px)`
           }}></div>
         </div>
 
-        <div className="relative z-10 px-4 py-16 sm:py-20 lg:py-24">
+        <div className="relative z-10 px-4 py-16 sm:py-20 lg:py-24 flex items-center min-h-screen">
           <div className="max-w-7xl mx-auto">
             {/* 상단 배지 */}
             <div className="flex justify-center mb-8">
@@ -49,24 +190,41 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               </div>
             </div>
             
-            {/* 메인 헤더 - 심플하고 임팩트 있는 디자인 */}
-            <div className="text-center mb-12">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6"
-                  style={{ color: 'var(--text-primary)' }}>
+            {/* 메인 헤더 - 동적 애니메이션 효과 */}
+            <div className="text-center mb-12"
+                 style={{
+                   transform: `translateY(${scrollY * 0.1}px)`,
+                   transition: 'transform 0.1s ease-out'
+                 }}>
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6 animate-fade-in-up"
+                  style={{ 
+                    color: 'var(--text-primary)',
+                    animation: 'fadeInUp 1s ease-out'
+                  }}>
                 복잡한 의사결정을
-                <span className="block" style={{ color: 'var(--accent-primary, #10b981)' }}>체계적으로 분석하세요</span>
+                <span className="block" 
+                      style={{ 
+                        color: 'var(--accent-primary, #10b981)',
+                        animation: 'fadeInUp 1s ease-out 0.3s both'
+                      }}>체계적으로 분석하세요</span>
               </h1>
               
               <p className="text-xl sm:text-2xl max-w-3xl mx-auto leading-relaxed"
-                 style={{ color: 'var(--text-secondary)' }}>
+                 style={{ 
+                   color: 'var(--text-secondary)',
+                   animation: 'fadeInUp 1s ease-out 0.6s both'
+                 }}>
                 AHP(Analytic Hierarchy Process) 방법론을 활용한
                 <br className="hidden sm:block" />
                 과학적 의사결정 지원 플랫폼
               </p>
             </div>
 
-            {/* CTA 버튼들 - 대비가 개선된 스타일 */}
-            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
+            {/* CTA 버튼들 - 동적 애니메이션 효과 */}
+            <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12"
+                 style={{
+                   animation: 'fadeInUp 1s ease-out 0.9s both'
+                 }}>
               <button 
                 onClick={onLoginClick}
                 className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center"
@@ -195,7 +353,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div className="rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300"
                  style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
@@ -208,7 +366,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div className="rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300"
                  style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
@@ -221,7 +379,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div className="rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300"
                  style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
