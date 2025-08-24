@@ -619,65 +619,101 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
       <div className="max-w-7xl mx-auto space-y-8 p-4 md:p-6 lg:p-8">
-        {/* Header */}
-        <div className="text-center space-y-8 py-12">
-          <div className="relative inline-block">
-            {/* 배경 장식 요소들 */}
-            <div className="absolute -top-6 -left-6 w-32 h-32 bg-gradient-to-br from-blue-400/20 to-purple-400/20 rounded-full blur-2xl"></div>
-            <div className="absolute -bottom-6 -right-6 w-40 h-40 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-2xl"></div>
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-gradient-to-br from-cyan-400/10 to-blue-400/10 rounded-full blur-3xl"></div>
-            
-            {/* 메인 컨텐츠 */}
-            <div className="relative bg-white/90 backdrop-blur-sm border border-white/20 shadow-2xl rounded-3xl p-8 lg:p-12 max-w-4xl mx-auto">
-              {/* 아이콘과 타이틀 */}
-              <div className="flex items-center justify-center mb-6">
-                <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg mr-6">
-                  <span className="text-4xl text-white">📚</span>
-                </div>
-                <div className="text-left">
-                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 leading-tight">
-                    AHP 의사결정 지원 시스템
-                  </h1>
-                </div>
-              </div>
-              
-              {/* 서브타이틀 */}
-              <div className="mb-8">
-                <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-gray-800 mb-2">
-                  <span className="inline-block px-6 py-2 bg-gradient-to-r from-blue-100 to-purple-100 rounded-xl border border-blue-200">
-                    완전한 사용 가이드
-                  </span>
-                </h2>
-              </div>
-              
-              {/* 설명 텍스트 */}
-              <div className="space-y-4">
-                <p className="text-xl md:text-2xl font-semibold text-gray-700 leading-relaxed">
-                  샘플 데이터를 통해 AHP 분석의 
-                  <span className="text-blue-600 font-bold"> 전체 프로세스</span>를 체험해보세요
-                </p>
-                <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                  단계별로 자세한 설명과 실제 예시를 확인하며, 
-                  전문적인 의사결정 분석 방법론을 완벽하게 마스터할 수 있습니다
-                </p>
-              </div>
-              
-              {/* 특징 배지들 */}
-              <div className="flex flex-wrap items-center justify-center gap-3 mt-8">
-                <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 rounded-full text-sm font-semibold border border-green-200">
-                  <span className="mr-2">✨</span>
-                  실제 예시 데이터
-                </span>
-                <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 rounded-full text-sm font-semibold border border-blue-200">
-                  <span className="mr-2">📊</span>
-                  단계별 상세 가이드
-                </span>
-                <span className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 rounded-full text-sm font-semibold border border-purple-200">
-                  <span className="mr-2">🎯</span>
-                  전문적인 분석 도구
-                </span>
-              </div>
+        {/* Header - 대시보드 환영인사 스타일 */}
+        <div className="text-center space-y-6 py-8">
+          <div className="space-y-3">
+            <h1 
+              className="text-4xl lg:text-5xl font-light tracking-wide"
+              style={{ 
+                color: 'var(--text-primary)',
+                fontFamily: "'Inter', 'Pretendard', system-ui, sans-serif"
+              }}
+            >
+              안녕하세요, 
+              <span 
+                className="font-semibold ml-2"
+                style={{ color: 'var(--accent-primary)' }}
+              >
+                AHP 연구자
+              </span>님
+            </h1>
+            <div className="flex items-center justify-center space-x-2">
+              <div 
+                className="w-12 h-0.5 rounded-full"
+                style={{ backgroundColor: 'var(--accent-primary)' }}
+              ></div>
+              <span 
+                className="text-xs font-medium uppercase tracking-wider px-3 py-1 rounded-full border"
+                style={{ 
+                  color: 'var(--accent-primary)',
+                  borderColor: 'var(--accent-light)',
+                  backgroundColor: 'var(--accent-light)'
+                }}
+              >
+                Complete Guide
+              </span>
+              <div 
+                className="w-12 h-0.5 rounded-full"
+                style={{ backgroundColor: 'var(--accent-primary)' }}
+              ></div>
             </div>
+            <p 
+              className="text-lg font-light max-w-3xl mx-auto leading-relaxed"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              전문적인 AHP 의사결정 분석을 위한 완벽한 단계별 가이드를 제공합니다
+            </p>
+          </div>
+        </div>
+
+        {/* 새로운 핵심 기능 섹션 */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* 실습 데이터 */}
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/60 shadow-lg text-center">
+            <div 
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl border-2 border-dashed shadow-lg mb-4"
+              style={{ borderColor: 'var(--accent-primary)', backgroundColor: 'rgba(var(--accent-rgb), 0.1)' }}
+            >
+              <span className="text-2xl">📊</span>
+            </div>
+            <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+              실제 예시 데이터
+            </h3>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              AI 개발 활용 방안 분석 예제로 실습
+            </p>
+          </div>
+
+          {/* 단계별 가이드 */}
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/60 shadow-lg text-center">
+            <div 
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl border-2 border-dashed shadow-lg mb-4"
+              style={{ borderColor: 'var(--accent-secondary)', backgroundColor: 'rgba(var(--accent-secondary-rgb), 0.1)' }}
+            >
+              <span className="text-2xl">🎯</span>
+            </div>
+            <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+              5단계 프로세스
+            </h3>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              프로젝트 생성부터 결과 분석까지
+            </p>
+          </div>
+
+          {/* 인터렉티브 */}
+          <div className="bg-white/95 backdrop-blur-xl rounded-2xl p-6 border border-gray-200/60 shadow-lg text-center">
+            <div 
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl border-2 border-dashed shadow-lg mb-4"
+              style={{ borderColor: 'var(--status-success-bg)', backgroundColor: 'rgba(34, 197, 94, 0.1)' }}
+            >
+              <span className="text-2xl">🎆</span>
+            </div>
+            <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+              인터렉티브 학습
+            </h3>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+              드래그&드롭으로 순서 변경 가능
+            </p>
           </div>
         </div>
 
