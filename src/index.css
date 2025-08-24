@@ -46,10 +46,10 @@
   --bg-subtle:     var(--ivory);      /* Subtle section backgrounds */
   
   /* === Typography === */
-  --text-primary:   #181818;          /* Primary text - high contrast */
-  --text-secondary: #2f2f2f;          /* Secondary text */
-  --text-tertiary:  var(--gray-700);  /* Tertiary text */
-  --text-muted:     var(--gray-500);  /* Muted text */
+  --text-primary:   #0f0f0f;          /* Primary text - maximum contrast */
+  --text-secondary: #1f1f1f;          /* Secondary text - stronger contrast */
+  --text-tertiary:  #4f4f4f;          /* Tertiary text - improved readability */
+  --text-muted:     #6f6f6f;          /* Muted text - better contrast */
   --text-inverse:   #ffffff;          /* Text on dark backgrounds */
 
   /* === Borders & Dividers === */
@@ -257,9 +257,9 @@
   
   /* Dark mode typography - Enhanced for readability */
   --text-primary:   #ffffff;  /* Pure white for maximum contrast */
-  --text-secondary: #e8e8e8;  /* Bright secondary text */
-  --text-tertiary:  #d0d0d0;  /* More visible tertiary text */
-  --text-muted:     #a8a8a8;  /* Brighter muted text */
+  --text-secondary: #f0f0f0;  /* Brighter secondary text for better readability */
+  --text-tertiary:  #e0e0e0;  /* Much more visible tertiary text */
+  --text-muted:     #c0c0c0;  /* Significantly brighter muted text */
   --text-inverse:   #0a0a0a;  /* Very dark text on light backgrounds */
   
   /* Dark mode borders - More visible */
@@ -318,9 +318,9 @@
     --bg-subtle:     #2e2e2e;
     
     --text-primary:   #ffffff;
-    --text-secondary: #e8e8e8;
-    --text-tertiary:  #d0d0d0;
-    --text-muted:     #a8a8a8;
+    --text-secondary: #f0f0f0;
+    --text-tertiary:  #e0e0e0;
+    --text-muted:     #c0c0c0;
     --text-inverse:   #0a0a0a;
     
     --border-light:   #333333;
