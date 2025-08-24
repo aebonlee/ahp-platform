@@ -21,11 +21,14 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
         <ColorThemeButton />
       </div>
       {/* 히어로 섹션 - 깔끔한 미니멀 디자인 */}
-      <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
+      <div className="relative overflow-hidden" 
+           style={{
+             background: 'linear-gradient(to bottom, var(--bg-elevated), var(--bg-primary), var(--bg-primary))'
+           }}>
         {/* 서브틀한 패턴 배경 */}
-        <div className="absolute inset-0 opacity-40">
+        <div className="absolute inset-0 opacity-30">
           <div className="absolute inset-0" style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgb(219, 234, 254) 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(circle at 1px 1px, var(--border-light) 1px, transparent 1px)`,
             backgroundSize: '40px 40px'
           }}></div>
         </div>
@@ -48,12 +51,14 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             
             {/* 메인 헤더 - 심플하고 임팩트 있는 디자인 */}
             <div className="text-center mb-12">
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold leading-tight mb-6"
+                  style={{ color: 'var(--text-primary)' }}>
                 복잡한 의사결정을
                 <span className="block" style={{ color: 'var(--accent-primary, #10b981)' }}>체계적으로 분석하세요</span>
               </h1>
               
-              <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-xl sm:text-2xl max-w-3xl mx-auto leading-relaxed"
+                 style={{ color: 'var(--text-secondary)' }}>
                 AHP(Analytic Hierarchy Process) 방법론을 활용한
                 <br className="hidden sm:block" />
                 과학적 의사결정 지원 플랫폼
@@ -176,50 +181,53 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       </div>
 
       {/* 주요 특징 섹션 - 깔끔한 카드 디자인 */}
-      <div className="py-16 bg-gray-50">
+      <div className="py-16" style={{ backgroundColor: 'var(--bg-elevated)' }}>
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
               왜 AHP for Paper를 선택해야 할까요?
             </h2>
-            <p className="text-lg text-gray-600">
+            <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
               연구자와 의사결정자를 위한 최적화된 기능
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300"
+                 style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">빠른 설정</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>빠른 설정</h3>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 복잡한 설치 과정 없이 웹 브라우저에서 바로 시작할 수 있습니다. 5분 안에 첫 프로젝트를 생성하세요.
               </p>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300"
+                 style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="w-14 h-14 bg-green-100 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">정확한 분석</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>정확한 분석</h3>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 검증된 AHP 알고리즘과 일관성 검증을 통해 신뢰할 수 있는 의사결정 결과를 도출합니다.
               </p>
             </div>
             
-            <div className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300">
+            <div className="rounded-2xl p-8 shadow-sm hover:shadow-lg transition-all duration-300"
+                 style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6">
                 <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">협업 지원</h3>
-              <p className="text-gray-600 leading-relaxed">
+              <h3 className="text-xl font-bold mb-3" style={{ color: 'var(--text-primary)' }}>협업 지원</h3>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 여러 평가자와 함께 작업하고 결과를 종합하여 집단 의사결정을 지원합니다.
               </p>
             </div>
@@ -229,7 +237,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
       {/* 컨텐츠 섹션 */}
       {activeView === 'example' ? (
-        <div className="bg-white">
+        <div style={{ backgroundColor: 'var(--bg-primary)' }}>
           <div className="max-w-6xl mx-auto px-4 py-16">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -243,7 +251,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
           <ExampleGuide />
         </div>
       ) : activeView === 'guide' ? (
-        <div className="bg-white">
+        <div style={{ backgroundColor: 'var(--bg-primary)' }}>
           <div className="max-w-6xl mx-auto px-4 py-16">
             {/* 서비스 이용 가이드 */}
             <div className="text-center mb-12">
@@ -469,7 +477,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
           </div>
         </div>
       ) : (
-        <div className="bg-white">
+        <div style={{ backgroundColor: 'var(--bg-primary)' }}>
           <div className="max-w-6xl mx-auto px-4 py-16">
             {/* 서비스 소개 */}
             <div className="text-center mb-12">

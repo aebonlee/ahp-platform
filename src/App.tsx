@@ -22,6 +22,7 @@ import DirectInputEvaluation from './components/evaluator/DirectInputEvaluation'
 import UserGuideOverview from './components/guide/UserGuideOverview';
 import { API_BASE_URL } from './config/api';
 import { useColorTheme } from './hooks/useColorTheme';
+import { useTheme } from './hooks/useTheme';
 import { 
   DEMO_USER, 
   DEMO_PROJECTS, 
@@ -31,8 +32,9 @@ import {
 } from './data/demoData';
 
 function App() {
-  // Initialize color theme
+  // Initialize theme systems
   useColorTheme();
+  useTheme();
   const [user, setUser] = useState<{
     id: string;
     first_name: string;
