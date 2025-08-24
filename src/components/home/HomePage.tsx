@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ExampleGuide from './ExampleGuide';
 import ThemeModeToggle from '../common/ThemeModeToggle';
 import ColorThemeButton from '../common/ColorThemeButton';
+import PricingSection from './PricingSection';
 
 interface HomePageProps {
   onLoginClick: () => void;
@@ -39,44 +40,74 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
     }}>
       {/* 헤더 - 잔디 스타일 */}
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrollY > 10 ? 'bg-white/95 backdrop-blur-md shadow-sm' : 'bg-transparent'
-      }`}>
+        scrollY > 10 ? 'backdrop-blur-md shadow-sm' : 'bg-transparent'
+      }`} style={{
+        backgroundColor: scrollY > 10 ? 'var(--bg-primary)' + '95' : 'transparent'
+      }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">
             {/* 로고 */}
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r bg-clip-text text-transparent" style={{
+                backgroundImage: 'linear-gradient(to right, var(--accent-primary), var(--accent-secondary))'
+              }}>
                 AHP for Paper
               </h1>
             </div>
 
             {/* 네비게이션 - 데스크톱 */}
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <a href="#features" className="transition-colors" style={{
+                color: 'var(--text-secondary)'
+              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
+                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
                 주요 기능
               </a>
-              <a href="#how-it-works" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <a href="#how-it-works" className="transition-colors" style={{
+                color: 'var(--text-secondary)'
+              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
+                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
                 이용 방법
               </a>
-              <a href="#pricing" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <a href="#pricing" className="transition-colors" style={{
+                color: 'var(--text-secondary)'
+              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
+                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
                 요금제
               </a>
-              <a href="#research" className="text-gray-700 hover:text-blue-600 transition-colors">
+              <a href="#research" className="transition-colors" style={{
+                color: 'var(--text-secondary)'
+              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
+                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
                 연구 사례
               </a>
             </nav>
 
-            {/* CTA 버튼들 */}
+            {/* CTA 버튼들 및 테마 컨트롤 */}
             <div className="hidden md:flex items-center gap-4">
+              {/* 테마 컨트롤 */}
+              <div className="flex items-center gap-2">
+                <ThemeModeToggle />
+                <ColorThemeButton />
+              </div>
+              
+              <div className="w-px h-6" style={{ backgroundColor: 'var(--border-light)' }}></div>
+              
               <button
                 onClick={onLoginClick}
-                className="px-5 py-2 text-gray-700 hover:text-blue-600 transition-colors font-medium"
+                className="px-5 py-2 transition-colors font-medium"
+                style={{ color: 'var(--text-secondary)' }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
               >
                 로그인
               </button>
               <button
                 onClick={onLoginClick}
-                className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all transform hover:scale-105 font-medium shadow-sm"
+                className="px-6 py-2.5 text-white rounded-lg transition-all transform hover:scale-105 font-medium shadow-sm"
+                style={{ backgroundColor: 'var(--accent-primary)' }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-hover)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-primary)'}
               >
                 시작하기
               </button>
@@ -100,13 +131,25 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
         {/* 모바일 메뉴 */}
         {isMenuOpen && (
-          <div className="md:hidden bg-white border-t">
+          <div className="md:hidden border-t" style={{ backgroundColor: 'var(--bg-secondary)' }}>
             <div className="px-6 py-4 space-y-3">
-              <a href="#features" className="block py-2 text-gray-700">주요 기능</a>
-              <a href="#how-it-works" className="block py-2 text-gray-700">이용 방법</a>
-              <a href="#pricing" className="block py-2 text-gray-700">요금제</a>
-              <a href="#research" className="block py-2 text-gray-700">연구 사례</a>
-              <button onClick={onLoginClick} className="w-full py-3 mt-4 bg-blue-600 text-white rounded-lg">
+              <a href="#features" className="block py-2" style={{ color: 'var(--text-secondary)' }}>주요 기능</a>
+              <a href="#how-it-works" className="block py-2" style={{ color: 'var(--text-secondary)' }}>이용 방법</a>
+              <a href="#pricing" className="block py-2" style={{ color: 'var(--text-secondary)' }}>요금제</a>
+              <a href="#research" className="block py-2" style={{ color: 'var(--text-secondary)' }}>연구 사례</a>
+              
+              {/* 모바일 테마 컨트롤 */}
+              <div className="flex items-center gap-3 py-3 border-t" style={{ borderColor: 'var(--border-light)' }}>
+                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>테마:</span>
+                <ThemeModeToggle />
+                <ColorThemeButton />
+              </div>
+              
+              <button 
+                onClick={onLoginClick} 
+                className="w-full py-3 mt-4 text-white rounded-lg"
+                style={{ backgroundColor: 'var(--accent-primary)' }}
+              >
                 시작하기
               </button>
             </div>
@@ -309,6 +352,9 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
         </div>
       </section>
 
+      {/* 요금제 섹션 */}
+      <PricingSection onLoginClick={onLoginClick} />
+
       {/* CTA 섹션 */}
       <section className="py-20 bg-gradient-to-r from-blue-600 to-purple-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
@@ -322,16 +368,11 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             onClick={onLoginClick}
             className="px-10 py-4 bg-white text-blue-600 rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 font-semibold text-lg shadow-xl"
           >
-            무료로 시작하기
+            14일 무료 체험 시작
           </button>
         </div>
       </section>
 
-      {/* Theme Controls */}
-      <div className="fixed top-20 right-4 z-40 flex gap-3">
-        <ThemeModeToggle />
-        <ColorThemeButton />
-      </div>
 
       {/* Scroll to Top Button */}
       <button
