@@ -140,7 +140,7 @@ const ColorThemeButton: React.FC = () => {
               </div>
 
               {/* Theme Grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 {getAvailableThemes().map((theme) => {
                   const palette = getPalette(theme);
                   const info = themeInfo[theme];

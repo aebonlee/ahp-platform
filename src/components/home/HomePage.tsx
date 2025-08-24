@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Button from '../common/Button';
 import ExampleGuide from './ExampleGuide';
 import ThemeModeToggle from '../common/ThemeModeToggle';
 import ColorThemeButton from '../common/ColorThemeButton';
@@ -12,7 +11,10 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
   const [activeView, setActiveView] = useState<'intro' | 'guide' | 'example'>('intro');
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{
+      backgroundColor: 'var(--bg-primary, #ffffff)',
+      color: 'var(--text-primary, #1f2937)'
+    }}>
       {/* Theme Controls */}
       <div className="fixed top-4 right-4 z-40 flex gap-3">
         <ThemeModeToggle />
@@ -32,7 +34,11 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
           <div className="max-w-7xl mx-auto">
             {/* 상단 배지 */}
             <div className="flex justify-center mb-8">
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-emerald-100 text-emerald-700 text-sm font-medium">
+              <div className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium"
+                   style={{
+                     backgroundColor: 'var(--accent-light, #86efac)',
+                     color: 'var(--accent-primary, #10b981)'
+                   }}>
                 <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
@@ -44,7 +50,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div className="text-center mb-12">
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6">
                 복잡한 의사결정을
-                <span className="block text-emerald-600">체계적으로 분석하세요</span>
+                <span className="block" style={{ color: 'var(--accent-primary, #10b981)' }}>체계적으로 분석하세요</span>
               </h1>
               
               <p className="text-xl sm:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
@@ -56,30 +62,39 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
             {/* CTA 버튼들 - 대비가 개선된 스타일 */}
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
-              <Button 
-                variant="primary" 
-                size="xl"
+              <button 
                 onClick={onLoginClick}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl"
+                className="text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center"
+                style={{
+                  backgroundColor: 'var(--accent-primary, #10b981)'
+                }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-hover, #047857)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-primary, #10b981)'}
               >
                 무료로 시작하기
                 <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
-              </Button>
+              </button>
               
-              <Button 
-                variant="outline" 
-                size="xl"
+              <button
                 onClick={() => setActiveView('guide')}
-                className="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300 hover:border-emerald-500 hover:text-emerald-700 shadow-sm hover:shadow-md transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl"
+                className="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300 shadow-sm hover:shadow-md transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center"
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent-primary, #10b981)';
+                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary, #10b981)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#d1d5db';
+                  (e.currentTarget as HTMLButtonElement).style.color = '#374151';
+                }}
               >
                 <svg className="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 사용 가이드 보기
-              </Button>
+              </button>
             </div>
 
             {/* 네비게이션 탭 - 심플한 디자인 */}
@@ -89,9 +104,22 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   onClick={() => setActiveView('intro')}
                   className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeView === 'intro'
-                      ? 'bg-white text-emerald-600 shadow-sm'
-                      : 'text-gray-600 hover:text-emerald-600'
+                      ? 'bg-white shadow-sm'
+                      : 'text-gray-600'
                   }`}
+                  style={{
+                    color: activeView === 'intro' ? 'var(--accent-primary, #10b981)' : '#6b7280'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeView !== 'intro') {
+                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary, #10b981)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeView !== 'intro') {
+                      (e.currentTarget as HTMLButtonElement).style.color = '#6b7280';
+                    }
+                  }}
                 >
                   서비스 소개
                 </button>
@@ -99,9 +127,22 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   onClick={() => setActiveView('guide')}
                   className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeView === 'guide'
-                      ? 'bg-white text-emerald-600 shadow-sm'
-                      : 'text-gray-600 hover:text-emerald-600'
+                      ? 'bg-white shadow-sm'
+                      : 'text-gray-600'
                   }`}
+                  style={{
+                    color: activeView === 'guide' ? 'var(--accent-primary, #10b981)' : '#6b7280'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeView !== 'guide') {
+                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary, #10b981)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeView !== 'guide') {
+                      (e.currentTarget as HTMLButtonElement).style.color = '#6b7280';
+                    }
+                  }}
                 >
                   이용 가이드
                 </button>
@@ -109,9 +150,22 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   onClick={() => setActiveView('example')}
                   className={`px-6 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
                     activeView === 'example'
-                      ? 'bg-white text-emerald-600 shadow-sm'
-                      : 'text-gray-600 hover:text-emerald-600'
+                      ? 'bg-white shadow-sm'
+                      : 'text-gray-600'
                   }`}
+                  style={{
+                    color: activeView === 'example' ? 'var(--accent-primary, #10b981)' : '#6b7280'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeView !== 'example') {
+                      (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary, #10b981)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeView !== 'example') {
+                      (e.currentTarget as HTMLButtonElement).style.color = '#6b7280';
+                    }
+                  }}
                 >
                   분석 예시
                 </button>
@@ -389,26 +443,26 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   최적의 도구를 선택하는 AHP 분석 과정을 단계별로 확인해보세요.
                 </p>
                 <div className="flex flex-wrap justify-center gap-4">
-                  <Button 
-                    variant="secondary" 
+                  <button 
                     onClick={() => setActiveView('example')}
-                    className="bg-white text-emerald-600 hover:bg-gray-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 font-semibold rounded-xl"
+                    className="bg-white hover:bg-gray-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 font-semibold rounded-xl inline-flex items-center justify-center"
+                    style={{ color: 'var(--accent-primary, #10b981)' }}
                   >
                     분석 예시 보기
                     <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
-                  </Button>
-                  <Button 
-                    variant="primary" 
+                  </button>
+                  <button 
                     onClick={onLoginClick}
-                    className="bg-white hover:bg-gray-50 text-emerald-600 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 font-semibold rounded-xl"
+                    className="bg-white hover:bg-gray-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 font-semibold rounded-xl inline-flex items-center justify-center"
+                    style={{ color: 'var(--accent-primary, #10b981)' }}
                   >
                     직접 시작하기
                     <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
-                  </Button>
+                  </button>
                 </div>
               </div>
             </div>
@@ -580,28 +634,26 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                     과학적 의사결정을 위한 AHP 분석을 경험해보세요
                   </p>
                   <div className="flex flex-wrap justify-center gap-4">
-                    <Button 
-                      variant="secondary" 
-                      size="lg"
+                    <button 
                       onClick={onLoginClick}
-                      className="bg-white text-emerald-600 hover:bg-gray-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-12 py-4 text-lg font-semibold rounded-xl"
+                      className="bg-white hover:bg-gray-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-12 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center"
+                      style={{ color: 'var(--accent-primary, #10b981)' }}
                     >
                       서비스 시작하기
                       <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                       </svg>
-                    </Button>
-                    <Button 
-                      variant="primary" 
-                      size="lg"
+                    </button>
+                    <button 
                       onClick={() => setActiveView('guide')}
-                      className="bg-white hover:bg-gray-50 text-emerald-600 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 px-12 py-4 text-lg font-semibold rounded-xl"
+                      className="bg-white hover:bg-gray-50 border-2 border-white shadow-lg hover:shadow-xl transition-all duration-300 px-12 py-4 text-lg font-semibold rounded-xl inline-flex items-center justify-center"
+                      style={{ color: 'var(--accent-primary, #10b981)' }}
                     >
                       이용 가이드 보기
                       <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                       </svg>
-                    </Button>
+                    </button>
                   </div>
                 </div>
               </div>
