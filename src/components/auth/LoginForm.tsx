@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import Button from '../common/Button';
 import Input from '../common/Input';
 import Card from '../common/Card';
 
@@ -106,26 +105,32 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
           <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
         </div>
 
-        <div className="max-w-4xl w-full space-y-8 relative z-10">
-          {/* 개선된 헤더 디자인 */}
-          <div className="text-center">
-            <div className="mb-6">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-3" style={{
-                color: '#1f2937'
-              }}>
+        <div className="max-w-5xl w-full space-y-6 relative z-10">
+          {/* 개선된 헤더 디자인 - 더욱 세련된 스타일 */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 mb-6 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 rounded-2xl shadow-2xl transform rotate-3 hover:rotate-0 transition-all duration-300">
+              <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+              </svg>
+            </div>
+            
+            <div className="relative inline-block">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black mb-2 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-700 bg-clip-text text-transparent">
                 AHP for Paper
               </h1>
-              <p className="text-lg sm:text-xl font-medium" style={{
-                color: '#374151'
-              }}>
-                전문가급 의사결정 지원 시스템
-              </p>
-              <p className="text-base mt-2 font-normal" style={{
-                color: '#6b7280'
-              }}>
-                Analytic Hierarchy Process Decision Support System
-              </p>
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-24 h-1 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"></div>
             </div>
+            
+            <p className="text-base sm:text-lg font-semibold mt-4 mb-2" style={{
+              color: '#374151'
+            }}>
+              전문가급 의사결정 지원 시스템
+            </p>
+            <p className="text-sm font-medium tracking-wide" style={{
+              color: '#6b7280'
+            }}>
+              Analytic Hierarchy Process Decision Support System
+            </p>
           </div>
 
           {/* 개선된 서비스 선택 카드 - 2가지 옵션 (회원가입, 서비스 이용) */}
@@ -182,14 +187,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                   </div>
                 </div>
 
-                <Button 
-                  variant="primary" 
-                  size="lg"
-                  className="w-full text-lg font-bold py-4 lg:py-5"
-                  onClick={() => handleModeSelect('register')}
-                >
-                  🎯 회원가입 시작하기
-                </Button>
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <button 
+                    className="relative w-full py-4 lg:py-5 px-8 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    onClick={() => handleModeSelect('register')}
+                  >
+                    <span className="flex items-center justify-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                      </svg>
+                      회원가입 시작하기
+                    </span>
+                  </button>
+                </div>
               </div>
             </Card>
 
@@ -245,14 +256,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                   </div>
                 </div>
 
-                <Button 
-                  variant="primary" 
-                  size="lg"
-                  className="w-full text-lg font-bold py-4 lg:py-5"
-                  onClick={() => handleModeSelect('service')}
-                >
-                  🚀 서비스 로그인
-                </Button>
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <button 
+                    className="relative w-full py-4 lg:py-5 px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    onClick={() => handleModeSelect('service')}
+                  >
+                    <span className="flex items-center justify-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                      </svg>
+                      서비스 로그인
+                    </span>
+                  </button>
+                </div>
               </div>
             </Card>
           </div>
@@ -371,28 +388,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
               />
 
               <div className="mt-6 space-y-4">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="xl"
-                  loading={loading}
-                  disabled={loading}
-                  className="w-full"
-                >
-                  {loading ? (
-                    <>
-                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      가입 처리 중...
-                    </>
-                  ) : (
-                    <>
-                      🎯 계정 생성하기
-                    </>
-                  )}
-                </Button>
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="relative w-full py-4 px-8 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center">
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        가입 처리 중...
+                      </span>
+                    ) : (
+                      <span className="flex items-center justify-center">
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        계정 생성하기
+                      </span>
+                    )}
+                  </button>
+                </div>
 
                 <div className="text-center">
                   <p className="text-sm mb-2" style={{
@@ -524,14 +544,21 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                   </div>
                 </div>
 
-                <Button 
-                  variant="secondary" 
-                  size="lg"
-                  className="w-full text-lg font-bold py-4 lg:py-5"
-                  onClick={() => handleAdminServiceSelect('admin')}
-                >
-                  🔧 관리자 페이지로 이동
-                </Button>
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-green-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <button 
+                    className="relative w-full py-4 lg:py-5 px-8 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    onClick={() => handleAdminServiceSelect('admin')}
+                  >
+                    <span className="flex items-center justify-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      </svg>
+                      관리자 페이지로 이동
+                    </span>
+                  </button>
+                </div>
               </div>
             </Card>
 
@@ -587,14 +614,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                   </div>
                 </div>
 
-                <Button 
-                  variant="primary" 
-                  size="lg"
-                  className="w-full text-lg font-bold py-4 lg:py-5"
-                  onClick={() => handleAdminServiceSelect('personal')}
-                >
-                  🚀 개인 서비스로 이동
-                </Button>
+                <div className="relative group">
+                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <button 
+                    className="relative w-full py-4 lg:py-5 px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    onClick={() => handleAdminServiceSelect('personal')}
+                  >
+                    <span className="flex items-center justify-center">
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                      </svg>
+                      개인 서비스로 이동
+                    </span>
+                  </button>
+                </div>
               </div>
             </Card>
           </div>
@@ -724,28 +757,31 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
               }
             />
 
-            <Button
-              type="submit"
-              variant="primary"
-              size="xl"
-              loading={loading}
-              disabled={loading}
-              className="w-full"
-            >
-              {loading ? (
-                <>
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  로그인 중...
-                </>
-              ) : (
-                <>
-                  🚀 서비스 로그인
-                </>
-              )}
-            </Button>
+            <div className="relative group">
+              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    로그인 중...
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center">
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                    </svg>
+                    서비스 로그인
+                  </span>
+                )}
+              </button>
+            </div>
           </form>
 
           {/* 개선된 회원가입 링크 */}
