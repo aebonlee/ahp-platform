@@ -66,74 +66,79 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
 
   if (mode === 'selection') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-hero py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        {/* Blocksy 스타일 배경 패턴 */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl"></div>
-          <div className="absolute top-40 right-20 w-20 h-20 bg-cyan-200 rounded-full blur-lg"></div>
-          <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-blue-200 rounded-full blur-lg"></div>
-          <div className="absolute bottom-40 right-1/3 w-16 h-16 bg-indigo-200 rounded-full blur-md"></div>
+      <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+        {/* 고급스러운 그라디언트 배경 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-600/10 to-cyan-500/20"></div>
+        
+        {/* 세련된 기하학적 패턴 */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
         </div>
 
         <div className="max-w-4xl w-full space-y-8 relative z-10">
-          {/* Blocksy 스타일 헤더 */}
+          {/* 개선된 헤더 디자인 */}
           <div className="text-center">
             <div className="mb-8">
-              <h1 className="text-6xl font-black text-white mb-4 drop-shadow-lg">
-                AHP for Paper
+              <h1 className="text-6xl font-extrabold mb-4">
+                <span className="bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                  AHP for Paper
+                </span>
               </h1>
-              <p className="text-2xl text-blue-100 font-semibold">
+              <p className="text-2xl text-blue-200 font-light">
                 전문가급 의사결정 지원 시스템
               </p>
-              <p className="text-lg text-blue-200 mt-2 font-medium">
+              <p className="text-lg text-blue-300/70 mt-2 font-light">
                 Analytic Hierarchy Process Decision Support System
               </p>
             </div>
           </div>
 
-          {/* Blocksy 스타일 서비스 선택 카드 */}
+          {/* 개선된 서비스 선택 카드 */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {/* 서비스 이용 카드 */}
             <Card 
               variant="glass" 
               hoverable={true} 
-              className="border-2 border-white/30 hover:border-primary-300 transform hover:scale-105 cursor-pointer"
+              className="bg-white/10 backdrop-blur-xl border-2 border-white/20 hover:border-blue-400/50 transform hover:scale-105 cursor-pointer hover:bg-white/15 transition-all duration-300"
             >
               <div 
                 className="text-center p-8"
                 onClick={() => handleModeSelect('service')}
               >
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-primary-400 to-primary-600 rounded-blocksy-xl flex items-center justify-center shadow-blocksy-lg">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-2xl">
                   <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                   </svg>
                 </div>
                 
-                <h3 className="text-2xl font-black text-neutral-900 mb-4">
+                <h3 className="text-2xl font-bold text-white mb-4">
                   서비스 이용
                 </h3>
                 
-                <p className="text-neutral-700 mb-6 leading-relaxed font-medium">
+                <p className="text-blue-100 mb-6 leading-relaxed font-light">
                   AHP 의사결정 분석을 위한<br />
                   프로젝트 생성 및 평가 서비스
                 </p>
                 
-                <div className="space-y-3 text-sm text-neutral-700 mb-6">
+                <div className="space-y-3 text-sm text-blue-100 mb-6">
                   <div className="flex items-center justify-center">
-                    <span className="text-success-500 mr-2 text-lg">✓</span>
-                    <span className="font-semibold">프로젝트 생성 및 관리</span>
+                    <span className="text-green-400 mr-2 text-lg">✓</span>
+                    <span className="font-light">프로젝트 생성 및 관리</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-success-500 mr-2 text-lg">✓</span>
-                    <span className="font-semibold">평가자 초대 및 설문 진행</span>
+                    <span className="text-green-400 mr-2 text-lg">✓</span>
+                    <span className="font-light">평가자 초대 및 설문 진행</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-success-500 mr-2 text-lg">✓</span>
-                    <span className="font-semibold">실시간 결과 분석</span>
+                    <span className="text-green-400 mr-2 text-lg">✓</span>
+                    <span className="font-light">실시간 결과 분석</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-success-500 mr-2 text-lg">✓</span>
-                    <span className="font-semibold">리포트 생성 및 내보내기</span>
+                    <span className="text-green-400 mr-2 text-lg">✓</span>
+                    <span className="font-light">리포트 생성 및 내보내기</span>
                   </div>
                 </div>
 
@@ -152,44 +157,44 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             <Card 
               variant="glass" 
               hoverable={true} 
-              className="border-2 border-white/30 hover:border-secondary-300 transform hover:scale-105 cursor-pointer"
+              className="bg-white/10 backdrop-blur-xl border-2 border-white/20 hover:border-green-400/50 transform hover:scale-105 cursor-pointer hover:bg-white/15 transition-all duration-300"
             >
               <div 
                 className="text-center p-8"
                 onClick={() => handleModeSelect('admin')}
               >
-                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-secondary-400 to-secondary-600 rounded-blocksy-xl flex items-center justify-center shadow-blocksy-lg">
+                <div className="w-24 h-24 mx-auto mb-6 bg-gradient-to-br from-green-500 to-green-700 rounded-2xl flex items-center justify-center shadow-2xl">
                   <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
                 
-                <h3 className="text-2xl font-black text-neutral-900 mb-4">
+                <h3 className="text-2xl font-bold text-white mb-4">
                   시스템 관리
                 </h3>
                 
-                <p className="text-neutral-700 mb-6 leading-relaxed font-medium">
+                <p className="text-blue-100 mb-6 leading-relaxed font-light">
                   시스템 운영 및 사용자 관리를 위한<br />
                   관리자 전용 대시보드
                 </p>
                 
-                <div className="space-y-3 text-sm text-neutral-700 mb-6">
+                <div className="space-y-3 text-sm text-blue-100 mb-6">
                   <div className="flex items-center justify-center">
-                    <span className="text-accent-500 mr-2 text-lg">✓</span>
-                    <span className="font-semibold">사용자 및 권한 관리</span>
+                    <span className="text-cyan-400 mr-2 text-lg">✓</span>
+                    <span className="font-light">사용자 및 권한 관리</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-accent-500 mr-2 text-lg">✓</span>
-                    <span className="font-semibold">구독 서비스 운영</span>
+                    <span className="text-cyan-400 mr-2 text-lg">✓</span>
+                    <span className="font-light">구독 서비스 운영</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-accent-500 mr-2 text-lg">✓</span>
-                    <span className="font-semibold">시스템 모니터링</span>
+                    <span className="text-cyan-400 mr-2 text-lg">✓</span>
+                    <span className="font-light">시스템 모니터링</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="text-accent-500 mr-2 text-lg">✓</span>
-                    <span className="font-semibold">운영 통계 및 분석</span>
+                    <span className="text-cyan-400 mr-2 text-lg">✓</span>
+                    <span className="font-light">운영 통계 및 분석</span>
                   </div>
                 </div>
 
@@ -205,32 +210,36 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             </Card>
           </div>
 
-          {/* Blocksy 스타일 하단 정보 */}
-          <div className="text-center text-blue-100 text-sm">
-            <p className="font-medium">Powered by Advanced Analytics & Decision Intelligence</p>
+          {/* 개선된 하단 정보 */}
+          <div className="text-center text-blue-200/70 text-sm">
+            <p className="font-light">Powered by Advanced Analytics & Decision Intelligence</p>
           </div>
         </div>
       </div>
     );
   }
 
-  // Blocksy 스타일 로그인 폼 화면 (서비스 또는 관리자)
+  // 개선된 로그인 폼 화면 (서비스 또는 관리자)
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-hero py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Blocksy 스타일 배경 패턴 */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl"></div>
-        <div className="absolute bottom-20 right-20 w-20 h-20 bg-cyan-200 rounded-full blur-lg"></div>
-        <div className="absolute top-1/3 right-1/4 w-24 h-24 bg-blue-200 rounded-full blur-lg"></div>
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
+      {/* 고급스러운 그라디언트 배경 */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"></div>
+      <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-600/10 to-cyan-500/20"></div>
+      
+      {/* 세련된 기하학적 패턴 */}
+      <div className="absolute inset-0">
+        <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="max-w-lg w-full space-y-8 relative z-10">
-        {/* Blocksy 스타일 헤더 */}
+        {/* 개선된 헤더 */}
         <div className="text-center">
           <Button
             variant="ghost"
             onClick={handleBackToSelection}
-            className="inline-flex items-center text-white hover:bg-white/20 mb-6 border-0"
+            className="inline-flex items-center text-white/80 hover:text-white hover:bg-white/10 mb-6 border-0 transition-all duration-200"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -238,19 +247,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             이전으로 돌아가기
           </Button>
           
-          <h2 className="text-4xl font-black text-white mb-4 drop-shadow-lg">
+          <h2 className="text-4xl font-bold mb-4">
             {mode === 'service' ? (
-              <>
-                <span className="text-blue-200">서비스</span> 로그인
-              </>
+              <span className="bg-gradient-to-r from-blue-200 to-cyan-200 bg-clip-text text-transparent">
+                서비스 로그인
+              </span>
             ) : (
-              <>
-                <span className="text-green-200">관리자</span> 로그인
-              </>
+              <span className="bg-gradient-to-r from-green-200 to-cyan-200 bg-clip-text text-transparent">
+                관리자 로그인
+              </span>
             )}
           </h2>
           
-          <p className="mt-2 text-lg text-blue-100 font-medium">
+          <p className="mt-2 text-lg text-blue-200/80 font-light">
             {mode === 'service' 
               ? 'AHP 의사결정 분석 서비스에 로그인하세요'
               : '시스템 관리 대시보드에 로그인하세요'
@@ -258,16 +267,16 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
           </p>
         </div>
         
-        {/* Blocksy 스타일 로그인 폼 */}
-        <Card variant="glass" className="shadow-blocksy-xl border-2 border-white/30">
+        {/* 개선된 로그인 폼 */}
+        <Card variant="glass" className="bg-white/10 backdrop-blur-xl border-2 border-white/20 shadow-2xl">
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
-              <div className="bg-error-50 border-2 border-error-200 rounded-blocksy p-4">
+              <div className="bg-red-500/10 border-2 border-red-400/30 rounded-xl p-4 backdrop-blur-sm">
                 <div className="flex items-center">
-                  <svg className="w-5 h-5 text-error-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
-                  <p className="text-sm text-error-700 font-semibold">{error}</p>
+                  <p className="text-sm text-red-200 font-light">{error}</p>
                 </div>
               </div>
             )}
@@ -330,17 +339,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             </Button>
           </form>
 
-          {/* Blocksy 스타일 회원가입 링크 */}
+          {/* 개선된 회원가입 링크 */}
           {onRegister && (
-            <div className="mt-8 text-center p-4 bg-neutral-50 rounded-blocksy border border-neutral-200">
-              <p className="text-sm text-neutral-700 font-medium">
+            <div className="mt-8 text-center p-4 bg-white/5 rounded-xl border border-white/10 backdrop-blur-sm">
+              <p className="text-sm text-blue-100 font-light">
                 계정이 없으신가요?{' '}
                 <button
                   onClick={onRegister}
-                  className={`font-bold ${
+                  className={`font-medium ${
                     mode === 'service' 
-                      ? 'text-primary-600 hover:text-primary-700' 
-                      : 'text-secondary-600 hover:text-secondary-700'
+                      ? 'text-blue-300 hover:text-blue-200' 
+                      : 'text-green-300 hover:text-green-200'
                   } transition-all duration-200 hover:underline`}
                 >
                   회원가입하기 →

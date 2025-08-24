@@ -11,32 +11,33 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      {/* 히어로 섹션 - Blocksy 스타일 */}
+      {/* 히어로 섹션 - 개선된 디자인 */}
       <div className="relative overflow-hidden">
-        {/* 배경 그라데이션 및 패턴 */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800"></div>
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-500/20 to-cyan-400/30"></div>
+        {/* 고급스러운 그라데이션 배경 */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900"></div>
+        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-blue-600/10 to-cyan-500/20"></div>
         
-        {/* 기하학적 패턴 배경 */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-10 left-10 w-32 h-32 bg-white rounded-full blur-xl"></div>
-          <div className="absolute top-40 right-20 w-20 h-20 bg-cyan-200 rounded-full blur-lg"></div>
-          <div className="absolute bottom-20 left-1/4 w-24 h-24 bg-blue-200 rounded-full blur-lg"></div>
-          <div className="absolute bottom-40 right-1/3 w-16 h-16 bg-indigo-200 rounded-full blur-md"></div>
+        {/* 개선된 기하학적 패턴 */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-20 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl"></div>
         </div>
 
         <div className="relative z-10 px-4 py-20 sm:py-28 lg:py-32">
           <div className="max-w-7xl mx-auto text-center">
-            {/* 메인 헤더 */}
-            <div className="space-y-6 mb-12">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight">
-                <span className="block">AHP for Paper</span>
-                <span className="block text-2xl sm:text-3xl lg:text-4xl font-normal text-blue-100 mt-2">
+            {/* 메인 헤더 - 개선된 타이포그래피 */}
+            <div className="space-y-8 mb-12">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold text-white leading-tight tracking-tight">
+                <span className="block bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
+                  AHP for Paper
+                </span>
+                <span className="block text-2xl sm:text-3xl lg:text-4xl font-light text-blue-200 mt-4">
                   과학적 의사결정을 위한 계층적 분석 플랫폼
                 </span>
               </h1>
               
-              <p className="text-lg sm:text-xl text-blue-100 max-w-4xl mx-auto leading-relaxed">
+              <p className="text-lg sm:text-xl text-blue-100/90 max-w-4xl mx-auto leading-relaxed font-light">
                 복잡한 의사결정 문제를 체계적으로 분해하고, 정량적으로 평가하여 
                 최적의 선택을 도출하는 전문 분석 도구입니다.
               </p>
@@ -97,19 +98,22 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               </Button>
             </div>
 
-            {/* 특징 미리보기 */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl mx-auto text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <div className="text-2xl mb-2">⚡</div>
-                <p className="text-white/90 text-sm font-medium">빠른 설정</p>
+            {/* 특징 미리보기 - 개선된 카드 디자인 */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto text-center">
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 cursor-pointer">
+                <div className="text-3xl mb-3">⚡</div>
+                <h4 className="text-white font-semibold mb-1">빠른 설정</h4>
+                <p className="text-white/70 text-xs">5분 안에 프로젝트 시작</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <div className="text-2xl mb-2">📊</div>
-                <p className="text-white/90 text-sm font-medium">정확한 분석</p>
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 cursor-pointer">
+                <div className="text-3xl mb-3">📊</div>
+                <h4 className="text-white font-semibold mb-1">정확한 분석</h4>
+                <p className="text-white/70 text-xs">검증된 AHP 알고리즘</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
-                <div className="text-2xl mb-2">🎯</div>
-                <p className="text-white/90 text-sm font-medium">최적 결과</p>
+              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105 cursor-pointer">
+                <div className="text-3xl mb-3">🎯</div>
+                <h4 className="text-white font-semibold mb-1">최적 결과</h4>
+                <p className="text-white/70 text-xs">데이터 기반 의사결정</p>
               </div>
             </div>
           </div>
