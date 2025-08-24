@@ -47,13 +47,13 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               </p>
             </div>
 
-            {/* CTA 버튼들 - 깔끔한 스타일 */}
+            {/* CTA 버튼들 - 대비가 개선된 스타일 */}
             <div className="flex flex-col sm:flex-row justify-center gap-4 mb-12">
               <Button 
                 variant="primary" 
                 size="xl"
                 onClick={onLoginClick}
-                className="bg-blue-600 hover:bg-blue-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl"
               >
                 무료로 시작하기
                 <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -65,7 +65,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 variant="outline" 
                 size="xl"
                 onClick={() => setActiveView('guide')}
-                className="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300 hover:border-gray-400 shadow-sm hover:shadow-md transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl"
+                className="bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-300 hover:border-emerald-500 hover:text-emerald-700 shadow-sm hover:shadow-md transition-all duration-300 px-8 py-4 text-lg font-semibold rounded-xl"
               >
                 <svg className="w-5 h-5 mr-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -385,7 +385,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   <Button 
                     variant="secondary" 
                     onClick={() => setActiveView('example')}
-                    className="bg-white text-blue-600 hover:bg-gray-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 font-semibold rounded-xl"
+                    className="bg-white text-emerald-600 hover:bg-gray-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-8 py-3 font-semibold rounded-xl"
                   >
                     분석 예시 보기
                     <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -577,7 +577,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                       variant="secondary" 
                       size="lg"
                       onClick={onLoginClick}
-                      className="bg-white text-blue-600 hover:bg-gray-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-12 py-4 text-lg font-semibold rounded-xl"
+                      className="bg-white text-emerald-600 hover:bg-gray-100 border-0 shadow-lg hover:shadow-xl transition-all duration-300 px-12 py-4 text-lg font-semibold rounded-xl"
                     >
                       서비스 시작하기
                       <svg className="w-5 h-5 ml-2 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
