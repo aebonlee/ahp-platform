@@ -3128,11 +3128,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
           </div>
 
-          {/* 사용량 현황 - 3개 계열로 분류 */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* 사용량 현황 - 3개 계열로 분류 - 100% 너비 사용 */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 w-full">
             
             {/* 1. 프로젝트 계열 */}
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/60 hover:shadow-lg transition-all duration-300">
               <div className="space-y-2">
                 <div 
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed"
@@ -3192,7 +3192,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
 
             {/* 2. 협업 계열 */}
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/60 hover:shadow-lg transition-all duration-300">
               <div className="space-y-2">
                 <div 
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed"
@@ -3252,7 +3252,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </div>
 
             {/* 3. 리소스 계열 */}
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-4 bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-200/60 hover:shadow-lg transition-all duration-300">
               <div className="space-y-2">
                 <div 
                   className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed"
@@ -3806,8 +3806,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             ))}
           </div>
 
-          {/* Second Row - Advanced Functions (6 items) */}
-          <div className="grid grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* Second Row - Advanced Functions (6 items) - 100% 너비 사용 */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 w-full">
             {[
               { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과와 순위 확인' },
               { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기' },
@@ -3820,7 +3820,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <button
                   onClick={() => handleTabChange(item.id)}
                   aria-label={item.label}
-                  className="w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform"
+                  className="w-full p-5 lg:p-6 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform min-h-[120px] flex flex-col items-center justify-center space-y-2"
                   style={{
                     backgroundColor: activeMenu === item.id ? 'var(--accent-light)' : 'var(--bg-secondary)',
                     borderColor: activeMenu === item.id ? 'var(--accent-primary)' : 'var(--border-light)',
@@ -3843,8 +3843,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     }
                   }}
                 >
-                  <div className="text-2xl lg:text-3xl mb-2">{item.icon}</div>
-                  <div className="font-bold text-sm lg:text-base leading-tight">{item.label}</div>
+                  <div className="text-3xl lg:text-4xl">{item.icon}</div>
+                  <div className="font-bold text-xs lg:text-sm leading-tight mt-2">{item.label}</div>
                 </button>
                 {/* Enhanced Tooltip */}
                 <div 
