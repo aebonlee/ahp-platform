@@ -4,6 +4,7 @@ import dataService, { ProjectData } from '../../services/dataService';
 import ProjectSelector from '../project/ProjectSelector';
 import NewProjectModal from '../modals/NewProjectModal';
 import ModelBuilder from '../modals/ModelBuilder';
+import DemographicSurvey from '../survey/DemographicSurvey';
 
 interface User {
   first_name: string;
@@ -17,7 +18,7 @@ interface User {
   };
 }
 
-type MenuTab = 'dashboard' | 'projects' | 'creation' | 'analysis' | 'export' | 'survey-links' | 'workshop' | 'decision-support' | 'settings' | 'model-builder' | 'evaluators' | 'monitoring' | 'payment';
+type MenuTab = 'dashboard' | 'projects' | 'creation' | 'analysis' | 'export' | 'survey-links' | 'workshop' | 'decision-support' | 'settings' | 'model-builder' | 'evaluators' | 'monitoring' | 'payment' | 'demographic-survey' | 'my-projects' | 'project-creation' | 'evaluator-management' | 'progress-monitoring' | 'results-analysis' | 'paper-management' | 'export-reports' | 'workshop-management' | 'decision-support-system' | 'personal-settings' | 'personal-service' | 'user-guide';
 
 type ModelStep = 'overview' | 'details' | 'criteria' | 'alternatives' | 'evaluators' | 'complete';
 
@@ -38,7 +39,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
   onTabChange: propOnTabChange 
 }) => {
   const { user: authUser } = useAuth();
-  const [activeMenu, setActiveMenu] = useState<MenuTab>('dashboard');
+  const [activeMenu, setActiveMenu] = useState<MenuTab>((propActiveTab as MenuTab) || 'dashboard');
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
@@ -65,6 +66,12 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
   useEffect(() => {
     fetchProjects();
   }, []);
+
+  useEffect(() => {
+    if (propActiveTab) {
+      setActiveMenu(propActiveTab as MenuTab);
+    }
+  }, [propActiveTab]);
 
   const fetchProjects = async () => {
     try {
@@ -181,6 +188,140 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
           </div>
         );
 
+      case 'demographic-survey':
+        return (
+          <DemographicSurvey 
+            onSave={(data) => {
+              console.log('설문조사 데이터 저장:', data);
+              alert('설문조사가 저장되었습니다.');
+              setActiveMenu('dashboard');
+            }}
+            onCancel={() => setActiveMenu('dashboard')}
+          />
+        );
+
+      case 'my-projects':
+        return (
+          <div>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                📂 내 프로젝트
+              </h2>
+              <button
+                onClick={() => setShowNewProjectModal(true)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                ➕ 새 프로젝트
+              </button>
+            </div>
+            <div className="text-center py-12">
+              <p style={{ color: 'var(--text-secondary)' }}>프로젝트 목록이 여기에 표시됩니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'project-creation':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+              ➕ 새 프로젝트 생성
+            </h2>
+            <div className="text-center py-12">
+              <button
+                onClick={() => setShowNewProjectModal(true)}
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                프로젝트 생성 시작하기
+              </button>
+            </div>
+          </div>
+        );
+
+      case 'evaluator-management':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+              👥 평가자 관리
+            </h2>
+            <div className="text-center py-12">
+              <p style={{ color: 'var(--text-secondary)' }}>평가자 관리 기능이 여기에 표시됩니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'progress-monitoring':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+              📈 진행률 모니터링
+            </h2>
+            <div className="text-center py-12">
+              <p style={{ color: 'var(--text-secondary)' }}>프로젝트 진행 상황이 여기에 표시됩니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'results-analysis':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+              📊 결과 분석
+            </h2>
+            <div className="text-center py-12">
+              <p style={{ color: 'var(--text-secondary)' }}>분석 결과가 여기에 표시됩니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'paper-management':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+              📝 논문 작성 관리
+            </h2>
+            <div className="text-center py-12">
+              <p style={{ color: 'var(--text-secondary)' }}>논문 작성 도구가 여기에 표시됩니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'export-reports':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+              📤 보고서 내보내기
+            </h2>
+            <div className="text-center py-12">
+              <p style={{ color: 'var(--text-secondary)' }}>보고서 내보내기 기능이 여기에 표시됩니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'workshop-management':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+              🎯 워크숍 관리
+            </h2>
+            <div className="text-center py-12">
+              <p style={{ color: 'var(--text-secondary)' }}>워크숍 관리 도구가 여기에 표시됩니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'decision-support-system':
+        return (
+          <div>
+            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+              🧠 의사결정 지원
+            </h2>
+            <div className="text-center py-12">
+              <p style={{ color: 'var(--text-secondary)' }}>의사결정 지원 시스템이 여기에 표시됩니다.</p>
+            </div>
+          </div>
+        );
+
+      case 'personal-settings':
       case 'settings':
         return (
           <div className="space-y-8">
@@ -363,6 +504,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
         );
 
       default:
+        // 기본적으로 대시보드 콘텐츠를 보여줌
         return null;
     }
   };
@@ -380,6 +522,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
+      {/* 특정 메뉴가 선택된 경우 해당 콘텐츠 표시 */}
+      {activeMenu !== 'dashboard' && activeMenu !== 'personal-service' && renderMenuContent() ? (
+        renderMenuContent()
+      ) : (
+        <>
       {/* 환영 메시지 + 요금제 정보 통합 - 원래 디자인 복원 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
         {/* 환영 메시지 - 원래 디자인 복원 */}
@@ -826,6 +973,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
           onProjectSelect={handleProjectSelect}
           onCancel={handleProjectSelectorCancel}
         />
+      )}
+        </>
       )}
     </div>
   );

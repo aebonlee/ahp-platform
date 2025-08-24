@@ -1055,6 +1055,7 @@ function App() {
         );
 
       case 'personal-service':
+      case 'demographic-survey':
       case 'my-projects':
       case 'project-creation':
       case 'model-builder':

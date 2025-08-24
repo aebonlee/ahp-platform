@@ -27,6 +27,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
   const personalServiceMenuItems = [
     { id: 'personal-service', label: '내 대시보드', icon: '🏠' },
     { id: 'user-guide', label: '사용자 가이드', icon: '📚' },
+    { id: 'demographic-survey', label: '인구통계학적 설문조사', icon: '📊' },
     { id: 'my-projects', label: '내 프로젝트', icon: '📂' },
     { id: 'project-creation', label: '새 프로젝트', icon: '➕' },
     { id: 'model-builder', label: '모델 구축', icon: '🏗️' },
