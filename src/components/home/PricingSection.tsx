@@ -7,58 +7,58 @@ interface PricingSectionProps {
 const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
   const plans = [
     {
-      name: '기본 연구자',
-      price: '₩29,000',
-      period: '/월',
-      description: '개인 연구자를 위한 기본 플랜',
+      name: 'Single Project Pack',
+      price: '₩200,000',
+      period: '',
+      description: '단일 프로젝트용 (기본 연구자 모드)',
+      subtitle: '개인 연구자를 위한 기본 플랜',
       popular: false,
       features: [
-        '월 5개 프로젝트',
-        '기본 AHP 분석 도구',
-        '표준 보고서 생성',
-        '이메일 지원',
-        '클라우드 저장소 5GB',
-        '기본 가이드 학습'
+        '사용 기간: 1개월',
+        '프로젝트 수: 1개',
+        '평가자 인원: 30명',
+        '대상: 대학원 논문, 단기 과제, 학술 발표 준비',
+        '인공지능 활용 (옵션: +₩50,000)',
+        '문헌정보 정리 (옵션: +₩50,000)',
+        '평가자 10명 단위 추가 (옵션: +₩50,000)'
       ],
       buttonText: '기본 플랜 시작',
       buttonVariant: 'outline' as const
     },
     {
-      name: '프로 연구자',
-      price: '₩59,000',
-      period: '/월',
-      description: '전문 연구자를 위한 고급 플랜',
+      name: 'Team Project Pack',
+      price: '₩500,000',
+      period: '',
+      description: '소규모 연구팀 단기 이용 (프로 연구자)',
+      subtitle: '전문 연구자를 위한 고급 플랜',
       popular: true,
       features: [
-        '월 20개 프로젝트',
-        '고급 AHP 분석 + 민감도 분석',
-        '커스텀 보고서 템플릿',
-        '우선 이메일 + 채팅 지원',
-        '클라우드 저장소 50GB',
-        '고급 가이드 + 1:1 컨설팅',
-        '협업 기능 (5명까지)',
-        '데이터 내보내기'
+        '사용 기간: 1개월',
+        '프로젝트 수: 3개',
+        '평가자 인원: 50명',
+        '대상: 기업·기관 연구과제, 단일 컨설팅 프로젝트',
+        '인공지능 활용 (옵션: +₩50,000)',
+        '문헌정보 정리 (옵션: +₩50,000)',
+        '평가자 10명 단위 추가 (옵션: +₩50,000)'
       ],
       buttonText: '프로 플랜 시작',
       buttonVariant: 'primary' as const
     },
     {
-      name: '연구기관',
-      price: '₩159,000',
-      period: '/월',
-      description: '연구기관·대학교를 위한 엔터프라이즈',
+      name: 'Institution Pack',
+      price: '₩1,000,000',
+      period: '',
+      description: '기관 단위 단기 프로젝트',
+      subtitle: '연구기관·대학교를 위한 엔터프라이즈',
       popular: false,
       features: [
-        '무제한 프로젝트',
-        '전체 AHP 분석 스위트',
-        '브랜드 커스터마이징',
-        '전담 지원팀 + 전화 지원',
-        '클라우드 저장소 500GB',
-        '맞춤형 교육 프로그램',
-        '무제한 협업 사용자',
-        'API 접근 권한',
-        '온프레미스 배포 옵션',
-        'SLA 보장'
+        '사용 기간: 1개월',
+        '프로젝트 수: 3개',
+        '평가자 인원: 100명',
+        '대상: 공공기관·대규모 연구 프로젝트 단위 사용',
+        '인공지능 활용 (옵션: +₩50,000)',
+        '문헌정보 정리 (옵션: +₩50,000)',
+        '평가자 10명 단위 추가 (옵션: +₩50,000)'
       ],
       buttonText: '연구기관 문의',
       buttonVariant: 'secondary' as const
@@ -111,18 +111,25 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
                 </h3>
                 
                 {/* 설명 */}
-                <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+                <p className="mb-2" style={{ color: 'var(--text-secondary)' }}>
                   {plan.description}
                 </p>
+                {'subtitle' in plan && plan.subtitle && (
+                  <p className="mb-6 text-sm" style={{ color: 'var(--text-muted)' }}>
+                    {plan.subtitle}
+                  </p>
+                )}
 
                 {/* 가격 */}
                 <div className="mb-8">
                   <span className="text-5xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     {plan.price}
                   </span>
-                  <span className="text-xl" style={{ color: 'var(--text-secondary)' }}>
-                    {plan.period}
-                  </span>
+                  {plan.period && (
+                    <span className="text-xl" style={{ color: 'var(--text-secondary)' }}>
+                      {plan.period}
+                    </span>
+                  )}
                   {plan.name === '연구기관' && (
                     <p className="text-sm mt-2" style={{ color: 'var(--text-muted)' }}>
                       * 사용자 수에 따라 할인 적용
@@ -197,44 +204,41 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
             borderColor: 'var(--border-light)' 
           }}>
             <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
-              모든 플랜에 포함된 기본 혜택
+              추가 옵션 선택
             </h3>
-            <div className="grid md:grid-cols-4 gap-6 mt-8">
-              <div className="text-center">
+            <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+              모든 요금제에서 필요에 따라 추가 옵션을 선택하실 수 있습니다.
+            </p>
+            <div className="grid md:grid-cols-3 gap-6 mt-8">
+              <div className="text-center p-4 rounded-xl border" style={{ borderColor: 'var(--border-light)' }}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--accent-light)' }}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
                   </svg>
                 </div>
-                <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>품질 보장</h4>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>검증된 AHP 알고리즘</p>
+                <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>인공지능 활용</h4>
+                <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>AI 기반 분석 및 추천</p>
+                <p className="font-bold" style={{ color: 'var(--accent-primary)' }}>+₩50,000</p>
               </div>
-              <div className="text-center">
+              <div className="text-center p-4 rounded-xl border" style={{ borderColor: 'var(--border-light)' }}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--accent-light)' }}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                   </svg>
                 </div>
-                <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>보안</h4>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>데이터 암호화 및 보호</p>
+                <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>문헌정보 정리</h4>
+                <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>체계적 문헌 관리</p>
+                <p className="font-bold" style={{ color: 'var(--accent-primary)' }}>+₩50,000</p>
               </div>
-              <div className="text-center">
+              <div className="text-center p-4 rounded-xl border" style={{ borderColor: 'var(--border-light)' }}>
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--accent-light)' }}>
                   <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </div>
-                <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>지원</h4>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>한국어 고객 지원</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-xl flex items-center justify-center mx-auto mb-3" style={{ backgroundColor: 'var(--accent-light)' }}>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>업데이트</h4>
-                <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>정기 기능 업데이트</p>
+                <h4 className="font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>평가자 추가</h4>
+                <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>10명 단위 추가</p>
+                <p className="font-bold" style={{ color: 'var(--accent-primary)' }}>+₩50,000</p>
               </div>
             </div>
           </div>
