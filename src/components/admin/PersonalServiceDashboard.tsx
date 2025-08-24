@@ -968,98 +968,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
       </div>
 
-      {/* 최근 활동 요약 */}
-      {projects.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8">
-          <div className="text-center">
-            <div className="text-gray-400 text-6xl mb-4">📊</div>
-            <h3 className="text-xl font-medium text-gray-900 mb-2">첫 번째 프로젝트를 시작해보세요</h3>
-            <p className="text-gray-600 mb-6 max-w-md mx-auto">
-              AHP 분석을 통해 복잡한 의사결정을 체계적으로 해결할 수 있습니다.
-            </p>
-            <div className="flex justify-center space-x-4">
-              <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('creation')}>
-                ➕ 새 프로젝트 생성
-              </Button>
-              <Button variant="outline" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('user-guide')}>
-                📚 사용자 가이드
-              </Button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">최근 프로젝트</h3>
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => handleTabChange('projects')}
-            >
-              모든 프로젝트 보기 ({projects.length}개)
-            </Button>
-          </div>
-          <div className="space-y-3">
-            {projects.slice(0, 3).map((project) => (
-              <div key={project.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3">
-                    <h4 className="font-medium text-gray-900">{project.title}</h4>
-                    <span className={`px-2 py-1 rounded text-xs font-medium ${
-                      project.status === 'active' ? 'bg-green-100 text-green-800' :
-                      project.status === 'completed' ? 'bg-blue-100 text-blue-800' :
-                      'bg-gray-100 text-gray-800'
-                    }`}>
-                      {project.status === 'active' ? '🚀 진행중' : 
-                       project.status === 'completed' ? '✅ 완료' : '📝 준비중'}
-                    </span>
-                  </div>
-                  <p className="text-sm text-gray-600 mt-1 line-clamp-1">{project.description}</p>
-                  <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
-                    <span>수정: {project.last_modified}</span>
-                    <span>{project.evaluator_count}명 참여</span>
-                    <div className="flex items-center space-x-1">
-                      <div className="w-12 bg-gray-200 rounded-full h-1.5">
-                        <div 
-                          className={`h-1.5 rounded-full ${
-                            (project.completion_rate || 0) >= 80 ? 'bg-green-500' :
-                            (project.completion_rate || 0) >= 50 ? 'bg-blue-500' :
-                            'bg-yellow-500'
-                          }`}
-                          style={{ width: `${(project.completion_rate || 0)}%` }}
-                        />
-                      </div>
-                      <span>{(project.completion_rate || 0)}%</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex space-x-2 ml-4">
-                  <button
-                    onClick={() => {
-                      setSelectedProjectId(project.id || '');
-                      handleTabChange('model-builder');
-                    }}
-                    className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
-                    title="모델 구성"
-                  >
-                    🏗️
-                  </button>
-                  <button
-                    onClick={() => {
-                      setSelectedProjectId(project.id || '');
-                      handleTabChange('analysis');
-                    }}
-                    className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-                    title="결과 분석"
-                  >
-                    📊
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 
@@ -3439,6 +3347,354 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   </span>
                 </div>
               ))}
+            </div>
+          </div>
+        </div>
+
+        {/* 최근 프로젝트 및 사용량 현황 - 2등분 배치 */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+          {/* 왼쪽: 최근 프로젝트 */}
+          <div 
+            className="p-6 rounded-xl border-2 transition-all duration-300"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              backdropFilter: 'blur(10px)',
+              boxShadow: 'var(--shadow-md)'
+            }}
+          >
+            <div className="flex items-center justify-between mb-6">
+              <h3 
+                className="text-xl font-bold"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                📂 최근 프로젝트
+              </h3>
+              {projects.length > 0 && (
+                <button
+                  onClick={() => handleTabChange('projects')}
+                  className="text-sm font-medium transition-all duration-300"
+                  style={{ color: 'var(--accent-primary)' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--accent-secondary)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--accent-primary)';
+                  }}
+                >
+                  모든 프로젝트 보기 ({projects.length}개) →
+                </button>
+              )}
+            </div>
+            
+            {projects.length === 0 ? (
+              <div className="text-center py-8">
+                <div className="text-6xl mb-4 opacity-50">📊</div>
+                <h4 
+                  className="text-lg font-medium mb-2"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  첫 번째 프로젝트를 시작해보세요
+                </h4>
+                <p 
+                  className="text-sm mb-6 max-w-xs mx-auto leading-relaxed"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  AHP 분석을 통해 복잡한 의사결정을 체계적으로 해결할 수 있습니다.
+                </p>
+                <button
+                  onClick={() => handleTabChange('creation')}
+                  className="px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
+                    color: 'white'
+                  }}
+                >
+                  ➕ 새 프로젝트 생성
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {projects.slice(0, 3).map((project) => (
+                  <div 
+                    key={project.id} 
+                    className="p-4 rounded-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                    style={{
+                      backgroundColor: 'rgba(255, 255, 255, 0.8)',
+                      borderColor: 'rgba(255, 255, 255, 0.3)',
+                      backdropFilter: 'blur(5px)'
+                    }}
+                    onClick={() => {
+                      setSelectedProjectId(project.id || '');
+                      handleTabChange('projects');
+                    }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <h5 
+                            className="font-medium text-sm"
+                            style={{ color: 'var(--text-primary)' }}
+                          >
+                            {project.title}
+                          </h5>
+                          <span 
+                            className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                              project.status === 'active' 
+                                ? 'bg-green-100 text-green-700' :
+                              project.status === 'completed' 
+                                ? 'bg-blue-100 text-blue-700' :
+                                'bg-gray-100 text-gray-700'
+                            }`}
+                          >
+                            {project.status === 'active' ? '🚀' : 
+                             project.status === 'completed' ? '✅' : '📝'}
+                          </span>
+                        </div>
+                        <p 
+                          className="text-xs leading-relaxed line-clamp-2 mb-3"
+                          style={{ color: 'var(--text-secondary)' }}
+                        >
+                          {project.description || '프로젝트 설명이 없습니다.'}
+                        </p>
+                        <div className="flex items-center justify-between">
+                          <div 
+                            className="text-xs"
+                            style={{ color: 'var(--text-muted)' }}
+                          >
+                            {project.last_modified} • {project.evaluator_count}명 참여
+                          </div>
+                          <div className="flex items-center space-x-2">
+                            <div 
+                              className="w-16 bg-gray-200 rounded-full h-1.5"
+                              style={{ backgroundColor: 'var(--bg-elevated)' }}
+                            >
+                              <div 
+                                className="h-1.5 rounded-full transition-all duration-300"
+                                style={{ 
+                                  width: `${(project.completion_rate || 0)}%`,
+                                  backgroundColor: (project.completion_rate || 0) >= 80 ? 'var(--status-success-bg)' :
+                                                   (project.completion_rate || 0) >= 50 ? 'var(--accent-primary)' :
+                                                   'var(--status-warning-bg)'
+                                }}
+                              />
+                            </div>
+                            <span 
+                              className="text-xs font-medium"
+                              style={{ color: 'var(--accent-primary)' }}
+                            >
+                              {(project.completion_rate || 0)}%
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* 오른쪽: 사용량 현황 (3개 계열로 분류) */}
+          <div 
+            className="p-6 rounded-xl border-2 transition-all duration-300"
+            style={{
+              backgroundColor: 'rgba(255, 255, 255, 0.7)',
+              borderColor: 'rgba(255, 255, 255, 0.3)',
+              backdropFilter: 'blur(10px)',
+              boxShadow: 'var(--shadow-md)'
+            }}
+          >
+            <h3 
+              className="text-xl font-bold mb-6"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              📊 사용량 현황
+            </h3>
+            
+            <div className="space-y-6">
+              {/* 1. 프로젝트 관리 계열 */}
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <div 
+                    className="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center"
+                    style={{ borderColor: 'var(--accent-primary)' }}
+                  >
+                    <span className="text-lg">📋</span>
+                  </div>
+                  <div>
+                    <h4 
+                      className="text-sm font-bold"
+                      style={{ color: 'var(--accent-primary)' }}
+                    >
+                      프로젝트 관리
+                    </h4>
+                    <p 
+                      className="text-xs"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      Projects & Elements
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="pl-12 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span 
+                      className="text-sm"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      프로젝트 수
+                    </span>
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--accent-primary)' }}
+                    >
+                      {projects.length}/20
+                    </span>
+                  </div>
+                  <div 
+                    className="w-full rounded-full h-2 overflow-hidden"
+                    style={{ backgroundColor: 'var(--bg-elevated)' }}
+                  >
+                    <div 
+                      className="h-2 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${Math.min((projects.length / 20) * 100, 100)}%`,
+                        backgroundColor: 'var(--accent-primary)'
+                      }}
+                    ></div>
+                  </div>
+                  <div 
+                    className="text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    모델 요소: {projects.reduce((sum, p) => sum + p.criteria_count + p.alternatives_count, 0)}개
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. 협업 관리 계열 */}
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <div 
+                    className="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center"
+                    style={{ borderColor: 'var(--accent-secondary)' }}
+                  >
+                    <span className="text-lg">👥</span>
+                  </div>
+                  <div>
+                    <h4 
+                      className="text-sm font-bold"
+                      style={{ color: 'var(--accent-secondary)' }}
+                    >
+                      협업 관리
+                    </h4>
+                    <p 
+                      className="text-xs"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      Evaluators & Teams
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="pl-12 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span 
+                      className="text-sm"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      평가자 수
+                    </span>
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--accent-secondary)' }}
+                    >
+                      12/100
+                    </span>
+                  </div>
+                  <div 
+                    className="w-full rounded-full h-2 overflow-hidden"
+                    style={{ backgroundColor: 'var(--bg-elevated)' }}
+                  >
+                    <div 
+                      className="h-2 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: '12%',
+                        backgroundColor: 'var(--accent-secondary)'
+                      }}
+                    ></div>
+                  </div>
+                  <div 
+                    className="text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    활성 평가자: 8명
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. 리소스 사용 계열 */}
+              <div className="space-y-3">
+                <div className="flex items-center space-x-2">
+                  <div 
+                    className="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center"
+                    style={{ borderColor: 'var(--status-success-bg)' }}
+                  >
+                    <span className="text-lg">💾</span>
+                  </div>
+                  <div>
+                    <h4 
+                      className="text-sm font-bold"
+                      style={{ color: 'var(--status-success-text)' }}
+                    >
+                      리소스 사용
+                    </h4>
+                    <p 
+                      className="text-xs"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      Storage & API
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="pl-12 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span 
+                      className="text-sm"
+                      style={{ color: 'var(--text-secondary)' }}
+                    >
+                      저장용량
+                    </span>
+                    <span 
+                      className="text-sm font-medium"
+                      style={{ color: 'var(--status-success-text)' }}
+                    >
+                      2.3GB/10GB
+                    </span>
+                  </div>
+                  <div 
+                    className="w-full rounded-full h-2 overflow-hidden"
+                    style={{ backgroundColor: 'var(--bg-elevated)' }}
+                  >
+                    <div 
+                      className="h-2 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: '23%',
+                        backgroundColor: 'var(--status-success-bg)'
+                      }}
+                    ></div>
+                  </div>
+                  <div 
+                    className="text-xs"
+                    style={{ color: 'var(--text-muted)' }}
+                  >
+                    API 호출: 847/5000회
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
