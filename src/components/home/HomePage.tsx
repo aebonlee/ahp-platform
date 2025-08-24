@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import Button from '../common/Button';
 import ExampleGuide from './ExampleGuide';
-import ThemeSettings from '../common/ThemeSettings';
+import ThemeModeToggle from '../common/ThemeModeToggle';
+import ColorThemeButton from '../common/ColorThemeButton';
 
 interface HomePageProps {
   onLoginClick: () => void;
@@ -12,8 +13,11 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Theme Settings */}
-      <ThemeSettings />
+      {/* Theme Controls */}
+      <div className="fixed top-4 right-4 z-40 flex gap-3">
+        <ThemeModeToggle />
+        <ColorThemeButton />
+      </div>
       {/* 히어로 섹션 - 깔끔한 미니멀 디자인 */}
       <div className="relative overflow-hidden bg-gradient-to-b from-blue-50 via-white to-white">
         {/* 서브틀한 패턴 배경 */}
