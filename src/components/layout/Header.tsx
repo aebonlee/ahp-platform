@@ -4,7 +4,7 @@ import LayerPopup from '../common/LayerPopup';
 import ColorThemeSelector from '../common/ColorThemeSelector';
 import sessionService from '../../services/sessionService';
 import { useTheme } from '../../hooks/useTheme';
-import { useColorTheme } from '../../hooks/useColorTheme';
+// import { useColorTheme } from '../../hooks/useColorTheme';
 
 interface HeaderProps {
   user?: {
@@ -30,10 +30,10 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
   const [remainingTime, setRemainingTime] = useState<number>(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [favorites, setFavorites] = useState<FavoriteMenuItem[]>([]);
-  const [showFavoriteModal, setShowFavoriteModal] = useState(false);
+  // const [showFavoriteModal, setShowFavoriteModal] = useState(false);
   
-  const { theme, resolvedTheme, toggleTheme } = useTheme();
-  const { currentTheme } = useColorTheme();
+  const { theme, toggleTheme } = useTheme();
+  // const { currentTheme } = useColorTheme();
 
   useEffect(() => {
     // 세션 상태 확인 및 시간 업데이트
@@ -99,6 +99,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
     return 'session-danger';
   };
 
+  /*
   const getTimeStyle = () => {
     if (remainingTime > 10) {
       return {
@@ -120,6 +121,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
       borderColor: 'var(--session-danger-border)'
     };
   };
+  */
 
   const getTimeIcon = () => {
     if (remainingTime > 10) return '🟢';

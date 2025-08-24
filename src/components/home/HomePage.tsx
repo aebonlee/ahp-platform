@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
-import ExampleGuide from './ExampleGuide';
+import React, { useState, useEffect } from 'react';
 import ThemeModeToggle from '../common/ThemeModeToggle';
 import ColorThemeButton from '../common/ColorThemeButton';
 import PricingSection from './PricingSection';
@@ -42,7 +41,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrollY > 10 ? 'backdrop-blur-md shadow-sm' : 'bg-transparent'
       }`} style={{
-        backgroundColor: scrollY > 10 ? 'var(--bg-primary)' + '95' : 'transparent'
+        backgroundColor: scrollY > 10 ? 'var(--bg-primary)95' : 'transparent'
       }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center justify-between h-16">

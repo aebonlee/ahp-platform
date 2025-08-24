@@ -325,7 +325,7 @@ export const authApi = {
     makeRequest<any>('/api/auth/verify')
 };
 
-export default {
+const apiExports = {
   project: projectApi,
   criteria: criteriaApi,
   alternative: alternativeApi,
@@ -335,3 +335,5 @@ export default {
   export: exportApi,
   auth: authApi
 };
+
+export default apiExports;
