@@ -617,10 +617,10 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div>
               <h4 className="text-lg font-bold mb-4">Quick Links</h4>
               <ul className="space-y-2 text-sm text-gray-400">
-                <li><a href="#" className="hover:text-white transition">서비스 소개</a></li>
-                <li><a href="#" className="hover:text-white transition">이용 가이드</a></li>
-                <li><a href="#" className="hover:text-white transition">분석 예시</a></li>
-                <li><a href="#" className="hover:text-white transition">요금제</a></li>
+                <li><button onClick={() => setActiveView('intro')} className="hover:text-white transition text-left">서비스 소개</button></li>
+                <li><button onClick={() => setActiveView('guide')} className="hover:text-white transition text-left">이용 가이드</button></li>
+                <li><button onClick={() => setActiveView('example')} className="hover:text-white transition text-left">분석 예시</button></li>
+                <li><button onClick={onLoginClick} className="hover:text-white transition text-left">요금제</button></li>
               </ul>
             </div>
             <div>

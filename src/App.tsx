@@ -193,6 +193,7 @@ function App() {
     if (isNavigationReady) {
       restoreSessionOnLoad();
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isDemoMode, isNavigationReady]);
 
   // 페이지 새로고침 시 URL에서 상태 복원
