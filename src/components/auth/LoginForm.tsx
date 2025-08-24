@@ -287,7 +287,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                 </div>
 
                 <Button 
-                  variant="accent" 
+                  variant="primary" 
                   size="lg"
                   className="w-full"
                   onClick={() => handleModeSelect('register')}
@@ -341,17 +341,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
         <div className="max-w-lg w-full space-y-8 relative z-10">
           {/* 개선된 헤더 */}
           <div className="text-center">
-            <Button
-              variant="ghost"
+            <button
               onClick={handleBackToSelection}
-              className="inline-flex items-center hover:bg-white/10 mb-6 border-0 transition-all duration-200"
-              style={{ color: 'var(--text-inverse)' }}
+              className="inline-flex items-center hover:bg-white/10 mb-6 border-0 transition-all duration-200 px-4 py-2 rounded-lg text-white"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
               이전으로 돌아가기
-            </Button>
+            </button>
             
             <h2 className="text-4xl font-bold mb-4">
               <span className="bg-gradient-to-r from-purple-200 to-pink-200 bg-clip-text text-transparent">
@@ -418,7 +416,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
               <div className="mt-6 space-y-4">
                 <Button
                   type="submit"
-                  variant="accent"
+                  variant="primary"
                   size="xl"
                   loading={loading}
                   disabled={loading}
@@ -511,20 +509,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
       <div className="max-w-lg w-full space-y-8 relative z-10">
         {/* 개선된 헤더 */}
         <div className="text-center">
-          <Button
-            variant="ghost"
+          <button
             onClick={handleBackToSelection}
-            className="inline-flex items-center hover:bg-white/10 mb-6 border-0 transition-all duration-200"
+            className="inline-flex items-center hover:bg-white/10 mb-6 border-0 transition-all duration-200 px-4 py-2 rounded-lg"
             style={{ 
               color: 'var(--text-inverse)',
               textShadow: '0 1px 3px rgba(0,0,0,0.3)'
-            }}"
+            }}
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             이전으로 돌아가기
-          </Button>
+          </button>
           
           <h2 className="text-4xl font-bold mb-4">
             {mode === 'service' ? (
