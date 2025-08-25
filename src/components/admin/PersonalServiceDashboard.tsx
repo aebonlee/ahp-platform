@@ -162,43 +162,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
 
   const renderMenuContent = () => {
     switch (activeMenu) {
-      case 'projects':
-        return (
-          <div>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                📂 내 프로젝트
-              </h2>
-              <button
-                onClick={() => setShowNewProjectModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                ➕ 새 프로젝트
-              </button>
-            </div>
-            {/* Project list content would go here */}
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>프로젝트 목록이 여기에 표시됩니다.</p>
-            </div>
-          </div>
-        );
-      
-      case 'creation':
-        return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              ➕ 새 프로젝트 생성
-            </h2>
-            <div className="text-center py-12">
-              <button
-                onClick={() => setShowNewProjectModal(true)}
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-              >
-                프로젝트 생성 시작하기
-              </button>
-            </div>
-          </div>
-        );
 
       case 'demographic-survey':
         return (
@@ -574,10 +537,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
     );
   }
 
+  // 메뉴별 컨텐츠 렌더링 체크
+  const shouldShowMenuContent = activeMenu !== 'dashboard' && activeMenu !== 'personal-service';
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* 특정 메뉴가 선택된 경우 해당 콘텐츠 표시 */}
-      {activeMenu !== 'dashboard' && activeMenu !== 'personal-service' && renderMenuContent() ? (
+      {shouldShowMenuContent ? (
         renderMenuContent()
       ) : (
         <>
