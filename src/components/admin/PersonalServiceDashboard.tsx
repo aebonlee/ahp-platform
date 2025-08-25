@@ -2980,6 +2980,28 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             <PaymentSystem />
           </div>
         );
+      case 'demographic-survey':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-gray-900">📊 인구통계학적 설문조사</h2>
+              <Button 
+                variant="secondary"
+                onClick={() => handleTabChange('dashboard')}
+              >
+                ← 대시보드로
+              </Button>
+            </div>
+            <SurveyFormBuilder 
+              onSave={(questions) => {
+                console.log('설문 폼 저장:', questions);
+                alert('설문 폼이 저장되었습니다.');
+                handleTabChange('dashboard');
+              }}
+              onCancel={() => handleTabChange('dashboard')}
+            />
+          </div>
+        );
       default:
         return renderOverview();
     }
@@ -3000,20 +3022,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         {externalActiveTab === 'workshop-management' && renderWorkshopManagementFullPage()}
         {externalActiveTab === 'decision-support-system' && renderDecisionSupportSystemFullPage()}
         {externalActiveTab === 'personal-settings' && renderPersonalSettingsFullPage()}
-        {externalActiveTab === 'demographic-survey' && (
-          <div className="max-w-6xl mx-auto space-y-6 p-6">
-            <SurveyFormBuilder 
-              onSave={(questions) => {
-                console.log('설문 폼 저장:', questions);
-                alert('설문 폼이 저장되었습니다.');
-                if (externalOnTabChange) externalOnTabChange('personal-service');
-              }}
-              onCancel={() => {
-                if (externalOnTabChange) externalOnTabChange('personal-service');
-              }}
-            />
-          </div>
-        )}
       </>
     );
   }
