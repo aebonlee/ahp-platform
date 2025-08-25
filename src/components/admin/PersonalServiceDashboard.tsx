@@ -2920,6 +2920,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderMenuContent = () => {
+    console.log('Current activeMenu:', activeMenu);
     switch (activeMenu) {
       case 'dashboard':
         return renderOverview();
@@ -2985,13 +2986,14 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-gray-900">📊 인구통계학적 설문조사</h2>
-              <Button 
-                variant="secondary"
+              <button 
                 onClick={() => handleTabChange('dashboard')}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 ← 대시보드로
-              </Button>
+              </button>
             </div>
+            
             <SurveyFormBuilder 
               onSave={(questions) => {
                 console.log('설문 폼 저장:', questions);
