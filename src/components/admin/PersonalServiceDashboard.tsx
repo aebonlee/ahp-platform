@@ -6,9 +6,15 @@ import NewProjectModal from '../modals/NewProjectModal';
 import ModelBuilder from '../modals/ModelBuilder';
 import SurveyFormBuilder from '../survey/SurveyFormBuilder';
 import MyProjects from './MyProjects';
-import EvaluatorManagement from './EvaluatorManagement';
-import ProjectCreationForm from './ProjectCreationForm';
-import EvaluationResults from './EvaluationResults';
+import ProjectCreation from './ProjectCreation';
+import ModelBuilding from './ModelBuilding';
+import EnhancedEvaluatorManagement from './EnhancedEvaluatorManagement';
+import ProjectCompletion from './ProjectCompletion';
+import ResultsAnalysis from '../analysis/ResultsAnalysis';
+import PaperManagement from '../paper/PaperManagement';
+import ExportManager from '../export/ExportManager';
+import WorkshopManagement from '../workshop/WorkshopManagement';
+import DecisionSupportSystem from '../decision/DecisionSupportSystem';
 
 interface User {
   first_name: string;
@@ -196,113 +202,176 @@ const PersonalServiceDashboard: React.FC<PersonalServiceDashboardProps> = ({
 
       case 'demographic-survey':
         return (
-          <SurveyFormBuilder 
-            onSave={(questions) => {
-              console.log('설문 폼 저장:', questions);
-              alert('설문 폼이 저장되었습니다.');
-              setActiveMenu('dashboard');
-            }}
-            onCancel={() => setActiveMenu('dashboard')}
-          />
+          <div className="max-w-6xl mx-auto">
+            <SurveyFormBuilder 
+              onSave={(questions) => {
+                console.log('설문 폼 저장:', questions);
+                alert('설문 폼이 저장되었습니다.');
+              }}
+              onCancel={() => setActiveMenu('personal-service')}
+            />
+          </div>
         );
 
       case 'my-projects':
         return (
-          <MyProjects 
-            onProjectSelect={(project) => {
-              setCurrentProject(project);
-              setSelectedProjectId(project.id || '');
-              setActiveMenu('model-builder');
-            }}
-            onCreateNew={() => setShowNewProjectModal(true)}
-          />
+          <div className="max-w-6xl mx-auto">
+            <MyProjects 
+              onProjectSelect={(project) => {
+                setCurrentProject(project);
+                setSelectedProjectId(project.id || '');
+                setSelectedProjectTitle(project.title || '');
+                setActiveMenu('model-builder');
+              }}
+              onCreateNew={() => setActiveMenu('project-creation')}
+            />
+          </div>
         );
 
       case 'project-creation':
         return (
-          <ProjectCreationForm 
-            onSubmit={(projectData) => {
-              fetchProjects();
-              setActiveMenu('my-projects');
-              alert('프로젝트가 생성되었습니다!');
-            }}
-            onCancel={() => setActiveMenu('dashboard')}
-          />
+          <div className="max-w-6xl mx-auto">
+            <ProjectCreation 
+              onProjectCreated={() => {
+                fetchProjects();
+                setActiveMenu('my-projects');
+              }}
+              onCancel={() => setActiveMenu('personal-service')}
+            />
+          </div>
         );
 
+      case 'model-builder':
+        if (!selectedProjectId) {
+          return (
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center py-12">
+                <p className="text-xl mb-4">프로젝트를 먼저 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveMenu('my-projects')}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  프로젝트 목록으로 이동
+                </button>
+              </div>
+            </div>
+          );
+        }
+        return (
+          <div className="max-w-6xl mx-auto">
+            <ModelBuilding 
+              projectId={selectedProjectId}
+              projectTitle={selectedProjectTitle}
+              onBack={() => setActiveMenu('my-projects')}
+              onModelFinalized={() => setActiveMenu('evaluator-management')}
+            />
+          </div>
+        );
+      
       case 'evaluator-management':
-        return <EvaluatorManagement />;
+        return (
+          <div className="max-w-6xl mx-auto">
+            <EnhancedEvaluatorManagement 
+              projectId={selectedProjectId}
+            />
+          </div>
+        );
 
       case 'progress-monitoring':
-        return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              📈 진행률 모니터링
-            </h2>
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>프로젝트 진행 상황이 여기에 표시됩니다.</p>
+        if (!selectedProjectId) {
+          return (
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center py-12">
+                <p className="text-xl mb-4">모니터링할 프로젝트를 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveMenu('my-projects')}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  프로젝트 목록으로 이동
+                </button>
+              </div>
             </div>
+          );
+        }
+        return (
+          <div className="max-w-6xl mx-auto">
+            <ProjectCompletion 
+              projectId={selectedProjectId}
+              projectTitle={selectedProjectTitle}
+              onBack={() => setActiveMenu('my-projects')}
+              onProjectStatusChange={(status) => {
+                if (status === 'completed') {
+                  alert('프로젝트가 완료되었습니다!');
+                  setActiveMenu('results-analysis');
+                } else {
+                  alert('프로젝트가 중단되었습니다.');
+                  setActiveMenu('my-projects');
+                }
+              }}
+            />
           </div>
         );
 
       case 'results-analysis':
+        if (!selectedProjectId) {
+          return (
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center py-12">
+                <p className="text-xl mb-4">분석할 프로젝트를 선택해주세요.</p>
+                <button
+                  onClick={() => setActiveMenu('my-projects')}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                >
+                  프로젝트 목록으로 이동
+                </button>
+              </div>
+            </div>
+          );
+        }
         return (
-          <EvaluationResults 
-            projectId={selectedProjectId}
-            projectTitle={selectedProjectTitle}
-            onBack={() => setActiveMenu('my-projects')}
-            onComplete={() => {
-              alert('평가가 완료되었습니다!');
-              setActiveMenu('dashboard');
-            }}
-          />
+          <div className="max-w-6xl mx-auto">
+            <ResultsAnalysis 
+              projectId={selectedProjectId}
+              evaluationMode="practical"
+            />
+          </div>
         );
 
       case 'paper-management':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              📝 논문 작성 관리
-            </h2>
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>논문 작성 도구가 여기에 표시됩니다.</p>
-            </div>
+          <div className="max-w-6xl mx-auto">
+            <PaperManagement />
           </div>
         );
 
       case 'export-reports':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              📤 보고서 내보내기
-            </h2>
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>보고서 내보내기 기능이 여기에 표시됩니다.</p>
-            </div>
+          <div className="max-w-6xl mx-auto">
+            <ExportManager 
+              projectId={selectedProjectId}
+              projectData={currentProject}
+              onExportComplete={(result) => {
+                if (result.success) {
+                  alert('내보내기가 완료되었습니다!');
+                } else {
+                  alert('내보내기 중 오류가 발생했습니다: ' + result.error);
+                }
+              }}
+            />
           </div>
         );
 
       case 'workshop-management':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              🎯 워크숍 관리
-            </h2>
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>워크숍 관리 도구가 여기에 표시됩니다.</p>
-            </div>
+          <div className="max-w-6xl mx-auto">
+            <WorkshopManagement />
           </div>
         );
 
       case 'decision-support-system':
         return (
-          <div>
-            <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
-              🧠 의사결정 지원
-            </h2>
-            <div className="text-center py-12">
-              <p style={{ color: 'var(--text-secondary)' }}>의사결정 지원 시스템이 여기에 표시됩니다.</p>
-            </div>
+          <div className="max-w-6xl mx-auto">
+            <DecisionSupportSystem />
           </div>
         );
 
