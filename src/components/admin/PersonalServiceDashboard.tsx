@@ -509,7 +509,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     ]
   };
 
-  const renderOverview = () => (
+  const renderOverview = () => {
+    console.log('Rendering renderOverview function');
+    return (
     <div className="space-y-6">
 
       {/* 프로젝트 현황 대시보드 */}
@@ -973,6 +975,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
     </div>
   );
+  };
 
   const renderStepContent = () => {
     switch (currentStep) {
@@ -2923,6 +2926,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     console.log('Current activeMenu:', activeMenu);
     switch (activeMenu) {
       case 'dashboard':
+        console.log('Rendering dashboard case');
         return renderOverview();
       case 'projects':
         return renderMyProjects();
@@ -2982,28 +2986,63 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           </div>
         );
       case 'demographic-survey':
-        return (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">📊 인구통계학적 설문조사</h2>
-              <button 
-                onClick={() => handleTabChange('dashboard')}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                ← 대시보드로
-              </button>
+        console.log('Rendering demographic-survey case');
+        try {
+          return (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">📊 인구통계학적 설문조사</h2>
+                <button 
+                  onClick={() => handleTabChange('dashboard')}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  ← 대시보드로
+                </button>
+              </div>
+              
+              <div className="p-6 bg-white rounded-lg border shadow-sm">
+                <h3 className="text-lg font-semibold mb-4">📋 Google Forms 스타일 설문조사 생성</h3>
+                <p className="text-gray-600 mb-4">직관적인 폼 빌더로 인구통계학적 설문조사를 생성하고 관리하세요.</p>
+                
+                <SurveyFormBuilder 
+                  onSave={(questions) => {
+                    console.log('설문 폼 저장:', questions);
+                    alert('설문 폼이 저장되었습니다.');
+                    handleTabChange('dashboard');
+                  }}
+                  onCancel={() => handleTabChange('dashboard')}
+                />
+              </div>
             </div>
-            
-            <SurveyFormBuilder 
-              onSave={(questions) => {
-                console.log('설문 폼 저장:', questions);
-                alert('설문 폼이 저장되었습니다.');
-                handleTabChange('dashboard');
-              }}
-              onCancel={() => handleTabChange('dashboard')}
-            />
-          </div>
-        );
+          );
+        } catch (error) {
+          console.error('SurveyFormBuilder 렌더링 오류:', error);
+          return (
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-gray-900">📊 인구통계학적 설문조사</h2>
+                <button 
+                  onClick={() => handleTabChange('dashboard')}
+                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  ← 대시보드로
+                </button>
+              </div>
+              
+              <div className="p-6 bg-red-50 border border-red-200 rounded-lg">
+                <h3 className="text-lg font-semibold text-red-800 mb-2">⚠️ 컴포넌트 로딩 오류</h3>
+                <p className="text-red-600 mb-4">설문조사 폼 빌더를 불러오는 중 오류가 발생했습니다.</p>
+                <p className="text-sm text-gray-600">오류 내용: {error?.toString()}</p>
+                <button 
+                  onClick={() => window.location.reload()}
+                  className="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  페이지 새로고침
+                </button>
+              </div>
+            </div>
+          );
+        }
       default:
         return renderOverview();
     }
