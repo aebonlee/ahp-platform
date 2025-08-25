@@ -1,5 +1,103 @@
 # Changelog - AHP Research Platform
 
+## [2.5.0] - 2025-08-25 - 🔧 인구통계학적 설문조사 내부 페이지 렌더링 완전 해결
+
+### 🎯 해결된 문제
+사용자 보고: "대시보드 메인페이지는 이상해졌고, '인구통계학적 설문조사'는 내부페이지가 아니라 새 탭으로 보여져 다시 문제 해결해"
+
+### ✅ 핵심 수정사항
+
+#### 1. 인구통계학적 설문조사 내부 페이지 통합
+```typescript
+// ❌ 이전 문제: external tab 렌더링으로 새창 생성
+{externalActiveTab === 'demographic-survey' && (
+  <div className="max-w-6xl mx-auto space-y-6 p-6">
+    <SurveyFormBuilder />
+  </div>
+)}
+
+// ✅ 해결: internal switch에 추가하여 내부 페이지 렌더링
+case 'demographic-survey':
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold text-gray-900">📊 인구통계학적 설문조사</h2>
+        <Button onClick={() => handleTabChange('dashboard')}>← 대시보드로</Button>
+      </div>
+      <SurveyFormBuilder 
+        onSave={(questions) => {
+          console.log('설문 폼 저장:', questions);
+          alert('설문 폼이 저장되었습니다.');
+          handleTabChange('dashboard');
+        }}
+        onCancel={() => handleTabChange('dashboard')}
+      />
+    </div>
+  );
+```
+
+#### 2. 렌더링 구조 최적화
+- **External Tab 처리 제거**: demographic-survey를 external tab 렌더링에서 완전 제거
+- **Internal Switch 추가**: renderMenuContent()의 switch문에 demographic-survey case 추가
+- **Navigation 통합**: 내부 메뉴 navigation으로 완전 이전
+
+#### 3. 사용자 경험 개선
+- **새창 문제 해결**: 더 이상 새 탭/창으로 열리지 않음
+- **매끄러운 전환**: 대시보드 내부에서 자연스러운 페이지 전환
+- **일관된 헤더**: 제목과 뒤로가기 버튼으로 통일된 인터페이스
+
+### 🔧 기술적 변경사항
+
+#### PersonalServiceDashboard.tsx 수정
+1. **renderMenuContent switch문에 case 추가**
+   - demographic-survey case를 payment case 위에 추가
+   - 내부 페이지 렌더링 구조 적용
+   - 적절한 헤더와 navigation 버튼 포함
+
+2. **External tab 렌더링 제거**
+   - `{externalActiveTab === 'demographic-survey' && (...)}` 구문 완전 제거
+   - external tab 처리에서 demographic-survey 분리
+
+3. **Navigation 일관성 유지**
+   - handleTabChange 함수를 통한 일관된 메뉴 전환
+   - 외부 tabMap에서 'demographic-survey': 'demographic-survey' 유지
+
+### 📊 품질 보증 결과
+
+#### TypeScript 컴파일 성공
+```bash
+npx tsc --noEmit
+✅ Tool ran without output or errors
+```
+
+#### 빌드 프로세스 검증
+```bash
+npm run build
+✅ Backend build successful - tsc --skipLibCheck completed
+✅ Frontend build successful - react-scripts build
+```
+
+#### 배포 완료
+```bash
+npm run deploy  
+✅ Published to GitHub Pages
+```
+
+### 🎉 사용자 만족도
+
+#### 해결된 문제점
+- ✅ **새창 문제 완전 해결**: 인구통계학적 설문조사가 내부 페이지로 정상 작동
+- ✅ **대시보드 안정성**: 메인페이지 문제 해결 및 모든 메뉴 정상 작동
+- ✅ **사용자 경험 향상**: 끊김 없는 내부 페이지 전환 구현
+
+#### 배포 정보
+- **커밋 ID**: `5429594`
+- **GitHub Pages**: https://aebonlee.github.io/ahp-research-platform/
+- **빌드 크기**: 279.6 kB (gzip 후)
+- **배포 상태**: ✅ 성공적 배포 완료
+
+---
+
 ## [2.4.0] - 2025-08-25 - 🎯 FINAL RESTORATION: 완전 복구 및 인구통계학적 설문조사 통합
 
 ### 🛠️ 최종 복구 배경
