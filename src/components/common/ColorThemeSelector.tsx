@@ -46,6 +46,11 @@ const ColorThemeSelector: React.FC = () => {
       name: 'Deep Indigo', 
       emoji: '🌌', 
       description: '깊이 있는 인디고 테마' 
+    },
+    red: { 
+      name: 'Vibrant Red', 
+      emoji: '🔴', 
+      description: '강렬한 레드 테마' 
     }
   };
 
@@ -137,7 +142,7 @@ const ColorThemeSelector: React.FC = () => {
               </div>
 
               {/* Theme Grid */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 {getAvailableThemes().map((theme) => {
                   const palette = getPalette(theme);
                   const info = themeInfo[theme];
