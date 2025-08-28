@@ -2681,43 +2681,37 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderDemographicSurveyFullPage = () => (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
-      <div style={{ backgroundColor: 'var(--card-bg)', borderBottom: '1px solid var(--border-default)' }} className="sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <button 
-                  onClick={() => handleTabChange('dashboard')}
-                  className="mr-4 transition-colors text-2xl"
-                  style={{ color: 'var(--text-muted)' }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
-                  onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
-                >
-                  ←
-                </button>
-                <div>
-                  <h1 className="text-3xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
-                    <span className="text-4xl mr-3">📊</span>
-                    인구통계학적 설문조사
-                  </h1>
-                  <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>Google Forms 스타일의 직관적인 설문조사를 생성하고 관리합니다</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <SurveyFormBuilder 
-          onSave={(questions) => {
-            console.log('설문 폼 저장:', questions);
-            alert('설문 폼이 저장되었습니다.');
-            handleTabChange('dashboard');
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+          <span className="text-3xl mr-3">📊</span>
+          인구통계학적 설문조사
+        </h2>
+        <button 
+          onClick={() => handleTabChange('dashboard')}
+          className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors"
+          style={{ 
+            borderColor: 'var(--border-default)', 
+            color: 'var(--text-secondary)',
+            backgroundColor: 'transparent' 
           }}
-          onCancel={() => handleTabChange('dashboard')}
-        />
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+        >
+          ← 대시보드로
+        </button>
       </div>
+      <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+        Google Forms 스타일의 직관적인 설문조사를 생성하고 관리합니다
+      </p>
+      <SurveyFormBuilder 
+        onSave={(questions) => {
+          console.log('설문 폼 저장:', questions);
+          alert('설문 폼이 저장되었습니다.');
+          handleTabChange('dashboard');
+        }}
+        onCancel={() => handleTabChange('dashboard')}
+      />
     </div>
   );
 
