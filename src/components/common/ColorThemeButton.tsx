@@ -46,6 +46,11 @@ const ColorThemeButton: React.FC = () => {
       name: 'Deep Indigo', 
       emoji: '🌌', 
       description: '깊이 있는 인디고 테마' 
+    },
+    red: { 
+      name: 'Vibrant Red', 
+      emoji: '🔴', 
+      description: '강렬한 레드 테마' 
     }
   };
 
