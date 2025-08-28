@@ -155,26 +155,34 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
   };
   
   const getQuickNavItems = () => {
-    if (!user) return [];
-    
     const items = [];
     
+    // 모든 사용자(비로그인 포함)에게 공통 메뉴
+    items.push(
+      { label: '사용자 가이드', tab: 'user-guide', icon: '📚' },
+      { label: '평가자 체험', tab: 'evaluator-mode', icon: '👨‍💼' }
+    );
+    
+    if (!user) return items;
+    
+    // 로그인된 사용자 전용 메뉴
     if (user.role === 'super_admin' && user.admin_type === 'super') {
       items.push(
-        { label: '대시보드', tab: 'super-admin', icon: '📊' },
-        { label: '사용자', tab: 'users', icon: '👥' },
-        { label: '모니터링', tab: 'monitoring', icon: '📈' }
+        { label: '관리 대시보드', tab: 'super-admin', icon: '📊' },
+        { label: '사용자 관리', tab: 'users', icon: '👥' },
+        { label: '시스템 모니터링', tab: 'monitoring', icon: '📈' }
       );
     } else if (user.admin_type === 'personal') {
       items.push(
+        { label: '연구 대시보드', tab: 'personal-service', icon: '🏗️' },
         { label: '내 프로젝트', tab: 'my-projects', icon: '📋' },
         { label: '프로젝트 생성', tab: 'project-creation', icon: '➕' },
         { label: '결과 분석', tab: 'results-analysis', icon: '📊' }
       );
     } else if (user.role === 'evaluator') {
       items.push(
-        { label: '평가 대시보드', tab: 'evaluator-dashboard', icon: '⚖️' },
-        { label: '내 평가', tab: 'evaluator-status', icon: '📝' }
+        { label: '평가 대시보드', tab: 'evaluator-mode', icon: '⚖️' },
+        { label: '내 평가 현황', tab: 'evaluator-status', icon: '📝' }
       );
     }
     

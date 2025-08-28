@@ -20,6 +20,8 @@ import ProjectSelection from './components/evaluator/ProjectSelection';
 import PairwiseEvaluation from './components/evaluator/PairwiseEvaluation';
 import DirectInputEvaluation from './components/evaluator/DirectInputEvaluation';
 import UserGuideOverview from './components/guide/UserGuideOverview';
+import ComprehensiveUserGuide from './components/guide/ComprehensiveUserGuide';
+import EvaluatorDashboard from './components/evaluator/EvaluatorDashboard';
 import { API_BASE_URL } from './config/api';
 import { useColorTheme } from './hooks/useColorTheme';
 import { useTheme } from './hooks/useTheme';
@@ -51,7 +53,8 @@ function App() {
     
     // tab 파라미터가 있고 유효한 탭이면 해당 탭으로, 아니면 'home'
     const validTabs = [
-      'home', 'personal-service', 'demographic-survey', 
+      'home', 'user-guide', 'evaluator-mode',
+      'personal-service', 'demographic-survey', 
       'my-projects', 'project-creation', 'model-builder',
       'evaluator-management', 'progress-monitoring', 'results-analysis',
       'paper-management', 'export-reports', 'workshop-management',
@@ -74,7 +77,7 @@ function App() {
   const [selectedProjectTitle, setSelectedProjectTitle] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedEvaluationMethod, setSelectedEvaluationMethod] = useState<'pairwise' | 'direct'>('pairwise');
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false); // 실제 서비스 모드로 운영
 
   // URL 파라미터 변경 감지 및 자동 로그인 처리
   useEffect(() => {
@@ -1117,12 +1120,72 @@ function App() {
         );
 
       case 'user-guide':
-        if (!user) return null;
         return (
-          <UserGuideOverview 
+          <ComprehensiveUserGuide 
             onNavigateToService={() => setActiveTab('personal-service')}
+            onNavigateToEvaluator={() => setActiveTab('evaluator-mode')}
+            userRole={user?.role}
+            isLoggedIn={!!user}
           />
         );
+
+      case 'evaluator-mode':
+        // 평가자 모드 - 로그인 상태에 따라 다르게 처리
+        if (!user) {
+          // 로그인하지 않은 경우 데모 사용자로 자동 설정
+          const evaluatorUser = {
+            id: 'demo-evaluator',
+            firstName: '데모',
+            lastName: '평가자',
+            email: 'evaluator@demo.com',
+            role: 'evaluator' as const
+          };
+          
+          return (
+            <EvaluatorDashboard 
+              user={evaluatorUser}
+              onSwitchToAdmin={() => setActiveTab('personal-service')}
+              onLogout={() => {
+                setUser(null);
+                setActiveTab('home');
+              }}
+            />
+          );
+        }
+
+        // 로그인한 사용자의 경우
+        if (user.role === 'evaluator') {
+          return (
+            <EvaluatorDashboard 
+              user={{
+                id: user.id,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email,
+                role: 'evaluator'
+              }}
+              onSwitchToAdmin={() => setActiveTab('personal-service')}
+              onLogout={() => {
+                setUser(null);
+                setActiveTab('home');
+              }}
+            />
+          );
+        } else {
+          // 관리자가 평가자 모드를 체험하는 경우
+          return (
+            <EvaluatorDashboard 
+              user={{
+                id: user.id,
+                firstName: user.first_name,
+                lastName: user.last_name,
+                email: user.email,
+                role: 'evaluator'
+              }}
+              onSwitchToAdmin={() => setActiveTab('personal-service')}
+            />
+          );
+        }
 
       case 'personal-service':
       case 'demographic-survey':
