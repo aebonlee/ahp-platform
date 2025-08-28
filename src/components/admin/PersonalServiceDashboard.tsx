@@ -41,6 +41,13 @@ interface UserProject extends Omit<ProjectData, 'evaluation_method'> {
 }
 
 
+// 요금제별 할당량 정의
+const PLAN_QUOTAS = {
+  'basic': { projects: 5, evaluators: 20 },
+  'pro': { projects: 20, evaluators: 100 },
+  'enterprise': { projects: 100, evaluators: 500 }
+};
+
 const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({ 
   user, 
   activeTab: externalActiveTab,
@@ -94,6 +101,38 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   const [filterStatus, setFilterStatus] = useState<'all' | 'draft' | 'active' | 'completed'>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'progress' | 'status'>('date');
+
+  // 현재 사용자의 플랜 정보 (실제로는 API에서 가져와야 함)
+  const currentPlan = 'pro'; // 임시로 Pro Plan으로 설정
+  const planLimits = PLAN_QUOTAS[currentPlan];
+  
+  // 사용량 계산
+  const usedProjects = projects.length;
+  const usedEvaluators = projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0);
+  
+  // 사용 가능한 옵션들 (플랜별로 다를 수 있음)
+  const availableFeatures = {
+    'basic': {
+      'advanced-analysis': false,
+      'group-ahp': false,
+      'realtime-collab': false,
+      'premium-support': false
+    },
+    'pro': {
+      'advanced-analysis': true,
+      'group-ahp': true,
+      'realtime-collab': true,
+      'premium-support': true
+    },
+    'enterprise': {
+      'advanced-analysis': true,
+      'group-ahp': true,
+      'realtime-collab': true,
+      'premium-support': true
+    }
+  };
+  
+  const currentFeatures = availableFeatures[currentPlan];
 
   const projectTemplates = {
     blank: { name: '빈 프로젝트', desc: '처음부터 설정' },
@@ -3035,8 +3074,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* 환영 메시지 + 요금제 정보 통합 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 py-6">
-        {/* 환영 메시지 */}
+      <div className="py-6">
+        {/* 환영 메시지 (기존 스타일) */}
         <div className="text-center lg:text-left space-y-6">
           <div className="space-y-3">
             <h1 
@@ -3067,7 +3106,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   backgroundColor: 'var(--accent-light)'
                 }}
               >
-                Premium Member
+                Pro Plan 🔵
+              </span>
+              <span 
+                className="text-lg font-bold"
+                style={{ color: 'var(--accent-primary)' }}
+              >
+                $99/월
               </span>
               <div 
                 className="w-12 h-0.5 rounded-full"
@@ -3075,325 +3120,215 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               ></div>
             </div>
             <p 
-              className="text-lg font-light max-w-2xl mx-auto leading-relaxed"
+              className="text-lg font-light max-w-2xl mx-auto lg:mx-0 leading-relaxed"
               style={{ color: 'var(--text-secondary)' }}
             >
               전문적인 AHP 의사결정 분석으로 복잡한 문제를 체계적으로 해결해보세요
             </p>
           </div>
         </div>
-
-        {/* 통합된 요금제 및 사용량 정보 */}
-        <div className="space-y-6">
-          {/* 플랜 정보 헤더 */}
-          <div className="text-center lg:text-left space-y-4">
-            <div className="flex items-center justify-center lg:justify-start space-x-6">
-              <div className="text-center lg:text-left">
-                <div 
-                  className="text-2xl font-light mb-1"
-                  style={{ color: 'var(--text-primary)' }}
-                >
-                  Pro Plan 🔵
-                </div>
-                <div className="flex items-center justify-center space-x-2">
-                  <span 
-                    className="text-3xl font-bold"
-                    style={{ color: 'var(--accent-primary)' }}
-                  >
-                    $99
-                  </span>
-                  <span 
-                    className="text-sm font-medium"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    /월
-                  </span>
-                </div>
-                <div 
-                  className="text-xs uppercase tracking-wide mt-1"
-                  style={{ color: 'var(--text-muted)' }}
-                >
-                  연구팀/기관용 (20개 프로젝트, 100명 평가자)
-                </div>
+        
+        {/* 요금제 할당량 정보 - 각 섹션을 개별 박스로 구분 */}
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* 프로젝트 개수 박스 */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-3xl">📋</span>
+                <h3 className="text-lg font-bold text-blue-700 dark:text-blue-300">
+                  프로젝트 개수
+                </h3>
               </div>
-            </div>
-            
-            <div className="flex justify-center lg:justify-start space-x-3">
-              <button 
-                onClick={() => handleTabChange('payment')}
-                className="px-6 py-2 text-sm font-medium transition-all duration-300 border border-transparent"
-                style={{
-                  color: 'var(--accent-primary)',
-                  borderColor: 'var(--accent-primary)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = 'var(--accent-primary)';
-                  e.currentTarget.style.color = 'white';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = 'transparent';
-                  e.currentTarget.style.color = 'var(--accent-primary)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
-              >
-                결제 관리
-              </button>
-              <button 
-                className="px-6 py-2 text-sm font-medium transition-all duration-300"
-                style={{
-                  color: 'var(--text-muted)'
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.color = 'var(--accent-secondary)';
-                  e.currentTarget.style.transform = 'translateY(-1px)';
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.color = 'var(--text-muted)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                플랜 변경
-              </button>
-            </div>
-          </div>
-
-          {/* 사용량 현황 - 3개 계열로 분류 */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
-            {/* 1. 프로젝트 계열 */}
-            <div className="text-center space-y-4">
               <div className="space-y-2">
-                <div 
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed"
-                  style={{ borderColor: 'var(--accent-primary)' }}
-                >
-                  <span className="text-2xl">📋</span>
+                <div className="text-4xl font-bold text-blue-800 dark:text-blue-200">
+                  {usedProjects}/{planLimits.projects}
                 </div>
-                <h4 
-                  className="text-sm font-medium uppercase tracking-wider"
-                  style={{ color: 'var(--accent-primary)' }}
-                >
-                  Projects
-                </h4>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex flex-col items-center">
-                  <div 
-                    className="text-3xl font-light mb-1"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    {projects.length}
-                  </div>
-                  <div 
-                    className="text-xs font-medium"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    of 50 projects
-                  </div>
+                <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                  사용 중인 프로젝트
                 </div>
-                
-                <div className="w-full max-w-24 mx-auto">
-                  <div 
-                    className="w-full rounded-full h-1.5 overflow-hidden"
-                    style={{ backgroundColor: 'var(--bg-elevated)' }}
-                  >
+                <div className="w-full max-w-40 mx-auto">
+                  <div className="w-full bg-blue-100 dark:bg-blue-800 rounded-full h-3">
                     <div 
-                      className="h-1.5 rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${Math.min((projects.length / 50) * 100, 100)}%`,
-                        backgroundColor: 'var(--accent-primary)'
-                      }}
+                      className="bg-blue-600 dark:bg-blue-400 h-3 rounded-full transition-all duration-500"
+                      style={{ width: `${Math.min((usedProjects / planLimits.projects) * 100, 100)}%` }}
                     ></div>
                   </div>
                 </div>
-                
-                <div className="text-xs">
-                  <span style={{ color: 'var(--text-muted)' }}>Elements: </span>
-                  <span 
-                    style={{ color: 'var(--accent-primary)' }}
-                    className="font-medium"
-                  >
-                    {projects.reduce((sum, p) => sum + p.criteria_count + p.alternatives_count, 0)}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. 협업 계열 */}
-            <div className="text-center space-y-4">
-              <div className="space-y-2">
-                <div 
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed"
-                  style={{ borderColor: 'var(--accent-secondary)' }}
-                >
-                  <span className="text-2xl">👥</span>
-                </div>
-                <h4 
-                  className="text-sm font-medium uppercase tracking-wider"
-                  style={{ color: 'var(--accent-secondary)' }}
-                >
-                  Collaboration
-                </h4>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex flex-col items-center">
-                  <div 
-                    className="text-3xl font-light mb-1"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    12
-                  </div>
-                  <div 
-                    className="text-xs font-medium"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    of 100 evaluators
-                  </div>
-                </div>
-                
-                <div className="w-full max-w-24 mx-auto">
-                  <div 
-                    className="w-full rounded-full h-1.5 overflow-hidden"
-                    style={{ backgroundColor: 'var(--bg-elevated)' }}
-                  >
-                    <div 
-                      className="h-1.5 rounded-full transition-all duration-500"
-                      style={{ 
-                        width: '12%',
-                        backgroundColor: 'var(--accent-secondary)'
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="text-xs">
-                  <span style={{ color: 'var(--text-muted)' }}>Active: </span>
-                  <span 
-                    style={{ color: 'var(--accent-secondary)' }}
-                    className="font-medium"
-                  >
-                    {projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0)}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* 3. 리소스 계열 */}
-            <div className="text-center space-y-4">
-              <div className="space-y-2">
-                <div 
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-full border-2 border-dashed"
-                  style={{ borderColor: 'var(--status-success-bg)' }}
-                >
-                  <span className="text-2xl">💾</span>
-                </div>
-                <h4 
-                  className="text-sm font-medium uppercase tracking-wider"
-                  style={{ color: 'var(--status-success-bg)' }}
-                >
-                  Resources
-                </h4>
-              </div>
-              
-              <div className="space-y-3">
-                <div className="flex flex-col items-center">
-                  <div 
-                    className="text-3xl font-light mb-1"
-                    style={{ color: 'var(--text-primary)' }}
-                  >
-                    2.3
-                  </div>
-                  <div 
-                    className="text-xs font-medium"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    of 10GB storage
-                  </div>
-                </div>
-                
-                <div className="w-full max-w-24 mx-auto">
-                  <div 
-                    className="w-full rounded-full h-1.5 overflow-hidden"
-                    style={{ backgroundColor: 'var(--bg-elevated)' }}
-                  >
-                    <div 
-                      className="h-1.5 rounded-full transition-all duration-500"
-                      style={{ 
-                        width: '23%',
-                        backgroundColor: 'var(--status-success-bg)'
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="text-xs">
-                  <span style={{ color: 'var(--text-muted)' }}>API Calls: </span>
-                  <span 
-                    style={{ color: 'var(--status-success-bg)' }}
-                    className="font-medium"
-                  >
-                    847/5000
-                  </span>
+                <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                  {planLimits.projects - usedProjects}개 남음
                 </div>
               </div>
             </div>
           </div>
 
-          {/* 플랜 혜택 요약 */}
-          <div className="text-center space-y-4">
-            <div 
-              className="inline-flex items-center space-x-1 text-xs font-medium uppercase tracking-wider"
-              style={{ color: 'var(--text-muted)' }}
-            >
-              <span>Next Renewal</span>
-              <div 
-                className="w-1 h-1 rounded-full mx-2"
-                style={{ backgroundColor: 'var(--accent-primary)' }}
-              ></div>
-              <span 
-                style={{ color: 'var(--accent-primary)' }}
-              >
-                September 23, 2025
-              </span>
-            </div>
-            
-            <div className="flex flex-wrap items-center justify-center gap-4 text-xs">
-              {[
-                '무제한 AHP 분석',
-                '실시간 협업',
-                '고급 리포트',
-                '우선 지원'
-              ].map((feature, index) => (
-                <div key={index} className="flex items-center space-x-2">
-                  <div 
-                    className="w-1.5 h-1.5 rounded-full"
-                    style={{ backgroundColor: 'var(--accent-primary)' }}
-                  ></div>
-                  <span style={{ color: 'var(--text-secondary)' }}>
-                    {feature}
-                  </span>
+          {/* 평가자 인원수 박스 */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-green-200 dark:border-green-700 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center space-x-2">
+                <span className="text-3xl">👥</span>
+                <h3 className="text-lg font-bold text-green-700 dark:text-green-300">
+                  평가자 인원수
+                </h3>
+              </div>
+              <div className="space-y-2">
+                <div className="text-4xl font-bold text-green-800 dark:text-green-200">
+                  {usedEvaluators}/{planLimits.evaluators}명
                 </div>
-              ))}
+                <div className="text-sm text-green-600 dark:text-green-400 font-medium">
+                  사용 중인 평가자
+                </div>
+                <div className="w-full max-w-40 mx-auto">
+                  <div className="w-full bg-green-100 dark:bg-green-800 rounded-full h-3">
+                    <div 
+                      className="bg-green-600 dark:bg-green-400 h-3 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${Math.min((usedEvaluators / planLimits.evaluators) * 100, 100)}%` 
+                      }}
+                    ></div>
+                  </div>
+                </div>
+                <div className="text-sm text-green-600 dark:text-green-400 font-medium">
+                  {planLimits.evaluators - usedEvaluators}명 남음
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* 사용 가능 옵션 박스 */}
+          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700 shadow-lg hover:shadow-xl transition-all duration-300">
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="flex items-center justify-center space-x-2 mb-3">
+                  <span className="text-3xl">⚙️</span>
+                  <h3 className="text-lg font-bold text-purple-700 dark:text-purple-300">
+                    사용 가능 옵션
+                  </h3>
+                </div>
+              </div>
+              {/* 체크박스 목록 - 왼쪽 정렬 및 가독성 개선 */}
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    id="advanced-analysis" 
+                    checked={currentFeatures['advanced-analysis']} 
+                    readOnly 
+                    className={`w-5 h-5 text-purple-600 bg-gray-100 border-2 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 ${
+                      currentFeatures['advanced-analysis'] 
+                        ? 'border-purple-300 dark:border-purple-600' 
+                        : 'border-gray-300 dark:border-gray-600 opacity-50'
+                    }`}
+                  />
+                  <label htmlFor="advanced-analysis" className={`text-sm font-semibold cursor-pointer ${
+                    currentFeatures['advanced-analysis'] 
+                      ? 'text-purple-700 dark:text-purple-300' 
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>
+                    고급 분석 도구
+                  </label>
+                </div>
+                <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    id="group-ahp" 
+                    checked={currentFeatures['group-ahp']} 
+                    readOnly 
+                    className={`w-5 h-5 text-purple-600 bg-gray-100 border-2 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 ${
+                      currentFeatures['group-ahp'] 
+                        ? 'border-purple-300 dark:border-purple-600' 
+                        : 'border-gray-300 dark:border-gray-600 opacity-50'
+                    }`}
+                  />
+                  <label htmlFor="group-ahp" className={`text-sm font-semibold cursor-pointer ${
+                    currentFeatures['group-ahp'] 
+                      ? 'text-purple-700 dark:text-purple-300' 
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>
+                    그룹 AHP 분석
+                  </label>
+                </div>
+                <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    id="realtime-collab" 
+                    checked={currentFeatures['realtime-collab']} 
+                    readOnly 
+                    className={`w-5 h-5 text-purple-600 bg-gray-100 border-2 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 ${
+                      currentFeatures['realtime-collab'] 
+                        ? 'border-purple-300 dark:border-purple-600' 
+                        : 'border-gray-300 dark:border-gray-600 opacity-50'
+                    }`}
+                  />
+                  <label htmlFor="realtime-collab" className={`text-sm font-semibold cursor-pointer ${
+                    currentFeatures['realtime-collab'] 
+                      ? 'text-purple-700 dark:text-purple-300' 
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>
+                    실시간 협업
+                  </label>
+                </div>
+                <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                  <input 
+                    type="checkbox" 
+                    id="premium-support" 
+                    checked={currentFeatures['premium-support']} 
+                    readOnly 
+                    className={`w-5 h-5 text-purple-600 bg-gray-100 border-2 rounded focus:ring-purple-500 dark:focus:ring-purple-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 ${
+                      currentFeatures['premium-support'] 
+                        ? 'border-purple-300 dark:border-purple-600' 
+                        : 'border-gray-300 dark:border-gray-600 opacity-50'
+                    }`}
+                  />
+                  <label htmlFor="premium-support" className={`text-sm font-semibold cursor-pointer ${
+                    currentFeatures['premium-support'] 
+                      ? 'text-purple-700 dark:text-purple-300' 
+                      : 'text-gray-500 dark:text-gray-400'
+                  }`}>
+                    프리미엄 지원
+                  </label>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+          
+        {/* 요금제 관리 버튼 */}
+        <div className="mt-6 flex justify-center space-x-4">
+          <button 
+            onClick={() => handleTabChange('payment')}
+            className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-all duration-200 shadow-sm hover:shadow-md"
+          >
+            결제 관리
+          </button>
+          <button 
+            className="px-6 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-lg transition-all duration-200"
+          >
+            플랜 변경
+          </button>
+        </div>
+        
+        {/* 설명 텍스트 */}
+        <div className="mt-6 text-center">
+          <p 
+            className="text-lg font-light max-w-2xl mx-auto leading-relaxed"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            전문적인 AHP 의사결정 분석으로 복잡한 문제를 체계적으로 해결해보세요
+          </p>
+        </div>
+      </div>
 
-        {/* 최근 프로젝트 및 사용량 현황 - 2등분 배치 */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
-          {/* 왼쪽: 최근 프로젝트 */}
-          <div 
-            className="p-6 rounded-xl border-2 transition-all duration-300"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.7)',
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-              backdropFilter: 'blur(10px)',
-              boxShadow: 'var(--shadow-md)'
-            }}
+      {/* 최근 프로젝트 및 사용량 현황 - 2등분 배치 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        {/* 왼쪽: 최근 프로젝트 */}
+        <div 
+          className="p-6 rounded-xl border-2 transition-all duration-300"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: 'var(--shadow-md)'
+          }}
           >
             <div className="flex items-center justify-between mb-6">
               <h3 
@@ -3527,16 +3462,16 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             )}
           </div>
 
-          {/* 오른쪽: 사용량 현황 (3개 계열로 분류) */}
-          <div 
-            className="p-6 rounded-xl border-2 transition-all duration-300"
-            style={{
-              backgroundColor: 'rgba(255, 255, 255, 0.7)',
-              borderColor: 'rgba(255, 255, 255, 0.3)',
-              backdropFilter: 'blur(10px)',
-              boxShadow: 'var(--shadow-md)'
-            }}
-          >
+        {/* 오른쪽: 사용량 현황 (3개 계열로 분류) */}
+        <div 
+          className="p-6 rounded-xl border-2 transition-all duration-300"
+          style={{
+            backgroundColor: 'rgba(255, 255, 255, 0.7)',
+            borderColor: 'rgba(255, 255, 255, 0.3)',
+            backdropFilter: 'blur(10px)',
+            boxShadow: 'var(--shadow-md)'
+          }}
+        >
             <h3 
               className="text-xl font-bold mb-6"
               style={{ color: 'var(--text-primary)' }}
@@ -3725,33 +3660,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   >
                     API 호출: 847/5000회
                   </div>
-                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">개인 서비스</h1>
-          <p className="text-gray-600">나만의 AHP 의사결정 분석 프로젝트</p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <div className="text-sm text-gray-600">
-            {user.email}
-          </div>
-          {currentStep !== 'overview' && (
-            <Button 
-              variant="secondary" 
-              size="sm"
-              onClick={() => setCurrentStep('overview')}
-            >
-              홈으로
-            </Button>
-          )}
-        </div>
-      </div>
+
+      {/* 메뉴 네비게이션 */}
 
       {/* Enhanced Navigation Menu - 2 Rows Layout */}
       <div 
