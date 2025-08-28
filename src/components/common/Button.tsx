@@ -13,6 +13,7 @@ interface ButtonProps {
   onMouseEnter?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   onMouseLeave?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   rounded?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
+  title?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -27,7 +28,8 @@ const Button: React.FC<ButtonProps> = ({
   style,
   onMouseEnter,
   onMouseLeave,
-  rounded = 'md'
+  rounded = 'md',
+  title
 }) => {
   // CSS 변수 기반 variant 스타일
   const getVariantStyle = (variant: string) => {
@@ -223,6 +225,7 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
       className={className}
       style={combinedStyle}
+      title={title}
       onMouseEnter={(e) => {
         if (!disabled && !loading) {
           const hoverStyle = getHoverStyle(variant);

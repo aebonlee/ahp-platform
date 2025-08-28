@@ -14,7 +14,7 @@ import WorkshopManagement from '../workshop/WorkshopManagement';
 import DecisionSupportSystem from '../decision/DecisionSupportSystem';
 import PaperManagement from '../paper/PaperManagement';
 import ProjectSelector from '../project/ProjectSelector';
-import SurveyFormBuilder from '../survey/SurveyFormBuilder';
+import SurveyManagementSystem from '../survey/SurveyManagementSystem';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
 
@@ -90,7 +90,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     externalActiveTab === 'workshop-management' ? 'workshop' :
     externalActiveTab === 'decision-support-system' ? 'decision-support' :
     externalActiveTab === 'personal-settings' ? 'settings' :
-    externalActiveTab === 'demographic-survey' ? 'demographic-survey' :
     'dashboard'
   );
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
@@ -2680,40 +2679,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     </div>
   );
 
-  const renderDemographicSurveyFullPage = () => (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
-          <span className="text-3xl mr-3">📊</span>
-          인구통계학적 설문조사
-        </h2>
-        <button 
-          onClick={() => handleTabChange('dashboard')}
-          className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition-colors"
-          style={{ 
-            borderColor: 'var(--border-default)', 
-            color: 'var(--text-secondary)',
-            backgroundColor: 'transparent' 
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-        >
-          ← 대시보드로
-        </button>
-      </div>
-      <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-        Google Forms 스타일의 직관적인 설문조사를 생성하고 관리합니다
-      </p>
-      <SurveyFormBuilder 
-        onSave={(questions) => {
-          console.log('설문 폼 저장:', questions);
-          alert('설문 폼이 저장되었습니다.');
-          handleTabChange('dashboard');
-        }}
-        onCancel={() => handleTabChange('dashboard')}
-      />
-    </div>
-  );
 
   const renderWorkshopManagement = () => (
     <WorkshopManagement />
@@ -3058,28 +3023,29 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         return (
           <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">📊 인구통계학적 설문조사</h2>
+              <h2 className="text-2xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+                <span className="text-3xl mr-3">📊</span>
+                인구통계학적 설문조사
+              </h2>
               <button 
                 onClick={() => handleTabChange('dashboard')}
-                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 border rounded-lg transition-colors"
+                style={{ 
+                  borderColor: 'var(--border-default)', 
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'transparent' 
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-muted)'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 ← 대시보드로
               </button>
             </div>
             
-            <div className="p-6 bg-white rounded-lg border shadow-sm">
-              <h3 className="text-lg font-semibold mb-4">📋 Google Forms 스타일 설문조사</h3>
-              <p className="text-gray-600 mb-4">직관적인 폼 빌더로 인구통계학적 설문조사를 생성하고 관리하세요.</p>
-              
-              <SurveyFormBuilder 
-                onSave={(questions) => {
-                  console.log('설문 폼 저장:', questions);
-                  alert('설문 폼이 저장되었습니다.');
-                  handleTabChange('dashboard');
-                }}
-                onCancel={() => handleTabChange('dashboard')}
-              />
-            </div>
+            <SurveyManagementSystem 
+              projectId="current-project-id"
+              onBack={() => handleTabChange('dashboard')}
+            />
           </div>
         );
       default:
@@ -3102,7 +3068,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         {externalActiveTab === 'workshop-management' && renderWorkshopManagementFullPage()}
         {externalActiveTab === 'decision-support-system' && renderDecisionSupportSystemFullPage()}
         {externalActiveTab === 'personal-settings' && renderPersonalSettingsFullPage()}
-        {externalActiveTab === 'demographic-survey' && renderDemographicSurveyFullPage()}
       </>
     );
   }
