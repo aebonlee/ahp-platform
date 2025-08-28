@@ -16,20 +16,32 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>AHP for Paper - 연구 논문을 위한 AHP 의사결정 분석</title>
     <script>
-      // GitHub Pages SPA redirect - preserve query parameters
+      // GitHub Pages SPA redirect - preserve query parameters and paths
       const currentUrl = window.location.href;
+      const pathname = window.location.pathname;
       const searchParams = window.location.search;
       const hash = window.location.hash;
       
-      // If we're already on the correct path, don't redirect
-      if (currentUrl.includes('/ahp-research-platform/')) {
-        // We're already on the correct path, let React handle routing
-        return;
-      }
+      // Check if we're on a survey evaluation path
+      const surveyMatch = pathname.match(/\/survey\/eval\/(.+)/);
       
-      // Redirect to the correct base path while preserving query parameters and hash
-      const newUrl = window.location.origin + '/ahp-research-platform/' + searchParams + hash;
-      window.location.replace(newUrl);
+      if (surveyMatch) {
+        // Handle survey evaluation paths
+        const surveyId = surveyMatch[1];
+        // Store survey info in sessionStorage for React to pick up
+        sessionStorage.setItem('survey_redirect', JSON.stringify({
+          path: pathname,
+          id: surveyId
+        }));
+        // Redirect to main app with survey indicator
+        const newUrl = window.location.origin + '/ahp-research-platform/?survey=' + surveyId + hash;
+        window.location.replace(newUrl);
+      } else if (!currentUrl.includes('/ahp-research-platform/')) {
+        // Normal redirect to the correct base path while preserving query parameters and hash
+        const newUrl = window.location.origin + '/ahp-research-platform/' + searchParams + hash;
+        window.location.replace(newUrl);
+      }
+      // If we're already on the correct path, let React handle routing
     </script>
   </head>
   <body>

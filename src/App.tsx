@@ -22,6 +22,7 @@ import DirectInputEvaluation from './components/evaluator/DirectInputEvaluation'
 import UserGuideOverview from './components/guide/UserGuideOverview';
 import ComprehensiveUserGuide from './components/guide/ComprehensiveUserGuide';
 import EvaluatorDashboard from './components/evaluator/EvaluatorDashboard';
+import EvaluatorSurveyPage from './components/survey/EvaluatorSurveyPage';
 import { API_BASE_URL } from './config/api';
 import { useColorTheme } from './hooks/useColorTheme';
 import { useTheme } from './hooks/useTheme';
@@ -78,6 +79,60 @@ function App() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedEvaluationMethod, setSelectedEvaluationMethod] = useState<'pairwise' | 'direct'>('pairwise');
   const [isDemoMode, setIsDemoMode] = useState(false); // 실제 서비스 모드로 운영
+  
+  // 평가자 설문조사 관련 상태
+  const [isEvaluatorSurvey, setIsEvaluatorSurvey] = useState(false);
+  const [surveyId, setSurveyId] = useState<string>('');
+  const [surveyToken, setSurveyToken] = useState<string>('');
+
+  // 평가자 설문조사 경로 확인
+  useEffect(() => {
+    // 먼저 sessionStorage에서 리다이렉트 정보 확인
+    const surveyRedirect = sessionStorage.getItem('survey_redirect');
+    if (surveyRedirect) {
+      const data = JSON.parse(surveyRedirect);
+      sessionStorage.removeItem('survey_redirect');
+      
+      // survey-001-token-abc123 형태를 파싱
+      const parts = data.id.split('-token-');
+      if (parts.length === 2) {
+        setSurveyId(parts[0]);
+        setSurveyToken(parts[1]);
+        setIsEvaluatorSurvey(true);
+        setActiveTab('evaluator-survey');
+        return;
+      }
+    }
+    
+    // URL 파라미터에서 survey 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const surveyParam = urlParams.get('survey');
+    if (surveyParam) {
+      const parts = surveyParam.split('-token-');
+      if (parts.length === 2) {
+        setSurveyId(parts[0]);
+        setSurveyToken(parts[1]);
+        setIsEvaluatorSurvey(true);
+        setActiveTab('evaluator-survey');
+        return;
+      }
+    }
+    
+    // 직접 경로 확인 (개발 환경)
+    const path = window.location.pathname;
+    const surveyMatch = path.match(/\/survey\/eval\/(.+)/);
+    
+    if (surveyMatch) {
+      const fullId = surveyMatch[1];
+      const parts = fullId.split('-token-');
+      if (parts.length === 2) {
+        setSurveyId(parts[0]);
+        setSurveyToken(parts[1]);
+        setIsEvaluatorSurvey(true);
+        setActiveTab('evaluator-survey');
+      }
+    }
+  }, []);
 
   // URL 파라미터 변경 감지 및 자동 로그인 처리
   useEffect(() => {
@@ -638,7 +693,8 @@ function App() {
     'settings', 'backup', 'system', 'landing', 'model-building', 
     'evaluation-results', 'project-completion', 'personal-projects', 
     'personal-users', 'results', 'evaluator-dashboard', 'pairwise-evaluation', 
-    'direct-evaluation', 'evaluator-status', 'evaluations', 'progress'
+    'direct-evaluation', 'evaluator-status', 'evaluations', 'progress',
+    'demographic-survey', 'evaluator-mode'
   ], []);
 
   // 사용자 상태 저장 및 복원 (자동 리다이렉션 제거)
@@ -1118,6 +1174,18 @@ function App() {
             onTabChange={setActiveTab}
           />
         );
+
+      case 'evaluator-survey':
+        // 평가자 전용 설문조사 페이지 (독립 페이지)
+        if (isEvaluatorSurvey && surveyId && surveyToken) {
+          return (
+            <EvaluatorSurveyPage 
+              surveyId={surveyId}
+              token={surveyToken}
+            />
+          );
+        }
+        return null;
 
       case 'user-guide':
         return (
