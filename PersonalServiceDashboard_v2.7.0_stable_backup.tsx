@@ -15,7 +15,6 @@ import DecisionSupportSystem from '../decision/DecisionSupportSystem';
 import PaperManagement from '../paper/PaperManagement';
 import ProjectSelector from '../project/ProjectSelector';
 import SurveyManagementSystem from '../survey/SurveyManagementSystem';
-import ValidityCheck from '../validity/ValidityCheck';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
 
@@ -78,7 +77,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     description: string;
     nextAction: string;
   } | null>(null);
-  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'settings' | 'payment' | 'demographic-survey'>(() => {
+  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'settings' | 'payment' | 'demographic-survey'>(() => {
     // URL 파라미터에서 직접 demographic-survey 확인
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
@@ -168,7 +167,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         'my-projects': 'projects',
         'project-creation': 'creation',
         'model-builder': 'model-builder',
-        'validity-check': 'validity-check',
         'evaluator-management': 'evaluators',
         'progress-monitoring': 'monitoring',
         'results-analysis': 'analysis',
@@ -993,7 +991,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           {[
             { id: 'user-guide', label: '사용자 가이드', icon: '📚', color: 'from-blue-500 to-blue-600' },
             { id: 'model-builder', label: '모델 구성', icon: '🏗️', color: 'from-green-500 to-green-600' },
-            { id: 'validity-check', label: '평가문항 확인', icon: '🔍', color: 'from-teal-500 to-teal-600' },
             { id: 'monitoring', label: '진행률 확인', icon: '📈', color: 'from-purple-500 to-purple-600' },
             { id: 'survey-links', label: '설문 링크', icon: '🔗', color: 'from-orange-500 to-orange-600' },
             { id: 'workshop', label: '워크숍 관리', icon: '🎯', color: 'from-indigo-500 to-indigo-600' },
@@ -1157,7 +1154,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         'projects': 'my-projects',
         'creation': 'project-creation',
         'model-builder': 'model-builder',
-        'validity-check': 'validity-check',
         'evaluators': 'evaluator-management',
         'monitoring': 'progress-monitoring',
         'analysis': 'results-analysis',
@@ -3031,12 +3027,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               프로젝트 선택하기
             </Button>
           </Card>
-        );
-      case 'validity-check':
-        return (
-          <div className="space-y-6">
-            <ValidityCheck />
-          </div>
         );
       case 'evaluators':
         return renderEvaluatorManagement();
