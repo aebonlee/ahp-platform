@@ -82,12 +82,19 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
     
+    console.log('🔍 PersonalServiceDashboard 초기화:', { 
+      tabParam, 
+      externalActiveTab,
+      urlSearch: window.location.search 
+    });
+    
     if (tabParam === 'demographic-survey') {
+      console.log('✅ demographic-survey 탭으로 설정');
       return 'demographic-survey';
     }
     
     // 기존 externalActiveTab 기반 로직
-    return externalActiveTab === 'personal-service' ? 'dashboard' :
+    const result = externalActiveTab === 'personal-service' ? 'dashboard' :
     externalActiveTab === 'my-projects' ? 'projects' :
     externalActiveTab === 'project-creation' ? 'creation' :
     externalActiveTab === 'model-builder' ? 'model-builder' :
@@ -100,6 +107,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     externalActiveTab === 'decision-support-system' ? 'decision-support' :
     externalActiveTab === 'personal-settings' ? 'settings' :
     'dashboard';
+    
+    console.log('📊 최종 activeMenu 설정:', result);
+    return result;
   });
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const [projectTemplate, setProjectTemplate] = useState<'blank' | 'business' | 'technical' | 'academic'>('blank');

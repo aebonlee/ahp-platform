@@ -76,7 +76,7 @@ function App() {
   const [selectedEvaluationMethod, setSelectedEvaluationMethod] = useState<'pairwise' | 'direct'>('pairwise');
   const [isDemoMode, setIsDemoMode] = useState(false);
 
-  // URL 파라미터 변경 감지 (브라우저 뒤로가기/앞으로가기 대응)
+  // URL 파라미터 변경 감지 및 자동 로그인 처리
   useEffect(() => {
     const handlePopState = () => {
       const urlParams = new URLSearchParams(window.location.search);
@@ -98,6 +98,34 @@ function App() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
+
+  // demographic-survey 직접 접근 시 자동 데모 로그인 처리
+  useEffect(() => {
+    console.log('🔍 현재 상태 체크:', { activeTab, user: !!user, isDemoMode });
+    
+    if (activeTab === 'demographic-survey' && !user && !isDemoMode) {
+      console.log('🚀 설문조사 페이지 자동 데모 로그인 시작');
+      
+      // 데모 모드 활성화
+      setIsDemoMode(true);
+      setBackendStatus('unavailable');
+      
+      // 데모 사용자 설정
+      const demoUser = {
+        ...DEMO_USER,
+        id: 'auto-demo-user',
+        email: 'demo@ahp-system.com',
+        role: 'admin' as const,
+        admin_type: 'personal' as const
+      };
+      
+      setUser(demoUser);
+      setProjects(DEMO_PROJECTS);
+      setIsNavigationReady(true);
+      
+      console.log('✅ 설문조사 페이지 자동 로그인 완료', demoUser);
+    }
+  }, [activeTab, user, isDemoMode]);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
   const [showApiErrorModal, setShowApiErrorModal] = useState(false);
   const [isNavigationReady, setIsNavigationReady] = useState(false);
@@ -1109,7 +1137,36 @@ function App() {
       case 'workshop-management':
       case 'decision-support-system':
       case 'personal-settings':
-        if (!user) return null;
+        if (!user) {
+          // demographic-survey 직접 접근 시 자동 데모 로그인
+          if (activeTab === 'demographic-survey') {
+            console.log('🚀 설문조사 페이지 직접 접근 - 자동 데모 로그인 처리');
+            
+            // 즉시 데모 사용자 설정
+            setUser({
+              ...DEMO_USER,
+              id: 'auto-demo-user',
+              email: 'demo@ahp-system.com',
+              role: 'admin',
+              admin_type: 'personal'
+            });
+            setProjects(DEMO_PROJECTS);
+            setIsDemoMode(true);
+            
+            // 로딩 상태를 잠시 보여준 후 페이지 렌더링
+            return (
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-4xl mb-4">📊</div>
+                  <h2 className="text-xl font-semibold mb-2">설문조사 페이지 로딩 중...</h2>
+                  <p className="text-gray-600">잠시만 기다려주세요.</p>
+                </div>
+              </div>
+            );
+          }
+          return null;
+        }
+        console.log('🎯 PersonalServiceDashboard 렌더링:', { activeTab, userId: user.id, userRole: user.role });
         return (
           <PersonalServiceDashboard 
             user={user}
