@@ -2664,6 +2664,40 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     </div>
   );
 
+  const renderDemographicSurveyFullPage = () => (
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <button 
+                  onClick={() => handleTabChange('dashboard')}
+                  className="mr-4 text-gray-500 hover:text-gray-700 transition-colors text-2xl"
+                >
+                  ←
+                </button>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 flex items-center">
+                    <span className="text-4xl mr-3">📊</span>
+                    인구통계학적 설문조사
+                  </h1>
+                  <p className="text-gray-600 mt-2">평가자를 위한 Google Forms 스타일 설문조사를 생성하고 관리합니다</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <SurveyManagementSystem 
+          projectId="current-project-id"
+          onBack={() => handleTabChange('dashboard')}
+        />
+      </div>
+    </div>
+  );
+
   const renderPersonalSettingsFullPage = () => (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -3087,6 +3121,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         {externalActiveTab === 'workshop-management' && renderWorkshopManagementFullPage()}
         {externalActiveTab === 'decision-support-system' && renderDecisionSupportSystemFullPage()}
         {externalActiveTab === 'personal-settings' && renderPersonalSettingsFullPage()}
+        {externalActiveTab === 'demographic-survey' && renderDemographicSurveyFullPage()}
       </>
     );
   }
