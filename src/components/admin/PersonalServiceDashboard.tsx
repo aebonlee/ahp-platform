@@ -77,8 +77,17 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     description: string;
     nextAction: string;
   } | null>(null);
-  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'settings' | 'payment' | 'demographic-survey'>(
-    externalActiveTab === 'personal-service' ? 'dashboard' :
+  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'settings' | 'payment' | 'demographic-survey'>(() => {
+    // URL 파라미터에서 직접 demographic-survey 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    
+    if (tabParam === 'demographic-survey') {
+      return 'demographic-survey';
+    }
+    
+    // 기존 externalActiveTab 기반 로직
+    return externalActiveTab === 'personal-service' ? 'dashboard' :
     externalActiveTab === 'my-projects' ? 'projects' :
     externalActiveTab === 'project-creation' ? 'creation' :
     externalActiveTab === 'model-builder' ? 'model-builder' :
@@ -90,8 +99,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     externalActiveTab === 'workshop-management' ? 'workshop' :
     externalActiveTab === 'decision-support-system' ? 'decision-support' :
     externalActiveTab === 'personal-settings' ? 'settings' :
-    'dashboard'
-  );
+    'dashboard';
+  });
   const [selectedProjectId, setSelectedProjectId] = useState<string>('');
   const [projectTemplate, setProjectTemplate] = useState<'blank' | 'business' | 'technical' | 'academic'>('blank');
   

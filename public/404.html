@@ -16,8 +16,20 @@
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
     <title>AHP for Paper - 연구 논문을 위한 AHP 의사결정 분석</title>
     <script>
-      // GitHub Pages SPA redirect
-      window.location.replace(window.location.origin + '/ahp-research-platform/');
+      // GitHub Pages SPA redirect - preserve query parameters
+      const currentUrl = window.location.href;
+      const searchParams = window.location.search;
+      const hash = window.location.hash;
+      
+      // If we're already on the correct path, don't redirect
+      if (currentUrl.includes('/ahp-research-platform/')) {
+        // We're already on the correct path, let React handle routing
+        return;
+      }
+      
+      // Redirect to the correct base path while preserving query parameters and hash
+      const newUrl = window.location.origin + '/ahp-research-platform/' + searchParams + hash;
+      window.location.replace(newUrl);
     </script>
   </head>
   <body>

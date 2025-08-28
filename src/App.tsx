@@ -44,7 +44,26 @@ function App() {
     admin_type?: 'super' | 'personal'; // 관리자 유형 구분
     canSwitchModes?: boolean; // 모드 전환 가능 여부
   } | null>(null);
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState(() => {
+    // URL 파라미터에서 초기 탭 결정
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    
+    // tab 파라미터가 있고 유효한 탭이면 해당 탭으로, 아니면 'home'
+    const validTabs = [
+      'home', 'personal-service', 'demographic-survey', 
+      'my-projects', 'project-creation', 'model-builder',
+      'evaluator-management', 'progress-monitoring', 'results-analysis',
+      'paper-management', 'export-reports', 'workshop-management',
+      'decision-support-system', 'personal-settings'
+    ];
+    
+    if (tabParam && validTabs.includes(tabParam)) {
+      return tabParam;
+    }
+    
+    return 'home';
+  });
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [registerMode, setRegisterMode] = useState<'service' | 'admin' | null>(null);
@@ -56,6 +75,29 @@ function App() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedEvaluationMethod, setSelectedEvaluationMethod] = useState<'pairwise' | 'direct'>('pairwise');
   const [isDemoMode, setIsDemoMode] = useState(false);
+
+  // URL 파라미터 변경 감지 (브라우저 뒤로가기/앞으로가기 대응)
+  useEffect(() => {
+    const handlePopState = () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabParam = urlParams.get('tab');
+      
+      const validTabs = [
+        'home', 'personal-service', 'demographic-survey', 
+        'my-projects', 'project-creation', 'model-builder',
+        'evaluator-management', 'progress-monitoring', 'results-analysis',
+        'paper-management', 'export-reports', 'workshop-management',
+        'decision-support-system', 'personal-settings'
+      ];
+      
+      if (tabParam && validTabs.includes(tabParam)) {
+        setActiveTab(tabParam);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
   const [showApiErrorModal, setShowApiErrorModal] = useState(false);
   const [isNavigationReady, setIsNavigationReady] = useState(false);
