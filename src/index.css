@@ -1,16 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css');
+/* Import global theme and color system */
+@import './styles/global.css';
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ============================================================================
-   AHP for Paper - Luxury Gray + Gold Accent Design System
-   Based on WCAG 2.2 AA standards with sophisticated typography
+   AHP Research Platform - Application Specific Styles
+   Extends global.css with app-specific utilities
    ============================================================================ */
 
-/* CSS Custom Properties for Design System */
+/* Legacy variable mappings for backward compatibility */
 :root {
   /* === Primary Color Palette === */
   /* Luxury Brand Grays (12-step scale centered on #848484) */

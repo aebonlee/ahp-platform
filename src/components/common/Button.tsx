@@ -21,18 +21,18 @@ const Button: React.FC<ButtonProps> = ({
   type = 'button',
   className = ''
 }) => {
-  // Blocksy 스타일 기본 클래스
-  const baseClasses = 'inline-flex items-center justify-center font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 transform hover:scale-105 active:scale-95 shadow-blocksy hover:shadow-blocksy-lg rounded-blocksy';
+  // 글로벌 테마 시스템 기반 기본 클래스
+  const baseClasses = 'inline-flex items-center justify-center font-semibold transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2 transform hover:scale-105 active:scale-95 shadow-sm hover:shadow-md rounded-lg';
   
-  // Blocksy 스타일 variant 클래스 (흰색 배경 + 흰색 글씨 문제 해결)
+  // 글로벌 테마 변수를 활용한 variant 클래스
   const variantClasses = {
-    primary: 'bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white shadow-primary-500/25 focus:ring-primary-500',
-    secondary: 'bg-gradient-to-r from-secondary-500 to-secondary-600 hover:from-secondary-600 hover:to-secondary-700 text-white shadow-secondary-500/25 focus:ring-secondary-500',
-    success: 'bg-gradient-to-r from-success-500 to-success-600 hover:from-success-600 hover:to-success-700 text-white shadow-success-500/25 focus:ring-success-500',
-    warning: 'bg-gradient-to-r from-warning-500 to-warning-600 hover:from-warning-600 hover:to-warning-700 text-white shadow-warning-500/25 focus:ring-warning-500',
-    error: 'bg-gradient-to-r from-error-500 to-error-600 hover:from-error-600 hover:to-error-700 text-white shadow-error-500/25 focus:ring-error-500',
-    outline: 'bg-white border-2 border-primary-500 text-primary-600 hover:bg-primary-50 hover:border-primary-600 focus:ring-primary-500',
-    ghost: 'bg-transparent text-neutral-700 hover:bg-neutral-100 hover:text-neutral-900 focus:ring-neutral-500'
+    primary: 'bg-[var(--button-primary-bg)] hover:bg-[var(--button-primary-hover)] text-[var(--button-primary-text)] focus:ring-[var(--interactive-normal)]',
+    secondary: 'bg-[var(--button-secondary-bg)] hover:bg-[var(--button-secondary-hover)] text-[var(--button-secondary-text)] focus:ring-[var(--interactive-normal)]',
+    success: 'bg-[var(--semantic-success)] hover:bg-green-700 text-white focus:ring-[var(--semantic-success)]',
+    warning: 'bg-[var(--semantic-warning)] hover:bg-amber-700 text-white focus:ring-[var(--semantic-warning)]',
+    error: 'bg-[var(--semantic-danger)] hover:bg-red-700 text-white focus:ring-[var(--semantic-danger)]',
+    outline: 'bg-[var(--surface-base)] border-2 border-[var(--interactive-normal)] text-[var(--interactive-normal)] hover:bg-[var(--surface-raised)] focus:ring-[var(--interactive-normal)]',
+    ghost: 'bg-transparent text-[var(--text-secondary)] hover:bg-[var(--surface-raised)] hover:text-[var(--text-primary)] focus:ring-[var(--interactive-normal)]'
   };
   
   // Blocksy 스타일 크기 클래스
@@ -45,7 +45,7 @@ const Button: React.FC<ButtonProps> = ({
   
   // 비활성화 상태 스타일
   const disabledClasses = disabled || loading 
-    ? 'opacity-60 cursor-not-allowed transform-none hover:scale-100 hover:shadow-blocksy' 
+    ? 'opacity-60 cursor-not-allowed transform-none hover:scale-100 hover:shadow-sm' 
     : '';
 
   return (

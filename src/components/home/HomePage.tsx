@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ThemeModeToggle from '../common/ThemeModeToggle';
 import ColorThemeButton from '../common/ColorThemeButton';
+import ParticleBackground from '../common/ParticleBackground';
 import PricingSection from './PricingSection';
 
 interface HomePageProps {
@@ -11,6 +12,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
   const [scrollY, setScrollY] = useState(0);
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
 
   // 스크롤 이벤트 처리
   useEffect(() => {
@@ -22,6 +24,42 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // 테마 변경 감지
+  useEffect(() => {
+    const detectTheme = () => {
+      const theme = document.documentElement.getAttribute('data-theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setCurrentTheme(theme === 'dark' || (!theme && systemPrefersDark) ? 'dark' : 'light');
+    };
+
+    // 초기 테마 설정
+    detectTheme();
+
+    // 테마 변경 감지
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+          detectTheme();
+        }
+      });
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
+    });
+
+    // 시스템 테마 변경 감지
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleMediaChange = () => detectTheme();
+    mediaQuery.addListener(handleMediaChange);
+
+    return () => {
+      observer.disconnect();
+      mediaQuery.removeListener(handleMediaChange);
+    };
   }, []);
 
   // 상단으로 스크롤
@@ -156,22 +194,30 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
         )}
       </header>
 
-      {/* 히어로 섹션 - 잔디 스타일 */}
+      {/* 히어로 섹션 - Particles.js 배경 */}
       <section className="relative pt-24 pb-20 overflow-hidden">
-        {/* 배경 그라디언트 */}
+        {/* Particles.js 배경 */}
+        <ParticleBackground 
+          className="absolute inset-0"
+          theme={currentTheme}
+          intensity="medium"
+          interactive={true}
+        />
+        
+        {/* 배경 그라디언트 - 더 투명하게 조정 */}
         <div className="absolute inset-0" style={{
-          background: `linear-gradient(to bottom right, var(--bg-subtle), var(--bg-primary), var(--bg-elevated))`
+          background: `linear-gradient(to bottom right, var(--bg-subtle)60, var(--bg-primary)40, var(--bg-elevated)60)`
         }}></div>
         
-        {/* 애니메이션 도형들 */}
-        <div className="absolute top-20 left-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse" style={{
+        {/* 애니메이션 도형들 - 투명도 낮춤 */}
+        <div className="absolute top-20 left-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse" style={{
           backgroundColor: 'var(--accent-primary)'
         }}></div>
-        <div className="absolute top-40 right-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-15 animate-pulse" style={{
+        <div className="absolute top-40 right-10 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-8 animate-pulse" style={{
           backgroundColor: 'var(--accent-secondary)',
           animationDelay: '2s'
         }}></div>
-        <div className="absolute -bottom-8 left-20 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-10 animate-pulse" style={{
+        <div className="absolute -bottom-8 left-20 w-72 h-72 rounded-full mix-blend-multiply filter blur-xl opacity-5 animate-pulse" style={{
           backgroundColor: 'var(--accent-light)',
           animationDelay: '4s'
         }}></div>
