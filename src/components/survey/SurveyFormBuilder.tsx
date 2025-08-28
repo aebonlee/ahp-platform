@@ -217,7 +217,10 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="bg-white/95 backdrop-blur-xl rounded-2xl p-8 border border-gray-200/60 shadow-lg">
+      <div className="backdrop-blur-xl rounded-2xl p-8 shadow-lg" style={{ 
+        backgroundColor: 'var(--card-bg)', 
+        border: '1px solid var(--card-border)' 
+      }}>
         {/* 헤더 */}
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -231,13 +234,27 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
           <div className="flex space-x-3">
             <button
               onClick={() => setIsPreview(true)}
-              className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50"
+              className="px-4 py-2 border rounded-lg transition-colors"
+              style={{ 
+                borderColor: 'var(--accent-primary)', 
+                color: 'var(--accent-primary)',
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-light)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
             >
               👁️ 미리보기
             </button>
             <button
               onClick={handleSave}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 rounded-lg transition-colors"
+              style={{ 
+                backgroundColor: 'var(--accent-primary)',
+                color: 'white',
+                border: '1px solid var(--accent-primary)'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
             >
               💾 저장
             </button>
@@ -277,7 +294,14 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
                       type="text"
                       value={question.question}
                       onChange={(e) => updateQuestion(question.id, 'question', e.target.value)}
-                      className="flex-1 text-lg p-2 border-b border-gray-300 focus:border-blue-500 focus:outline-none"
+                      className="flex-1 text-lg p-2 border-b focus:outline-none transition-colors"
+                      style={{ 
+                        borderColor: 'var(--border-default)', 
+                        backgroundColor: 'transparent',
+                        color: 'var(--text-primary)'
+                      }}
+                      onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
+                      onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-default)'}
                       placeholder="질문을 입력하세요"
                     />
                   </div>
@@ -287,7 +311,14 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
                     <select
                       value={question.type}
                       onChange={(e) => updateQuestion(question.id, 'type', e.target.value)}
-                      className="p-2 border rounded-lg focus:border-blue-500 focus:outline-none"
+                      className="p-2 border rounded-lg focus:outline-none transition-colors"
+                      style={{ 
+                        borderColor: 'var(--border-default)',
+                        backgroundColor: 'var(--input-bg)',
+                        color: 'var(--text-primary)'
+                      }}
+                      onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
+                      onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-default)'}
                     >
                       {questionTypes.map(type => (
                         <option key={type.value} value={type.value}>
@@ -402,13 +433,27 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
           )}
           <button
             onClick={() => setIsPreview(true)}
-            className="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50"
+            className="px-6 py-3 border rounded-lg transition-colors"
+            style={{ 
+              borderColor: 'var(--accent-primary)', 
+              color: 'var(--accent-primary)',
+              backgroundColor: 'transparent'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-light)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             미리보기
           </button>
           <button
             onClick={handleSave}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-6 py-3 rounded-lg transition-colors"
+            style={{ 
+              backgroundColor: 'var(--accent-primary)',
+              color: 'white',
+              border: '1px solid var(--accent-primary)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
           >
             저장하기
           </button>
