@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import LayerPopup from '../common/LayerPopup';
 import Button from '../common/Button';
 
 // 도움말 컨텐츠 타입 정의
@@ -271,15 +270,24 @@ const HelpSystem: React.FC<HelpSystemProps> = ({
       {!showPopup && <HelpButton />}
       
       {showPopup && currentHelp && (
-        <LayerPopup
-          isOpen={showPopup}
-          onClose={() => {
-            setShowPopup(false);
-            onClose?.();
-          }}
-          title={currentHelp.title}
-          content={
-            <div className="max-h-[60vh] overflow-y-auto">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-hidden">
+            <div className="flex items-center justify-between p-6 border-b">
+              <h3 className="text-xl font-bold text-gray-900">
+                {currentHelp.title}
+              </h3>
+              <button
+                onClick={() => {
+                  setShowPopup(false);
+                  onClose?.();
+                }}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <span className="text-2xl">×</span>
+              </button>
+            </div>
+            
+            <div className="p-6 max-h-[60vh] overflow-y-auto">
               {currentHelp.content}
               
               {currentHelp.examples && currentHelp.examples.length > 0 && (
@@ -334,9 +342,8 @@ const HelpSystem: React.FC<HelpSystemProps> = ({
                 </div>
               )}
             </div>
-          }
-          width="lg"
-        />
+          </div>
+        </div>
       )}
     </>
   );
