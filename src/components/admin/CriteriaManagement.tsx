@@ -313,13 +313,13 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
     if (!showHelp) return null;
     
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg p-6 max-w-2xl max-h-[80vh] overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ backgroundColor: 'var(--modal-backdrop)' }}>
+        <div className="rounded-lg p-6 max-w-2xl max-h-[80vh] overflow-y-auto" style={{ backgroundColor: 'var(--modal-bg)', boxShadow: 'var(--shadow-2xl)' }}>
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-bold text-gray-900">📚 기준 설정 도움말</h3>
+            <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>📚 기준 설정 도움말</h3>
             <button
               onClick={() => setShowHelp(false)}
-              className="text-gray-500 hover:text-gray-700 text-xl"
+              className="text-xl transition-colors" style={{ color: 'var(--text-muted)' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-secondary)'} onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-muted)'}
             >
               ×
             </button>
@@ -327,16 +327,16 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
           
           <div className="space-y-4 text-sm">
             <div>
-              <h4 className="font-semibold text-blue-900 mb-2">🎯 AHP 기준 계층구조란?</h4>
-              <p className="text-gray-700 leading-relaxed">
+              <h4 className="font-semibold mb-2" style={{ color: 'var(--status-info-text)' }}>🎯 AHP 기준 계층구조란?</h4>
+              <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                 AHP(Analytic Hierarchy Process)에서 기준 계층구조는 의사결정 문제를 체계적으로 분해하여 
                 상위 목표부터 세부 기준까지 단계별로 구성하는 구조입니다.
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold text-green-900 mb-2">📊 AHP 5단계 계층구조</h4>
-              <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <h4 className="font-semibold mb-2" style={{ color: 'var(--status-success-text)' }}>📊 AHP 5단계 계층구조</h4>
+              <ul className="list-disc list-inside space-y-1" style={{ color: 'var(--text-secondary)' }}>
                 <li><strong>🎯 Level 1 (목표):</strong> 최종 의사결정 목표</li>
                 <li><strong>📋 Level 2 (기준):</strong> 주요 평가 영역 (3-7개 권장)</li>
                 <li><strong>🎪 Level 3 (대안):</strong> 선택 가능한 대안들 (표준 AHP)</li>
@@ -346,22 +346,22 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
             </div>
 
             <div>
-              <h4 className="font-semibold text-purple-900 mb-2">🔄 레이아웃 모드</h4>
+              <h4 className="font-semibold mb-2" style={{ color: 'var(--accent-secondary)' }}>🔄 레이아웃 모드</h4>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-3 bg-blue-50 rounded">
-                  <div className="font-medium text-blue-900">📋 세로형</div>
-                  <div className="text-xs text-blue-700">계층구조를 세로로 표시, 상세 정보 확인에 적합</div>
+                <div className="p-3 rounded" style={{ backgroundColor: 'var(--status-info-bg)', border: '1px solid var(--status-info-border)' }}>
+                  <div className="font-medium" style={{ color: 'var(--status-info-text)' }}>📋 세로형</div>
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>계층구조를 세로로 표시, 상세 정보 확인에 적합</div>
                 </div>
-                <div className="p-3 bg-green-50 rounded">
-                  <div className="font-medium text-green-900">📊 가로형</div>
-                  <div className="text-xs text-green-700">계층구조를 가로로 표시, 전체 구조 파악에 적합</div>
+                <div className="p-3 rounded" style={{ backgroundColor: 'var(--status-success-bg)', border: '1px solid var(--status-success-border)' }}>
+                  <div className="font-medium" style={{ color: 'var(--status-success-text)' }}>📊 가로형</div>
+                  <div className="text-xs" style={{ color: 'var(--text-muted)' }}>계층구조를 가로로 표시, 전체 구조 파악에 적합</div>
                 </div>
               </div>
             </div>
 
             <div>
-              <h4 className="font-semibold text-red-900 mb-2">⚠️ 주의사항</h4>
-              <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <h4 className="font-semibold mb-2" style={{ color: 'var(--status-danger-text)' }}>⚠️ 주의사항</h4>
+              <ul className="list-disc list-inside space-y-1" style={{ color: 'var(--text-secondary)' }}>
                 <li>기준명은 중복될 수 없습니다</li>
                 <li>기존 데이터를 삭제하면 복구할 수 없습니다</li>
                 <li>너무 많은 기준(9개 이상)은 평가의 일관성을 떨어뜨릴 수 있습니다</li>
@@ -370,8 +370,8 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
             </div>
 
             <div>
-              <h4 className="font-semibold text-orange-900 mb-2">💡 실무 팁</h4>
-              <ul className="list-disc list-inside text-gray-700 space-y-1">
+              <h4 className="font-semibold mb-2" style={{ color: 'var(--status-warning-text)' }}>💡 실무 팁</h4>
+              <ul className="list-disc list-inside space-y-1" style={{ color: 'var(--text-secondary)' }}>
                 <li>기준 설명을 명확히 작성하여 평가자의 이해를 돕습니다</li>
                 <li>비슷한 성격의 기준들은 하나의 상위 기준으로 그룹화하세요</li>
                 <li>측정 가능한 기준과 주관적 기준을 적절히 균형있게 구성하세요</li>
@@ -396,10 +396,10 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
       {renderHelpModal()}
       <Card title="2-1단계 — 기준추가">
         <div className="space-y-6">
-          <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between rounded-lg p-4" style={{ backgroundColor: 'var(--status-info-bg)', border: '1px solid var(--status-info-border)' }}>
             <div>
-              <h4 className="font-medium text-blue-900 mb-2">📋 프로젝트 기준 설정 가이드</h4>
-              <ul className="text-sm text-blue-700 space-y-1">
+              <h4 className="font-medium mb-2" style={{ color: 'var(--status-info-text)' }}>📋 프로젝트 기준 설정 가이드</h4>
+              <ul className="text-sm space-y-1" style={{ color: 'var(--status-info-text)' }}>
                 <li>• 프로젝트 목표에 맞는 평가 기준을 계층적으로 구성</li>
                 <li>• 1레벨(목표) → 2레벨(기준) → 3레벨(대안) 순서로 추가</li>
                 <li>• 기준명은 중복될 수 없으며, 최대 5단계까지 세분화 가능</li>
@@ -419,7 +419,10 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
                   variant="outline" 
                   size="sm"
                   onClick={handleClearAllData}
-                  className="text-red-600 border-red-300 hover:bg-red-50"
+                  className="transition-all duration-200" 
+                  style={{ color: 'var(--status-danger-text)', borderColor: 'var(--status-danger-border)' }} 
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--status-danger-bg)'} 
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   🗑️ 모든 데이터 삭제
                 </Button>
@@ -429,7 +432,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
 
           {/* Evaluation Method Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium mb-3" style={{ color: 'var(--text-primary)' }}>
               평가방법 선택
             </label>
             <div className="flex space-x-4">
@@ -441,7 +444,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
                   onChange={(e) => setEvaluationMethod(e.target.value as 'pairwise')}
                   className="mr-2"
                 />
-                <span className="text-sm">쌍대비교</span>
+                <span className="text-sm" style={{ color: 'var(--text-primary)' }}>쌍대비교</span>
               </label>
               <label className="flex items-center">
                 <input
@@ -451,7 +454,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
                   onChange={(e) => setEvaluationMethod(e.target.value as 'direct')}
                   className="mr-2"
                 />
-                <span className="text-sm">직접입력</span>
+                <span className="text-sm" style={{ color: 'var(--text-primary)' }}>직접입력</span>
               </label>
             </div>
           </div>
@@ -459,27 +462,47 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
           {/* Current Criteria Tree Visualization */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="font-medium text-gray-900">🌳 기준 계층구조 시각화</h4>
+              <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>🌳 기준 계층구조 시각화</h4>
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">표시 방식:</span>
-                <div className="flex bg-gray-100 rounded-lg p-1">
+                <span className="text-sm" style={{ color: 'var(--text-muted)' }}>표시 방식:</span>
+                <div className="flex rounded-lg p-1" style={{ backgroundColor: 'var(--bg-elevated)' }}>
                   <button
                     onClick={() => setLayoutMode('vertical')}
-                    className={`px-3 py-1 text-xs rounded-md transition-colors ${
-                      layoutMode === 'vertical' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'text-gray-600 hover:bg-gray-200'
-                    }`}
+                    className="px-3 py-1 text-xs rounded-md transition-colors"
+                    style={{
+                      backgroundColor: layoutMode === 'vertical' ? 'var(--status-info-text)' : 'transparent',
+                      color: layoutMode === 'vertical' ? 'white' : 'var(--text-muted)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (layoutMode !== 'vertical') {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-muted)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (layoutMode !== 'vertical') {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
                   >
                     📋 세로형
                   </button>
                   <button
                     onClick={() => setLayoutMode('horizontal')}
-                    className={`px-3 py-1 text-xs rounded-md transition-colors ${
-                      layoutMode === 'horizontal' 
-                        ? 'bg-green-500 text-white' 
-                        : 'text-gray-600 hover:bg-gray-200'
-                    }`}
+                    className="px-3 py-1 text-xs rounded-md transition-colors"
+                    style={{
+                      backgroundColor: layoutMode === 'horizontal' ? 'var(--status-success-text)' : 'transparent',
+                      color: layoutMode === 'horizontal' ? 'white' : 'var(--text-muted)'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (layoutMode !== 'horizontal') {
+                        e.currentTarget.style.backgroundColor = 'var(--bg-muted)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (layoutMode !== 'horizontal') {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                      }
+                    }}
                   >
                     📊 가로형
                   </button>
@@ -488,7 +511,10 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
                   variant="outline" 
                   size="sm"
                   onClick={handleLoadTemplateData}
-                  className="text-blue-600 border-blue-300 hover:bg-blue-50 ml-2"
+                  className="transition-all duration-200 ml-2" 
+                  style={{ color: 'var(--status-info-text)', borderColor: 'var(--status-info-border)' }} 
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--status-info-bg)'} 
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   📝 기본 템플릿
                 </Button>
@@ -496,7 +522,10 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
                   variant="outline" 
                   size="sm"
                   onClick={() => setShowBulkInput(true)}
-                  className="text-green-600 border-green-300 hover:bg-green-50 ml-2"
+                  className="transition-all duration-200 ml-2" 
+                  style={{ color: 'var(--status-success-text)', borderColor: 'var(--status-success-border)' }} 
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--status-success-bg)'} 
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
                   🗂️ 일괄 입력
                 </Button>
@@ -505,7 +534,10 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
                     variant="outline" 
                     size="sm"
                     onClick={handleClearAllData}
-                    className="text-red-600 border-red-300 hover:bg-red-50"
+                    className="transition-all duration-200" 
+                    style={{ color: 'var(--status-danger-text)', borderColor: 'var(--status-danger-border)' }} 
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--status-danger-bg)'} 
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
                     🗑️ 초기화
                   </Button>
@@ -532,17 +564,31 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
           </div>
 
           {/* Add New Criterion */}
-          <div className="border-t pt-6">
-            <h4 className="font-medium text-gray-900 mb-4">➕ 새 기준 추가</h4>
+          <div className="pt-6" style={{ borderTop: '1px solid var(--border-light)' }}>
+            <h4 className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>➕ 새 기준 추가</h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                   상위 기준
                 </label>
                 <select
                   value={newCriterion.parentId}
                   onChange={(e) => setNewCriterion(prev => ({ ...prev, parentId: e.target.value }))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2"
+                  style={{ 
+                    backgroundColor: 'var(--input-bg)', 
+                    color: 'var(--text-primary)', 
+                    border: '1px solid var(--input-border)',
+                    borderRadius: 'var(--radius-md)'
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = 'var(--accent-primary)';
+                    e.target.style.boxShadow = '0 0 0 2px var(--accent-focus)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = 'var(--input-border)';
+                    e.target.style.boxShadow = 'none';
+                  }}
                 >
                   <option value="">🎯 최상위 기준 (목표)</option>
                   {getAvailableParentCriteria().map(criterion => (
@@ -580,8 +626,8 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
           </div>
 
           {/* Action Buttons */}
-          <div className="flex justify-between items-center pt-6 border-t">
-            <div className="text-sm text-gray-600">
+          <div className="flex justify-between items-center pt-6" style={{ borderTop: '1px solid var(--border-light)' }}>
+            <div className="text-sm" style={{ color: 'var(--text-muted)' }}>
               총 {getAllCriteria(criteria).length}개 기준 (
               {[1,2,3,4,5].map(level => {
                 const count = getAllCriteria(criteria).filter(c => c.level === level).length;

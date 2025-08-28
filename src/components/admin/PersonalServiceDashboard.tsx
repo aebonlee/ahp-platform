@@ -553,48 +553,48 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
       {/* 프로젝트 현황 대시보드 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
+        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-info-bg), var(--status-info-bg-light))', border: '1px solid var(--status-info-border)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-600">전체 프로젝트</p>
-              <p className="text-2xl font-bold text-blue-900">{projects.length}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.length}</p>
             </div>
-            <div className="p-3 bg-blue-500 rounded-full">
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-info-text)' }}>
               <span className="text-white text-xl">📊</span>
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
+        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-success-bg), var(--status-success-bg-light))', border: '1px solid var(--status-success-border)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-600">진행중</p>
-              <p className="text-2xl font-bold text-green-900">{projects.filter(p => p.status === 'active').length}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'active').length}</p>
             </div>
-            <div className="p-3 bg-green-500 rounded-full">
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-success-text)' }}>
               <span className="text-white text-xl">🚀</span>
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4">
+        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-light-2))', border: '1px solid var(--accent-primary)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-purple-600">완료됨</p>
-              <p className="text-2xl font-bold text-purple-900">{projects.filter(p => p.status === 'completed').length}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'completed').length}</p>
             </div>
-            <div className="p-3 bg-purple-500 rounded-full">
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--accent-primary)' }}>
               <span className="text-white text-xl">✅</span>
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-4">
+        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-warning-bg), var(--status-warning-bg-light))', border: '1px solid var(--status-warning-border)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-orange-600">평균 진행률</p>
-              <p className="text-2xl font-bold text-orange-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.completion_rate || 0), 0) / projects.length) : 0}%
               </p>
             </div>
-            <div className="p-3 bg-orange-500 rounded-full">
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-warning-text)' }}>
               <span className="text-white text-xl">📈</span>
             </div>
           </div>
@@ -1177,7 +1177,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   };
 
   const renderMyProjectsFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -1238,48 +1238,48 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <div className="space-y-6">
       {/* 프로젝트 통계 대시보드 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-gradient-to-r from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-4">
+        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-info-bg), var(--status-info-bg-light))', border: '1px solid var(--status-info-border)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-blue-600">전체 프로젝트</p>
-              <p className="text-2xl font-bold text-blue-900">{projects.length}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.length}</p>
             </div>
-            <div className="p-3 bg-blue-500 rounded-full">
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-info-text)' }}>
               <span className="text-white text-xl">📊</span>
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-green-50 to-green-100 border border-green-200 rounded-lg p-4">
+        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-success-bg), var(--status-success-bg-light))', border: '1px solid var(--status-success-border)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-green-600">진행중</p>
-              <p className="text-2xl font-bold text-green-900">{projects.filter(p => p.status === 'active').length}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'active').length}</p>
             </div>
-            <div className="p-3 bg-green-500 rounded-full">
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-success-text)' }}>
               <span className="text-white text-xl">🚀</span>
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-purple-50 to-purple-100 border border-purple-200 rounded-lg p-4">
+        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-light-2))', border: '1px solid var(--accent-primary)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-purple-600">완료됨</p>
-              <p className="text-2xl font-bold text-purple-900">{projects.filter(p => p.status === 'completed').length}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'completed').length}</p>
             </div>
-            <div className="p-3 bg-purple-500 rounded-full">
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--accent-primary)' }}>
               <span className="text-white text-xl">✅</span>
             </div>
           </div>
         </div>
-        <div className="bg-gradient-to-r from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-4">
+        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-warning-bg), var(--status-warning-bg-light))', border: '1px solid var(--status-warning-border)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-orange-600">평균 진행률</p>
-              <p className="text-2xl font-bold text-orange-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.completion_rate || 0), 0) / projects.length) : 0}%
               </p>
             </div>
-            <div className="p-3 bg-orange-500 rounded-full">
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-warning-text)' }}>
               <span className="text-white text-xl">📈</span>
             </div>
           </div>
@@ -1768,7 +1768,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 };
 
   const renderProjectCreationFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -1916,7 +1916,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderEvaluatorManagementFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -1982,7 +1982,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   };
 
   const renderProgressMonitoringFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -2103,7 +2103,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderResultsAnalysisFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -2388,7 +2388,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderExportReportsFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -2572,7 +2572,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderWorkshopManagementFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -2608,7 +2608,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderDecisionSupportSystemFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -2647,7 +2647,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderPersonalSettingsFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -2689,7 +2689,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderPaperManagementFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -2819,7 +2819,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderModelBuilderFullPage = () => (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
@@ -2993,7 +2993,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         return renderPersonalSettings();
       case 'payment':
         return (
-          <div className="min-h-screen bg-gray-50">
+          <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
             <div className="bg-white border-b border-gray-200">
               <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="py-6">
