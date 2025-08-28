@@ -47,18 +47,6 @@ const Card: React.FC<CardProps> = ({
     }
   };
 
-  // 호버 효과 스타일
-  const getHoverStyle = () => {
-    if (!hoverable && !onClick) return {};
-    return {
-      cursor: 'pointer',
-      transition: 'all 0.3s ease',
-      '&:hover': {
-        transform: 'translateY(-2px)',
-        boxShadow: 'var(--shadow-xl)'
-      }
-    };
-  };
 
   return (
     <div 
