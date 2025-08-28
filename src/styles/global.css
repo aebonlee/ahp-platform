@@ -194,6 +194,7 @@
   --bg-muted: var(--neutral-100);
   --bg-emphasis: var(--neutral-200);
   --bg-inverse: var(--neutral-900);
+  --bg-elevated: var(--neutral-0);
   
   /* === Surface Colors === */
   --surface-base: #ffffff;
@@ -228,23 +229,35 @@
   --interactive-hover: var(--brand-gold-secondary);
   --interactive-active: var(--brand-gold-secondary);
   --interactive-disabled: var(--neutral-400);
+
+  /* === Accent Colors (Theme-aware) === */
+  --accent-primary: var(--brand-gold-primary);
+  --accent-secondary: var(--brand-gold-secondary);
+  --accent-light: var(--brand-gold-light);
+  --accent-hover: var(--brand-gold-secondary);
+  --accent-focus: rgba(200, 169, 104, 0.35);
+  --accent-rgb: 200, 169, 104;
   
   /* === Status Colors === */
-  --status-info-bg: rgba(59, 130, 246, 0.1);
-  --status-info-border: rgba(59, 130, 246, 0.3);
-  --status-info-text: #1e40af;
+  --status-info-bg: rgba(var(--accent-rgb), 0.1);
+  --status-info-bg-light: rgba(var(--accent-rgb), 0.05);
+  --status-info-border: rgba(var(--accent-rgb), 0.3);
+  --status-info-text: var(--accent-primary);
   
   --status-success-bg: rgba(16, 185, 129, 0.1);
+  --status-success-bg-light: rgba(16, 185, 129, 0.05);
   --status-success-border: rgba(16, 185, 129, 0.3);
-  --status-success-text: #064e3b;
+  --status-success-text: #065f46;
   
   --status-warning-bg: rgba(245, 158, 11, 0.1);
+  --status-warning-bg-light: rgba(245, 158, 11, 0.05);
   --status-warning-border: rgba(245, 158, 11, 0.3);
-  --status-warning-text: #78350f;
+  --status-warning-text: #92400e;
   
   --status-danger-bg: rgba(239, 68, 68, 0.1);
+  --status-danger-bg-light: rgba(239, 68, 68, 0.05);
   --status-danger-border: rgba(239, 68, 68, 0.3);
-  --status-danger-text: #7f1d1d;
+  --status-danger-text: #991b1b;
   
   /* === Focus Colors === */
   --focus-ring-color: var(--brand-gold-primary);
@@ -294,6 +307,7 @@
   --bg-muted: var(--neutral-850);
   --bg-emphasis: var(--neutral-800);
   --bg-inverse: var(--neutral-50);
+  --bg-elevated: var(--neutral-800);
   
   /* === Surface Colors === */
   --surface-base: var(--neutral-900);
@@ -327,24 +341,36 @@
   --interactive-normal: var(--brand-gold-light);
   --interactive-hover: var(--brand-gold-primary);
   --interactive-active: var(--brand-gold-primary);
+
+  /* === Accent Colors (Dark Theme) === */
+  --accent-primary: var(--brand-gold-light);
+  --accent-secondary: var(--brand-gold-primary);
+  --accent-light: var(--brand-gold-light);
+  --accent-hover: var(--brand-gold-primary);
+  --accent-focus: rgba(229, 213, 170, 0.35);
+  --accent-rgb: 229, 213, 170;
   --interactive-disabled: var(--neutral-700);
   
   /* === Status Colors === */
-  --status-info-bg: rgba(59, 130, 246, 0.15);
-  --status-info-border: rgba(59, 130, 246, 0.4);
-  --status-info-text: #93c5fd;
+  --status-info-bg: rgba(var(--accent-rgb), 0.15);
+  --status-info-bg-light: rgba(var(--accent-rgb), 0.08);
+  --status-info-border: rgba(var(--accent-rgb), 0.4);
+  --status-info-text: var(--accent-light);
   
   --status-success-bg: rgba(16, 185, 129, 0.15);
+  --status-success-bg-light: rgba(16, 185, 129, 0.08);
   --status-success-border: rgba(16, 185, 129, 0.4);
-  --status-success-text: #86efac;
+  --status-success-text: #6ee7b7;
   
   --status-warning-bg: rgba(245, 158, 11, 0.15);
+  --status-warning-bg-light: rgba(245, 158, 11, 0.08);
   --status-warning-border: rgba(245, 158, 11, 0.4);
-  --status-warning-text: #fde047;
+  --status-warning-text: #fcd34d;
   
   --status-danger-bg: rgba(239, 68, 68, 0.15);
+  --status-danger-bg-light: rgba(239, 68, 68, 0.08);
   --status-danger-border: rgba(239, 68, 68, 0.4);
-  --status-danger-text: #fca5a5;
+  --status-danger-text: #f87171;
   
   /* === Focus Colors === */
   --focus-ring-color: var(--brand-gold-light);
