@@ -1,47 +1,47 @@
-# 🗂️ AHP Research Platform - Backup System
+# 🗂️ AHP Research Platform - 백업 시스템
 
-## 📋 Overview
-Comprehensive backup system for AHP Research Platform project with organized structure and easy recovery procedures.
+## 📋 개요
+체계적인 구조와 간편한 복구 절차를 갖춘 AHP Research Platform 프로젝트의 포괄적인 백업 시스템입니다.
 
-## 📁 Directory Structure
+## 📁 디렉토리 구조
 
 ```
 C:\Users\ASUS\backup\
-├── 📂 ahp-project/              # Complete project backups
+├── 📂 ahp-project/              # 완전한 프로젝트 백업
 │   └── ahp-research-platform-complete-YYYYMMDD-HHMM.tar.gz
-├── 📂 stable-versions/          # Stable release versions
+├── 📂 stable-versions/          # 안정 버전 릴리스
 │   └── v1.0-evaluation-test-complete-20250829/
 │       └── v1.0-evaluation-test-complete-20250829-source.tar.gz
-├── 📂 source-archives/          # Development source backups
+├── 📂 source-archives/          # 개발 소스 백업
 │   └── ahp-research-platform-latest-20250829.tar.gz
-├── 📂 documentation/            # Project docs and metadata
+├── 📂 documentation/            # 프로젝트 문서 및 메타데이터
 │   ├── README.md
 │   ├── DEVELOPMENT-STATUS.md
 │   ├── git-status.txt
-│   └── various git info files
-├── 📂 scripts/                  # Backup and recovery scripts
+│   └── 다양한 git 정보 파일들
+├── 📂 scripts/                  # 백업 및 복구 스크립트
 │   └── restore-stable.bat
-└── 📄 README.md                 # This file
+└── 📄 README.md                 # 이 파일
 ```
 
-## 🏷️ Current Stable Version
+## 🏷️ 현재 안정 버전
 
 ### v1.0-evaluation-test-complete (2025-08-29)
-- **Status**: ✅ Production Ready
-- **Git Tag**: `v1.0-evaluation-test-complete`
+- **상태**: ✅ 프로덕션 준비 완료
+- **Git 태그**: `v1.0-evaluation-test-complete`
 - **GitHub**: https://github.com/aebonlee/ahp-research-platform
-- **Build Size**: 331.93 kB (gzipped)
-- **TypeScript**: Zero compilation errors
+- **빌드 크기**: 331.93 kB (gzipped)
+- **TypeScript**: 컴파일 오류 없음
 
-#### Key Features Implemented
-- ✅ **Evaluation Test System**: Complete preview and simulation functionality
-- ✅ **Template Integration**: Full header/sidebar layout integration
-- ✅ **Optimized Routing**: Independent App.tsx processing
-- ✅ **Production Build**: Optimized and error-free
+#### 구현된 주요 기능
+- ✅ **평가 테스트 시스템**: 완전한 미리보기 및 시뮬레이션 기능
+- ✅ **템플릿 통합**: 완전한 헤더/사이드바 레이아웃 통합
+- ✅ **라우팅 최적화**: 독립적인 App.tsx 처리
+- ✅ **프로덕션 빌드**: 최적화되고 오류 없음
 
-## 🔄 Recovery Procedures
+## 🔄 복구 절차
 
-### Method 1: Git Tag Recovery (Recommended)
+### 방법 1: Git 태그 복구 (권장)
 ```bash
 cd C:\Users\ASUS\ahp-research-platform
 git checkout v1.0-evaluation-test-complete
@@ -49,92 +49,92 @@ npm install
 npm run build
 ```
 
-### Method 2: One-Click Recovery
+### 방법 2: 원클릭 복구
 ```batch
-# Windows batch script
+# Windows 배치 스크립트
 C:\Users\ASUS\backup\scripts\restore-stable.bat
 ```
 
-### Method 3: Archive Recovery
+### 방법 3: 아카이브 복구
 ```bash
 cd C:\Users\ASUS
-# Extract stable version
+# 안정 버전 추출
 tar -xzf backup/stable-versions/v1.0-evaluation-test-complete-20250829/v1.0-evaluation-test-complete-20250829-source.tar.gz
 
-# Or extract latest complete backup
+# 또는 최신 완전 백업 추출
 tar -xzf backup/ahp-project/ahp-research-platform-complete-YYYYMMDD-HHMM.tar.gz
 ```
 
-## 📊 Backup Types
+## 📊 백업 유형
 
-### 1. Complete Project Backup
-- **Location**: `ahp-project/`
-- **Content**: Full project with all source files
-- **Frequency**: Major milestones and releases
-- **Size**: ~1.3MB compressed
+### 1. 완전한 프로젝트 백업
+- **위치**: `ahp-project/`
+- **내용**: 모든 소스 파일이 포함된 전체 프로젝트
+- **빈도**: 주요 마일스톤 및 릴리스
+- **크기**: ~1.3MB 압축
 
-### 2. Stable Version Backup
-- **Location**: `stable-versions/`
-- **Content**: Verified stable releases only
-- **Frequency**: When tagged as stable
-- **Purpose**: Safe rollback points
+### 2. 안정 버전 백업
+- **위치**: `stable-versions/`
+- **내용**: 검증된 안정 버전만
+- **빈도**: 안정적으로 태그된 경우
+- **목적**: 안전한 롤백 지점
 
-### 3. Source Archives
-- **Location**: `source-archives/`
-- **Content**: Development snapshots
-- **Frequency**: Regular development backups
-- **Purpose**: Latest changes preservation
+### 3. 소스 아카이브
+- **위치**: `source-archives/`
+- **내용**: 개발 스냅샷
+- **빈도**: 정기적인 개발 백업
+- **목적**: 최신 변경사항 보존
 
-### 4. Documentation Backup
-- **Location**: `documentation/`
-- **Content**: Project docs, git info, development status
-- **Purpose**: Context and metadata preservation
+### 4. 문서 백업
+- **위치**: `documentation/`
+- **내용**: 프로젝트 문서, git 정보, 개발 상태
+- **목적**: 컨텍스트 및 메타데이터 보존
 
-## 🛠️ Maintenance
+## 🛠️ 유지보수
 
-### Regular Tasks
+### 정기 작업
 ```bash
-# Verify backup integrity
+# 백업 무결성 검증
 tar -tzf backup/ahp-project/[backup-file].tar.gz > /dev/null && echo "OK"
 
-# Check backup sizes
+# 백업 크기 확인
 du -sh backup/*/
 
-# Clean old backups (keep latest 5)
+# 오래된 백업 정리 (최신 5개 유지)
 cd backup/ahp-project && ls -t *.tar.gz | tail -n +6 | xargs rm -f
 ```
 
-### Backup Verification Checklist
-- [ ] Archive extracts without errors
-- [ ] npm install works after extraction
-- [ ] Build process succeeds
-- [ ] All major features functional
-- [ ] Git history preserved (if applicable)
+### 백업 검증 체크리스트
+- [ ] 아카이브가 오류 없이 추출됨
+- [ ] 추출 후 npm install이 작동함
+- [ ] 빌드 프로세스가 성공함
+- [ ] 모든 주요 기능이 작동함
+- [ ] Git 히스토리가 보존됨 (해당하는 경우)
 
-## ⚠️ Important Notes
+## ⚠️ 중요 사항
 
-1. **Dependencies**: Always run `npm install` after recovery
-2. **Environment**: Verify `.env` files and configurations
-3. **Git Setup**: Reconnect to remote repository if needed
-4. **Build Test**: Confirm `npm run build` succeeds
-5. **Feature Test**: Verify evaluation test system works
+1. **의존성**: 복구 후 항상 `npm install` 실행
+2. **환경**: `.env` 파일 및 구성 확인
+3. **Git 설정**: 필요시 원격 저장소 재연결
+4. **빌드 테스트**: `npm run build` 성공 확인
+5. **기능 테스트**: 평가 테스트 시스템 작동 확인
 
-## 📞 Quick Reference
+## 📞 빠른 참조
 
-- **Project GitHub**: https://github.com/aebonlee/ahp-research-platform
-- **Backup Location**: `C:\Users\ASUS\backup\`
-- **Stable Tag**: `v1.0-evaluation-test-complete`
-- **Recovery Script**: `backup\scripts\restore-stable.bat`
+- **프로젝트 GitHub**: https://github.com/aebonlee/ahp-research-platform
+- **백업 위치**: `C:\Users\ASUS\backup\`
+- **안정 태그**: `v1.0-evaluation-test-complete`
+- **복구 스크립트**: `backup\scripts\restore-stable.bat`
 
-## 🎯 System Status Summary
+## 🎯 시스템 상태 요약
 
-- ✅ **Project Status**: Production ready and stable
-- ✅ **Backup System**: Fully operational with multiple recovery methods
-- ✅ **Documentation**: Complete guides and procedures
-- ✅ **Automation**: One-click recovery available
-- ✅ **Version Control**: Git tags synchronized with GitHub
+- ✅ **프로젝트 상태**: 프로덕션 준비 완료 및 안정적
+- ✅ **백업 시스템**: 다중 복구 방법으로 완전 운영
+- ✅ **문서화**: 완전한 가이드 및 절차
+- ✅ **자동화**: 원클릭 복구 가능
+- ✅ **버전 관리**: Git 태그가 GitHub와 동기화
 
 ---
-**Created**: 2025-08-29 16:00 KST  
-**Last Updated**: 2025-08-29 16:00 KST  
-**System Version**: 2.0 (Simplified Structure)
+**생성일**: 2025-08-29 16:00 KST  
+**최종 업데이트**: 2025-08-29 16:00 KST  
+**시스템 버전**: 2.0 (단순화된 구조)
