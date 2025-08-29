@@ -656,7 +656,71 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         ))}
       </div>
 
-
+      {/* 빠른 시작 및 빠른 접근 통합 - 하단에 크게 배치 */}
+      <div 
+        className="p-8 rounded-xl border-2 transition-all duration-300"
+        style={{
+          background: 'linear-gradient(135deg, var(--accent-light), var(--bg-elevated))',
+          borderColor: 'var(--accent-primary)',
+          boxShadow: 'var(--shadow-xl)'
+        }}
+      >
+        <div className="text-center mb-8">
+          <h2 
+            className="text-2xl lg:text-3xl font-bold mb-2"
+            style={{ color: 'var(--accent-secondary)' }}
+          >
+            ⚡ 빠른 시작 및 접근
+          </h2>
+          <p 
+            className="text-lg"
+            style={{ color: 'var(--text-secondary)' }}
+          >
+            AHP 분석의 모든 기능을 빠르고 쉽게 사용해보세요
+          </p>
+        </div>
+        
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          {[
+            { id: 'user-guide', label: '사용자 가이드', icon: '📚', color: 'from-blue-500 to-blue-600' },
+            { id: 'model-builder', label: '모델 구성', icon: '🏗️', color: 'from-green-500 to-green-600' },
+            { id: 'validity-check', label: '평가문항 확인', icon: '🔍', color: 'from-teal-500 to-teal-600' },
+            { id: 'monitoring', label: '진행률 확인', icon: '📈', color: 'from-purple-500 to-purple-600' },
+            { id: 'survey-links', label: '설문 링크', icon: '🔗', color: 'from-orange-500 to-orange-600' },
+            { id: 'workshop', label: '워크숍 관리', icon: '🎯', color: 'from-indigo-500 to-indigo-600' },
+            { id: 'decision-support', label: '의사결정 지원', icon: '🧠', color: 'from-pink-500 to-pink-600' }
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleTabChange(item.id)}
+              className="flex flex-col items-center p-4 rounded-xl border-2 transition-all duration-300 hover:scale-105 hover:shadow-lg"
+              style={{
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
+                borderColor: 'rgba(255, 255, 255, 0.3)',
+                backdropFilter: 'blur(10px)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                e.currentTarget.style.borderColor = 'var(--accent-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.7)';
+                e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.3)';
+              }}
+            >
+              <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-lg flex items-center justify-center mb-3`}>
+                <span className="text-white text-xl">{item.icon}</span>
+              </div>
+              <span 
+                className="text-sm font-medium text-center leading-tight"
+                style={{ color: 'var(--text-primary)' }}
+              >
+                {item.label}
+              </span>
+            </button>
+          ))}
+        </div>
+      </div>
 
     </div>
   );
