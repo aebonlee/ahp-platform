@@ -43,19 +43,21 @@
   --bg-elevated:   var(--gray-100);   /* Elevated surfaces */
   --bg-subtle:     var(--gray-100);   /* Subtle section backgrounds */
   
-  /* === Unified Typography Scale === */
-  --text-primary:   var(--gray-900);  /* Primary text - maximum contrast */
-  --text-secondary: var(--gray-700);  /* Secondary text - strong contrast */
-  --text-tertiary:  var(--gray-600);  /* Tertiary text - medium contrast */
-  --text-muted:     var(--gray-500);  /* Muted text - accessible contrast */
-  --text-disabled:  var(--gray-400);  /* Disabled text */
-  --text-inverse:   #FFFFFF;          /* Text on dark backgrounds */
+  /* === Enhanced Typography Scale (High Contrast) === */
+  --text-primary:   #000000;          /* Pure black - maximum contrast */
+  --text-secondary: var(--gray-800);  /* Very dark gray - strong contrast */
+  --text-tertiary:  var(--gray-700);  /* Dark gray - clear contrast */
+  --text-muted:     var(--gray-600);  /* Medium gray - readable contrast */
+  --text-disabled:  var(--gray-400);  /* Light gray - disabled state */
+  --text-inverse:   #FFFFFF;          /* Pure white - dark backgrounds */
 
-  /* === Borders & Dividers === */
-  --border-light:   var(--gray-200);  /* Light borders */
-  --border-medium:  var(--gray-300);  /* Medium borders */
-  --border-strong:  var(--gray-400);  /* Strong borders */
-  --border-focus:   var(--gold-primary); /* Focus ring color */
+  /* === Unified Border System (2px, 5px radius) === */
+  --border-width: 2px;                 /* Standard 2px border width */
+  --border-radius: 5px;                /* Standard 5px radius */
+  --border-light:   var(--gray-200);   /* Light borders */
+  --border-medium:  var(--gray-300);   /* Medium borders */
+  --border-strong:  var(--gray-400);   /* Strong borders */
+  --border-focus:   var(--accent-primary); /* Focus ring color */
 
   /* === Layout System === */
   --container-max-width: 1880px;     /* Max desktop width (under 1980px) */
@@ -72,14 +74,14 @@
   --breakpoint-large: 1680px;   /* Large Desktop */
   --breakpoint-xlarge: 1980px;  /* Extra Large Desktop */
   
-  /* === Border Radius (12px system) === */
-  --radius-xs:  12px;  /* Unified radius */
-  --radius-sm:  12px;  /* Unified radius */
-  --radius-md:  12px;  /* Primary radius */
-  --radius-lg:  12px;  /* Unified radius */
-  --radius-xl:  12px;  /* Unified radius */
-  --radius-2xl: 12px;  /* Unified radius */
-  --radius-3xl: 12px;  /* Unified radius */
+  /* === Border Radius (5px system) === */
+  --radius-xs:  5px;   /* Unified 5px radius */
+  --radius-sm:  5px;   /* Unified 5px radius */
+  --radius-md:  5px;   /* Primary 5px radius */
+  --radius-lg:  5px;   /* Unified 5px radius */
+  --radius-xl:  5px;   /* Unified 5px radius */
+  --radius-2xl: 5px;   /* Unified 5px radius */
+  --radius-3xl: 5px;   /* Unified 5px radius */
 
   /* === Spacing Scale === */
   --space-0: 0;
@@ -219,7 +221,7 @@
   --session-danger-border: var(--status-danger-border);
 
   /* User Avatar Colors - Theme Adaptive */
-  --user-avatar-bg:        linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  --user-avatar-bg:        var(--accent-primary); /* Simplified solid background */
   --user-avatar-text:      white;
 
   /* === Legacy Compatibility (for existing components) === */
@@ -268,13 +270,13 @@
   --bg-elevated:   var(--gray-700);   /* Elevated surfaces */
   --bg-subtle:     var(--gray-800);   /* Section backgrounds */
   
-  /* Dark Mode Typography - Unified Scale */
-  --text-primary:   var(--gray-100);  /* Light primary text */
-  --text-secondary: var(--gray-300);  /* Secondary text */
-  --text-tertiary:  var(--gray-400);  /* Tertiary text */
-  --text-muted:     var(--gray-500);  /* Muted text */
-  --text-disabled:  var(--gray-600);  /* Disabled text */
-  --text-inverse:   var(--gray-900);  /* Dark text on light backgrounds */
+  /* Dark Mode Typography - Enhanced Contrast */
+  --text-primary:   #FFFFFF;          /* Pure white - maximum contrast */
+  --text-secondary: var(--gray-200);  /* Very light gray - strong contrast */
+  --text-tertiary:  var(--gray-300);  /* Light gray - clear contrast */
+  --text-muted:     var(--gray-400);  /* Medium gray - readable contrast */
+  --text-disabled:  var(--gray-600);  /* Darker gray - disabled state */
+  --text-inverse:   #000000;          /* Pure black - light backgrounds */
   
   /* Dark Mode Borders - Unified Scale */
   --border-light:   var(--gray-700);  /* Light borders */
@@ -528,13 +530,13 @@
   }
   
   .scrollbar-luxury::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--border-light), var(--border-medium));
+    background: var(--border-medium); /* Clean solid background */
     border-radius: var(--radius-sm);
     transition: var(--transition-normal);
   }
   
   .scrollbar-luxury::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--border-medium), var(--border-strong));
+    background: var(--border-strong); /* Clean solid background */
   }
   
   /* Legacy scrollbar class support */
@@ -554,13 +556,13 @@
   }
   
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: linear-gradient(135deg, var(--border-light), var(--border-medium));
+    background: var(--border-medium); /* Clean solid background */
     border-radius: var(--radius-sm);
     transition: var(--transition-normal);
   }
   
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(135deg, var(--border-medium), var(--border-strong));
+    background: var(--border-strong); /* Clean solid background */
   }
 }
 
@@ -574,7 +576,7 @@
   .rounded-2xl,
   .rounded-3xl,
   .rounded-full {
-    border-radius: 12px !important;
+    border-radius: var(--border-radius) !important;
   }
   
   /* Keep rounded-full as circle */
@@ -712,7 +714,7 @@
   .page-content {
     width: 100%;
     background-color: var(--bg-secondary);
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     padding: 2rem;
     box-shadow: var(--shadow-md);
     border: 1px solid var(--border-light);
@@ -798,7 +800,7 @@
   .card-enhanced {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-light);
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     padding: 1.5rem;
     box-shadow: var(--shadow-sm);
     transition: var(--transition-luxury);
@@ -814,14 +816,14 @@
   .theme-surface {
     background-color: var(--bg-secondary);
     border: 1px solid var(--border-light);
-    border-radius: 12px;
+    border-radius: var(--border-radius);
   }
   
   .theme-surface-elevated {
     background-color: var(--bg-secondary);
-    background-image: linear-gradient(var(--ahp-surface-elevated), var(--ahp-surface-elevated));
+    background: var(--bg-elevated); /* Simplified solid background */
     border: 1px solid var(--border-light);
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     box-shadow: var(--shadow-md);
   }
   
@@ -855,7 +857,7 @@
   
   .bg-luxury-surface {
     background-color: var(--bg-secondary);
-    background-image: linear-gradient(var(--ahp-surface-elevated), var(--ahp-surface-elevated));
+    background: var(--bg-elevated); /* Simplified solid background */
   }
   
   .border-luxury {
@@ -1032,12 +1034,7 @@
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.2),
-    transparent
-  );
+  background: rgba(255, 255, 255, 0.1); /* Simplified shimmer effect */
   transition: left 0.5s;
 }
 
