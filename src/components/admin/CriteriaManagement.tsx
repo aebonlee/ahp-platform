@@ -196,7 +196,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
   };
 
   const handleDeleteCriterion = (id: string) => {
-    console.log('🗑️ 기준 삭제:', id);
+    console.log('기준 삭제:', id);
     
     const filter = (items: Criterion[]): Criterion[] => {
       return items.filter(item => {
@@ -211,7 +211,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
     const updatedCriteria = filter(criteria);
     setCriteria(updatedCriteria);
     saveProjectCriteria(updatedCriteria);
-    console.log('✅ 기준 삭제 완료:', id);
+    console.log('기준 삭제 완료:', id);
   };
 
 
@@ -222,15 +222,15 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
     return flatCriteria.filter(c => c.level <= 4);
   };
 
-  // 레벨별 아이콘 반환
+  // 레벨별 표시 아이콘 (최소화)
   const getLevelIcon = (level: number) => {
     switch (level) {
-      case 1: return '🎯'; // 목표(Goal)
-      case 2: return '📋'; // 기준(Criteria) 
-      case 3: return '🎪'; // 대안(Alternatives)
-      case 4: return '📝'; // 하위기준(Sub-criteria)
-      case 5: return '🔹'; // 세부기준(Detailed criteria)
-      default: return '📄';
+      case 1: return 'G'; // Goal
+      case 2: return 'C'; // Criteria
+      case 3: return 'A'; // Alternatives
+      case 4: return 'S'; // Sub-criteria
+      case 5: return 'D'; // Detailed criteria
+      default: return 'L';
     }
   };
 
@@ -247,7 +247,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
   };
 
   const handleClearAllData = () => {
-    if (window.confirm('⚠️ 모든 기준 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
+    if (window.confirm('경고: 모든 기준 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
       setCriteria([]);
       saveProjectCriteria([]);
       setNewCriterion({ name: '', description: '', parentId: '' });

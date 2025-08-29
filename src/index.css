@@ -12,20 +12,18 @@
 
 /* Legacy variable mappings for backward compatibility */
 :root {
-  /* === Primary Color Palette === */
-  /* Luxury Brand Grays (12-step scale centered on #848484) */
-  --gray-0:   #fafafa;
-  --gray-50:  #f5f5f5;
-  --gray-100: #eeeeee;
-  --gray-200: #e5e5e5;
-  --gray-300: #d4d4d4;
-  --gray-400: #bfbfbf;
-  --gray-500: #a3a3a3;
-  --gray-600: #919191;
-  --gray-650: #848484; /* Core brand color - sophisticated neutral */
-  --gray-700: #6f6f6f;
-  --gray-800: #4d4d4d;
-  --gray-900: #1f1f1f;
+  /* === Unified Gray Scale System === */
+  /* 10-step system optimized for readability and consistency */
+  --gray-50:  #F9FAFB;  /* Lightest background */
+  --gray-100: #F3F4F6;  /* Light surfaces */
+  --gray-200: #E5E7EB;  /* Light borders */
+  --gray-300: #D1D5DB;  /* Default borders */
+  --gray-400: #9CA3AF;  /* Disabled elements */
+  --gray-500: #6B7280;  /* Placeholder text */
+  --gray-600: #4B5563;  /* Secondary text */
+  --gray-700: #374151;  /* Primary text (light mode) */
+  --gray-800: #1F2937;  /* Strong text */
+  --gray-900: #111827;  /* Darkest text */
 
   /* Luxury Gold Accents (restrained usage) */
   --gold-primary:   #C8A968; /* Primary gold for buttons, highlights */
@@ -39,18 +37,19 @@
   --color-warning: #C49A4A; /* Muted amber */
   --color-danger:  #A65A5A; /* Muted burgundy */
 
-  /* === Surface & Background === */
-  --bg-primary:    var(--gray-0);     /* Main background */
-  --bg-secondary:  #ffffff;           /* Card/content background */
-  --bg-elevated:   var(--gray-50);    /* Elevated surfaces */
-  --bg-subtle:     var(--ivory);      /* Subtle section backgrounds */
+  /* === Unified Surface & Background === */
+  --bg-primary:    #FFFFFF;           /* Main background - pure white */
+  --bg-secondary:  var(--gray-50);    /* Card/content background */
+  --bg-elevated:   var(--gray-100);   /* Elevated surfaces */
+  --bg-subtle:     var(--gray-100);   /* Subtle section backgrounds */
   
-  /* === Typography === */
-  --text-primary:   #0f0f0f;          /* Primary text - maximum contrast */
-  --text-secondary: #1f1f1f;          /* Secondary text - stronger contrast */
-  --text-tertiary:  #4f4f4f;          /* Tertiary text - improved readability */
-  --text-muted:     #6f6f6f;          /* Muted text - better contrast */
-  --text-inverse:   #ffffff;          /* Text on dark backgrounds */
+  /* === Unified Typography Scale === */
+  --text-primary:   var(--gray-900);  /* Primary text - maximum contrast */
+  --text-secondary: var(--gray-700);  /* Secondary text - strong contrast */
+  --text-tertiary:  var(--gray-600);  /* Tertiary text - medium contrast */
+  --text-muted:     var(--gray-500);  /* Muted text - accessible contrast */
+  --text-disabled:  var(--gray-400);  /* Disabled text */
+  --text-inverse:   #FFFFFF;          /* Text on dark backgrounds */
 
   /* === Borders & Dividers === */
   --border-light:   var(--gray-200);  /* Light borders */
@@ -145,14 +144,28 @@
   --transition-slow:   350ms ease;
   --transition-luxury: 250ms cubic-bezier(0.4, 0, 0.2, 1);
 
-  /* === Dynamic Color System === */
-  --accent-primary:   #3B82F6; /* Will be updated by ColorTheme hook - Default Ocean Blue */
-  --accent-secondary: #2563EB;
-  --accent-light:     #93C5FD;
-  --accent-hover:     #1D4ED8;
-  --accent-focus:     rgba(59, 130, 246, 0.35);
-  --accent-rgb:       59, 130, 246;
-  --shadow-accent:    0 4px 20px rgba(59, 130, 246, 0.25);
+  /* === Dynamic Color System (5-Color Extended Palette) === */
+  /* Base 3 Colors */
+  --accent-primary:   #3B82F6; /* Ocean Blue - Default primary */
+  --accent-secondary: #10B981; /* Emerald Green - Secondary action */
+  --accent-tertiary:  #F59E0B; /* Amber - Tertiary highlights */
+  
+  /* Dark Variants (30% darker) */
+  --accent-primary-dark:   #1E40AF; /* Deep Ocean */
+  --accent-secondary-dark: #047857; /* Forest Green */
+  --accent-tertiary-dark:  #D97706; /* Dark Amber */
+  
+  /* Pastel Variants (80% lighter) */
+  --accent-primary-pastel:   #DBEAFE; /* Light Ocean */
+  --accent-secondary-pastel: #D1FAE5; /* Light Emerald */
+  --accent-tertiary-pastel:  #FEF3C7; /* Light Amber */
+  
+  /* Hover/Active States */
+  --accent-hover: var(--accent-primary-dark);
+  --accent-light: var(--accent-primary-pastel);
+  --accent-rgb: 59, 130, 246; /* RGB for opacity usage */
+  --accent-focus: rgba(59, 130, 246, 0.35);
+  --shadow-accent: 0 4px 20px rgba(59, 130, 246, 0.25);
 
   /* === Semantic Theme Colors === */
   /* Status Colors */
@@ -249,23 +262,24 @@
    Dark Mode - Sophisticated Dark Theme with Better Readability
    ============================================================================ */
 :root[data-theme="dark"] {
-  /* Dark mode surface colors */
-  --bg-primary:    #0f0f0f;   /* Deeper black for better contrast */
-  --bg-secondary:  #1a1a1a;   /* Slightly lighter card backgrounds */
-  --bg-elevated:   #242424;   /* More visible elevated surfaces */
-  --bg-subtle:     #2e2e2e;   /* Better contrast subtle backgrounds */
+  /* Dark Mode - Unified Gray System */
+  --bg-primary:    var(--gray-900);   /* Main dark background */
+  --bg-secondary:  var(--gray-800);   /* Card backgrounds */
+  --bg-elevated:   var(--gray-700);   /* Elevated surfaces */
+  --bg-subtle:     var(--gray-800);   /* Section backgrounds */
   
-  /* Dark mode typography - Enhanced for readability */
-  --text-primary:   #ffffff;  /* Pure white for maximum contrast */
-  --text-secondary: #f0f0f0;  /* Brighter secondary text for better readability */
-  --text-tertiary:  #e0e0e0;  /* Much more visible tertiary text */
-  --text-muted:     #c0c0c0;  /* Significantly brighter muted text */
-  --text-inverse:   #0a0a0a;  /* Very dark text on light backgrounds */
+  /* Dark Mode Typography - Unified Scale */
+  --text-primary:   var(--gray-100);  /* Light primary text */
+  --text-secondary: var(--gray-300);  /* Secondary text */
+  --text-tertiary:  var(--gray-400);  /* Tertiary text */
+  --text-muted:     var(--gray-500);  /* Muted text */
+  --text-disabled:  var(--gray-600);  /* Disabled text */
+  --text-inverse:   var(--gray-900);  /* Dark text on light backgrounds */
   
-  /* Dark mode borders - More visible */
-  --border-light:   #333333;  /* More visible light borders */
-  --border-medium:  #404040;  /* Better contrast medium borders */
-  --border-strong:  #555555;  /* Clear strong borders */
+  /* Dark Mode Borders - Unified Scale */
+  --border-light:   var(--gray-700);  /* Light borders */
+  --border-medium:  var(--gray-600);  /* Default borders */
+  --border-strong:  var(--gray-500);  /* Strong borders */
   
   /* Enhanced shadows for dark mode - More subtle */
   --shadow-xs:  0 1px 3px rgba(0, 0, 0, 0.4);
