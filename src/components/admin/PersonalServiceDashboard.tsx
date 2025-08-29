@@ -3041,7 +3041,16 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         );
       case 'evaluation-test':
         console.log('🧪 evaluation-test 케이스 실행됨');
-        return <EvaluationTest />;
+        console.log('EvaluationTest 컴포넌트:', EvaluationTest);
+        if (!EvaluationTest) {
+          console.error('EvaluationTest 컴포넌트가 없습니다!');
+          return <div>평가 테스트 컴포넌트 로드 오류</div>;
+        }
+        return (
+          <div className="evaluation-test-wrapper">
+            <EvaluationTest />
+          </div>
+        );
       case 'validity-check':
         return (
           <div className="space-y-6">
@@ -3912,6 +3921,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       {/* Main Content */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-6">
+          {/* Debug Info */}
+          <div className="mb-4 p-2 bg-yellow-100 rounded text-xs">
+            <div>Active Menu: {activeMenu}</div>
+            <div>External Active Tab: {externalActiveTab}</div>
+          </div>
           {renderMenuContent()}
         </div>
       </div>
