@@ -3280,8 +3280,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         <div 
           className="p-6 rounded-xl border-2 transition-all duration-300"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            borderColor: 'rgba(255, 255, 255, 0.3)',
+            background: 'var(--gradient-gold-light)',
+            borderColor: 'var(--color-gold-pastel-3)',
             backdropFilter: 'blur(10px)',
             boxShadow: 'var(--shadow-md)'
           }}
@@ -3422,8 +3422,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         <div 
           className="p-6 rounded-xl border-2 transition-all duration-300"
           style={{
-            backgroundColor: 'rgba(255, 255, 255, 0.7)',
-            borderColor: 'rgba(255, 255, 255, 0.3)',
+            background: 'var(--gradient-gray-light)',
+            borderColor: 'var(--color-gray-pastel-3)',
             backdropFilter: 'blur(10px)',
             boxShadow: 'var(--shadow-md)'
           }}
@@ -3441,14 +3441,17 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div className="flex items-center space-x-2">
                   <div 
                     className="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center"
-                    style={{ borderColor: 'var(--accent-primary)' }}
+                    style={{ 
+                      borderColor: 'var(--color-gold-dark-1)',
+                      backgroundColor: 'var(--color-gold-pastel-1)'
+                    }}
                   >
                     <span className="text-lg">⚙️</span>
                   </div>
                   <div>
                     <h4 
                       className="text-sm font-bold"
-                      style={{ color: 'var(--accent-primary)' }}
+                      style={{ color: 'var(--color-gold-dark-2)' }}
                     >
                       프로젝트 설정
                     </h4>
@@ -3478,7 +3481,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                           </span>
                           <span 
                             className="text-sm font-medium"
-                            style={{ color: progressPercent === 100 ? 'var(--status-success-text)' : 'var(--accent-primary)' }}
+                            style={{ color: progressPercent === 100 ? 'var(--semantic-success)' : 'var(--color-gold-dark-1)' }}
                           >
                             {progressPercent}%
                           </span>
@@ -3491,7 +3494,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             className="h-2 rounded-full transition-all duration-500"
                             style={{ 
                               width: `${progressPercent}%`,
-                              backgroundColor: progressPercent === 100 ? 'var(--status-success-bg)' : 'var(--accent-primary)'
+                              background: progressPercent === 100 ? 'var(--semantic-success)' : 'var(--gradient-gold-main)'
                             }}
                           ></div>
                         </div>
@@ -3514,14 +3517,17 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div className="flex items-center space-x-2">
                   <div 
                     className="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center"
-                    style={{ borderColor: 'var(--accent-secondary)' }}
+                    style={{ 
+                      borderColor: 'var(--color-gray-dark-1)',
+                      backgroundColor: 'var(--color-gray-pastel-1)'
+                    }}
                   >
                     <span className="text-lg">👥</span>
                   </div>
                   <div>
                     <h4 
                       className="text-sm font-bold"
-                      style={{ color: 'var(--accent-secondary)' }}
+                      style={{ color: 'var(--color-gray-dark-2)' }}
                     >
                       평가자 진행률
                     </h4>
@@ -3552,7 +3558,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                           </span>
                           <span 
                             className="text-xs font-medium"
-                            style={{ color: 'var(--accent-secondary)' }}
+                            style={{ color: 'var(--color-gray-dark-1)' }}
                           >
                             {completedEvaluators}/{totalEvaluators}명
                           </span>
@@ -3565,7 +3571,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             className="h-2 rounded-full transition-all duration-500"
                             style={{ 
                               width: `${progressPercent}%`,
-                              backgroundColor: progressPercent >= 100 ? 'var(--status-success-bg)' : 'var(--accent-secondary)'
+                              background: progressPercent >= 100 ? 'var(--semantic-success)' : 'var(--gradient-gray-main)'
                             }}
                           ></div>
                         </div>
@@ -3583,7 +3589,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       </span>
                       <span 
                         className="text-xs font-medium"
-                        style={{ color: 'var(--accent-secondary)' }}
+                        style={{ color: 'var(--color-gray-dark-1)' }}
                       >
                         {projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0)}명
                       </span>
@@ -3680,8 +3686,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       <div 
         className="card-enhanced p-6"
         style={{
-          background: 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))',
-          boxShadow: 'var(--shadow-sm)'
+          background: 'var(--gradient-mixed)',
+          boxShadow: 'var(--shadow-md)',
+          border: '1px solid var(--color-gold-pastel-2)'
         }}
       >
         <div className="mb-4">
@@ -3716,23 +3723,23 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   aria-label={item.label}
                   className="w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform"
                   style={{
-                    backgroundColor: activeMenu === item.id ? 'var(--accent-light)' : 'var(--bg-secondary)',
-                    borderColor: activeMenu === item.id ? 'var(--accent-primary)' : 'var(--border-light)',
-                    color: activeMenu === item.id ? 'var(--accent-secondary)' : 'var(--text-primary)',
+                    backgroundColor: activeMenu === item.id ? 'var(--color-gold-pastel-2)' : 'var(--neutral-50)',
+                    borderColor: activeMenu === item.id ? 'var(--color-gold-dark-1)' : 'var(--color-gold-pastel-3)',
+                    color: activeMenu === item.id ? 'var(--color-gold-dark-2)' : 'var(--text-primary)',
                     transform: activeMenu === item.id ? 'scale(1.02)' : 'scale(1)',
                     boxShadow: activeMenu === item.id ? 'var(--shadow-xl)' : 'var(--shadow-sm)'
                   }}
                   onMouseEnter={(e) => {
                     if (activeMenu !== item.id) {
-                      e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
-                      e.currentTarget.style.borderColor = 'var(--border-medium)';
+                      e.currentTarget.style.backgroundColor = 'var(--color-gold-pastel-1)';
+                      e.currentTarget.style.borderColor = 'var(--color-gold-pastel-3)';
                       e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (activeMenu !== item.id) {
-                      e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
-                      e.currentTarget.style.borderColor = 'var(--border-light)';
+                      e.currentTarget.style.backgroundColor = 'var(--neutral-50)';
+                      e.currentTarget.style.borderColor = 'var(--color-gold-pastel-3)';
                       e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                     }
                   }}
@@ -3779,23 +3786,23 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   aria-label={item.label}
                   className="w-full p-4 lg:p-5 rounded-xl border-2 transition-all duration-300 text-center hover:scale-[1.02] hover:shadow-xl transform"
                   style={{
-                    backgroundColor: activeMenu === item.id ? 'var(--accent-light)' : 'var(--bg-secondary)',
-                    borderColor: activeMenu === item.id ? 'var(--accent-primary)' : 'var(--border-light)',
-                    color: activeMenu === item.id ? 'var(--accent-secondary)' : 'var(--text-primary)',
+                    backgroundColor: activeMenu === item.id ? 'var(--color-gold-pastel-2)' : 'var(--neutral-50)',
+                    borderColor: activeMenu === item.id ? 'var(--color-gold-dark-1)' : 'var(--color-gold-pastel-3)',
+                    color: activeMenu === item.id ? 'var(--color-gold-dark-2)' : 'var(--text-primary)',
                     transform: activeMenu === item.id ? 'scale(1.02)' : 'scale(1)',
                     boxShadow: activeMenu === item.id ? 'var(--shadow-xl)' : 'var(--shadow-sm)'
                   }}
                   onMouseEnter={(e) => {
                     if (activeMenu !== item.id) {
-                      e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
-                      e.currentTarget.style.borderColor = 'var(--border-medium)';
+                      e.currentTarget.style.backgroundColor = 'var(--color-gold-pastel-1)';
+                      e.currentTarget.style.borderColor = 'var(--color-gold-pastel-3)';
                       e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (activeMenu !== item.id) {
-                      e.currentTarget.style.backgroundColor = 'var(--bg-secondary)';
-                      e.currentTarget.style.borderColor = 'var(--border-light)';
+                      e.currentTarget.style.backgroundColor = 'var(--neutral-50)';
+                      e.currentTarget.style.borderColor = 'var(--color-gold-pastel-3)';
                       e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                     }
                   }}
