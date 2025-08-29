@@ -1262,7 +1262,6 @@ function App() {
       case 'project-creation':
       case 'model-builder':
       case 'evaluation-test':
-        console.log('🧪 App.tsx - evaluation-test 케이스 진입');
       case 'evaluator-management':
       case 'progress-monitoring':
       case 'results-analysis':
