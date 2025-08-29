@@ -37,10 +37,10 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      case 'draft': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return { backgroundColor: 'var(--accent-secondary-pastel)', color: 'var(--accent-secondary-dark)' };
+      case 'completed': return { backgroundColor: 'var(--accent-primary-pastel)', color: 'var(--accent-primary-dark)' };
+      case 'draft': return { backgroundColor: 'var(--bg-subtle)', color: 'var(--text-secondary)' };
+      default: return { backgroundColor: 'var(--bg-subtle)', color: 'var(--text-secondary)' };
     }
   };
 
@@ -57,8 +57,8 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="text-4xl mb-4">⏳</div>
-          <p>프로젝트 로딩 중...</p>
+          <div className="text-4xl mb-4" style={{ color: 'var(--text-muted)' }}>•••</div>
+          <p style={{ color: 'var(--text-secondary)' }}>프로젝트 로딩 중...</p>
         </div>
       </div>
     );
@@ -70,7 +70,7 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-            📂 내 프로젝트
+            내 프로젝트
           </h2>
           <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
             총 {projects.length}개의 프로젝트
@@ -78,9 +78,15 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
         </div>
         <button
           onClick={onCreateNew}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center space-x-2"
+          className="px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          style={{ 
+            backgroundColor: 'var(--accent-primary)', 
+            color: 'white' 
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-hover)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
         >
-          <span>➕</span>
+          <span>+</span>
           <span>새 프로젝트</span>
         </button>
       </div>
@@ -90,10 +96,17 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
         <div className="flex-1">
           <input
             type="text"
-            placeholder="🔍 프로젝트 검색..."
+            placeholder="프로젝트 검색..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full p-3 border rounded-lg focus:border-blue-500 focus:outline-none"
+            className="w-full p-3 border rounded-lg focus:outline-none"
+            style={{
+              borderColor: 'var(--border-light)',
+              backgroundColor: 'var(--bg-primary)',
+              color: 'var(--text-primary)'
+            }}
+            onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent-primary)'}
+            onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border-light)'}
           />
         </div>
         <div className="flex space-x-2">
@@ -101,11 +114,21 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
             <button
               key={status}
               onClick={() => setFilter(status)}
-              className={`px-4 py-2 rounded-lg transition-colors ${
-                filter === status 
-                  ? 'bg-blue-600 text-white' 
-                  : 'bg-gray-100 hover:bg-gray-200'
-              }`}
+              className="px-4 py-2 rounded-lg transition-colors"
+              style={filter === status 
+                ? { backgroundColor: 'var(--accent-primary)', color: 'white' }
+                : { backgroundColor: 'var(--bg-subtle)', color: 'var(--text-secondary)' }
+              }
+              onMouseEnter={(e) => {
+                if (filter !== status) {
+                  e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (filter !== status) {
+                  e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+                }
+              }}
             >
               {status === 'all' ? '전체' : getStatusText(status)}
             </button>
@@ -115,16 +138,19 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
 
       {/* 프로젝트 목록 */}
       {filteredProjects.length === 0 ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg">
-          <div className="text-6xl mb-4">📋</div>
+        <div className="text-center py-12 rounded-lg" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+          <div className="text-6xl mb-4" style={{ color: 'var(--text-muted)' }}>□</div>
           <p className="text-xl font-medium mb-2">프로젝트가 없습니다</p>
-          <p className="text-gray-500 mb-6">
+          <p className="mb-6" style={{ color: 'var(--text-muted)' }}>
             {searchTerm ? '검색 결과가 없습니다' : '첫 번째 프로젝트를 생성해보세요'}
           </p>
           {!searchTerm && (
             <button
               onClick={onCreateNew}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-3 rounded-lg transition-colors"
+              style={{ backgroundColor: 'var(--accent-primary)', color: 'white' }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'var(--accent-primary)'}
             >
               새 프로젝트 만들기
             </button>
@@ -136,14 +162,27 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
             <div
               key={project.id}
               onClick={() => onProjectSelect?.(project)}
-              className="p-6 bg-white rounded-xl border-2 border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all cursor-pointer"
+              className="p-6 rounded-xl border-2 transition-all cursor-pointer"
+              style={{
+                backgroundColor: 'var(--bg-primary)',
+                borderColor: 'var(--border-light)',
+                boxShadow: 'var(--shadow-sm)'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--border-light)';
+                e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
+              }}
             >
               {/* 프로젝트 헤더 */}
               <div className="flex items-start justify-between mb-4">
                 <h3 className="font-bold text-lg flex-1 mr-2" style={{ color: 'var(--text-primary)' }}>
                   {project.title}
                 </h3>
-                <span className={`px-2 py-1 text-xs rounded-full ${getStatusColor(project.status || 'draft')}`}>
+                <span className="px-2 py-1 text-xs rounded-full" style={getStatusColor(project.status || 'draft')}>
                   {getStatusText(project.status || 'draft')}
                 </span>
               </div>
@@ -157,14 +196,14 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
 
               {/* 프로젝트 통계 */}
               <div className="grid grid-cols-2 gap-3 mb-4">
-                <div className="text-center p-2 bg-gray-50 rounded">
-                  <div className="text-xl font-bold" style={{ color: 'var(--accent-primary)' }}>
+                <div className="text-center p-2 rounded" style={{ backgroundColor: 'var(--bg-subtle)' }}>
+                  <div className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     {project.criteria_count || 0}
                   </div>
                   <div className="text-xs" style={{ color: 'var(--text-muted)' }}>기준</div>
                 </div>
-                <div className="text-center p-2 bg-gray-50 rounded">
-                  <div className="text-xl font-bold" style={{ color: 'var(--accent-secondary)' }}>
+                <div className="text-center p-2 rounded" style={{ backgroundColor: 'var(--bg-subtle)' }}>
+                  <div className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     {project.alternatives_count || 0}
                   </div>
                   <div className="text-xs" style={{ color: 'var(--text-muted)' }}>대안</div>
@@ -179,16 +218,19 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
                     {(project as any).completion_rate || 0}%
                   </span>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--border-light)' }}>
                   <div 
-                    className="bg-blue-600 h-2 rounded-full transition-all"
-                    style={{ width: `${(project as any).completion_rate || 0}%` }}
+                    className="h-2 rounded-full transition-all"
+                    style={{ 
+                      width: `${(project as any).completion_rate || 0}%`,
+                      backgroundColor: 'var(--accent-primary)'
+                    }}
                   />
                 </div>
               </div>
 
               {/* 날짜 정보 */}
-              <div className="mt-4 pt-4 border-t flex justify-between text-xs" style={{ color: 'var(--text-muted)' }}>
+              <div className="mt-4 pt-4 flex justify-between text-xs" style={{ borderTop: '1px solid var(--border-light)', color: 'var(--text-muted)' }}>
                 <span>생성: {new Date(project.created_at || Date.now()).toLocaleDateString('ko-KR')}</span>
                 <span>수정: {new Date(project.updated_at || Date.now()).toLocaleDateString('ko-KR')}</span>
               </div>
