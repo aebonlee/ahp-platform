@@ -1332,7 +1332,16 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             setSelectedProjectId(project.id || '');
                             handleTabChange('analysis');
                           }}
-                          className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                          className="p-2 rounded-lg transition-colors"
+                          style={{ color: 'var(--text-muted)' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = 'var(--accent-primary)';
+                            e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = 'var(--text-muted)';
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
                           title="결과 분석"
                         >
                           📊
@@ -1455,7 +1464,16 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                               setSelectedProjectId(project.id || '');
                               handleTabChange('analysis');
                             }}
-                            className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                            className="p-2 rounded-lg transition-colors"
+                          style={{ color: 'var(--text-muted)' }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = 'var(--accent-primary)';
+                            e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = 'var(--text-muted)';
+                            e.currentTarget.style.backgroundColor = 'transparent';
+                          }}
                             title="결과 분석"
                           >
                             📊
@@ -3087,30 +3105,50 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         {/* 요금제 할당량 정보 - 각 섹션을 개별 박스로 구분 */}
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* 프로젝트 개수 박스 */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-blue-200 dark:border-blue-700 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div 
+            className="rounded-xl p-6 border-2 transition-all duration-300"
+            style={{
+              backgroundColor: 'var(--bg-secondary)',
+              borderColor: 'var(--accent-primary-pastel)',
+              boxShadow: 'var(--shadow-md)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}
+          >
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center space-x-2">
-                <span className="text-3xl">📋</span>
-                <h3 className="text-lg font-bold text-blue-700 dark:text-blue-300">
+                <div 
+                  className="text-2xl font-bold rounded-full w-8 h-8 flex items-center justify-center"
+                  style={{ 
+                    backgroundColor: 'var(--accent-primary)', 
+                    color: 'white' 
+                  }}
+                >
+                  P
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                   프로젝트 개수
                 </h3>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl font-bold text-blue-800 dark:text-blue-200">
+                <div className="text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {usedProjects}/{planLimits.projects}
                 </div>
-                <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                   사용 중인 프로젝트
                 </div>
                 <div className="w-full max-w-40 mx-auto">
-                  <div className="w-full bg-blue-100 dark:bg-blue-800 rounded-full h-3">
+                  <div className="w-full rounded-full h-3" style={{ backgroundColor: 'var(--bg-subtle)' }}>
                     <div 
-                      className="bg-blue-600 dark:bg-blue-400 h-3 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min((usedProjects / planLimits.projects) * 100, 100)}%` }}
+                      className="h-3 rounded-full transition-all duration-500"
+                      style={{ 
+                        width: `${Math.min((usedProjects / planLimits.projects) * 100, 100)}%`,
+                        backgroundColor: 'var(--accent-primary)'
+                      }}
                     ></div>
                   </div>
                 </div>
-                <div className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                <div className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
                   {planLimits.projects - usedProjects}개 남음
                 </div>
               </div>
@@ -3118,32 +3156,50 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           </div>
 
           {/* 평가자 인원수 박스 */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-green-200 dark:border-green-700 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div 
+            className="rounded-xl p-6 border-2 transition-all duration-300"
+            style={{
+              backgroundColor: 'var(--bg-secondary)',
+              borderColor: 'var(--accent-secondary-pastel)',
+              boxShadow: 'var(--shadow-md)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}
+          >
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center space-x-2">
-                <span className="text-3xl">👥</span>
-                <h3 className="text-lg font-bold text-green-700 dark:text-green-300">
+                <div 
+                  className="text-2xl font-bold rounded-full w-8 h-8 flex items-center justify-center"
+                  style={{ 
+                    backgroundColor: 'var(--accent-secondary)', 
+                    color: 'white' 
+                  }}
+                >
+                  E
+                </div>
+                <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                   평가자 인원수
                 </h3>
               </div>
               <div className="space-y-2">
-                <div className="text-4xl font-bold text-green-800 dark:text-green-200">
+                <div className="text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {usedEvaluators}/{planLimits.evaluators}명
                 </div>
-                <div className="text-sm text-green-600 dark:text-green-400 font-medium">
+                <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
                   사용 중인 평가자
                 </div>
                 <div className="w-full max-w-40 mx-auto">
-                  <div className="w-full bg-green-100 dark:bg-green-800 rounded-full h-3">
+                  <div className="w-full rounded-full h-3" style={{ backgroundColor: 'var(--bg-subtle)' }}>
                     <div 
-                      className="bg-green-600 dark:bg-green-400 h-3 rounded-full transition-all duration-500"
+                      className="h-3 rounded-full transition-all duration-500"
                       style={{ 
-                        width: `${Math.min((usedEvaluators / planLimits.evaluators) * 100, 100)}%` 
+                        width: `${Math.min((usedEvaluators / planLimits.evaluators) * 100, 100)}%`,
+                        backgroundColor: 'var(--accent-secondary)'
                       }}
                     ></div>
                   </div>
                 </div>
-                <div className="text-sm text-green-600 dark:text-green-400 font-medium">
+                <div className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
                   {planLimits.evaluators - usedEvaluators}명 남음
                 </div>
               </div>
@@ -3151,19 +3207,43 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           </div>
 
           {/* 사용 가능 옵션 박스 */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 border-2 border-purple-200 dark:border-purple-700 shadow-lg hover:shadow-xl transition-all duration-300">
+          <div 
+            className="rounded-xl p-6 border-2 transition-all duration-300"
+            style={{
+              backgroundColor: 'var(--bg-secondary)',
+              borderColor: 'var(--accent-tertiary-pastel)',
+              boxShadow: 'var(--shadow-md)'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}
+          >
             <div className="space-y-4">
               <div className="text-center">
                 <div className="flex items-center justify-center space-x-2 mb-3">
-                  <span className="text-3xl">⚙️</span>
-                  <h3 className="text-lg font-bold text-purple-700 dark:text-purple-300">
+                  <div 
+                    className="text-2xl font-bold rounded-full w-8 h-8 flex items-center justify-center"
+                    style={{ 
+                      backgroundColor: 'var(--accent-tertiary)', 
+                      color: 'white' 
+                    }}
+                  >
+                    O
+                  </div>
+                  <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                     사용 가능 옵션
                   </h3>
                 </div>
               </div>
               {/* 체크박스 목록 - 왼쪽 정렬 및 가독성 개선 */}
               <div className="space-y-3">
-                <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                <div 
+                  className="flex items-center space-x-3 p-2 rounded-lg transition-colors"
+                  style={{ 
+                    '&:hover': { backgroundColor: 'var(--bg-subtle)' } 
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
                   <input 
                     type="checkbox" 
                     id="advanced-analysis" 
@@ -3183,7 +3263,14 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     고급 분석 도구
                   </label>
                 </div>
-                <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                <div 
+                  className="flex items-center space-x-3 p-2 rounded-lg transition-colors"
+                  style={{ 
+                    '&:hover': { backgroundColor: 'var(--bg-subtle)' } 
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
                   <input 
                     type="checkbox" 
                     id="group-ahp" 
@@ -3203,7 +3290,14 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     그룹 AHP 분석
                   </label>
                 </div>
-                <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                <div 
+                  className="flex items-center space-x-3 p-2 rounded-lg transition-colors"
+                  style={{ 
+                    '&:hover': { backgroundColor: 'var(--bg-subtle)' } 
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
                   <input 
                     type="checkbox" 
                     id="realtime-collab" 
@@ -3223,7 +3317,14 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     실시간 협업
                   </label>
                 </div>
-                <div className="flex items-center space-x-3 p-2 rounded-lg hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors">
+                <div 
+                  className="flex items-center space-x-3 p-2 rounded-lg transition-colors"
+                  style={{ 
+                    '&:hover': { backgroundColor: 'var(--bg-subtle)' } 
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
+                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                >
                   <input 
                     type="checkbox" 
                     id="premium-support" 
