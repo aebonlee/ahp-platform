@@ -3,6 +3,7 @@ import React from 'react';
 interface CardProps {
   children: React.ReactNode;
   title?: string;
+  icon?: string;
   className?: string;
   padding?: boolean;
   variant?: 'default' | 'gradient' | 'glass' | 'bordered' | 'elevated' | 'outlined' | 'flat' | 'filled';
@@ -10,18 +11,21 @@ interface CardProps {
   onClick?: () => void;
   rounded?: 'none' | 'sm' | 'md' | 'lg' | 'xl' | 'full';
   shadow?: 'none' | 'sm' | 'md' | 'lg' | 'xl';
+  style?: React.CSSProperties;
 }
 
 const Card: React.FC<CardProps> = ({ 
   children, 
   title, 
+  icon,
   className = '', 
   padding = true,
   variant = 'default',
   hoverable = false,
   onClick,
   rounded = 'md',
-  shadow = 'md'
+  shadow = 'md',
+  style
 }) => {
   // CSS 변수 기반 variant 스타일
   const getVariantStyle = (variant: string) => {
@@ -129,7 +133,8 @@ const Card: React.FC<CardProps> = ({
     ...getVariantStyle(variant),
     ...getRoundedStyle(rounded),
     ...getShadowStyle(shadow),
-    cursor: (hoverable || onClick) ? 'pointer' : 'default'
+    cursor: (hoverable || onClick) ? 'pointer' : 'default',
+    ...style
   };
 
   return (
@@ -152,6 +157,7 @@ const Card: React.FC<CardProps> = ({
       {title && (
         <div className="px-6 py-4" style={{ borderBottom: '1px solid var(--card-border)' }}>
           <h3 className="text-lg font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+            {icon && <span className="mr-2">{icon}</span>}
             {title}
           </h3>
         </div>

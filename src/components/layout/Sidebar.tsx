@@ -81,19 +81,27 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
   const menuItems = getMenuItems();
 
   return (
-    <aside className={`fixed left-0 h-full transition-luxury z-40 scrollbar-luxury overflow-y-auto ${
+    <aside className={`fixed left-0 transition-luxury z-40 flex flex-col ${
       isCollapsed ? 'w-16' : ''
     }`}
          style={{
            top: 'var(--header-height)',
+           bottom: 0,
            width: isCollapsed ? '4rem' : 'var(--sidebar-width)',
            backgroundColor: 'var(--bg-secondary)',
            borderRight: '1px solid var(--border-light)',
            boxShadow: 'var(--shadow-md)',
            fontFamily: 'Inter, Pretendard, system-ui, sans-serif',
-           minHeight: 'calc(100vh - var(--header-height))'
+           height: 'calc(100vh - var(--header-height))'
          }}>
-      <div style={{ padding: 'var(--space-6)' }}>
+      {/* 메뉴 영역 - 스크롤 가능 */}
+      <div 
+        className="flex-1 scrollbar-luxury overflow-y-auto"
+        style={{ 
+          padding: 'var(--space-6)',
+          paddingBottom: 0
+        }}
+      >
         {!isCollapsed && (
           <h2 className="font-bold mb-6"
               style={{
@@ -202,6 +210,46 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
           })}
         </nav>
       </div>
+      
+      {/* 하단 푸터 영역 */}
+      {!isCollapsed && (
+        <div 
+          className="border-t p-4"
+          style={{
+            borderColor: 'var(--border-light)',
+            backgroundColor: 'var(--bg-elevated)'
+          }}
+        >
+          <div className="text-center space-y-2">
+            <div 
+              className="text-xs font-semibold"
+              style={{ color: 'var(--text-primary)' }}
+            >
+              AHP Research Platform
+            </div>
+            <div 
+              className="text-xs"
+              style={{ color: 'var(--text-muted)' }}
+            >
+              © 2025 All rights reserved
+            </div>
+            <div className="flex justify-center space-x-3 text-xs">
+              <button 
+                className="hover:underline"
+                style={{ color: 'var(--accent-primary)' }}
+              >
+                📧 문의하기
+              </button>
+              <button 
+                className="hover:underline"
+                style={{ color: 'var(--accent-primary)' }}
+              >
+                📖 도움말
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </aside>
   );
 };

@@ -78,7 +78,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     description: string;
     nextAction: string;
   } | null>(null);
-  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'settings' | 'payment' | 'demographic-survey'>(() => {
+  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'evaluation-test' | 'settings' | 'payment' | 'demographic-survey'>(() => {
     // URL 파라미터에서 직접 demographic-survey 확인
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
@@ -855,6 +855,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         'export': 'export-reports',
         'workshop': 'workshop-management',
         'decision-support': 'decision-support-system',
+        'evaluation-test': 'evaluation-test',
         'settings': 'personal-settings',
         'demographic-survey': 'demographic-survey'
       };
@@ -2625,7 +2626,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="space-y-4">
             <Button 
               variant="primary" 
-              size="large"
+              size="lg"
               className="px-12 py-4 text-lg font-bold"
               style={{
                 backgroundColor: 'var(--accent-primary)',
