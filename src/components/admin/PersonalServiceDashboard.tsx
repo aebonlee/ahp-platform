@@ -79,7 +79,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     description: string;
     nextAction: string;
   } | null>(null);
-  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'settings' | 'payment' | 'demographic-survey'>(() => {
+  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'evaluation-test' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'settings' | 'payment' | 'demographic-survey'>(() => {
     // URL 파라미터에서 직접 demographic-survey 확인
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
@@ -100,6 +100,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     externalActiveTab === 'my-projects' ? 'projects' :
     externalActiveTab === 'project-creation' ? 'creation' :
     externalActiveTab === 'model-builder' ? 'model-builder' :
+    externalActiveTab === 'evaluation-test' ? 'evaluation-test' :
     externalActiveTab === 'evaluator-management' ? 'evaluators' :
     externalActiveTab === 'progress-monitoring' ? 'monitoring' :
     externalActiveTab === 'results-analysis' ? 'analysis' :
@@ -169,6 +170,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         'my-projects': 'projects',
         'project-creation': 'creation',
         'model-builder': 'model-builder',
+        'evaluation-test': 'evaluation-test',
         'validity-check': 'validity-check',
         'evaluator-management': 'evaluators',
         'progress-monitoring': 'monitoring',
@@ -1158,6 +1160,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         'projects': 'my-projects',
         'creation': 'project-creation',
         'model-builder': 'model-builder',
+        'evaluation-test': 'evaluation-test',
         'validity-check': 'validity-check',
         'evaluators': 'evaluator-management',
         'monitoring': 'progress-monitoring',
