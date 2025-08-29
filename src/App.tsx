@@ -1198,6 +1198,9 @@ function App() {
           />
         );
 
+      case 'evaluation-test':
+        return <EvaluationTest />;
+
       case 'evaluator-mode':
         // 평가자 모드 - 로그인 상태에 따라 다르게 처리
         if (!user) {
@@ -1261,7 +1264,6 @@ function App() {
       case 'my-projects':
       case 'project-creation':
       case 'model-builder':
-      case 'evaluation-test':
       case 'evaluator-management':
       case 'progress-monitoring':
       case 'results-analysis':
