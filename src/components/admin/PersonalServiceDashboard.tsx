@@ -3238,9 +3238,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               <div className="space-y-3">
                 <div 
                   className="flex items-center space-x-3 p-2 rounded-lg transition-colors"
-                  style={{ 
-                    '&:hover': { backgroundColor: 'var(--bg-subtle)' } 
-                  }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -3265,9 +3262,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
                 <div 
                   className="flex items-center space-x-3 p-2 rounded-lg transition-colors"
-                  style={{ 
-                    '&:hover': { backgroundColor: 'var(--bg-subtle)' } 
-                  }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -3292,9 +3286,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
                 <div 
                   className="flex items-center space-x-3 p-2 rounded-lg transition-colors"
-                  style={{ 
-                    '&:hover': { backgroundColor: 'var(--bg-subtle)' } 
-                  }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
@@ -3319,9 +3310,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
                 <div 
                   className="flex items-center space-x-3 p-2 rounded-lg transition-colors"
-                  style={{ 
-                    '&:hover': { backgroundColor: 'var(--bg-subtle)' } 
-                  }}
                   onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--bg-subtle)'}
                   onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                 >
