@@ -6,7 +6,7 @@
 ## 📁 디렉토리 구조
 
 ```
-C:\Users\ASUS\backup\
+C:\Users\ASUS\ahp-research-platform\backup\
 ├── 📂 ahp-project/              # 완전한 프로젝트 백업
 │   └── ahp-research-platform-complete-YYYYMMDD-HHMM.tar.gz
 ├── 📂 stable-versions/          # 안정 버전 릴리스
@@ -20,7 +20,7 @@ C:\Users\ASUS\backup\
 │   ├── git-status.txt
 │   └── 다양한 git 정보 파일들
 ├── 📂 scripts/                  # 백업 및 복구 스크립트
-│   └── restore-stable.bat
+│   └── restore-project.bat
 └── 📄 README.md                 # 이 파일
 ```
 
@@ -52,17 +52,17 @@ npm run build
 ### 방법 2: 원클릭 복구
 ```batch
 # Windows 배치 스크립트
-C:\Users\ASUS\backup\scripts\restore-stable.bat
+C:\Users\ASUS\ahp-research-platform\backup\scripts\restore-project.bat
 ```
 
 ### 방법 3: 아카이브 복구
 ```bash
 cd C:\Users\ASUS
 # 안정 버전 추출
-tar -xzf backup/stable-versions/v1.0-evaluation-test-complete-20250829/v1.0-evaluation-test-complete-20250829-source.tar.gz
+tar -xzf ahp-research-platform/backup/stable-versions/v1.0-evaluation-test-complete-20250829/v1.0-evaluation-test-complete-20250829-source.tar.gz
 
 # 또는 최신 완전 백업 추출
-tar -xzf backup/ahp-project/ahp-research-platform-complete-YYYYMMDD-HHMM.tar.gz
+tar -xzf ahp-research-platform/backup/ahp-project/ahp-research-platform-complete-YYYYMMDD-HHMM.tar.gz
 ```
 
 ## 📊 백업 유형
@@ -95,13 +95,13 @@ tar -xzf backup/ahp-project/ahp-research-platform-complete-YYYYMMDD-HHMM.tar.gz
 ### 정기 작업
 ```bash
 # 백업 무결성 검증
-tar -tzf backup/ahp-project/[backup-file].tar.gz > /dev/null && echo "OK"
+tar -tzf ahp-research-platform/backup/ahp-project/[backup-file].tar.gz > /dev/null && echo "OK"
 
 # 백업 크기 확인
-du -sh backup/*/
+du -sh ahp-research-platform/backup/*/
 
 # 오래된 백업 정리 (최신 5개 유지)
-cd backup/ahp-project && ls -t *.tar.gz | tail -n +6 | xargs rm -f
+cd ahp-research-platform/backup/ahp-project && ls -t *.tar.gz | tail -n +6 | xargs rm -f
 ```
 
 ### 백업 검증 체크리스트
@@ -122,9 +122,9 @@ cd backup/ahp-project && ls -t *.tar.gz | tail -n +6 | xargs rm -f
 ## 📞 빠른 참조
 
 - **프로젝트 GitHub**: https://github.com/aebonlee/ahp-research-platform
-- **백업 위치**: `C:\Users\ASUS\backup\`
+- **백업 위치**: `C:\Users\ASUS\ahp-research-platform\backup\`
 - **안정 태그**: `v1.0-evaluation-test-complete`
-- **복구 스크립트**: `backup\scripts\restore-stable.bat`
+- **복구 스크립트**: `backup\scripts\restore-project.bat`
 
 ## 🎯 시스템 상태 요약
 
