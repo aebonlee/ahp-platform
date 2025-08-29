@@ -31,6 +31,7 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
     { id: 'my-projects', label: '내 프로젝트', icon: '📂' },
     { id: 'project-creation', label: '새 프로젝트', icon: '➕' },
     { id: 'model-builder', label: '모델 구축', icon: '🏗️' },
+    { id: 'evaluation-test', label: '평가 테스트', icon: '🧪' },
     { id: 'evaluator-management', label: '평가자 관리', icon: '👥' },
     { id: 'progress-monitoring', label: '진행률 모니터링', icon: '📈' },
     { id: 'results-analysis', label: '결과 분석', icon: '📊' },

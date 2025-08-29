@@ -23,6 +23,7 @@ import UserGuideOverview from './components/guide/UserGuideOverview';
 import ComprehensiveUserGuide from './components/guide/ComprehensiveUserGuide';
 import EvaluatorDashboard from './components/evaluator/EvaluatorDashboard';
 import EvaluatorSurveyPage from './components/survey/EvaluatorSurveyPage';
+import EvaluationTest from './components/evaluation/EvaluationTest';
 import { API_BASE_URL } from './config/api';
 import { useColorTheme } from './hooks/useColorTheme';
 import { useTheme } from './hooks/useTheme';
@@ -1260,6 +1261,7 @@ function App() {
       case 'my-projects':
       case 'project-creation':
       case 'model-builder':
+      case 'evaluation-test':
       case 'evaluator-management':
       case 'progress-monitoring':
       case 'results-analysis':

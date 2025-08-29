@@ -16,6 +16,7 @@ import PaperManagement from '../paper/PaperManagement';
 import ProjectSelector from '../project/ProjectSelector';
 import SurveyManagementSystem from '../survey/SurveyManagementSystem';
 import ValidityCheck from '../validity/ValidityCheck';
+import EvaluationTest from '../evaluation/EvaluationTest';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
 
@@ -3032,6 +3033,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             </Button>
           </Card>
         );
+      case 'evaluation-test':
+        return <EvaluationTest />;
       case 'validity-check':
         return (
           <div className="space-y-6">
