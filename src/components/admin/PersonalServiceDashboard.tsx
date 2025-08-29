@@ -3232,72 +3232,84 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               className="text-xl font-bold mb-6"
               style={{ color: 'var(--text-primary)' }}
             >
-              📊 사용량 현황
+              📊 진행률 현황
             </h3>
             
             <div className="space-y-6">
-              {/* 1. 프로젝트 관리 계열 */}
+              {/* 1. 프로젝트별 설정 진행률 */}
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
                   <div 
                     className="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center"
                     style={{ borderColor: 'var(--accent-primary)' }}
                   >
-                    <span className="text-lg">📋</span>
+                    <span className="text-lg">⚙️</span>
                   </div>
                   <div>
                     <h4 
                       className="text-sm font-bold"
                       style={{ color: 'var(--accent-primary)' }}
                     >
-                      프로젝트 관리
+                      프로젝트 설정
                     </h4>
                     <p 
                       className="text-xs"
                       style={{ color: 'var(--text-muted)' }}
                     >
-                      Projects & Elements
+                      Configuration Progress
                     </p>
                   </div>
                 </div>
                 
-                <div className="pl-12 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span 
-                      className="text-sm"
-                      style={{ color: 'var(--text-secondary)' }}
-                    >
-                      프로젝트 수
-                    </span>
-                    <span 
-                      className="text-sm font-medium"
-                      style={{ color: 'var(--accent-primary)' }}
-                    >
-                      {projects.length}/20
-                    </span>
-                  </div>
-                  <div 
-                    className="w-full rounded-full h-2 overflow-hidden"
-                    style={{ backgroundColor: 'var(--bg-elevated)' }}
-                  >
+                <div className="pl-12 space-y-3">
+                  {projects.slice(0, 3).map((project, index) => {
+                    const progressPercent = ((project.criteria_count || 0) >= 3 && (project.alternatives_count || 0) >= 2 && (project.evaluator_count || 0) >= 1) ? 100 : 
+                      (((project.criteria_count || 0) >= 3 ? 40 : 0) + ((project.alternatives_count || 0) >= 2 ? 40 : 0) + ((project.evaluator_count || 0) >= 1 ? 20 : 0));
+                    
+                    return (
+                      <div key={index} className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span 
+                            className="text-sm truncate"
+                            style={{ color: 'var(--text-secondary)' }}
+                            title={project.title}
+                          >
+                            {project.title.length > 20 ? `${project.title.slice(0, 20)}...` : project.title}
+                          </span>
+                          <span 
+                            className="text-sm font-medium"
+                            style={{ color: progressPercent === 100 ? 'var(--status-success-text)' : 'var(--accent-primary)' }}
+                          >
+                            {progressPercent}%
+                          </span>
+                        </div>
+                        <div 
+                          className="w-full rounded-full h-2 overflow-hidden"
+                          style={{ backgroundColor: 'var(--bg-elevated)' }}
+                        >
+                          <div 
+                            className="h-2 rounded-full transition-all duration-500"
+                            style={{ 
+                              width: `${progressPercent}%`,
+                              backgroundColor: progressPercent === 100 ? 'var(--status-success-bg)' : 'var(--accent-primary)'
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {projects.length > 3 && (
                     <div 
-                      className="h-2 rounded-full transition-all duration-500"
-                      style={{ 
-                        width: `${Math.min((projects.length / 20) * 100, 100)}%`,
-                        backgroundColor: 'var(--accent-primary)'
-                      }}
-                    ></div>
-                  </div>
-                  <div 
-                    className="text-xs"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    모델 요소: {projects.reduce((sum, p) => sum + p.criteria_count + p.alternatives_count, 0)}개
-                  </div>
+                      className="text-xs text-center pt-2"
+                      style={{ color: 'var(--text-muted)' }}
+                    >
+                      +{projects.length - 3}개 프로젝트 더 있음
+                    </div>
+                  )}
                 </div>
               </div>
 
-              {/* 2. 협업 관리 계열 */}
+              {/* 2. 평가자 배정 및 진행률 */}
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
                   <div 
@@ -3311,49 +3323,85 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       className="text-sm font-bold"
                       style={{ color: 'var(--accent-secondary)' }}
                     >
-                      협업 관리
+                      평가자 진행률
                     </h4>
                     <p 
                       className="text-xs"
                       style={{ color: 'var(--text-muted)' }}
                     >
-                      Evaluators & Teams
+                      Evaluator Progress
                     </p>
                   </div>
                 </div>
                 
-                <div className="pl-12 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span 
-                      className="text-sm"
-                      style={{ color: 'var(--text-secondary)' }}
-                    >
-                      평가자 수
-                    </span>
-                    <span 
-                      className="text-sm font-medium"
-                      style={{ color: 'var(--accent-secondary)' }}
-                    >
-                      12/100
-                    </span>
-                  </div>
-                  <div 
-                    className="w-full rounded-full h-2 overflow-hidden"
-                    style={{ backgroundColor: 'var(--bg-elevated)' }}
-                  >
-                    <div 
-                      className="h-2 rounded-full transition-all duration-500"
-                      style={{ 
-                        width: '12%',
-                        backgroundColor: 'var(--accent-secondary)'
-                      }}
-                    ></div>
-                  </div>
-                  <div 
-                    className="text-xs"
-                    style={{ color: 'var(--text-muted)' }}
-                  >
-                    활성 평가자: 8명
+                <div className="pl-12 space-y-3">
+                  {projects.filter(p => (p.evaluator_count || 0) > 0).slice(0, 3).map((project, index) => {
+                    const totalEvaluators = project.evaluator_count || 0;
+                    const completedEvaluators = Math.floor(totalEvaluators * 0.6); // 60% 완료율 시뮤레이션
+                    const progressPercent = totalEvaluators > 0 ? Math.round((completedEvaluators / totalEvaluators) * 100) : 0;
+                    
+                    return (
+                      <div key={index} className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <span 
+                            className="text-sm truncate"
+                            style={{ color: 'var(--text-secondary)' }}
+                            title={project.title}
+                          >
+                            {project.title.length > 15 ? `${project.title.slice(0, 15)}...` : project.title}
+                          </span>
+                          <span 
+                            className="text-xs font-medium"
+                            style={{ color: 'var(--accent-secondary)' }}
+                          >
+                            {completedEvaluators}/{totalEvaluators}명
+                          </span>
+                        </div>
+                        <div 
+                          className="w-full rounded-full h-2 overflow-hidden"
+                          style={{ backgroundColor: 'var(--bg-elevated)' }}
+                        >
+                          <div 
+                            className="h-2 rounded-full transition-all duration-500"
+                            style={{ 
+                              width: `${progressPercent}%`,
+                              backgroundColor: progressPercent >= 100 ? 'var(--status-success-bg)' : 'var(--accent-secondary)'
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  
+                  <div className="pt-2 space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span 
+                        className="text-xs"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        전체 평가자
+                      </span>
+                      <span 
+                        className="text-xs font-medium"
+                        style={{ color: 'var(--accent-secondary)' }}
+                      >
+                        {projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0)}명
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span 
+                        className="text-xs"
+                        style={{ color: 'var(--text-muted)' }}
+                      >
+                        완료 평가자
+                      </span>
+                      <span 
+                        className="text-xs font-medium"
+                        style={{ color: 'var(--status-success-text)' }}
+                      >
+                        {Math.floor(projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0) * 0.6)}명
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -3363,22 +3411,22 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div className="flex items-center space-x-2">
                   <div 
                     className="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center"
-                    style={{ borderColor: 'var(--status-success-bg)' }}
+                    style={{ borderColor: 'var(--status-info-bg)' }}
                   >
-                    <span className="text-lg">💾</span>
+                    <span className="text-lg">📈</span>
                   </div>
                   <div>
                     <h4 
                       className="text-sm font-bold"
-                      style={{ color: 'var(--status-success-text)' }}
+                      style={{ color: 'var(--status-info-text)' }}
                     >
-                      리소스 사용
+                      종합 현황
                     </h4>
                     <p 
                       className="text-xs"
                       style={{ color: 'var(--text-muted)' }}
                     >
-                      Storage & API
+                      Overall Progress
                     </p>
                   </div>
                 </div>
@@ -3389,13 +3437,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       className="text-sm"
                       style={{ color: 'var(--text-secondary)' }}
                     >
-                      저장용량
+                      완료된 프로젝트
                     </span>
                     <span 
                       className="text-sm font-medium"
                       style={{ color: 'var(--status-success-text)' }}
                     >
-                      2.3GB/10GB
+                      {projects.filter(p => (p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2 && (p.evaluator_count || 0) >= 1).length}/{projects.length}
                     </span>
                   </div>
                   <div 
@@ -3405,7 +3453,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     <div 
                       className="h-2 rounded-full transition-all duration-500"
                       style={{ 
-                        width: '23%',
+                        width: `${projects.length > 0 ? Math.round((projects.filter(p => (p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2 && (p.evaluator_count || 0) >= 1).length / projects.length) * 100) : 0}%`,
                         backgroundColor: 'var(--status-success-bg)'
                       }}
                     ></div>
@@ -3414,7 +3462,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     className="text-xs"
                     style={{ color: 'var(--text-muted)' }}
                   >
-                    API 호출: 847/5000회
+                    평균 진행률: {projects.length > 0 ? Math.round(projects.reduce((sum, p) => {
+                      const progress = ((p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2 && (p.evaluator_count || 0) >= 1) ? 100 : 
+                        (((p.criteria_count || 0) >= 3 ? 40 : 0) + ((p.alternatives_count || 0) >= 2 ? 40 : 0) + ((p.evaluator_count || 0) >= 1 ? 20 : 0));
+                      return sum + progress;
+                    }, 0) / projects.length) : 0}%
                   </div>
               </div>
             </div>
