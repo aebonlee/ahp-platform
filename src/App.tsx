@@ -687,7 +687,7 @@ function App() {
   // 보호된 탭 목록을 useMemo로 메모이제이션
   const protectedTabs = useMemo(() => [
     'welcome', 'super-admin', 'personal-service', 'my-projects', 
-    'project-creation', 'model-builder', 'evaluator-management', 
+    'project-creation', 'model-builder', 'evaluation-test', 'evaluator-management', 
     'progress-monitoring', 'results-analysis', 'paper-management', 'export-reports', 
     'workshop-management', 'decision-support-system', 'personal-settings', 
     'user-guide', 'dashboard', 'users', 'projects', 'monitoring', 'database', 'audit', 
@@ -1653,7 +1653,7 @@ function App() {
   };
 
 
-  const needsLayout = user && protectedTabs.includes(activeTab);
+  const needsLayout = (user && protectedTabs.includes(activeTab)) || activeTab === 'evaluation-test';
 
   if (needsLayout) {
     return (
