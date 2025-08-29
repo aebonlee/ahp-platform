@@ -164,6 +164,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   // 외부에서 activeTab이 변경되면 내부 activeMenu도 업데이트
   useEffect(() => {
+    console.log('🔄 useEffect - externalActiveTab 변경됨:', externalActiveTab);
     if (externalActiveTab) {
       const menuMap: Record<string, string> = {
         'personal-service': 'dashboard',
@@ -182,6 +183,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         'demographic-survey': 'demographic-survey'
       };
       const mappedMenu = menuMap[externalActiveTab] || 'dashboard';
+      console.log('🗺️ 매핑된 메뉴:', externalActiveTab, '->', mappedMenu);
       setActiveMenu(mappedMenu as any);
     }
   }, [externalActiveTab]);
@@ -3020,6 +3022,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderMenuContent = () => {
+    console.log('🎯 renderMenuContent - activeMenu:', activeMenu);
     switch (activeMenu) {
       case 'dashboard':
         return renderOverview();
@@ -3037,6 +3040,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           </Card>
         );
       case 'evaluation-test':
+        console.log('🧪 evaluation-test 케이스 실행됨');
         return <EvaluationTest />;
       case 'validity-check':
         return (
