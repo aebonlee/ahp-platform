@@ -25,8 +25,6 @@ interface TestProject {
 }
 
 const EvaluationTest: React.FC = () => {
-  console.log('🎯 EvaluationTest 컴포넌트 렌더링');
-  
   const [selectedProject, setSelectedProject] = useState<TestProject | null>(null);
   const [currentStep, setCurrentStep] = useState<'select' | 'demographic' | 'evaluation' | 'result'>('select');
   const [evaluationProgress, setEvaluationProgress] = useState(0);
@@ -371,10 +369,7 @@ const EvaluationTest: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6" style={{ minHeight: '500px', backgroundColor: '#f9fafb', padding: '20px' }}>
-      <div style={{ backgroundColor: 'red', color: 'white', padding: '10px', marginBottom: '10px' }}>
-        🔴 EvaluationTest 컴포넌트가 렌더링되고 있습니다!
-      </div>
+    <div className="space-y-6">
       {/* 헤더 */}
       <div className="text-center">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">

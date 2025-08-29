@@ -164,7 +164,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   // 외부에서 activeTab이 변경되면 내부 activeMenu도 업데이트
   useEffect(() => {
-    console.log('🔄 useEffect - externalActiveTab 변경됨:', externalActiveTab);
     if (externalActiveTab) {
       const menuMap: Record<string, string> = {
         'personal-service': 'dashboard',
@@ -183,7 +182,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         'demographic-survey': 'demographic-survey'
       };
       const mappedMenu = menuMap[externalActiveTab] || 'dashboard';
-      console.log('🗺️ 매핑된 메뉴:', externalActiveTab, '->', mappedMenu);
       setActiveMenu(mappedMenu as any);
     }
   }, [externalActiveTab]);
@@ -3022,7 +3020,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderMenuContent = () => {
-    console.log('🎯 renderMenuContent - activeMenu:', activeMenu);
     switch (activeMenu) {
       case 'dashboard':
         return renderOverview();
@@ -3040,17 +3037,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           </Card>
         );
       case 'evaluation-test':
-        console.log('🧪 evaluation-test 케이스 실행됨');
-        console.log('EvaluationTest 컴포넌트:', EvaluationTest);
-        if (!EvaluationTest) {
-          console.error('EvaluationTest 컴포넌트가 없습니다!');
-          return <div>평가 테스트 컴포넌트 로드 오류</div>;
-        }
-        return (
-          <div className="evaluation-test-wrapper">
-            <EvaluationTest />
-          </div>
-        );
+        return <EvaluationTest />;
       case 'validity-check':
         return (
           <div className="space-y-6">
@@ -3921,11 +3908,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       {/* Main Content */}
       <div className="bg-white rounded-lg border border-gray-200">
         <div className="p-6">
-          {/* Debug Info */}
-          <div className="mb-4 p-2 bg-yellow-100 rounded text-xs">
-            <div>Active Menu: {activeMenu}</div>
-            <div>External Active Tab: {externalActiveTab}</div>
-          </div>
           {renderMenuContent()}
         </div>
       </div>
