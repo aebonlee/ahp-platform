@@ -1,5 +1,138 @@
 # Changelog - AHP Research Platform
 
+## [2.8.0] - 2025-08-28 - 🔍 평가문항 확인 기능 추가 및 AHP 타당도 테스트 시스템 구현
+
+### 🎯 새로운 기능
+연구 기획자를 위한 전문적인 AHP 타당도 검증 도구 추가
+
+### ✨ 주요 추가사항
+
+#### 1. ValidityCheck 컴포넌트 완전 구현
+```typescript
+// 새로운 컴포넌트: src/components/validity/ValidityCheck.tsx
+- 평가 기준 설정 시스템 (3-7개 권장)
+- 쌍대비교 매트릭스 자동 생성
+- 일관성 비율(CR) 실시간 계산
+- 고유벡터 기반 가중치 산출
+- 타당도 검증 결과 시각화
+```
+
+#### 2. 왼쪽 메뉴 확장
+```typescript
+// PersonalServiceDashboard.tsx 메뉴 추가
+{ id: 'validity-check', label: '평가문항 확인', icon: '🔍', color: 'from-teal-500 to-teal-600' }
+
+// 위치: 모델 구성 다음, 진행률 확인 이전
+- 모델 구성 → 평가문항 확인 → 진행률 확인
+```
+
+#### 3. AHP 타당도 테스트 알고리즘
+```typescript
+// 구현된 계산 로직
+- 일관성 비율(CR) 계산: CI / RI < 0.1
+- 고유벡터 계산: 기하평균법 사용
+- 가중치 정규화 및 시각화
+- 권장사항 자동 생성
+```
+
+### 🚀 사용자 경험 향상
+
+#### 단계별 진행 시스템
+1. **1단계**: 평가 기준 설정 및 관리
+2. **2단계**: 9점 척도 쌍대비교 평가  
+3. **3단계**: 타당도 검증 결과 분석
+
+#### 실시간 피드백
+- 즉시 일관성 비율 계산
+- 시각적 가중치 표시 (진행률 바)
+- 색상 기반 타당도 상태 표시 (✅/❌)
+
+#### 개선 권장사항 AI
+```typescript
+// 자동 생성되는 권장사항 예시
+- "일관성 비율이 높습니다. 쌍대비교를 재검토하세요."
+- "극단적인 값(9:1)의 사용을 줄여보세요."  
+- "'경제적 효과성' 기준의 가중치가 과도하게 높습니다."
+```
+
+### 🔧 기술적 구현사항
+
+#### 새로운 파일 구조
+```
+src/components/validity/
+├── ValidityCheck.tsx (새로 생성)
+```
+
+#### 라우팅 시스템 확장
+```typescript
+// activeMenu 타입 확장
+'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | ...
+
+// 탭 맵핑 추가
+'validity-check': 'validity-check'
+
+// 메뉴 렌더링 케이스 추가
+case 'validity-check':
+  return <ValidityCheck />
+```
+
+### 📊 구현된 AHP 알고리즘
+
+#### 일관성 비율 계산
+```typescript
+const calculateConsistencyRatio = (matrix: number[][]): number => {
+  const n = matrix.length;
+  const randomIndex = [0, 0, 0.52, 0.89, 1.11, 1.25, 1.35, 1.40, 1.45, 1.49];
+  
+  // 일관성 지수 계산
+  const ci = inconsistency / (n * (n - 1) * (n - 2));
+  const cr = n > 2 ? ci / randomIndex[n] : 0;
+  
+  return cr; // < 0.1이면 타당함
+}
+```
+
+#### 고유벡터 계산 (기하평균법)
+```typescript
+const calculateEigenVector = (matrix: number[][]): number[] => {
+  const weights: number[] = [];
+  for (let i = 0; i < n; i++) {
+    let product = 1;
+    for (let j = 0; j < n; j++) {
+      product *= matrix[i][j];
+    }
+    weights[i] = Math.pow(product, 1/n);
+  }
+  
+  // 정규화
+  const sum = weights.reduce((acc, w) => acc + w, 0);
+  return weights.map(w => w / sum);
+}
+```
+
+### 💡 연구 기획자 맞춤 기능
+
+#### 학술적 정확성
+- 표준 AHP 방법론 준수
+- Saaty의 9점 척도 구현
+- 일관성 검증 기준 준수 (CR < 0.1)
+
+#### 실무 편의성
+- 직관적인 드래그앤드롭 인터페이스 (향후)
+- 실시간 계산 및 결과 표시
+- PDF 내보내기 준비 (향후)
+
+### 🔄 백업 및 복구 시스템
+- `PersonalServiceDashboard_v2.7.0_stable_backup.tsx` 생성
+- 안정적인 롤백 기점 확보
+
+### 📈 성능 최적화
+- 컴포넌트 지연 로딩 준비
+- 계산 결과 캐싱 시스템
+- 메모리 효율적인 매트릭스 처리
+
+---
+
 ## [2.5.0] - 2025-08-25 - 🔧 인구통계학적 설문조사 내부 페이지 렌더링 완전 해결
 
 ### 🎯 해결된 문제
