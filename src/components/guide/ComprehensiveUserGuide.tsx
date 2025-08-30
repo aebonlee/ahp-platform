@@ -31,9 +31,10 @@ const ComprehensiveUserGuide: React.FC<ComprehensiveUserGuideProps> = ({
       </div>
 
       {/* 주요 기능 카드들 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* 연구자 모드 */}
-        <Card variant="gradient" className="p-8">
+      <div className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* 연구자 모드 */}
+          <Card variant="gradient" className="p-6">
           <div className="text-center">
             <div className="text-6xl mb-6">👨‍🔬</div>
             <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
@@ -74,8 +75,8 @@ const ComprehensiveUserGuide: React.FC<ComprehensiveUserGuideProps> = ({
           </div>
         </Card>
 
-        {/* 평가자 모드 */}
-        <Card variant="outlined" className="p-8">
+          {/* 평가자 모드 */}
+          <Card variant="outlined" className="p-6">
           <div className="text-center">
             <div className="text-6xl mb-6">👨‍💼</div>
             <h3 className="text-2xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
@@ -115,10 +116,12 @@ const ComprehensiveUserGuide: React.FC<ComprehensiveUserGuideProps> = ({
             </Button>
           </div>
         </Card>
+        </div>
       </div>
 
       {/* 시작하기 섹션 */}
-      <Card variant="elevated" className="p-8">
+      <div className="max-w-4xl mx-auto">
+        <Card variant="elevated" className="p-6">
         <div className="text-center">
           <h3 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
             🚀 지금 시작하기
@@ -173,6 +176,7 @@ const ComprehensiveUserGuide: React.FC<ComprehensiveUserGuideProps> = ({
           )}
         </div>
       </Card>
+      </div>
     </div>
   );
 
