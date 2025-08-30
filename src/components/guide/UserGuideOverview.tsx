@@ -177,7 +177,7 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
             />
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
             <div className="bg-green-50 border border-green-200 rounded-xl p-6">
               <h5 className="text-lg font-bold text-green-900 mb-4 flex items-center">
                 <span className="text-xl mr-2">🎯</span>
@@ -366,7 +366,7 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
             </div>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
               <h5 className="text-lg font-bold text-blue-900 mb-4 flex items-center">
                 <span className="text-xl mr-2">🎯</span>
@@ -430,7 +430,7 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
       tooltip: '모든 평가를 종합하여 최종 결과를 도출하는 단계입니다. 순위와 점수를 확인하고 의사결정에 활용하세요.',
       content: (
         <div className="space-y-6">
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-6">
             <div className="bg-green-50 border border-green-200 rounded-xl p-6 lg:p-8">
               <h4 className="text-xl font-bold text-green-900 mb-6 flex items-center">
                 <span className="text-2xl mr-3">🏆</span>
@@ -618,7 +618,7 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
-      <div className="max-w-7xl mx-auto space-y-8 p-4 md:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto space-y-8 p-4 md:p-6 lg:p-8">
         {/* Header - 대시보드 환영인사 스타일 */}
         <div className="text-center space-y-6 py-8">
           <div className="space-y-3">
