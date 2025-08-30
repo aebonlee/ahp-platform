@@ -219,9 +219,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="text"
                     value={settings.profile.firstName}
                     onChange={(e) => setSettings({...settings, profile: {...settings.profile, firstName: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   />
@@ -234,9 +234,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="text"
                     value={settings.profile.lastName}
                     onChange={(e) => setSettings({...settings, profile: {...settings.profile, lastName: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   />
@@ -249,9 +249,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="email"
                     value={settings.profile.email}
                     readOnly
-                    className="w-full px-4 py-2 rounded-lg border-2 opacity-75"
+                    className="w-full px-4 py-2 rounded-lg border opacity-75"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-muted)'
                     }}
                   />
@@ -264,9 +264,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="tel"
                     value={settings.profile.phone}
                     onChange={(e) => setSettings({...settings, profile: {...settings.profile, phone: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                     placeholder="010-1234-5678"
@@ -280,9 +280,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="text"
                     value={settings.profile.organization}
                     onChange={(e) => setSettings({...settings, profile: {...settings.profile, organization: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                     placeholder="예: 삼성전자"
@@ -296,9 +296,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="text"
                     value={settings.profile.department}
                     onChange={(e) => setSettings({...settings, profile: {...settings.profile, department: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                     placeholder="예: 개발팀"
@@ -322,9 +322,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="password"
                     value={passwordForm.currentPassword}
                     onChange={(e) => setPasswordForm({...passwordForm, currentPassword: e.target.value})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   />
@@ -337,9 +337,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="password"
                     value={passwordForm.newPassword}
                     onChange={(e) => setPasswordForm({...passwordForm, newPassword: e.target.value})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   />
@@ -355,9 +355,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     type="password"
                     value={passwordForm.confirmPassword}
                     onChange={(e) => setPasswordForm({...passwordForm, confirmPassword: e.target.value})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   />
@@ -422,9 +422,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.security.sessionTimeout}
                     onChange={(e) => setSettings({...settings, security: {...settings.security, sessionTimeout: Number(e.target.value)}})}
-                    className="px-3 py-1 rounded-lg border-2"
+                    className="px-3 py-1 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -452,9 +452,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.workflow.autoSaveInterval}
                     onChange={(e) => setSettings({...settings, workflow: {...settings.workflow, autoSaveInterval: Number(e.target.value)}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -473,9 +473,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.workflow.defaultTemplate}
                     onChange={(e) => setSettings({...settings, workflow: {...settings.workflow, defaultTemplate: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -493,9 +493,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.workflow.screenLayout}
                     onChange={(e) => setSettings({...settings, workflow: {...settings.workflow, screenLayout: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -512,9 +512,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.workflow.defaultViewMode}
                     onChange={(e) => setSettings({...settings, workflow: {...settings.workflow, defaultViewMode: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -525,7 +525,7 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                 </div>
               </div>
 
-              <div className="mt-6 pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
+              <div className="mt-6 pt-6 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>
@@ -658,9 +658,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.display.theme}
                     onChange={(e) => setSettings({...settings, display: {...settings.display, theme: e.target.value as ColorTheme | 'auto'}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -684,9 +684,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.display.darkMode ? 'dark' : 'light'}
                     onChange={(e) => setSettings({...settings, display: {...settings.display, darkMode: e.target.value === 'dark'}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -702,9 +702,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.display.language}
                     onChange={(e) => setSettings({...settings, display: {...settings.display, language: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -722,9 +722,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.display.dateFormat}
                     onChange={(e) => setSettings({...settings, display: {...settings.display, dateFormat: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -742,9 +742,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.display.numberFormat}
                     onChange={(e) => setSettings({...settings, display: {...settings.display, numberFormat: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -761,9 +761,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.display.timezone}
                     onChange={(e) => setSettings({...settings, display: {...settings.display, timezone: e.target.value}})}
-                    className="w-full px-4 py-2 rounded-lg border-2"
+                    className="w-full px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -790,9 +790,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   <select
                     value={settings.privacy.profileVisibility}
                     onChange={(e) => setSettings({...settings, privacy: {...settings.privacy, profileVisibility: e.target.value as 'public' | 'private' | 'team'}})}
-                    className="w-full max-w-md px-4 py-2 rounded-lg border-2"
+                    className="w-full max-w-md px-4 py-2 rounded-lg border"
                     style={{ 
-                      borderColor: 'var(--border-color)',
+                      borderColor: 'var(--border-subtle)',
                       backgroundColor: 'var(--bg-elevated)'
                     }}
                   >
@@ -859,7 +859,7 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                   </Button>
                 </div>
 
-                <div className="pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
+                <div className="pt-6 border-t" style={{ borderColor: 'var(--border-subtle)' }}>
                   <h4 className="font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                     데이터 가져오기
                   </h4>
@@ -904,7 +904,10 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+      <div className="border-b sticky top-0 z-10" style={{ 
+        backgroundColor: 'var(--bg-primary)',
+        borderBottomColor: 'var(--border-subtle)'
+      }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="py-6">
             <div className="flex items-center justify-between">
@@ -949,9 +952,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 탭 네비게이션 */}
-        <div className="border-b mb-8" style={{ borderColor: 'var(--border-color)' }}>
-          <nav className="flex space-x-8">
+        {/* 탭 네비게이션 - 개선된 구분도 */}
+        <div className="border-b mb-8" style={{ borderColor: 'var(--border-subtle)' }}>
+          <nav className="flex space-x-2 overflow-x-auto">
             {[
               { id: 'profile', label: '프로필', icon: '👤' },
               { id: 'security', label: '보안', icon: '🔒' },
@@ -964,14 +967,25 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                className={`px-4 py-3 mx-1 border-b-2 font-medium text-sm transition-all duration-200 whitespace-nowrap rounded-t-lg ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'text-blue-700 bg-blue-50 shadow-sm border-b-blue-500'
+                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50 border-b-transparent hover:border-b-gray-200'
                 }`}
+                style={activeTab === tab.id ? {
+                  borderBottomColor: 'var(--accent-primary)',
+                  borderBottomWidth: '3px',
+                  color: 'var(--accent-primary)',
+                  backgroundColor: 'var(--accent-light)',
+                  fontWeight: '600',
+                  transform: 'translateY(-1px)'
+                } : {
+                  color: 'var(--text-muted)',
+                  borderBottomWidth: '1px'
+                }}
               >
-                <span className="mr-2">{tab.icon}</span>
-                {tab.label}
+                <span className="mr-2 text-base">{tab.icon}</span>
+                <span>{tab.label}</span>
               </button>
             ))}
           </nav>
