@@ -151,12 +151,20 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
       }
 
       // 사용자 정보 변경 시 상위 컴포넌트에 알림
+      console.log('🔍 PersonalSettings: 이름 변경 체크', {
+        현재이름: `${user.first_name} ${user.last_name}`,
+        새이름: `${settings.profile.firstName} ${settings.profile.lastName}`,
+        변경됨: settings.profile.firstName !== user.first_name || settings.profile.lastName !== user.last_name,
+        onUserUpdate존재: !!onUserUpdate
+      });
+      
       if (onUserUpdate && (settings.profile.firstName !== user.first_name || settings.profile.lastName !== user.last_name)) {
         const updatedUser = {
           ...user,
           first_name: settings.profile.firstName,
           last_name: settings.profile.lastName
         };
+        console.log('🔄 PersonalSettings: onUserUpdate 호출!', updatedUser);
         onUserUpdate(updatedUser);
       }
 

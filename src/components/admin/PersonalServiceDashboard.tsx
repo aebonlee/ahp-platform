@@ -70,8 +70,14 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   // 사용자 정보 업데이트 처리
   const handleUserUpdate = (updatedUser: typeof initialUser) => {
+    console.log('🔄 PersonalServiceDashboard: handleUserUpdate 호출!', {
+      이전사용자: user,
+      새사용자: updatedUser,
+      onUserUpdate존재: !!onUserUpdate
+    });
     setUser(updatedUser);
     if (onUserUpdate) {
+      console.log('🚀 PersonalServiceDashboard: App.tsx로 전파!', updatedUser);
       onUserUpdate(updatedUser);
     }
   };
