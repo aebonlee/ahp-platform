@@ -84,6 +84,40 @@ router.put('/:id',
   }
 );
 
+// 사용자 본인 정보 업데이트 (일반 사용자용)
+router.put('/profile',
+  authenticateToken,
+  [
+    body('first_name').optional().trim().isLength({ min: 1, max: 50 }).withMessage('First name must be 1-50 characters'),
+    body('last_name').optional().trim().isLength({ min: 1, max: 50 }).withMessage('Last name must be 1-50 characters'),
+    body('email').optional().isEmail().withMessage('Valid email is required')
+  ],
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
+      const userId = req.user.id;
+      const user = await UserService.updateUser(userId, req.body);
+      const { password_hash, ...userResponse } = user;
+
+      res.json({ 
+        success: true,
+        message: 'Profile updated successfully',
+        user: userResponse 
+      });
+    } catch (error: any) {
+      if (error.message === 'User not found') {
+        return res.status(404).json({ error: error.message });
+      }
+      console.error('Profile update error:', error);
+      res.status(500).json({ error: 'Failed to update profile' });
+    }
+  }
+);
+
 router.delete('/:id', authenticateToken, requireAdmin, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;

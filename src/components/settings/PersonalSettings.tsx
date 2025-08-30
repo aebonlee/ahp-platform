@@ -140,9 +140,10 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
   }, []);
 
   // 설정 저장 함수
-  const saveSettings = () => {
+  const saveSettings = async () => {
     setSaveStatus('saving');
     try {
+      // localStorage에 저장
       localStorage.setItem('userSettings', JSON.stringify(settings));
       
       // 테마 설정 적용
@@ -150,22 +151,48 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
         changeColorTheme(settings.display.theme);
       }
 
-      // 사용자 정보 변경 시 상위 컴포넌트에 알림
+      // 사용자 정보 변경 시 DB에 저장
+      const isNameChanged = settings.profile.firstName !== user.first_name || settings.profile.lastName !== user.last_name;
       console.log('🔍 PersonalSettings: 이름 변경 체크', {
         현재이름: `${user.first_name} ${user.last_name}`,
         새이름: `${settings.profile.firstName} ${settings.profile.lastName}`,
-        변경됨: settings.profile.firstName !== user.first_name || settings.profile.lastName !== user.last_name,
+        변경됨: isNameChanged,
         onUserUpdate존재: !!onUserUpdate
       });
       
-      if (onUserUpdate && (settings.profile.firstName !== user.first_name || settings.profile.lastName !== user.last_name)) {
-        const updatedUser = {
-          ...user,
-          first_name: settings.profile.firstName,
-          last_name: settings.profile.lastName
-        };
-        console.log('🔄 PersonalSettings: onUserUpdate 호출!', updatedUser);
-        onUserUpdate(updatedUser);
+      if (isNameChanged) {
+        // DB에 사용자 정보 저장
+        console.log('💾 PersonalSettings: DB 저장 시작!');
+        const token = localStorage.getItem('token');
+        const response = await fetch('/api/users/profile', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            first_name: settings.profile.firstName,
+            last_name: settings.profile.lastName
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`DB 저장 실패: ${response.status}`);
+        }
+
+        const result = await response.json();
+        console.log('✅ PersonalSettings: DB 저장 성공!', result);
+
+        // 상위 컴포넌트에 알림
+        if (onUserUpdate) {
+          const updatedUser = {
+            ...user,
+            first_name: settings.profile.firstName,
+            last_name: settings.profile.lastName
+          };
+          console.log('🔄 PersonalSettings: onUserUpdate 호출!', updatedUser);
+          onUserUpdate(updatedUser);
+        }
       }
 
       setTimeout(() => {
