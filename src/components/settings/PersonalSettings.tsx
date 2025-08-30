@@ -216,10 +216,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
         }
       }
 
-      setTimeout(() => {
-        setSaveStatus('saved');
-        setTimeout(() => setSaveStatus('idle'), 2000);
-      }, 500);
+      // 즉시 저장 완료 표시 (지연 없음)
+      setSaveStatus('saved');
+      setTimeout(() => setSaveStatus('idle'), 2000);
     } catch (error) {
       console.error('❌ PersonalSettings 저장 실패:', error);
       console.error('❌ 에러 상세 정보:', {
