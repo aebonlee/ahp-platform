@@ -141,18 +141,19 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
   }, []);
 
   // 설정 저장 함수
-  const saveSettings = async () => {
+  const saveSettings = () => {
     setSaveStatus('saving');
+    
     try {
-      // localStorage에 저장
+      // localStorage에 저장 (즉시)
       localStorage.setItem('userSettings', JSON.stringify(settings));
       
-      // 테마 설정 적용
+      // 테마 설정 적용 (즉시)
       if (settings.display.theme !== 'auto' && settings.display.theme !== currentTheme) {
         changeColorTheme(settings.display.theme);
       }
 
-      // 사용자 정보 변경 시 DB에 저장
+      // 사용자 정보 변경 시 즉시 UI 업데이트
       const isNameChanged = settings.profile.firstName !== user.first_name || settings.profile.lastName !== user.last_name;
       console.log('🔍 PersonalSettings: 이름 변경 체크', {
         현재이름: `${user.first_name} ${user.last_name}`,
@@ -161,64 +162,62 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
         onUserUpdate존재: !!onUserUpdate
       });
       
-      if (isNameChanged) {
-        // 우선 상위 컴포넌트에 변경사항 알림 (즉시 UI 업데이트)
-        if (onUserUpdate) {
-          const updatedUser = {
-            ...user,
-            first_name: settings.profile.firstName,
-            last_name: settings.profile.lastName,
-            _updated: Date.now() // React 리렌더링 강제
-          };
-          console.log('🔄 PersonalSettings: 즉시 UI 업데이트!', updatedUser);
-          onUserUpdate(updatedUser);
-        }
-
-        // DB에 사용자 정보 저장 시도 (실패해도 UI는 업데이트됨)
-        try {
-          console.log('💾 PersonalSettings: DB 저장 시작!');
-          console.log('🔗 API_BASE_URL:', API_BASE_URL);
-          
-          const token = localStorage.getItem('token');
-          console.log('🔑 Token 확인:', token ? '토큰 존재' : '토큰 없음');
-          
-          if (!token) {
-            console.warn('⚠️ 토큰 없음 - localStorage만 사용');
-            return;
-          }
-
-          const requestData = {
-            first_name: settings.profile.firstName,
-            last_name: settings.profile.lastName
-          };
-          console.log('📤 요청 데이터:', requestData);
-
-          const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(requestData)
-          });
-
-          console.log('📡 응답 상태:', response.status, response.statusText);
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('✅ PersonalSettings: DB 저장 성공!', result);
-          } else {
-            const errorText = await response.text();
-            console.warn('⚠️ DB 저장 실패하지만 localStorage는 성공:', errorText);
-          }
-        } catch (dbError) {
-          console.warn('⚠️ DB 저장 실패하지만 localStorage는 성공:', dbError);
-        }
+      if (isNameChanged && onUserUpdate) {
+        // 즉시 상위 컴포넌트에 변경사항 알림
+        const updatedUser = {
+          ...user,
+          first_name: settings.profile.firstName,
+          last_name: settings.profile.lastName,
+          _updated: Date.now()
+        };
+        console.log('🔄 PersonalSettings: 즉시 UI 업데이트!', updatedUser);
+        onUserUpdate(updatedUser);
       }
 
-      // 즉시 저장 완료 표시 (지연 없음)
-      setSaveStatus('saved');
-      setTimeout(() => setSaveStatus('idle'), 2000);
+      // 즉시 저장 완료 표시 (200ms 이내)
+      setTimeout(() => {
+        setSaveStatus('saved');
+        setTimeout(() => setSaveStatus('idle'), 2000);
+      }, 100);
+
+      // DB 저장은 완전 백그라운드에서 처리 (UI와 독립적)
+      if (isNameChanged) {
+        setTimeout(async () => {
+          try {
+            console.log('💾 PersonalSettings: 백그라운드 DB 저장 시작!');
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+              console.warn('⚠️ 토큰 없음 - localStorage만 사용');
+              return;
+            }
+
+            const requestData = {
+              first_name: settings.profile.firstName,
+              last_name: settings.profile.lastName
+            };
+
+            const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(requestData)
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              console.log('✅ 백그라운드 DB 저장 성공!', result);
+            } else {
+              const errorText = await response.text();
+              console.warn('⚠️ 백그라운드 DB 저장 실패:', errorText);
+            }
+          } catch (dbError) {
+            console.warn('⚠️ 백그라운드 DB 저장 에러:', dbError);
+          }
+        }, 0);
+      }
     } catch (error) {
       console.error('❌ PersonalSettings 저장 실패:', error);
       console.error('❌ 에러 상세 정보:', {
