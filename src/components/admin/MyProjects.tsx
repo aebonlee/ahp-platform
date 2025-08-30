@@ -162,18 +162,18 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
             <div
               key={project.id}
               onClick={() => onProjectSelect?.(project)}
-              className="p-6 rounded-xl border-2 transition-all cursor-pointer"
+              className="p-6 rounded-xl transition-all cursor-pointer"
               style={{
                 backgroundColor: 'var(--bg-primary)',
-                borderColor: 'var(--border-light)',
+                border: '1px solid var(--border-light)',
                 boxShadow: 'var(--shadow-sm)'
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                e.currentTarget.style.border = '1px solid var(--accent-primary)';
                 e.currentTarget.style.boxShadow = 'var(--shadow-lg)';
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--border-light)';
+                e.currentTarget.style.border = '1px solid var(--border-light)';
                 e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
               }}
             >

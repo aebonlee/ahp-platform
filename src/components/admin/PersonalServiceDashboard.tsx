@@ -3045,10 +3045,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* 프로젝트 개수 박스 */}
           <div 
-            className="rounded-xl p-6 border-2 transition-all duration-300"
+            className="rounded-xl p-6 transition-all duration-300"
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              borderColor: 'var(--accent-primary-pastel)',
+              border: '1px solid var(--border-medium)',
               boxShadow: 'var(--shadow-md)'
             }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
@@ -3096,10 +3096,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
           {/* 평가자 인원수 박스 */}
           <div 
-            className="rounded-xl p-6 border-2 transition-all duration-300"
+            className="rounded-xl p-6 transition-all duration-300"
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              borderColor: 'var(--accent-secondary-pastel)',
+              border: '1px solid var(--border-medium)',
               boxShadow: 'var(--shadow-md)'
             }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
@@ -3147,10 +3147,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
           {/* 사용 가능 옵션 박스 */}
           <div 
-            className="rounded-xl p-6 border-2 transition-all duration-300"
+            className="rounded-xl p-6 transition-all duration-300"
             style={{
               backgroundColor: 'var(--bg-secondary)',
-              borderColor: 'var(--accent-tertiary-pastel)',
+              border: '1px solid var(--border-medium)',
               boxShadow: 'var(--shadow-md)'
             }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
@@ -3306,10 +3306,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         {/* 왼쪽: 최근 프로젝트 */}
         <div 
-          className="p-6 rounded-xl border-2 transition-all duration-300"
+          className="p-6 rounded-xl transition-all duration-300"
           style={{
             background: 'var(--gradient-gold-light)',
-            borderColor: 'var(--color-gold-pastel-3)',
+            border: '1px solid var(--border-medium)',
             backdropFilter: 'blur(10px)',
             boxShadow: 'var(--shadow-md)'
           }}
@@ -3448,10 +3448,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
         {/* 오른쪽: 사용량 현황 (3개 계열로 분류) */}
         <div 
-          className="p-6 rounded-xl border-2 transition-all duration-300"
+          className="p-6 rounded-xl transition-all duration-300"
           style={{
             background: 'var(--gradient-gray-light)',
-            borderColor: 'var(--color-gray-pastel-3)',
+            border: '1px solid var(--border-medium)',
             backdropFilter: 'blur(10px)',
             boxShadow: 'var(--shadow-md)'
           }}
