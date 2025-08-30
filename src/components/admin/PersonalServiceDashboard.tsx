@@ -15,6 +15,7 @@ import DecisionSupportSystem from '../decision/DecisionSupportSystem';
 import PaperManagement from '../paper/PaperManagement';
 import ProjectSelector from '../project/ProjectSelector';
 import SurveyManagementSystem from '../survey/SurveyManagementSystem';
+import PersonalSettings from '../settings/PersonalSettings';
 import ValidityCheck from '../validity/ValidityCheck';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
@@ -2413,37 +2414,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderPersonalSettingsFullPage = () => (
-    <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="py-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center">
-                <button 
-                  onClick={() => handleTabChange('dashboard')}
-                  className="mr-4 text-gray-500 hover:text-gray-700 transition-colors text-2xl"
-                >
-                  ←
-                </button>
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900 flex items-center">
-                    <span className="text-4xl mr-3">⚙️</span>
-                    개인 설정
-                  </h1>
-                  <p className="text-gray-600 mt-2">계정 정보, 보안 설정, 개인 환경설정을 관리합니다</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
-          {/* 개인 설정 */}
-          {renderPersonalSettings()}
-        </div>
-      </div>
-    </div>
+    <PersonalSettings 
+      user={user}
+      onBack={() => handleTabChange('dashboard')}
+    />
   );
 
 
@@ -2684,102 +2658,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderPersonalSettings = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">개인 설정</h3>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card title="계정 정보">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">이름</label>
-              <input type="text" defaultValue={`${user.first_name} ${user.last_name}`} className="w-full border border-gray-300 rounded px-3 py-2" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">이메일</label>
-              <input type="email" defaultValue={user.email} className="w-full border border-gray-300 rounded px-3 py-2" readOnly />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">조직/부서</label>
-              <input type="text" placeholder="예: 개발팀" className="w-full border border-gray-300 rounded px-3 py-2" />
-            </div>
-            <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl">
-              정보 업데이트
-            </Button>
-          </div>
-        </Card>
-
-        <Card title="비밀번호 변경">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">현재 비밀번호</label>
-              <input type="password" className="w-full border border-gray-300 rounded px-3 py-2" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">새 비밀번호</label>
-              <input type="password" className="w-full border border-gray-300 rounded px-3 py-2" />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">비밀번호 확인</label>
-              <input type="password" className="w-full border border-gray-300 rounded px-3 py-2" />
-            </div>
-            <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl">
-              비밀번호 변경
-            </Button>
-          </div>
-        </Card>
-      </div>
-
-      <Card title="워크플로우 설정">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h4 className="font-medium">기본 설정</h4>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">자동 저장 간격</span>
-              <select className="text-sm border border-gray-300 rounded px-2 py-1">
-                <option>30초</option>
-                <option selected>1분</option>
-                <option>5분</option>
-              </select>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">기본 템플릿</span>
-              <select className="text-sm border border-gray-300 rounded px-2 py-1">
-                <option>기본</option>
-                <option>간단</option>
-                <option>상세</option>
-              </select>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-sm text-gray-600">화면 레이아웃</span>
-              <select className="text-sm border border-gray-300 rounded px-2 py-1">
-                <option>컴팩트</option>
-                <option selected>표준</option>
-                <option>와이드</option>
-              </select>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <h4 className="font-medium">알림 설정</h4>
-            <label className="flex items-center">
-              <input type="checkbox" className="form-checkbox" defaultChecked />
-              <span className="ml-2 text-sm">평가 완료 알림</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="form-checkbox" defaultChecked />
-              <span className="ml-2 text-sm">프로젝트 상태 변경</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="form-checkbox" />
-              <span className="ml-2 text-sm">주간 진행률 리포트</span>
-            </label>
-            <label className="flex items-center">
-              <input type="checkbox" className="form-checkbox" />
-              <span className="ml-2 text-sm">시스템 업데이트</span>
-            </label>
-          </div>
-        </div>
-      </Card>
-    </div>
+    <PersonalSettings 
+      user={user}
+      onBack={() => handleTabChange('dashboard')}
+    />
   );
 
   const renderModelBuilderFullPage = () => (
