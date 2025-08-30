@@ -372,11 +372,11 @@ a:focus-visible {
 /* High contrast mode support */
 @media (prefers-contrast: high) {
   :root {
-    --text-primary: #000000;
-    --text-secondary: #1a1a1a;
+    --text-primary: #1f1f1f;
+    --text-secondary: #374151;
     --bg-primary: #ffffff;
     --bg-secondary: #f0f0f0;
-    --border-primary: #000000;
+    --border-primary: #6b7280;
   }
 }
 
@@ -409,7 +409,7 @@ a:focus-visible {
   }
   
   .card {
-    border: 1px solid black;
+    border: 1px solid #6b7280;
     box-shadow: none;
   }
 }
