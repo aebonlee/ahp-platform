@@ -22,6 +22,7 @@ import analysisRoutes from './routes/analysis';
 import matrixRoutes from './routes/matrix';
 import computeRoutes from './routes/compute';
 import exportRoutes from './routes/export';
+import subscriptionRoutes from './routes/subscription';
 
 const app = express();
 const httpServer = createServer(app);
@@ -112,6 +113,7 @@ app.use('/api/analysis', analysisRoutes);
 app.use('/api/matrix', matrixRoutes);
 app.use('/api/compute', computeRoutes);
 app.use('/api/export', exportRoutes);
+app.use('/api/subscription', subscriptionRoutes);
 
 // Error handling middleware
 app.use((err: any, req: any, res: any, next: any) => {

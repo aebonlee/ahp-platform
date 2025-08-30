@@ -16,6 +16,7 @@ import PaperManagement from '../paper/PaperManagement';
 import ProjectSelector from '../project/ProjectSelector';
 import SurveyManagementSystem from '../survey/SurveyManagementSystem';
 import PersonalSettings from '../settings/PersonalSettings';
+import UsageManagement from './UsageManagement';
 import ValidityCheck from '../validity/ValidityCheck';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
@@ -81,7 +82,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     description: string;
     nextAction: string;
   } | null>(null);
-  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'evaluation-test' | 'settings' | 'payment' | 'demographic-survey'>(() => {
+  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'evaluation-test' | 'settings' | 'usage-management' | 'payment' | 'demographic-survey'>(() => {
     // URL 파라미터에서 직접 demographic-survey 확인
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
@@ -2668,6 +2669,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     />
   );
 
+  const renderUsageManagement = () => (
+    <UsageManagement 
+      user={user}
+      onBack={() => handleTabChange('dashboard')}
+    />
+  );
+
   const renderModelBuilderFullPage = () => (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -2847,6 +2855,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         return renderDecisionSupportSystem();
       case 'evaluation-test':
         return renderEvaluationTest();
+      case 'usage-management':
+        return renderUsageManagement();
       case 'settings':
         return renderPersonalSettings();
       case 'payment':
@@ -3753,6 +3763,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               { id: 'evaluation-test', label: '평가 테스트', icon: '🧪', tooltip: '실제 평가 환경에서 테스트 진행' },
               { id: 'workshop', label: '워크숍', icon: '🎯', tooltip: '협업 의사결정 워크숍 관리' },
               { id: 'decision-support', label: '의사결정 지원', icon: '🧠', tooltip: '과학적 의사결정 지원 도구' },
+              { id: 'usage-management', label: '사용량 관리', icon: '📊', tooltip: '구독 현황, 할당량 및 데이터 관리' },
               { id: 'settings', label: '설정', icon: '⚙️', tooltip: '개인 계정 및 환경 설정' }
             ].map((item) => (
               <div key={item.id} className="relative group">
