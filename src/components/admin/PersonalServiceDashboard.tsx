@@ -68,6 +68,18 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   // 사용자 정보 내부 상태 관리
   const [user, setUser] = useState(initialUser);
 
+  // props의 user가 변경될 때 내부 상태도 업데이트
+  useEffect(() => {
+    console.log('👀 PersonalServiceDashboard: props user 변경 감지', {
+      이전내부사용자: user,
+      새props사용자: initialUser,
+      변경됨: user.first_name !== initialUser.first_name || user.last_name !== initialUser.last_name
+    });
+    if (user.first_name !== initialUser.first_name || user.last_name !== initialUser.last_name) {
+      setUser(initialUser);
+    }
+  }, [initialUser.first_name, initialUser.last_name]);
+
   // 사용자 정보 업데이트 처리
   const handleUserUpdate = (updatedUser: typeof initialUser) => {
     console.log('🔄 PersonalServiceDashboard: handleUserUpdate 호출!', {
@@ -75,10 +87,18 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       새사용자: updatedUser,
       onUserUpdate존재: !!onUserUpdate
     });
-    setUser(updatedUser);
+    
+    // 새로운 객체 참조를 만들어 React 리렌더링 보장
+    const newUserObject = {
+      ...updatedUser,
+      // 타임스탬프 추가로 강제 리렌더링
+      _updated: Date.now()
+    };
+    
+    setUser(newUserObject);
     if (onUserUpdate) {
-      console.log('🚀 PersonalServiceDashboard: App.tsx로 전파!', updatedUser);
-      onUserUpdate(updatedUser);
+      console.log('🚀 PersonalServiceDashboard: App.tsx로 전파!', newUserObject);
+      onUserUpdate(newUserObject);
     }
   };
   const [projects, setProjects] = useState<UserProject[]>([]);
