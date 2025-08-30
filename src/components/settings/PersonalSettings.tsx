@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import { useColorTheme, ColorTheme } from '../../hooks/useColorTheme';
+import { API_BASE_URL } from '../../config/api';
 
 interface PersonalSettingsProps {
   user: {
@@ -164,7 +165,7 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
         // DB에 사용자 정보 저장
         console.log('💾 PersonalSettings: DB 저장 시작!');
         const token = localStorage.getItem('token');
-        const response = await fetch('/api/users/profile', {
+        const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
