@@ -164,21 +164,37 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
       if (isNameChanged) {
         // DB에 사용자 정보 저장
         console.log('💾 PersonalSettings: DB 저장 시작!');
+        console.log('🔗 API_BASE_URL:', API_BASE_URL);
+        
         const token = localStorage.getItem('token');
+        console.log('🔑 Token 확인:', token ? '토큰 존재' : '토큰 없음');
+        
+        if (!token) {
+          throw new Error('인증 토큰이 없습니다. 다시 로그인해주세요.');
+        }
+
+        const requestData = {
+          first_name: settings.profile.firstName,
+          last_name: settings.profile.lastName
+        };
+        console.log('📤 요청 데이터:', requestData);
+
         const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
           },
-          body: JSON.stringify({
-            first_name: settings.profile.firstName,
-            last_name: settings.profile.lastName
-          })
+          body: JSON.stringify(requestData)
         });
 
+        console.log('📡 응답 상태:', response.status, response.statusText);
+        console.log('📡 응답 헤더:', Object.fromEntries(response.headers.entries()));
+
         if (!response.ok) {
-          throw new Error(`DB 저장 실패: ${response.status}`);
+          const errorText = await response.text();
+          console.error('❌ API 응답 에러:', errorText);
+          throw new Error(`DB 저장 실패: ${response.status} - ${errorText}`);
         }
 
         const result = await response.json();
@@ -189,7 +205,8 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
           const updatedUser = {
             ...user,
             first_name: settings.profile.firstName,
-            last_name: settings.profile.lastName
+            last_name: settings.profile.lastName,
+            _updated: Date.now() // React 리렌더링 강제
           };
           console.log('🔄 PersonalSettings: onUserUpdate 호출!', updatedUser);
           onUserUpdate(updatedUser);
@@ -201,8 +218,20 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
         setTimeout(() => setSaveStatus('idle'), 2000);
       }, 500);
     } catch (error) {
-      console.error('Failed to save settings:', error);
+      console.error('❌ PersonalSettings 저장 실패:', error);
+      console.error('❌ 에러 상세 정보:', {
+        message: error instanceof Error ? error.message : String(error),
+        API_BASE_URL,
+        token: localStorage.getItem('token') ? '토큰 존재' : '토큰 없음',
+        settings: settings.profile
+      });
+      
       setSaveStatus('error');
+      
+      // 사용자에게 자세한 에러 메시지 표시
+      const errorMessage = error instanceof Error ? error.message : '알 수 없는 오류가 발생했습니다.';
+      alert(`저장 실패: ${errorMessage}`);
+      
       setTimeout(() => setSaveStatus('idle'), 3000);
     }
   };

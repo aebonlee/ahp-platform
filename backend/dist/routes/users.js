@@ -83,6 +83,12 @@ router.put('/profile', auth_1.authenticateToken, [
             return res.status(400).json({ errors: errors.array() });
         }
         const userId = req.user.id;
+        console.log('🔍 Profile update request:', {
+            userId,
+            userIdType: typeof userId,
+            requestBody: req.body,
+            userFromJWT: req.user
+        });
         const user = await userService_1.UserService.updateUser(userId, req.body);
         const { password_hash, ...userResponse } = user;
         res.json({

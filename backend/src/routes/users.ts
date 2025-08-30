@@ -100,6 +100,13 @@ router.put('/profile',
       }
 
       const userId = req.user.id;
+      console.log('🔍 Profile update request:', {
+        userId,
+        userIdType: typeof userId,
+        requestBody: req.body,
+        userFromJWT: req.user
+      });
+      
       const user = await UserService.updateUser(userId, req.body);
       const { password_hash, ...userResponse } = user;
 

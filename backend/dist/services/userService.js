@@ -16,30 +16,8 @@ class UserService {
         return result.rows[0];
     }
     static async findByEmail(email) {
-        // 임시 테스트 사용자 (DB 연결 문제 해결용)
-        if (email === 'test@ahp.com') {
-            const bcrypt = require('bcryptjs');
-            const hashedPassword = await bcrypt.hash('password', 10);
-            return {
-                id: '1',
-                email: 'test@ahp.com',
-                password_hash: hashedPassword,
-                first_name: '테스트',
-                last_name: '사용자',
-                role: 'admin',
-                is_active: true,
-                created_at: new Date(),
-                updated_at: new Date()
-            };
-        }
-        try {
-            const result = await (0, connection_1.query)('SELECT * FROM users WHERE email = $1 AND is_active = true', [email]);
-            return result.rows[0] || null;
-        }
-        catch (error) {
-            console.error('DB query error in findByEmail:', error);
-            return null;
-        }
+        const result = await (0, connection_1.query)('SELECT * FROM users WHERE email = $1 AND is_active = true', [email]);
+        return result.rows[0] || null;
     }
     static async findById(id) {
         const result = await (0, connection_1.query)('SELECT * FROM users WHERE id = $1 AND is_active = true', [id]);
@@ -57,37 +35,34 @@ class UserService {
         return result.rows;
     }
     static async updateUser(id, updates) {
-        // 임시 테스트 사용자 업데이트 (DB 연결 문제 해결용)
-        if (id === '1') {
-            return {
-                id: '1',
-                email: 'test@ahp.com',
-                password_hash: 'temp_hash',
-                first_name: updates.first_name || '테스트',
-                last_name: updates.last_name || '사용자',
-                role: 'admin',
-                is_active: true,
-                created_at: new Date(),
-                updated_at: new Date()
-            };
-        }
-        try {
-            const setClause = Object.keys(updates)
-                .map((key, index) => `${key} = $${index + 2}`)
-                .join(', ');
-            const values = [id, ...Object.values(updates)];
-            const result = await (0, connection_1.query)(`UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP
-         WHERE id = $1
-         RETURNING *`, values);
-            if (result.rows.length === 0) {
-                throw new Error('User not found');
-            }
-            return result.rows[0];
-        }
-        catch (error) {
-            console.error('DB query error in updateUser:', error);
+        console.log('🔍 UserService.updateUser 호출:', {
+            id,
+            idType: typeof id,
+            updates,
+            updateKeys: Object.keys(updates)
+        });
+        const setClause = Object.keys(updates)
+            .map((key, index) => `${key} = $${index + 2}`)
+            .join(', ');
+        const values = [id, ...Object.values(updates)];
+        console.log('📊 SQL 쿼리 정보:', {
+            setClause,
+            values,
+            sqlQuery: `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *`
+        });
+        const result = await (0, connection_1.query)(`UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1
+       RETURNING *`, values);
+        console.log('📊 쿼리 결과:', {
+            rowCount: result.rowCount,
+            rowsLength: result.rows.length,
+            firstRow: result.rows[0]
+        });
+        if (result.rows.length === 0) {
+            console.error('❌ User not found for id:', id);
             throw new Error('User not found');
         }
+        return result.rows[0];
     }
     static async deleteUser(id) {
         const result = await (0, connection_1.query)('UPDATE users SET is_active = false, updated_at = CURRENT_TIMESTAMP WHERE id = $1', [id]);

@@ -56,11 +56,23 @@ export class UserService {
   }
 
   static async updateUser(id: string, updates: Partial<Pick<User, 'first_name' | 'last_name' | 'email' | 'is_active'>>): Promise<User> {
+    console.log('🔍 UserService.updateUser 호출:', {
+      id,
+      idType: typeof id,
+      updates,
+      updateKeys: Object.keys(updates)
+    });
+    
     const setClause = Object.keys(updates)
       .map((key, index) => `${key} = $${index + 2}`)
       .join(', ');
     
     const values = [id, ...Object.values(updates)];
+    console.log('📊 SQL 쿼리 정보:', {
+      setClause,
+      values,
+      sqlQuery: `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP WHERE id = $1 RETURNING *`
+    });
     
     const result = await query(
       `UPDATE users SET ${setClause}, updated_at = CURRENT_TIMESTAMP
@@ -69,7 +81,14 @@ export class UserService {
       values
     );
     
+    console.log('📊 쿼리 결과:', {
+      rowCount: result.rowCount,
+      rowsLength: result.rows.length,
+      firstRow: result.rows[0]
+    });
+    
     if (result.rows.length === 0) {
+      console.error('❌ User not found for id:', id);
       throw new Error('User not found');
     }
     
