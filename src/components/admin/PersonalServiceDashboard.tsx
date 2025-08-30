@@ -51,10 +51,12 @@ const PLAN_QUOTAS = {
 };
 
 const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({ 
-  user, 
+  user: initialUser, 
   activeTab: externalActiveTab,
   onTabChange: externalOnTabChange
 }) => {
+  // 사용자 정보 내부 상태 관리
+  const [user, setUser] = useState(initialUser);
   const [projects, setProjects] = useState<UserProject[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeProject, setActiveProject] = useState<string | null>(null);
@@ -2417,6 +2419,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <PersonalSettings 
       user={user}
       onBack={() => handleTabChange('dashboard')}
+      onUserUpdate={setUser}
     />
   );
 
@@ -2661,6 +2664,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <PersonalSettings 
       user={user}
       onBack={() => handleTabChange('dashboard')}
+      onUserUpdate={setUser}
     />
   );
 

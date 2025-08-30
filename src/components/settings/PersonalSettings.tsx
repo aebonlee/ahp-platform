@@ -9,9 +9,18 @@ interface PersonalSettingsProps {
     first_name: string;
     last_name: string;
     email: string;
-    role: string;
+    role: 'super_admin' | 'admin' | 'evaluator';
+    admin_type?: 'super' | 'personal';
   };
   onBack?: () => void;
+  onUserUpdate?: (updatedUser: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    role: 'super_admin' | 'admin' | 'evaluator';
+    admin_type?: 'super' | 'personal';
+  }) => void;
 }
 
 interface UserSettings {
@@ -60,7 +69,7 @@ interface UserSettings {
   };
 }
 
-const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => {
+const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUserUpdate }) => {
   const { currentTheme, changeColorTheme } = useColorTheme();
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'workflow' | 'notifications' | 'display' | 'privacy' | 'data'>('profile');
   const [settings, setSettings] = useState<UserSettings>({
@@ -139,6 +148,16 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
       // 테마 설정 적용
       if (settings.display.theme !== 'auto' && settings.display.theme !== currentTheme) {
         changeColorTheme(settings.display.theme);
+      }
+
+      // 사용자 정보 변경 시 상위 컴포넌트에 알림
+      if (onUserUpdate && (settings.profile.firstName !== user.first_name || settings.profile.lastName !== user.last_name)) {
+        const updatedUser = {
+          ...user,
+          first_name: settings.profile.firstName,
+          last_name: settings.profile.lastName
+        };
+        onUserUpdate(updatedUser);
       }
 
       setTimeout(() => {
@@ -362,7 +381,11 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack }) => 
                     }}
                   />
                 </div>
-                <Button variant="primary" onClick={handlePasswordChange}>
+                <Button 
+                  variant="primary" 
+                  onClick={handlePasswordChange}
+                  disabled={!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword}
+                >
                   비밀번호 변경
                 </Button>
               </div>
