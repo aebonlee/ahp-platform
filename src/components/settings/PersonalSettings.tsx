@@ -172,6 +172,10 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
         };
         console.log('🔄 PersonalSettings: 즉시 UI 업데이트!', updatedUser);
         onUserUpdate(updatedUser);
+        
+        // saved_user_data도 업데이트 (F5 새로고침 대응)
+        localStorage.setItem('saved_user_data', JSON.stringify(updatedUser));
+        console.log('💾 saved_user_data 업데이트 완료');
       }
 
       // 즉시 저장 완료 표시 (200ms 이내)

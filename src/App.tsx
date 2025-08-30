@@ -283,7 +283,28 @@ function App() {
           
           if (savedUserData) {
             try {
-              const userData = JSON.parse(savedUserData);
+              let userData = JSON.parse(savedUserData);
+              
+              // userSettings에서 최신 이름 정보 확인 및 병합
+              const userSettings = localStorage.getItem('userSettings');
+              if (userSettings) {
+                try {
+                  const settingsData = JSON.parse(userSettings);
+                  if (settingsData.profile && settingsData.profile.firstName && settingsData.profile.lastName) {
+                    console.log('🔄 F5 새로고침: userSettings에서 최신 이름 복원');
+                    userData = {
+                      ...userData,
+                      first_name: settingsData.profile.firstName,
+                      last_name: settingsData.profile.lastName,
+                      _updated: Date.now() // React 리렌더링 강제
+                    };
+                    console.log('✅ 병합된 사용자 정보:', userData);
+                  }
+                } catch (settingsError) {
+                  console.error('userSettings 파싱 에러:', settingsError);
+                }
+              }
+              
               setUser(userData);
               setProjects(DEMO_PROJECTS);
               setSelectedProjectId(DEMO_PROJECTS[0].id);
