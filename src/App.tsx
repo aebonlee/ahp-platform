@@ -1307,6 +1307,7 @@ function App() {
             user={user}
             activeTab={activeTab}
             onTabChange={setActiveTab}
+            onUserUpdate={setUser}
           />
         );
 

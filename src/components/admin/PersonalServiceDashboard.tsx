@@ -32,6 +32,14 @@ interface PersonalServiceProps {
   };
   activeTab?: string;
   onTabChange?: (tab: string) => void;
+  onUserUpdate?: (updatedUser: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    role: 'super_admin' | 'admin' | 'evaluator';
+    admin_type?: 'super' | 'personal';
+  }) => void;
 }
 
 interface UserProject extends Omit<ProjectData, 'evaluation_method'> {
@@ -54,10 +62,19 @@ const PLAN_QUOTAS = {
 const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({ 
   user: initialUser, 
   activeTab: externalActiveTab,
-  onTabChange: externalOnTabChange
+  onTabChange: externalOnTabChange,
+  onUserUpdate
 }) => {
   // 사용자 정보 내부 상태 관리
   const [user, setUser] = useState(initialUser);
+
+  // 사용자 정보 업데이트 처리
+  const handleUserUpdate = (updatedUser: typeof initialUser) => {
+    setUser(updatedUser);
+    if (onUserUpdate) {
+      onUserUpdate(updatedUser);
+    }
+  };
   const [projects, setProjects] = useState<UserProject[]>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeProject, setActiveProject] = useState<string | null>(null);
@@ -2665,7 +2682,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <PersonalSettings 
       user={user}
       onBack={() => handleTabChange('dashboard')}
-      onUserUpdate={setUser}
+      onUserUpdate={handleUserUpdate}
     />
   );
 
