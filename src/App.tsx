@@ -1067,6 +1067,16 @@ function App() {
 
   // 휴지통에서 복원
   const restoreProject = async (projectId: string) => {
+    if (isDemoMode) {
+      console.log('📊 데모 모드 프로젝트 복원:', projectId);
+      const success = await dataService.restoreProject(projectId);
+      if (success) {
+        await fetchProjects(); // 목록 새로고침
+        return { success: true };
+      }
+      throw new Error('프로젝트 복원에 실패했습니다.');
+    }
+
     const token = localStorage.getItem('token');
     if (!token) throw new Error('로그인이 필요합니다.');
 
@@ -1088,6 +1098,15 @@ function App() {
 
   // 영구 삭제
   const permanentDeleteProject = async (projectId: string) => {
+    if (isDemoMode) {
+      console.log('📊 데모 모드 프로젝트 영구 삭제:', projectId);
+      const success = await dataService.permanentDeleteProject(projectId);
+      if (success) {
+        return { success: true };
+      }
+      throw new Error('영구 삭제에 실패했습니다.');
+    }
+
     const token = localStorage.getItem('token');
     if (!token) throw new Error('로그인이 필요합니다.');
 
