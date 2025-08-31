@@ -251,16 +251,24 @@ function App() {
         // 서버에서 쿠키로 세션 검증
         validateSession();
       } else {
-        fallbackToDemoMode();
+        // DB 연결 실패해도 개발 계속 진행
+        console.log('⚠️ 백엔드 연결 실패, 개발 모드로 진행');
+        setBackendStatus('unavailable');
+        setIsNavigationReady(true);
       }
     } catch (error) {
-      fallbackToDemoMode();
+      // DB 연결 실패해도 개발 계속 진행
+      console.log('⚠️ 백엔드 연결 실패, 개발 모드로 진행');
+      setBackendStatus('unavailable');
+      setIsNavigationReady(true);
     }
   };
 
   const fallbackToDemoMode = () => {
     setBackendStatus('unavailable');
-    setShowApiErrorModal(true);
+    // DB 설정 전까지 에러 모달 비활성화
+    setShowApiErrorModal(false);
+    setIsNavigationReady(true);
   };
 
   // API 연결 상태 체크 (백그라운드에서 실행)
