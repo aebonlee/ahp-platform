@@ -206,90 +206,169 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
         )}
       </header>
 
-      {/* 히어로 섹션 - AURI 스타일 미니멀 */}
-      <section className="relative pt-32 pb-24">
-        {/* 순수 화이트 배경 */}
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center">
-            {/* AURI 스타일 심플 배지 */}
-            <div className="inline-block px-4 py-1 mb-8 text-sm font-medium rounded border" style={{
-              color: '#666',
-              borderColor: '#ddd',
-              backgroundColor: '#f8f9fa'
+      {/* 히어로 섹션 - 풀스크린 세련된 디자인 */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* 동적 배경 효과 */}
+        <div className="absolute inset-0" style={{
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)'
+        }}></div>
+        
+        {/* 플로팅 기하학적 요소들 */}
+        <div 
+          className="absolute animate-pulse" 
+          style={{
+            top: '15%',
+            left: '10%',
+            width: '120px',
+            height: '120px',
+            borderRadius: '50%',
+            background: 'linear-gradient(45deg, #0066cc, #3b82f6)',
+            opacity: 0.1,
+            animation: 'float 6s ease-in-out infinite'
+          }}
+        ></div>
+        <div 
+          className="absolute animate-pulse" 
+          style={{
+            top: '25%',
+            right: '15%',
+            width: '80px',
+            height: '80px',
+            borderRadius: '8px',
+            background: 'linear-gradient(45deg, #10b981, #059669)',
+            opacity: 0.15,
+            animation: 'float 8s ease-in-out infinite reverse'
+          }}
+        ></div>
+        <div 
+          className="absolute animate-pulse" 
+          style={{
+            bottom: '30%',
+            left: '15%',
+            width: '100px',
+            height: '100px',
+            borderRadius: '50%',
+            background: 'linear-gradient(45deg, #8b5cf6, #7c3aed)',
+            opacity: 0.1,
+            animation: 'float 7s ease-in-out infinite'
+          }}
+        ></div>
+        
+        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
+          <div className="space-y-8">
+            {/* 세련된 배지 */}
+            <div className="inline-flex items-center px-6 py-2 text-sm font-semibold rounded-full backdrop-blur-sm" style={{
+              background: 'rgba(0, 102, 204, 0.1)',
+              color: '#0066cc',
+              border: '1px solid rgba(0, 102, 204, 0.2)'
             }}>
+              <span className="w-2 h-2 rounded-full mr-2 animate-pulse" style={{ backgroundColor: '#0066cc' }}></span>
               AHP 전문 연구 분석 플랫폼
             </div>
 
-            {/* AURI 스타일 깔끔한 타이틀 */}
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 leading-tight" style={{ 
-              color: '#222',
-              fontWeight: '700',
-              letterSpacing: '-0.02em'
+            {/* 메인 타이틀 - 더 큰 크기와 세련된 타이포그래피 */}
+            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-none" style={{ 
+              color: '#1e293b',
+              fontWeight: '900',
+              letterSpacing: '-0.025em',
+              textShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
             }}>
               논문 연구를 위한
               <br />
-              <span style={{ color: '#0066cc' }}>
+              <span style={{ 
+                background: 'linear-gradient(135deg, #0066cc 0%, #3b82f6 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                display: 'inline-block',
+                marginTop: '0.5rem'
+              }}>
                 AHP 분석 도구
               </span>
             </h1>
 
-            {/* AURI 스타일 서브 타이틀 */}
-            <p className="text-lg md:text-xl mb-12 max-w-3xl mx-auto leading-relaxed" style={{ 
-              color: '#666',
-              fontWeight: '400'
+            {/* 세련된 서브 타이틀 */}
+            <p className="text-xl md:text-2xl font-light max-w-4xl mx-auto" style={{ 
+              color: '#64748b',
+              lineHeight: '1.6',
+              marginBottom: '3rem'
             }}>
-              체계적인 의사결정 분석으로 연구의 신뢰성을 높이고<br />
+              체계적인 의사결정 분석으로 연구의 신뢰성을 높이고
+              <br className="hidden md:block" />
               논문에 바로 활용할 수 있는 결과를 얻으세요
             </p>
 
-            {/* AURI 스타일 심플 버튼 */}
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-20">
+            {/* 세련된 CTA 버튼들 */}
+            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-12">
               <button
                 onClick={onLoginClick}
-                className="px-8 py-3 text-white rounded font-medium text-base transition-colors"
-                style={{ backgroundColor: '#0066cc' }}
-                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0052a3'}
-                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#0066cc'}
+                className="group px-12 py-4 text-white rounded-xl font-semibold text-lg transition-all transform hover:scale-105 hover:shadow-2xl"
+                style={{ 
+                  background: 'linear-gradient(135deg, #0066cc 0%, #3b82f6 100%)',
+                  boxShadow: '0 10px 25px rgba(0, 102, 204, 0.3)'
+                }}
               >
-                연구 시작하기
+                <span className="flex items-center justify-center">
+                  연구 시작하기
+                  <svg className="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
               </button>
               <button
-                className="px-8 py-3 rounded font-medium text-base border transition-colors"
+                className="px-12 py-4 rounded-xl font-semibold text-lg border-2 transition-all transform hover:scale-105 backdrop-blur-sm"
                 style={{ 
-                  backgroundColor: 'white',
-                  color: '#666',
-                  borderColor: '#ddd'
+                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                  color: '#475569',
+                  borderColor: 'rgba(0, 102, 204, 0.2)',
+                  boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = '#f8f9fa';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#bbb';
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(0, 102, 204, 0.05)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#0066cc';
+                  (e.currentTarget as HTMLButtonElement).style.color = '#0066cc';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'white';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#ddd';
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0, 102, 204, 0.2)';
+                  (e.currentTarget as HTMLButtonElement).style.color = '#475569';
                 }}
               >
                 사용 가이드
               </button>
             </div>
 
-            {/* AURI 스타일 심플 통계 */}
-            <div className="grid grid-cols-3 gap-12 max-w-2xl mx-auto border-t pt-12" style={{ borderColor: '#eee' }}>
+            {/* 신뢰도 지표 - 2개만 */}
+            <div className="grid grid-cols-2 gap-16 max-w-md mx-auto">
               <div className="text-center">
-                <div className="text-2xl font-bold mb-1" style={{ color: '#0066cc' }}>1,000+</div>
-                <div className="text-sm" style={{ color: '#999' }}>논문 활용</div>
+                <div className="text-4xl font-black mb-2" style={{ 
+                  color: '#0066cc',
+                  textShadow: '0 2px 4px rgba(0, 102, 204, 0.2)'
+                }}>1,000+</div>
+                <div className="text-sm font-medium" style={{ color: '#64748b' }}>논문 활용</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold mb-1" style={{ color: '#0066cc' }}>98%</div>
-                <div className="text-sm" style={{ color: '#999' }}>연구자 만족도</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold mb-1" style={{ color: '#0066cc' }}>3분</div>
-                <div className="text-sm" style={{ color: '#999' }}>평균 설정시간</div>
+                <div className="text-4xl font-black mb-2" style={{ 
+                  color: '#0066cc',
+                  textShadow: '0 2px 4px rgba(0, 102, 204, 0.2)'
+                }}>98%</div>
+                <div className="text-sm font-medium" style={{ color: '#64748b' }}>연구자 만족도</div>
               </div>
             </div>
           </div>
         </div>
+        
+        {/* CSS 애니메이션 정의 */}
+        <style jsx>{`
+          @keyframes float {
+            0%, 100% {
+              transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+              transform: translateY(-20px) rotate(5deg);
+            }
+          }
+        `}</style>
       </section>
 
       {/* 주요 기능 섹션 - AURI 스타일 그리드 */}
