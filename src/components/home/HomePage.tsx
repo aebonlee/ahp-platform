@@ -903,8 +903,11 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 <p className="text-sm mb-1" style={{ color: '#666' }}>
                   고객지원: aebon@naver.com
                 </p>
+                <p className="text-sm mb-1" style={{ color: '#666' }}>
+                  전화: 010-3700-0629 (평일: 09:00 ~ 18:00)
+                </p>
                 <p className="text-sm" style={{ color: '#666' }}>
-                  전화: 010-3700-0629 (평일: 09시 ~ 18시 - 이외 문자 및 카카오톡 상담 가능)
+                  카카오톡 상담 - ID: aebon
                 </p>
               </div>
               <div className="text-sm" style={{ color: '#888' }}>
