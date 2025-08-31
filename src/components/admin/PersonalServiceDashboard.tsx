@@ -375,6 +375,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           
           // 프로젝트 목록 새로고침
           await loadProjects();
+          
+          alert(`"${projectTitle}"가 휴지통으로 이동되었습니다.\n\n🗑️ 휴지통 탭에서 복원하거나 영구 삭제할 수 있습니다.`);
         } else {
           // Fallback to dataService
           console.log('🗑️ 프로젝트 삭제 (dataService):', projectId);
@@ -1002,6 +1004,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
               </div>
               <div className="flex space-x-2">
+                <Button variant="error" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('trash')}>
+                  🗑️ 휴지통
+                </Button>
                 <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('creation')}>
                   ➕ 새 프로젝트 생성
                 </Button>
@@ -1163,8 +1168,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               </button>
             </div>
 
-            <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setIsProjectFormOpen(true)}>
-              ➕ 새 프로젝트
+            <Button variant="error" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => handleTabChange('trash')}>
+              🗑️ 휴지통
             </Button>
           </div>
         </div>
@@ -1457,10 +1462,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
+                            console.log('🗑️ 삭제 버튼 클릭됨:', project.id, project.title);
                             handleDeleteProject(project.id || '');
                           }}
-                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                          title="삭제"
+                          className="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-lg transition-colors border border-red-200"
+                          title="휴지통으로 이동"
                           type="button"
                         >
                           🗑️
@@ -1611,10 +1617,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             onClick={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
+                              console.log('🗑️ 삭제 버튼 클릭됨 (리스트뷰):', project.id, project.title);
                               handleDeleteProject(project.id || '');
                             }}
-                            className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                            title="삭제"
+                            className="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-lg transition-colors border border-red-200"
+                            title="휴지통으로 이동"
                             type="button"
                           >
                             🗑️
