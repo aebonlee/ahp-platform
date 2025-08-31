@@ -179,7 +179,35 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
           if (response.ok) {
             console.log('📡 서버 연결 가능 - 동기화 시도');
             // 서버가 살아있으면 현재 설정을 다시 저장 시도
-            saveSettings();
+            // saveSettings 대신 직접 동기화 로직 실행
+            const offlineSettings = localStorage.getItem('user_settings_offline');
+            if (offlineSettings) {
+              const parsed = JSON.parse(offlineSettings);
+              // 백그라운드에서 DB 동기화 시도
+              fetch(`${API_BASE_URL}/api/users/profile`, {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                  first_name: parsed.profile?.firstName,
+                  last_name: parsed.profile?.lastName,
+                  email: parsed.profile?.email,
+                  phone: parsed.profile?.phone,
+                  organization: parsed.profile?.organization,
+                  department: parsed.profile?.department
+                })
+              }).then(res => {
+                if (res.ok) {
+                  console.log('✅ 오프라인 설정 DB 동기화 성공');
+                  localStorage.removeItem('user_settings_pending_sync');
+                  localStorage.setItem('user_settings_synced', new Date().toISOString());
+                }
+              }).catch(err => {
+                console.warn('동기화 실패:', err);
+              });
+            }
           }
         }).catch(() => {
           console.log('📴 서버 연결 불가 - 오프라인 모드 유지');
@@ -257,8 +285,8 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
               phone: settings.profile.phone,
               organization: settings.profile.organization,
               department: settings.profile.department,
-              theme: settings.theme.colorScheme,
-              language: settings.preferences.language,
+              theme: settings.display.theme,
+              language: settings.display.language,
               notifications: settings.notifications
             };
 
