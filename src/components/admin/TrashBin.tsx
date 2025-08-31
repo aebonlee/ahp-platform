@@ -27,29 +27,57 @@ const TrashBin: React.FC<TrashBinProps> = ({
   const [trashedProjects, setTrashedProjects] = useState<TrashedProject[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+  const [debugInfo, setDebugInfo] = useState<string>('');
 
   useEffect(() => {
     loadTrashedProjects();
   }, []);
 
   const loadTrashedProjects = async () => {
+    const debugLog = [];
+    
     if (!onFetchTrashedProjects) {
-      console.log('❌ onFetchTrashedProjects 함수가 전달되지 않았습니다');
+      const msg = '❌ onFetchTrashedProjects 함수가 전달되지 않았습니다';
+      console.log(msg);
+      debugLog.push(msg);
+      setDebugInfo(debugLog.join('\n'));
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
-      console.log('🔄 휴지통 프로젝트 로드 시작...');
+      const startMsg = '🔄 휴지통 프로젝트 로드 시작...';
+      console.log(startMsg);
+      debugLog.push(startMsg);
+      
       const projects = await onFetchTrashedProjects();
-      console.log('📊 휴지통 프로젝트 로드 결과:', {
-        count: projects?.length || 0,
-        projects: projects
-      });
+      const resultMsg = `📊 휴지통 프로젝트 로드 결과: ${projects?.length || 0}개`;
+      console.log(resultMsg, projects);
+      debugLog.push(resultMsg);
+      
+      if (projects && projects.length > 0) {
+        debugLog.push(`✅ 휴지통 데이터 있음: ${JSON.stringify(projects[0], null, 2)}`);
+      } else {
+        debugLog.push('⚠️ 휴지통이 비어있거나 데이터 로드 실패');
+        
+        // localStorage에서 직접 확인
+        const localTrash = localStorage.getItem('ahp_trash_projects');
+        debugLog.push(`🔍 localStorage 확인: ${localTrash ? '데이터 있음' : '데이터 없음'}`);
+        if (localTrash) {
+          const parsedTrash = JSON.parse(localTrash);
+          debugLog.push(`📦 localStorage 휴지통: ${parsedTrash.length}개`);
+          setTrashedProjects(parsedTrash);
+        }
+      }
+      
       setTrashedProjects(projects || []);
+      setDebugInfo(debugLog.join('\n'));
     } catch (error) {
-      console.error('❌ 휴지통 프로젝트 로드 실패:', error);
+      const errorMsg = `❌ 휴지통 프로젝트 로드 실패: ${error}`;
+      console.error(errorMsg);
+      debugLog.push(errorMsg);
+      setDebugInfo(debugLog.join('\n'));
     } finally {
       setLoading(false);
     }
@@ -162,6 +190,19 @@ const TrashBin: React.FC<TrashBinProps> = ({
           </div>
         </div>
       </Card>
+
+      {/* 디버그 정보 표시 */}
+      {debugInfo && (
+        <Card variant="outlined" className="bg-blue-50 border-blue-200">
+          <div className="flex items-start space-x-3">
+            <span className="text-2xl">🔍</span>
+            <div>
+              <h3 className="font-medium text-blue-800 mb-2">휴지통 디버그 정보</h3>
+              <pre className="text-xs text-blue-700 whitespace-pre-wrap">{debugInfo}</pre>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* 프로젝트 목록 */}
       <Card>
