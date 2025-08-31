@@ -169,9 +169,22 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, selectedProjectId, selectedProjectTitle, user, isNavigationReady]);
   
-  // 페이지 로드 시 세션 복구 시도
+  // 페이지 로드 시 세션 복구 시도 (DB 설정 전까지 비활성화)
   useEffect(() => {
     const restoreSessionOnLoad = async () => {
+      // DB 연결 전까지 임시 사용자로 설정
+      if (backendStatus === 'unavailable') {
+        console.log('🔧 개발 모드: 임시 사용자로 설정');
+        setUser({
+          id: '1',
+          email: 'temp@dev.com',
+          first_name: '개발',
+          last_name: '사용자',
+          role: 'admin'
+        });
+        return;
+      }
+      
       try {
         // 백엔드에서 현재 로그인 상태 확인
         const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
