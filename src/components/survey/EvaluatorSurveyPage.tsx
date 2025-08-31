@@ -352,7 +352,7 @@ const EvaluatorSurveyPage: React.FC<EvaluatorSurveyPageProps> = ({ surveyId, tok
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
       {/* 헤더 */}
       <div className="bg-white border-b shadow-sm sticky top-0 z-10">
-        <div className="max-w-4xl mx-auto px-4 py-6">
+        <div className="max-w-4xl mx-auto px-4 survey-sm:px-6 py-4 survey-sm:py-6">
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
@@ -381,7 +381,7 @@ const EvaluatorSurveyPage: React.FC<EvaluatorSurveyPageProps> = ({ surveyId, tok
       </div>
 
       {/* 설문 내용 */}
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-4xl mx-auto px-4 survey-sm:px-6 py-6 survey-sm:py-8">
         {currentPage === 0 && (
           <Card variant="outlined" className="mb-6 p-6">
             <h2 className="text-xl font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>

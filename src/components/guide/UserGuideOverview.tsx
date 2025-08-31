@@ -228,7 +228,7 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
               <span className="text-2xl mr-3">🎲</span>
               평가 대안 목록
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
               {DEMO_ALTERNATIVES.map((alt, index) => (
                 <div key={alt.id} className="bg-white border border-orange-300 rounded-xl p-6 hover:shadow-md transition-shadow">
                   <div className="flex items-center space-x-3 mb-4">
@@ -430,7 +430,7 @@ const UserGuideOverview: React.FC<UserGuideOverviewProps> = ({ onNavigateToServi
       tooltip: '모든 평가를 종합하여 최종 결과를 도출하는 단계입니다. 순위와 점수를 확인하고 의사결정에 활용하세요.',
       content: (
         <div className="space-y-6">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="bg-green-50 border border-green-200 rounded-xl p-6 lg:p-8">
               <h4 className="text-xl font-bold text-green-900 mb-6 flex items-center">
                 <span className="text-2xl mr-3">🏆</span>

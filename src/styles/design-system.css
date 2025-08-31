@@ -304,32 +304,36 @@ a:focus-visible {
 .overflow-y-auto { overflow-y: auto; }
 
 /* === Responsive Design === */
-@media (min-width: 640px) {
-  .sm\:flex { display: flex; }
-  .sm\:hidden { display: none; }
-  .sm\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-  .sm\:p-6 { padding: var(--space-6); }
-}
-
+/* 연구자 모드: 태블릿(768px)과 데스크톱(1024px) 2단계만 사용 */
 @media (min-width: 768px) {
+  /* 태블릿 */
   .md\:flex { display: flex; }
   .md\:hidden { display: none; }
+  .md\:grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+  .md\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
   .md\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .md\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .md\:p-6 { padding: var(--space-6); }
   .md\:p-8 { padding: var(--space-8); }
 }
 
 @media (min-width: 1024px) {
+  /* 데스크톱 */
   .lg\:flex { display: flex; }
   .lg\:hidden { display: none; }
+  .lg\:grid-cols-1 { grid-template-columns: repeat(1, 1fr); }
+  .lg\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .lg\:grid-cols-3 { grid-template-columns: repeat(3, 1fr); }
   .lg\:grid-cols-4 { grid-template-columns: repeat(4, 1fr); }
   .lg\:p-10 { padding: var(--space-10); }
 }
 
-@media (min-width: 1280px) {
-  .xl\:flex { display: flex; }
-  .xl\:hidden { display: none; }
-  .xl\:grid-cols-5 { grid-template-columns: repeat(5, 1fr); }
-  .xl\:p-12 { padding: var(--space-12); }
+/* 평가자 설문 전용: 모바일 지원 */
+@media (min-width: 640px) {
+  .survey-sm\:flex { display: flex; }
+  .survey-sm\:hidden { display: none; }
+  .survey-sm\:grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+  .survey-sm\:p-4 { padding: var(--space-4); }
 }
 
 /* === Accessibility === */
