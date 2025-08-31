@@ -391,7 +391,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
           </div>
 
           <div className="max-w-5xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-3 gap-4 md:gap-8">
               
               {/* 단계 1 - AURI 스타일 */}
               <div className="text-center">
