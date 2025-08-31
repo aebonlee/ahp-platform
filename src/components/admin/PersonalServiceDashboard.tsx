@@ -1359,24 +1359,34 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       </div>
                       <div className="flex space-x-2">
                         <button
-                          onClick={() => handleEditProject(project)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleEditProject(project);
+                          }}
                           className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                           title="편집"
+                          type="button"
                         >
                           ✏️
                         </button>
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             setSelectedProjectId(project.id || '');
                             handleTabChange('model-builder');
                           }}
                           className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                           title="모델 구성"
+                          type="button"
                         >
                           🏗️
                         </button>
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
                             setSelectedProjectId(project.id || '');
                             handleTabChange('analysis');
                           }}
@@ -1391,13 +1401,19 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             e.currentTarget.style.backgroundColor = 'transparent';
                           }}
                           title="결과 분석"
+                          type="button"
                         >
                           📊
                         </button>
                         <button
-                          onClick={() => handleDeleteProject(project.id || '')}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleDeleteProject(project.id || '');
+                          }}
                           className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                           title="삭제"
+                          type="button"
                         >
                           🗑️
                         </button>
@@ -1491,24 +1507,34 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                         {/* 액션 버튼 */}
                         <div className="lg:col-span-2 flex justify-end space-x-2">
                           <button
-                            onClick={() => handleEditProject(project)}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleEditProject(project);
+                            }}
                             className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                             title="편집"
+                            type="button"
                           >
                             ✏️
                           </button>
                           <button
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
                               setSelectedProjectId(project.id || '');
                               handleTabChange('model-builder');
                             }}
                             className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                             title="모델 구성"
+                            type="button"
                           >
                             🏗️
                           </button>
                           <button
-                            onClick={() => {
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
                               setSelectedProjectId(project.id || '');
                               handleTabChange('analysis');
                             }}
@@ -1523,13 +1549,19 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             e.currentTarget.style.backgroundColor = 'transparent';
                           }}
                             title="결과 분석"
+                            type="button"
                           >
                             📊
                           </button>
                           <button
-                            onClick={() => handleDeleteProject(project.id || '')}
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleDeleteProject(project.id || '');
+                            }}
                             className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             title="삭제"
+                            type="button"
                           >
                             🗑️
                           </button>
