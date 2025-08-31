@@ -266,12 +266,12 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               AHP 전문 연구 분석 플랫폼
             </div>
 
-            {/* 메인 타이틀 - 더 큰 크기와 세련된 타이포그래피 */}
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-black leading-none" style={{ 
+            {/* 메인 타이틀 - 적당한 크기와 세련된 타이포그래피 */}
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight" style={{ 
               color: '#1e293b',
-              fontWeight: '900',
-              letterSpacing: '-0.025em',
-              textShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
+              fontWeight: '700',
+              letterSpacing: '-0.02em',
+              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
             }}>
               논문 연구를 위한
               <br />
@@ -852,27 +852,33 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
           <div className="border-t mt-8 pt-6" style={{ borderColor: '#e5e7eb' }}>
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="flex space-x-6 mb-4 md:mb-0">
-                <a href="#" className="text-sm transition-colors" style={{ 
+                <button className="text-sm transition-colors" style={{ 
                   color: '#666',
-                  textDecoration: 'none'
-                }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#0066cc'}
-                   onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#666'}>
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = '#0066cc'}
+                   onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = '#666'}>
                   이용약관
-                </a>
-                <a href="#" className="text-sm transition-colors" style={{ 
+                </button>
+                <button className="text-sm transition-colors" style={{ 
                   color: '#666',
-                  textDecoration: 'none'
-                }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#0066cc'}
-                   onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#666'}>
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = '#0066cc'}
+                   onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = '#666'}>
                   개인정보처리방침
-                </a>
-                <a href="#" className="text-sm transition-colors" style={{ 
+                </button>
+                <button className="text-sm transition-colors" style={{ 
                   color: '#666',
-                  textDecoration: 'none'
-                }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#0066cc'}
-                   onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#666'}>
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = '#0066cc'}
+                   onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = '#666'}>
                   환불정책
-                </a>
+                </button>
               </div>
               <div className="text-xs" style={{ color: '#999' }}>
                 Last updated: 2024.08.31
