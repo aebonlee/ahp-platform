@@ -359,7 +359,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
         </div>
         
         {/* CSS 애니메이션 정의 */}
-        <style jsx>{`
+        <style>{`
           @keyframes float {
             0%, 100% {
               transform: translateY(0px) rotate(0deg);
