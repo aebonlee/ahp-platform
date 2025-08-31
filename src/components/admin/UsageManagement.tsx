@@ -92,7 +92,6 @@ const UsageManagement: React.FC<UsageManagementProps> = ({ user, onBack }) => {
       const response = await fetch('/api/subscription/extend', {
         method: 'POST',
         credentials: 'include',
-        credentials: 'include',
         headers: {
           'Content-Type': 'application/json'
         },
@@ -128,7 +127,6 @@ const UsageManagement: React.FC<UsageManagementProps> = ({ user, onBack }) => {
     try {
       const response = await fetch('/api/subscription/reset-data', {
         method: 'POST',
-        credentials: 'include',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json'

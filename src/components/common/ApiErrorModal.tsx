@@ -4,14 +4,12 @@ interface ApiErrorModalProps {
   isVisible: boolean;
   onClose: () => void;
   onRetry: () => void;
-  onUseDemoMode: () => void;
 }
 
 const ApiErrorModal: React.FC<ApiErrorModalProps> = ({
   isVisible,
   onClose,
-  onRetry,
-  onUseDemoMode
+  onRetry
 }) => {
   if (!isVisible) return null;
 
@@ -29,28 +27,20 @@ const ApiErrorModal: React.FC<ApiErrorModalProps> = ({
 
         <div className="mb-6">
           <p className="text-gray-600 mb-4">
-            실시간 데이터베이스 서버에 연결할 수 없습니다. 다음 중 하나를 선택하세요:
+            백엔드 서버에 연결할 수 없습니다. 서버 상태를 확인하고 다시 시도해주세요.
           </p>
           
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-4">
-            <h4 className="font-medium text-orange-800 mb-2">📋 데모 모드로 계속하기</h4>
-            <div className="text-xs text-orange-600 space-y-1">
-              <div><strong>서비스 계정:</strong> test@ahp.com / ahptester</div>
-              <div><strong>기능:</strong> 완전한 AHP 기능 체험</div>
-              <div><strong>샘플 데이터:</strong> "소프트웨어 개발자의 AI 활용 방안 중요도 분석"</div>
-            </div>
-          </div>
-          
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-medium text-blue-800 mb-2">🚀 실제 API 서버</h4>
+            <h4 className="font-medium text-blue-800 mb-2">🚀 백엔드 API 서버</h4>
             <div className="text-xs text-blue-600 space-y-1">
               <div>
-                <strong>백엔드 API:</strong> 
+                <strong>서버 주소:</strong> 
                 <a href="https://ahp-forpaper.onrender.com" target="_blank" rel="noopener noreferrer" className="underline ml-1">
                   https://ahp-forpaper.onrender.com
                 </a>
               </div>
-              <div><strong>기능:</strong> 실제 데이터베이스 연동, JWT 인증, CRUD 작업</div>
+              <div><strong>기능:</strong> PostgreSQL 데이터베이스, JWT 인증, 실시간 CRUD</div>
+              <div><strong>상태:</strong> 서버가 깨어나는 중일 수 있습니다 (약 30초 소요)</div>
             </div>
           </div>
         </div>
@@ -61,13 +51,6 @@ const ApiErrorModal: React.FC<ApiErrorModalProps> = ({
             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
           >
             🔄 API 연결 재시도
-          </button>
-          
-          <button
-            onClick={onUseDemoMode}
-            className="w-full bg-orange-600 text-white py-2 px-4 rounded-lg font-medium hover:bg-orange-700 transition-colors"
-          >
-            📋 데모 모드로 계속하기
           </button>
           
           <button

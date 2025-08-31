@@ -9,12 +9,13 @@ const SessionBar: React.FC = () => {
 
   useEffect(() => {
     // 세션 상태 확인 및 시간 업데이트
-    const updateSessionStatus = () => {
-      const sessionValid = sessionService.isSessionValid();
+    const updateSessionStatus = async () => {
+      const sessionValid = await sessionService.isSessionValid();
       setIsLoggedIn(sessionValid);
       
       if (sessionValid) {
-        setRemainingTime(sessionService.getRemainingTime());
+        const remaining = await sessionService.getRemainingTime();
+        setRemainingTime(remaining);
       }
     };
 

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import sessionService from './services/sessionService';
 import dataService from './services/dataService';
 import Layout from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
@@ -28,13 +27,6 @@ import EvaluationTest from './components/evaluation/EvaluationTest';
 import { API_BASE_URL } from './config/api';
 import { useColorTheme } from './hooks/useColorTheme';
 import { useTheme } from './hooks/useTheme';
-import { 
-  DEMO_USER, 
-  DEMO_PROJECTS, 
-  DEMO_CRITERIA,
-  DEMO_ALTERNATIVES
-  // isBackendAvailable, DEMO_LOGIN_CREDENTIALS - 현재 미사용 (데모 모드 강제 활성화)
-} from './data/demoData';
 
 function App() {
   // Initialize theme systems
@@ -80,61 +72,12 @@ function App() {
   const [selectedProjectTitle, setSelectedProjectTitle] = useState<string>('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedEvaluationMethod, setSelectedEvaluationMethod] = useState<'pairwise' | 'direct'>('pairwise');
-  const [isDemoMode, setIsDemoMode] = useState(false); // 실제 서비스 모드로 운영
   
   // 평가자 설문조사 관련 상태
   const [isEvaluatorSurvey, setIsEvaluatorSurvey] = useState(false);
   const [surveyId, setSurveyId] = useState<string>('');
   const [surveyToken, setSurveyToken] = useState<string>('');
 
-  // 평가자 설문조사 경로 확인
-  useEffect(() => {
-    // 먼저 sessionStorage에서 리다이렉트 정보 확인
-    const surveyRedirect = sessionStorage.getItem('survey_redirect');
-    if (surveyRedirect) {
-      const data = JSON.parse(surveyRedirect);
-      sessionStorage.removeItem('survey_redirect');
-      
-      // survey-001-token-abc123 형태를 파싱
-      const parts = data.id.split('-token-');
-      if (parts.length === 2) {
-        setSurveyId(parts[0]);
-        setSurveyToken(parts[1]);
-        setIsEvaluatorSurvey(true);
-        setActiveTab('evaluator-survey');
-        return;
-      }
-    }
-    
-    // URL 파라미터에서 survey 확인
-    const urlParams = new URLSearchParams(window.location.search);
-    const surveyParam = urlParams.get('survey');
-    if (surveyParam) {
-      const parts = surveyParam.split('-token-');
-      if (parts.length === 2) {
-        setSurveyId(parts[0]);
-        setSurveyToken(parts[1]);
-        setIsEvaluatorSurvey(true);
-        setActiveTab('evaluator-survey');
-        return;
-      }
-    }
-    
-    // 직접 경로 확인 (개발 환경)
-    const path = window.location.pathname;
-    const surveyMatch = path.match(/\/survey\/eval\/(.+)/);
-    
-    if (surveyMatch) {
-      const fullId = surveyMatch[1];
-      const parts = fullId.split('-token-');
-      if (parts.length === 2) {
-        setSurveyId(parts[0]);
-        setSurveyToken(parts[1]);
-        setIsEvaluatorSurvey(true);
-        setActiveTab('evaluator-survey');
-      }
-    }
-  }, []);
 
   // URL 파라미터 변경 감지 및 자동 로그인 처리
   useEffect(() => {
@@ -159,65 +102,22 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // demographic-survey 직접 접근 시 자동 데모 로그인 처리
-  useEffect(() => {
-    console.log('🔍 현재 상태 체크:', { activeTab, user: !!user, isDemoMode });
-    
-    if (activeTab === 'demographic-survey' && !user && !isDemoMode) {
-      console.log('🚀 설문조사 페이지 자동 데모 로그인 시작');
-      
-      // 데모 모드 활성화
-      setIsDemoMode(true);
-      setBackendStatus('unavailable');
-      
-      // 데모 사용자 설정
-      const demoUser = {
-        ...DEMO_USER,
-        id: 'auto-demo-user',
-        email: 'demo@ahp-system.com',
-        role: 'admin' as const,
-        admin_type: 'personal' as const
-      };
-      
-      setUser(demoUser);
-      setProjects(DEMO_PROJECTS);
-      setIsNavigationReady(true);
-      
-      console.log('✅ 설문조사 페이지 자동 로그인 완료', demoUser);
-    }
-  }, [activeTab, user, isDemoMode]);
   const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
   const [showApiErrorModal, setShowApiErrorModal] = useState(false);
   const [isNavigationReady, setIsNavigationReady] = useState(false);
 
   // 초기 로딩 및 백엔드 연결 체크
   useEffect(() => {
-    const isProduction = process.env.NODE_ENV === 'production';
+    console.log('🚀 앱 초기화 - 백엔드 연결 확인');
+    checkBackendAndInitialize();
     
-    console.log('🚀 앱 초기화:', { 
-      nodeEnv: process.env.NODE_ENV,
-      isProduction,
-      currentUrl: window.location.href
-    });
-    
-    if (isProduction) {
-      console.log('🎯 프로덕션 환경 - 데모 모드 활성화');
-      activateDemoMode();
-      setIsNavigationReady(true);
-    } else {
-      console.log('🔧 개발 환경 - 백엔드 연결 확인');
-      checkBackendAndInitialize();
-    }
-    
-    if (!isProduction) {
-      const intervalId = setInterval(() => {
-        if (backendStatus === 'available') {
-          checkApiConnection();
-        }
-      }, 5 * 60 * 1000);
+    const intervalId = setInterval(() => {
+      if (backendStatus === 'available') {
+        checkApiConnection();
+      }
+    }, 5 * 60 * 1000);
 
-      return () => clearInterval(intervalId);
-    }
+    return () => clearInterval(intervalId);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendStatus]);
   
@@ -271,74 +171,27 @@ function App() {
   
   // 페이지 로드 시 세션 복구 시도
   useEffect(() => {
-    const restoreSessionOnLoad = () => {
-      const token = sessionService.getToken();
-      
-      if (token && sessionService.isSessionValid()) {
-        console.log('🔄 페이지 새로고침 - 세션 복구 시도');
-        
-        // 데모 모드에서 세션 복구
-        if (isDemoMode || process.env.NODE_ENV === 'production') {
-          // 저장된 사용자 정보가 있는지 확인
-          const savedUserData = sessionStorage.getItem('saved_user_data');
-          
-          if (savedUserData) {
-            try {
-              let userData = JSON.parse(savedUserData);
-              
-              // userSettings에서 최신 이름 정보 확인 및 병합
-              const userSettings = sessionStorage.getItem('userSettings');
-              if (userSettings) {
-                try {
-                  const settingsData = JSON.parse(userSettings);
-                  if (settingsData.profile && settingsData.profile.firstName && settingsData.profile.lastName) {
-                    console.log('🔄 F5 새로고침: userSettings에서 최신 이름 복원');
-                    userData = {
-                      ...userData,
-                      first_name: settingsData.profile.firstName,
-                      last_name: settingsData.profile.lastName,
-                      _updated: Date.now() // React 리렌더링 강제
-                    };
-                    console.log('✅ 병합된 사용자 정보:', userData);
-                  }
-                } catch (settingsError) {
-                  console.error('userSettings 파싱 에러:', settingsError);
-                }
-              }
-              
-              setUser(userData);
-              setProjects(DEMO_PROJECTS);
-              setSelectedProjectId(DEMO_PROJECTS[0].id);
-              
-              // 저장된 탭 정보가 있으면 복원
-              const savedTab = sessionStorage.getItem('current_tab');
-              if (savedTab && protectedTabs.includes(savedTab)) {
-                setActiveTab(savedTab);
-                console.log(`✅ 세션 및 탭 복구 완료: ${savedTab}`);
-              } else {
-                // 사용자 역할에 따른 기본 탭
-                if (userData.role === 'evaluator') {
-                  setActiveTab('evaluator-dashboard');
-                } else if (userData.role === 'super_admin') {
-                  setActiveTab('super-admin');
-                } else {
-                  setActiveTab('personal-service');
-                }
-                console.log(`✅ 세션 복구 및 기본 탭 설정 완료`);
-              }
-              
-              return;
-            } catch (error) {
-              console.error('사용자 데이터 파싱 오류:', error);
-              sessionStorage.removeItem('saved_user_data');
-            }
+    const restoreSessionOnLoad = async () => {
+      try {
+        // 백엔드에서 현재 로그인 상태 확인
+        const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
           }
+        });
+        
+        if (response.ok) {
+          const data = await response.json();
+          console.log('🔄 페이지 새로고침 - 세션 복구 성공');
+          setUser(data.user);
+        } else {
+          console.log('❌ 세션 만료 또는 로그인 필요');
+          setUser(null);
         }
-      } else {
-        // 세션이 만료된 경우 저장된 데이터 정리
-        sessionStorage.removeItem('saved_user_data');
-        sessionStorage.removeItem('current_tab');
-        console.log('⚠️ 세션 만료 - 저장된 데이터 정리');
+      } catch (error) {
+        console.error('세션 복구 실패:', error);
+        setUser(null);
       }
     };
 
@@ -347,7 +200,7 @@ function App() {
       restoreSessionOnLoad();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isDemoMode, isNavigationReady]);
+  }, [isNavigationReady]);
 
   // 페이지 새로고침 시 URL에서 상태 복원
   useEffect(() => {
@@ -369,23 +222,6 @@ function App() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, isNavigationReady]);
 
-  const activateDemoMode = () => {
-    console.log('🎯 데모 모드 강제 활성화 - AI 개발 활용 방안 AHP 분석');
-    setBackendStatus('unavailable');
-    setIsDemoMode(true);
-    // 자동 로그인 제거 - 사용자가 직접 로그인하도록
-    // setUser({
-    //   ...DEMO_USER,
-    //   id: '1',
-    //   email: 'admin@ahp-system.com',
-    //   admin_type: 'personal'
-    // });
-    setProjects(DEMO_PROJECTS);
-    // setSelectedProjectId(DEMO_PROJECTS[0].id);
-    // setActiveTab('personal-service'); // 자동 이동 제거
-    setIsNavigationReady(true);
-    console.log('✅ 데모 데이터 설정 완료');
-  };
 
   const checkBackendAndInitialize = async () => {
     try {
@@ -409,7 +245,6 @@ function App() {
       if (response.ok) {
         console.log('✅ 백엔드 연결 성공');
         setBackendStatus('available');
-        setIsDemoMode(false);
         setShowApiErrorModal(false);
         setIsNavigationReady(true);
         
@@ -425,8 +260,7 @@ function App() {
 
   const fallbackToDemoMode = () => {
     setBackendStatus('unavailable');
-    setShowApiErrorModal(false);
-    activateDemoMode();
+    setShowApiErrorModal(true);
   };
 
   // API 연결 상태 체크 (백그라운드에서 실행)
@@ -447,8 +281,9 @@ function App() {
       clearTimeout(timeoutId);
       
       if (!response.ok) {
-        console.log('⚠️ API 연결 끊김 - 데모 모드로 전환');
-        fallbackToDemoMode();
+        console.log('⚠️ API 연결 끊김');
+        setBackendStatus('unavailable');
+        setShowApiErrorModal(true);
       }
     } catch (error) {
       // 백그라운드 체크에서는 조용히 실패 처리
@@ -487,33 +322,8 @@ function App() {
     setLoginError('');
 
     try {
-      if (isDemoMode) {
-        // 데모 모드에서는 회원가입 후 바로 로그인 처리
-        const newUser = {
-          id: `user-${Date.now()}`,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          role: data.role === 'evaluator' ? 'admin' : 'super_admin',
-          admin_type: data.role === 'evaluator' ? 'personal' : undefined,
-        };
-
-        setUser(newUser as any);
-        setRegisterMode(null);
-        
-        // 회원가입 후 적절한 페이지로 리다이렉트
-        if (data.role === 'evaluator') {
-          setActiveTab('personal-service');
-        } else {
-          setActiveTab('personal-service'); // welcome에서 personal-service로 변경
-        }
-        
-        console.log('✅ 회원가입 성공:', newUser);
-        return;
-      }
-
-      // 실제 백엔드가 있을 때의 회원가입 처리
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
+      // 백엔드 회원가입 처리
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -543,128 +353,39 @@ function App() {
     setLoginError('');
 
     try {
-      console.log('🔍 로그인 시도:', { 
-        email, 
-        password: password ? '***' : 'empty',
-        isDemoMode,
-        backendStatus,
-        nodeEnv: process.env.NODE_ENV
-      });
+      console.log('🔍 백엔드 로그인 시도:', { email });
       
-      // 프로덕션 환경이거나 백엔드가 불가능한 경우 데모 모드로 처리
-      if (isDemoMode || process.env.NODE_ENV === 'production' || backendStatus === 'unavailable') {
-        console.log('✅ 데모 모드에서 로그인 처리 중');
-        
-        // 실제 운영 계정 설정
-        let authenticatedUser: any = null;
-        
-        // 시스템 관리자 계정 (숨김 처리) - 모드 전환 가능
-        if (email === 'aebon@naver.com' && password === 'zzang31') {
-          console.log('✅ 시스템 관리자 계정 인증 성공');
-          authenticatedUser = {
-            id: 'super-admin-1',
-            first_name: '시스템',
-            last_name: '관리자',
-            email: 'aebon@naver.com',
-            role: 'super_admin',
-            admin_type: undefined, // 초기에는 모드 선택 필요
-            canSwitchModes: true // 모드 전환 가능 플래그
-          };
-        }
-        // 서비스 사용자 계정 (프로젝트 관리) - 바로 서비스 모드
-        else if (email === 'test@ahp.com' && (password === 'ahptester' || password === 'tester@')) {
-          console.log('✅ 서비스 사용자 계정 인증 성공');
-          authenticatedUser = {
-            id: 'service-user-1',
-            first_name: 'AHP',
-            last_name: '테스터',
-            email: 'test@ahp.com',
-            role: 'admin', // 서비스 계정은 바로 admin으로
-            admin_type: 'personal', // 바로 개인 서비스로
-            canSwitchModes: false // 모드 전환 불가
-          };
-        }
-        // 데모 계정 (공개용)
-        else if (email === 'demo@ahp-system.com' && password === 'demo123') {
-          console.log('✅ 데모 계정 인증 성공');
-          authenticatedUser = {
-            ...DEMO_USER,
-            role: role === 'admin' ? 'admin' : 'evaluator',
-            admin_type: role === 'admin' ? 'personal' : undefined
-          };
-        } else {
-          console.log('❌ 인증 실패 - 일치하는 계정이 없습니다');
-          console.log('입력된 정보:', { email, password: password ? '***' : 'empty' });
-          throw new Error(`인증 실패: 올바른 계정 정보를 입력하세요.\n사용 가능한 계정:\n- test@ahp.com / tester@ (또는 ahptester)\n- demo@ahp-system.com / demo123`);
-        }
-        
-        if (authenticatedUser) {
-          // 세션 시작 (토큰 생성)
-          const demoToken = `demo_token_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-          sessionService.startSession(demoToken);
-          
-          // 사용자 데이터 저장 (새로고침 시 복구용)
-          sessionStorage.setItem('saved_user_data', JSON.stringify(authenticatedUser));
-          
-          setUser(authenticatedUser);
-          setProjects(DEMO_PROJECTS);
-          setSelectedProjectId(DEMO_PROJECTS[0].id);
-          
-          // 로그인 성공 후 적절한 화면으로 전환
-          let targetTab = '';
-          if (authenticatedUser.role === 'evaluator') {
-            targetTab = 'evaluator-dashboard';
-          } else if (authenticatedUser.role === 'super_admin') {
-            targetTab = 'super-admin';
-          } else {
-            targetTab = 'personal-service';
-          }
-          
-          setActiveTab(targetTab);
-          sessionStorage.setItem('current_tab', targetTab);
-          
-          console.log('✅ 로그인 성공 - 역할:', authenticatedUser.role, '탭:', targetTab);
-          return;
-        }
-      } else {
-        // PostgreSQL 백엔드 로그인
-        const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
-          method: 'POST',
-          credentials: 'include',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ email, password }),
-        });
+      // 백엔드 로그인
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-        const data = await response.json();
+      const data = await response.json();
+      
+      if (response.ok) {
+        setUser(data.user);
         
-        if (response.ok) {
-          // 백엔드 로그인 성공 시 세션 시작
-          sessionService.startSession(data.token);
-          
-          // 사용자 데이터 저장 (새로고침 시 복구용)
-          sessionStorage.setItem('saved_user_data', JSON.stringify(data.user));
-          setUser(data.user);
-          
-          // 기본 탭 설정 및 저장
-          let targetTab = '';
-          if (data.user.role === 'evaluator') {
-            targetTab = 'evaluator-dashboard';
-          } else if (data.user.role === 'super_admin') {
-            targetTab = 'super-admin';
-          } else {
-            targetTab = 'personal-service';
-          }
-          setActiveTab(targetTab);
-          sessionStorage.setItem('current_tab', targetTab);
-          
-          console.log('✅ PostgreSQL 백엔드 로그인 성공');
-          // 프로젝트 목록 로드
-          await fetchProjects();
+        // 기본 탭 설정
+        let targetTab = '';
+        if (data.user.role === 'evaluator') {
+          targetTab = 'evaluator-dashboard';
+        } else if (data.user.role === 'super_admin') {
+          targetTab = 'super-admin';
         } else {
-          throw new Error(data.message || '로그인에 실패했습니다.');
+          targetTab = 'personal-service';
         }
+        setActiveTab(targetTab);
+        
+        console.log('✅ 백엔드 로그인 성공');
+        // 프로젝트 목록 로드
+        await fetchProjects();
+      } else {
+        throw new Error(data.message || '로그인에 실패했습니다.');
       }
     } catch (error) {
       setLoginError(error instanceof Error ? error.message : 'Login failed');
@@ -673,15 +394,19 @@ function App() {
     }
   };
 
-  const handleLogout = () => {
-    // 세션 서비스를 통한 로그아웃
-    sessionService.logout();
-    
-    // 저장된 데이터 정리 (sessionStorage 사용)
-    sessionStorage.removeItem('lastActiveTab');
-    sessionStorage.removeItem('selectedProjectId');
-    sessionStorage.removeItem('saved_user_data');
-    sessionStorage.removeItem('current_tab');
+  const handleLogout = async () => {
+    try {
+      // 백엔드 로그아웃 API 호출
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.error('Logout API call failed:', error);
+    }
     
     // 상태 초기화
     setUser(null);
@@ -693,7 +418,7 @@ function App() {
     setLoginError('');
     setRegisterMode(null);
     
-    console.log('✅ 로그아웃 완료 - 모든 상태 및 세션 데이터 정리됨');
+    console.log('✅ 로그아웃 완료');
   };
 
   // 보호된 탭 목록을 useMemo로 메모이제이션
@@ -710,7 +435,7 @@ function App() {
     'demographic-survey', 'evaluator-mode'
   ], []);
 
-  // 사용자 상태 저장 및 복원 (자동 리다이렉션 제거)
+  // 사용자 상태 저장 및 복원
   useEffect(() => {
     if (user) {
       // URL에서 탭 정보가 있으면 우선 사용
@@ -722,42 +447,16 @@ function App() {
         return;
       }
       
-      // URL에 탭이 없으면 마지막 활성 탭 복원
-      const lastTab = sessionStorage.getItem('lastActiveTab');
-      if (lastTab && protectedTabs.includes(lastTab)) {
-        setActiveTab(lastTab);
-        return;
-      }
-      
-      // 둘 다 없으면 기본 탭 설정 (자동 이동 최소화)
+      // 기본 탭 설정
       if (user.role === 'super_admin' && user.admin_type === 'super') {
         setActiveTab('super-admin');
       } else if (user.role === 'evaluator') {
         setActiveTab('evaluator-dashboard');
-      }
-      // 다른 경우에는 현재 탭 유지 (자동 이동하지 않음)
-      
-      // 선택된 프로젝트 복원
-      const savedProjectId = sessionStorage.getItem('selectedProjectId');
-      if (savedProjectId && !selectedProjectId) {
-        setSelectedProjectId(savedProjectId);
+      } else {
+        setActiveTab('personal-service');
       }
     }
-  }, [user, protectedTabs, selectedProjectId]);
-  
-  // 탭 변경 시 저장
-  useEffect(() => {
-    if (user && activeTab && protectedTabs.includes(activeTab)) {
-      sessionStorage.setItem('lastActiveTab', activeTab);
-    }
-  }, [activeTab, user, protectedTabs]);
-  
-  // 프로젝트 선택 시 저장
-  useEffect(() => {
-    if (selectedProjectId) {
-      sessionStorage.setItem('selectedProjectId', selectedProjectId);
-    }
-  }, [selectedProjectId]);
+  }, [user, protectedTabs]);
 
   // 관리자 유형 선택 핸들러 (더 이상 사용하지 않음 - 통합 대시보드로 대체)
   // const handleAdminTypeSelect = (adminType: 'super' | 'personal') => {
@@ -797,24 +496,12 @@ function App() {
     checkBackendAndInitialize();
   };
 
-  const handleUseDemoMode = () => {
-    setShowApiErrorModal(false);
-    activateDemoMode();
-  };
 
   const handleCloseApiError = () => {
     setShowApiErrorModal(false);
-    // 기본적으로 데모 모드로 전환
-    activateDemoMode();
   };
 
   const fetchProjects = useCallback(async () => {
-    if (isDemoMode) {
-      // 데모 모드에서는 이미 로드된 DEMO_PROJECTS 유지
-      console.log('데모 모드: 샘플 프로젝트 데이터 사용 중');
-      return;
-    }
-
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects`, {
@@ -826,34 +513,17 @@ function App() {
 
       if (response.ok) {
         const data = await response.json();
-        // Filter out old sample projects on frontend as well
-        const filteredProjects = (data.projects || []).filter((project: any) => 
-          !['스마트폰 선택 평가', '직원 채용 평가', '투자 포트폴리오 선택'].includes(project.title)
-        );
-        setProjects(filteredProjects);
+        setProjects(data.projects || []);
       }
     } catch (error) {
       console.error('Failed to fetch projects:', error);
     } finally {
       setLoading(false);
     }
-  }, [isDemoMode]);
+  }, []);
 
   // 프로젝트 생성 함수 (DB 저장)
   const createProject = async (projectData: any) => {
-    if (isDemoMode) {
-      // 데모 모드에서는 로컬 상태에만 추가
-      const newProject = {
-        ...projectData,
-        id: `demo-${Date.now()}`,
-        created_at: new Date().toISOString(),
-        user_id: user?.id,
-        status: 'active'
-      };
-      setProjects(prev => [...prev, newProject]);
-      return newProject;
-    }
-
     const response = await fetch(`${API_BASE_URL}/api/projects`, {
       method: 'POST',
       credentials: 'include',
@@ -875,10 +545,6 @@ function App() {
 
   // 기준(Criteria) CRUD 함수들
   const fetchCriteria = async (projectId: string) => {
-    if (isDemoMode) {
-      return DEMO_CRITERIA;
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/criteria`, {
         credentials: 'include',
@@ -917,10 +583,6 @@ function App() {
 
   // 대안(Alternatives) CRUD 함수들
   const fetchAlternatives = async (projectId: string) => {
-    if (isDemoMode) {
-      return DEMO_ALTERNATIVES;
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/alternatives`, {
         credentials: 'include',
@@ -978,17 +640,6 @@ function App() {
 
   // 프로젝트 삭제 (휴지통으로 이동)
   const deleteProject = async (projectId: string) => {
-    if (isDemoMode) {
-      // 데모 모드에서는 로컬 상태에서 제거
-      console.log('🗑️ 데모 모드 프로젝트 삭제:', projectId);
-      setProjects(prev => {
-        const updated = prev.filter(p => p.id !== projectId);
-        console.log('✅ 데모 모드 프로젝트 삭제 완료. 남은 프로젝트:', updated.length);
-        return updated;
-      });
-      return;
-    }
-
     const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}`, {
       method: 'DELETE',
       credentials: 'include',
@@ -1064,43 +715,6 @@ function App() {
   };
 
   const fetchUsers = useCallback(async () => {
-    if (isDemoMode) {
-      // 데모 모드에서는 샘플 사용자 데이터 사용
-      const demoUsers = [
-        {
-          id: '1',
-          email: 'admin@ahp-system.com',
-          first_name: '관리자',
-          last_name: '시스템',
-          role: 'admin',
-          created_at: '2024-01-01T00:00:00Z',
-          last_login: '2024-01-15T10:30:00Z',
-          status: 'active'
-        },
-        {
-          id: '2',
-          email: 'evaluator1@example.com',
-          first_name: '평가자',
-          last_name: '김',
-          role: 'evaluator',
-          created_at: '2024-01-02T00:00:00Z',
-          last_login: '2024-01-14T15:20:00Z',
-          status: 'active'
-        },
-        {
-          id: '3',
-          email: 'evaluator2@example.com',
-          first_name: '평가자',
-          last_name: '이',
-          role: 'evaluator',
-          created_at: '2024-01-03T00:00:00Z',
-          status: 'inactive'
-        }
-      ];
-      setUsers(demoUsers);
-      return;
-    }
-
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/users`, {
@@ -1119,23 +733,10 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [isDemoMode]);
+  }, []);
 
   // 사용자 관리 함수들
   const createUser = async (userData: any) => {
-    if (isDemoMode) {
-      // 데모 모드에서는 로컬 상태에 추가
-      const newUser = {
-        ...userData,
-        id: Date.now().toString(),
-        created_at: new Date().toISOString(),
-        last_login: undefined
-      };
-      setUsers(prev => [...prev, newUser]);
-      await new Promise(resolve => setTimeout(resolve, 1000)); // 시뮬레이션
-      return;
-    }
-
     const response = await fetch(`${API_BASE_URL}/api/users`, {
       method: 'POST',
       credentials: 'include',
@@ -1154,15 +755,6 @@ function App() {
   };
 
   const updateUser = async (userId: string, userData: any) => {
-    if (isDemoMode) {
-      // 데모 모드에서는 로컬 상태 업데이트
-      setUsers(prev => prev.map(user => 
-        user.id === userId ? { ...user, ...userData } : user
-      ));
-      await new Promise(resolve => setTimeout(resolve, 1000)); // 시뮬레이션
-      return;
-    }
-
     const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
       method: 'PUT',
       credentials: 'include',
@@ -1181,13 +773,6 @@ function App() {
   };
 
   const deleteUser = async (userId: string) => {
-    if (isDemoMode) {
-      // 데모 모드에서는 로컬 상태에서 제거
-      setUsers(prev => prev.filter(user => user.id !== userId));
-      await new Promise(resolve => setTimeout(resolve, 1000)); // 시뮬레이션
-      return;
-    }
-
     const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
       method: 'DELETE',
       credentials: 'include',
@@ -1205,12 +790,6 @@ function App() {
   };
 
   const createSampleProject = async () => {
-    if (isDemoMode) {
-      // 데모 모드에서는 이미 DEMO_PROJECTS가 로드되어 있음
-      console.log('데모 모드에서 샘플 프로젝트가 이미 로드되어 있습니다.');
-      return;
-    }
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects`, {
         method: 'POST',
@@ -1239,10 +818,7 @@ function App() {
     if (projectId) {
       setSelectedProjectId(projectId);
       setSelectedProjectTitle(projectTitle || '');
-      sessionStorage.setItem('selectedProjectId', projectId);
-      sessionStorage.setItem('selectedProjectTitle', projectTitle || '');
     }
-    sessionStorage.setItem('lastActiveTab', newTab);
     console.log(`📦 탭 전환: ${newTab}${projectId ? ` (프로젝트: ${projectTitle})` : ''}`);
   }, []);
   
@@ -1282,15 +858,11 @@ function App() {
     changeTab('personal-projects');
     setSelectedProjectId(null);
     setSelectedProjectTitle('');
-    sessionStorage.removeItem('selectedProjectId');
-    sessionStorage.removeItem('selectedProjectTitle');
   };
 
   const handleProjectSelect = (projectId: string, projectTitle: string) => {
     setSelectedProjectId(projectId);
     setSelectedProjectTitle(projectTitle);
-    sessionStorage.setItem('selectedProjectId', projectId);
-    sessionStorage.setItem('selectedProjectTitle', projectTitle);
     console.log(`📋 프로젝트 선택됨: ${projectTitle}`);
   };
 
@@ -1308,24 +880,16 @@ function App() {
     changeTab('evaluator-dashboard');
     setSelectedProjectId(null);
     setSelectedProjectTitle('');
-    sessionStorage.removeItem('selectedProjectId');
-    sessionStorage.removeItem('selectedProjectTitle');
     console.log('✅ 평가자 평가 완료');
   };
 
   useEffect(() => {
     if (user && activeTab === 'personal-projects') {
-      if (isDemoMode) {
-        // 데모 모드에서는 DEMO_PROJECTS 강제 설정
-        console.log('🔧 프로젝트 탭 활성화 - 데모 데이터 강제 설정');
-        setProjects(DEMO_PROJECTS);
-      } else {
-        fetchProjects();
-      }
+      fetchProjects();
     } else if (user && activeTab === 'personal-users' && user.role === 'admin') {
       fetchUsers();
     }
-  }, [user, activeTab, isDemoMode, fetchProjects, fetchUsers]);
+  }, [user, activeTab, fetchProjects, fetchUsers]);
 
 
 
@@ -1423,26 +987,20 @@ function App() {
         return <EvaluationTest />;
 
       case 'evaluator-mode':
-        // 평가자 모드 - 로그인 상태에 따라 다르게 처리
+        // 평가자 모드 - 로그인 필요
         if (!user) {
-          // 로그인하지 않은 경우 데모 사용자로 자동 설정
-          const evaluatorUser = {
-            id: 'demo-evaluator',
-            firstName: '데모',
-            lastName: '평가자',
-            email: 'evaluator@demo.com',
-            role: 'evaluator' as const
-          };
-          
           return (
-            <EvaluatorDashboard 
-              user={evaluatorUser}
-              onSwitchToAdmin={() => setActiveTab('personal-service')}
-              onLogout={() => {
-                setUser(null);
-                setActiveTab('home');
-              }}
-            />
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+              <div className="text-center">
+                <h2 className="text-xl font-semibold mb-4">로그인이 필요합니다</h2>
+                <button
+                  onClick={() => setActiveTab('login')}
+                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                >
+                  로그인하기
+                </button>
+              </div>
+            </div>
           );
         }
 
@@ -1458,10 +1016,7 @@ function App() {
                 role: 'evaluator'
               }}
               onSwitchToAdmin={() => setActiveTab('personal-service')}
-              onLogout={() => {
-                setUser(null);
-                setActiveTab('home');
-              }}
+              onLogout={handleLogout}
             />
           );
         } else {
@@ -1495,32 +1050,6 @@ function App() {
       case 'decision-support-system':
       case 'personal-settings':
         if (!user) {
-          // demographic-survey 직접 접근 시 자동 데모 로그인
-          if (activeTab === 'demographic-survey') {
-            console.log('🚀 설문조사 페이지 직접 접근 - 자동 데모 로그인 처리');
-            
-            // 즉시 데모 사용자 설정
-            setUser({
-              ...DEMO_USER,
-              id: 'auto-demo-user',
-              email: 'demo@ahp-system.com',
-              role: 'admin',
-              admin_type: 'personal'
-            });
-            setProjects(DEMO_PROJECTS);
-            setIsDemoMode(true);
-            
-            // 로딩 상태를 잠시 보여준 후 페이지 렌더링
-            return (
-              <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-4xl mb-4">📊</div>
-                  <h2 className="text-xl font-semibold mb-2">설문조사 페이지 로딩 중...</h2>
-                  <p className="text-gray-600">잠시만 기다려주세요.</p>
-                </div>
-              </div>
-            );
-          }
           return null;
         }
         console.log('🎯 PersonalServiceDashboard 렌더링:', { activeTab, userId: user.id, userRole: user.role });
@@ -1632,7 +1161,6 @@ function App() {
 
       case 'personal-projects':
         console.log('🔍 프로젝트 관리 렌더링 - 현재 프로젝트:', projects);
-        console.log('📊 데모 모드:', isDemoMode, '프로젝트 수:', projects.length);
         return (
           <Card title="프로젝트 관리">
             {loading ? (
@@ -1648,14 +1176,12 @@ function App() {
                     >
                       새 프로젝트 생성
                     </button>
-                    {!isDemoMode && (
-                      <button
-                        onClick={createSampleProject}
-                        className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                      >
-                        샘플 프로젝트 생성
-                      </button>
-                    )}
+                    <button
+                      onClick={createSampleProject}
+                      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+                    >
+                      샘플 프로젝트 생성
+                    </button>
                   </div>
                 </div>
                 
@@ -1781,8 +1307,8 @@ function App() {
         return (
           <ResultsDashboard 
             projectId={selectedProjectId} 
-            projectTitle={isDemoMode ? DEMO_PROJECTS[0].title : 'AHP 프로젝트'}
-            demoMode={isDemoMode}
+            projectTitle={'AHP 프로젝트'}
+            demoMode={false}
           />
         );
         
@@ -1887,9 +1413,9 @@ function App() {
         return (
           <PairwiseComparison 
             projectId={selectedProjectId} 
-            criteria={isDemoMode ? DEMO_CRITERIA : []}
-            alternatives={isDemoMode ? DEMO_ALTERNATIVES : []}
-            demoMode={isDemoMode}
+            criteria={[]}
+            alternatives={[]}
+            demoMode={false}
           />
         );
         
@@ -1952,7 +1478,6 @@ function App() {
           isVisible={showApiErrorModal}
           onClose={handleCloseApiError}
           onRetry={handleApiRetry}
-          onUseDemoMode={handleUseDemoMode}
         />
       </div>
     );
@@ -1966,7 +1491,6 @@ function App() {
         isVisible={showApiErrorModal}
         onClose={handleCloseApiError}
         onRetry={handleApiRetry}
-        onUseDemoMode={handleUseDemoMode}
       />
     </div>
   );
