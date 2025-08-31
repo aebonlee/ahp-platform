@@ -1003,6 +1003,100 @@ function App() {
     return response.json();
   };
 
+  // 프로젝트 삭제 (휴지통으로 이동)
+  const deleteProject = async (projectId: string) => {
+    if (isDemoMode) {
+      // 데모 모드에서는 로컬 상태에서 제거
+      setProjects(prev => prev.filter(p => p.id !== projectId));
+      return;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '프로젝트 삭제에 실패했습니다.');
+    }
+
+    await fetchProjects(); // 목록 새로고침
+    return response.json();
+  };
+
+  // 휴지통 프로젝트 조회
+  const fetchTrashedProjects = async () => {
+    if (isDemoMode) {
+      return []; // 데모 모드에서는 휴지통 기능 없음
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/projects?status=deleted`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.projects || [];
+      }
+    } catch (error) {
+      console.error('Failed to fetch trashed projects:', error);
+    }
+    return [];
+  };
+
+  // 휴지통에서 복원
+  const restoreProject = async (projectId: string) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/restore`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '프로젝트 복원에 실패했습니다.');
+    }
+
+    await fetchProjects(); // 목록 새로고침
+    return response.json();
+  };
+
+  // 영구 삭제
+  const permanentDeleteProject = async (projectId: string) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/permanent`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '영구 삭제에 실패했습니다.');
+    }
+
+    return response.json();
+  };
+
   const fetchUsers = useCallback(async () => {
     if (isDemoMode) {
       // 데모 모드에서는 샘플 사용자 데이터 사용
@@ -1484,11 +1578,15 @@ function App() {
             onUserUpdate={setUser}
             projects={projects}
             onCreateProject={createProject}
+            onDeleteProject={deleteProject}
             onFetchCriteria={fetchCriteria}
             onCreateCriteria={createCriteria}
             onFetchAlternatives={fetchAlternatives}
             onCreateAlternative={createAlternative}
             onSaveEvaluation={saveEvaluation}
+            onFetchTrashedProjects={fetchTrashedProjects}
+            onRestoreProject={restoreProject}
+            onPermanentDeleteProject={permanentDeleteProject}
             selectedProjectId={selectedProjectId}
             onSelectProject={setSelectedProjectId}
           />

@@ -18,6 +18,7 @@ import SurveyManagementSystem from '../survey/SurveyManagementSystem';
 import PersonalSettings from '../settings/PersonalSettings';
 import UsageManagement from './UsageManagement';
 import ValidityCheck from '../validity/ValidityCheck';
+import TrashBin from './TrashBin';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
 import { DEMO_CRITERIA, DEMO_ALTERNATIVES, DEMO_EVALUATORS } from '../../data/demoData';
@@ -43,11 +44,15 @@ interface PersonalServiceProps {
   }) => void;
   projects?: any[];
   onCreateProject?: (projectData: any) => Promise<any>;
+  onDeleteProject?: (projectId: string) => Promise<any>;
   onFetchCriteria?: (projectId: string) => Promise<any[]>;
   onCreateCriteria?: (projectId: string, criteriaData: any) => Promise<any>;
   onFetchAlternatives?: (projectId: string) => Promise<any[]>;
   onCreateAlternative?: (projectId: string, alternativeData: any) => Promise<any>;
   onSaveEvaluation?: (projectId: string, evaluationData: any) => Promise<any>;
+  onFetchTrashedProjects?: () => Promise<any[]>;
+  onRestoreProject?: (projectId: string) => Promise<any>;
+  onPermanentDeleteProject?: (projectId: string) => Promise<any>;
   selectedProjectId?: string | null;
   onSelectProject?: (projectId: string | null) => void;
 }
@@ -76,11 +81,15 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   onUserUpdate,
   projects: externalProjects,
   onCreateProject,
+  onDeleteProject,
   onFetchCriteria,
   onCreateCriteria,
   onFetchAlternatives,
   onCreateAlternative,
   onSaveEvaluation,
+  onFetchTrashedProjects,
+  onRestoreProject,
+  onPermanentDeleteProject,
   selectedProjectId: externalSelectedProjectId,
   onSelectProject: externalOnSelectProject
 }) => {
@@ -144,7 +153,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     description: string;
     nextAction: string;
   } | null>(null);
-  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'evaluation-test' | 'settings' | 'usage-management' | 'payment' | 'demographic-survey'>(() => {
+  const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'evaluation-test' | 'settings' | 'usage-management' | 'payment' | 'demographic-survey' | 'trash'>(() => {
     // URL 파라미터에서 직접 demographic-survey 확인
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
@@ -353,22 +362,31 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   };
 
   const handleDeleteProject = async (projectId: string) => {
-    if (window.confirm('정말로 이 프로젝트를 삭제하시겠습니까? 모든 관련 데이터가 삭제됩니다.')) {
+    const project = projects.find(p => p.id === projectId);
+    const projectTitle = project?.title || '프로젝트';
+    
+    if (window.confirm(`"${projectTitle}"를 휴지통으로 이동하시겠습니까?\n\n휴지통에서 복원하거나 영구 삭제할 수 있습니다.`)) {
       try {
-        // dataService를 사용하여 프로젝트 삭제 (자동으로 온라인/오프라인 모드 처리)
-        console.log('🗑️ 프로젝트 삭제:', projectId);
-        const success = await dataService.deleteProject(projectId);
-        
-        if (success) {
-          const updatedProjects = projects.filter(p => p.id !== projectId);
-          setProjects(updatedProjects);
-          console.log('✅ Project deleted successfully:', projectId);
+        if (onDeleteProject) {
+          console.log('🗑️ 프로젝트 휴지통 이동:', projectId);
+          await onDeleteProject(projectId);
+          console.log('✅ 프로젝트가 휴지통으로 이동되었습니다:', projectId);
         } else {
-          alert('프로젝트 삭제에 실패했습니다.');
+          // Fallback to dataService
+          console.log('🗑️ 프로젝트 삭제 (dataService):', projectId);
+          const success = await dataService.deleteProject(projectId);
+          
+          if (success) {
+            const updatedProjects = projects.filter(p => p.id !== projectId);
+            setProjects(updatedProjects);
+            console.log('✅ Project deleted successfully:', projectId);
+          } else {
+            alert('프로젝트 삭제에 실패했습니다.');
+          }
         }
       } catch (error) {
         console.error('Project deletion error:', error);
-        alert('프로젝트 삭제 중 오류가 발생했습니다.');
+        alert(error instanceof Error ? error.message : '프로젝트 삭제 중 오류가 발생했습니다.');
       }
     }
   };
@@ -2994,6 +3012,15 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             <PaymentSystem />
           </div>
         );
+      case 'trash':
+        return (
+          <TrashBin
+            onFetchTrashedProjects={fetchTrashedProjects}
+            onRestoreProject={restoreProject}
+            onPermanentDeleteProject={permanentDeleteProject}
+            onBack={() => handleTabChange('dashboard')}
+          />
+        );
       case 'demographic-survey':
         return (
           <div className="space-y-6">
@@ -3863,6 +3890,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           {/* Second Row - Advanced Functions (8 items) */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
             {[
+              { id: 'trash', label: '휴지통', icon: '🗑️', tooltip: '삭제된 프로젝트 복원 및 영구 삭제' },
               { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과와 순위 확인' },
               { id: 'demographic-survey', label: '인구통계학적 설문조사', icon: '📋', tooltip: 'Google Forms 스타일 설문 생성 및 관리' },
               { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기' },
