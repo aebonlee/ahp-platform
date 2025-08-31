@@ -84,6 +84,32 @@ router.put('/:id',
   }
 );
 
+// 사용자 본인 정보 조회
+router.get('/profile',
+  authenticateToken,
+  async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const userId = req.user.id;
+      console.log('🔍 Profile fetch request for user:', userId);
+      
+      const user = await UserService.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      
+      const { password_hash, ...userResponse } = user;
+      
+      res.json({ 
+        success: true,
+        user: userResponse 
+      });
+    } catch (error) {
+      console.error('Profile fetch error:', error);
+      res.status(500).json({ error: 'Failed to fetch profile' });
+    }
+  }
+);
+
 // 사용자 본인 정보 업데이트 (일반 사용자용)
 router.put('/profile',
   authenticateToken,

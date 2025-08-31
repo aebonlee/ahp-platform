@@ -40,6 +40,10 @@ export class UserService {
     return result.rows[0] || null;
   }
 
+  static async getUser(id: string): Promise<User | null> {
+    return this.findById(id);
+  }
+
   static async getAllUsers(role?: 'admin' | 'evaluator'): Promise<User[]> {
     let queryText = 'SELECT * FROM users WHERE is_active = true';
     let params: any[] = [];
@@ -55,7 +59,7 @@ export class UserService {
     return result.rows;
   }
 
-  static async updateUser(id: string, updates: Partial<Pick<User, 'first_name' | 'last_name' | 'email' | 'is_active'>>): Promise<User> {
+  static async updateUser(id: string, updates: Partial<User>): Promise<User> {
     console.log('🔍 UserService.updateUser 호출:', {
       id,
       idType: typeof id,
@@ -63,11 +67,39 @@ export class UserService {
       updateKeys: Object.keys(updates)
     });
     
-    const setClause = Object.keys(updates)
+    // 업데이트 가능한 필드 필터링
+    const allowedFields = [
+      'first_name', 'last_name', 'email', 'is_active',
+      'phone', 'organization', 'department', 'profile_image',
+      'theme', 'language', 'notifications'
+    ];
+    
+    const filteredUpdates: any = {};
+    for (const key of allowedFields) {
+      if (key in updates) {
+        // notifications은 JSON으로 변환
+        if (key === 'notifications' && typeof updates[key] === 'object') {
+          filteredUpdates[key] = JSON.stringify(updates[key]);
+        } else {
+          filteredUpdates[key] = updates[key];
+        }
+      }
+    }
+    
+    if (Object.keys(filteredUpdates).length === 0) {
+      // 업데이트할 필드가 없으면 현재 사용자 정보 반환
+      const currentUser = await this.findById(id);
+      if (!currentUser) {
+        throw new Error('User not found');
+      }
+      return currentUser;
+    }
+    
+    const setClause = Object.keys(filteredUpdates)
       .map((key, index) => `${key} = $${index + 2}`)
       .join(', ');
     
-    const values = [id, ...Object.values(updates)];
+    const values = [id, ...Object.values(filteredUpdates)];
     console.log('📊 SQL 쿼리 정보:', {
       setClause,
       values,

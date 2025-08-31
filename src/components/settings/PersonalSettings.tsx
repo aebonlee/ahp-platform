@@ -158,62 +158,81 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
-  // 로컬 스토리지에서 설정 불러오기 및 동기화 체크
+  // DB에서 사용자 정보 불러오기 및 동기화
   useEffect(() => {
-    // 초기 설정 로드는 getInitialSettings에서 처리됨
-    
-    // 동기화 필요 여부 확인
-    const pendingSync = localStorage.getItem('user_settings_pending_sync');
-    if (pendingSync === 'true') {
-      console.log('⚠️ DB 동기화 대기 중인 설정이 있습니다.');
-      
-      // 백그라운드에서 동기화 재시도
+    const loadUserDataFromDB = async () => {
       const token = localStorage.getItem('token');
-      if (token) {
-        fetch(`${API_BASE_URL}/api/users/profile`, {
+      if (!token) {
+        console.log('🔒 토큰 없음 - 로그인 필요');
+        return;
+      }
+
+      try {
+        // DB에서 최신 사용자 정보 가져오기
+        const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${token}`
           }
-        }).then(response => {
-          if (response.ok) {
-            console.log('📡 서버 연결 가능 - 동기화 시도');
-            // 서버가 살아있으면 현재 설정을 다시 저장 시도
-            // saveSettings 대신 직접 동기화 로직 실행
-            const offlineSettings = localStorage.getItem('user_settings_offline');
-            if (offlineSettings) {
-              const parsed = JSON.parse(offlineSettings);
-              // 백그라운드에서 DB 동기화 시도
-              fetch(`${API_BASE_URL}/api/users/profile`, {
-                method: 'PUT',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                  first_name: parsed.profile?.firstName,
-                  last_name: parsed.profile?.lastName,
-                  email: parsed.profile?.email,
-                  phone: parsed.profile?.phone,
-                  organization: parsed.profile?.organization,
-                  department: parsed.profile?.department
-                })
-              }).then(res => {
-                if (res.ok) {
-                  console.log('✅ 오프라인 설정 DB 동기화 성공');
-                  localStorage.removeItem('user_settings_pending_sync');
-                  localStorage.setItem('user_settings_synced', new Date().toISOString());
-                }
-              }).catch(err => {
-                console.warn('동기화 실패:', err);
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          console.log('📥 DB에서 사용자 정보 로드:', data);
+          
+          // DB 데이터로 설정 업데이트
+          if (data.user) {
+            const dbSettings = {
+              profile: {
+                firstName: data.user.first_name || settings.profile.firstName,
+                lastName: data.user.last_name || settings.profile.lastName,
+                email: data.user.email || settings.profile.email,
+                phone: data.user.phone || settings.profile.phone,
+                organization: data.user.organization || settings.profile.organization,
+                department: data.user.department || settings.profile.department,
+                profileImage: data.user.profile_image || settings.profile.profileImage
+              },
+              security: settings.security,
+              workflow: settings.workflow,
+              notifications: data.user.notifications || settings.notifications,
+              display: {
+                ...settings.display,
+                theme: data.user.theme || settings.display.theme,
+                language: data.user.language || settings.display.language
+              },
+              privacy: settings.privacy
+            };
+            
+            setSettings(dbSettings);
+            localStorage.setItem('userSettings', JSON.stringify(dbSettings));
+            localStorage.removeItem('user_settings_pending_sync');
+            
+            // 사용자 정보 업데이트 콜백 호출
+            if (onUserUpdate && (data.user.first_name !== user.first_name || data.user.last_name !== user.last_name)) {
+              onUserUpdate({
+                ...user,
+                first_name: data.user.first_name,
+                last_name: data.user.last_name
               });
             }
           }
-        }).catch(() => {
-          console.log('📴 서버 연결 불가 - 오프라인 모드 유지');
-        });
+        } else if (response.status === 404) {
+          console.log('⚠️ 사용자 프로필이 DB에 없음 - 초기 설정 사용');
+          // DB에 프로필이 없으면 현재 설정을 저장
+          saveSettings();
+        }
+      } catch (error) {
+        console.warn('📴 DB 연결 실패 - 로컬 설정 사용:', error);
+        // 오프라인 설정 확인
+        const offlineSettings = localStorage.getItem('user_settings_offline');
+        if (offlineSettings) {
+          const parsed = JSON.parse(offlineSettings);
+          setSettings(parsed);
+        }
       }
-    }
+    };
+
+    loadUserDataFromDB();
   }, []);
 
   // 설정 저장 함수
