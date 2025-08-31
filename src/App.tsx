@@ -850,6 +850,159 @@ function App() {
     }
   }, [isDemoMode]);
 
+  // 프로젝트 생성 함수 (DB 저장)
+  const createProject = async (projectData: any) => {
+    if (isDemoMode) {
+      // 데모 모드에서는 로컬 상태에만 추가
+      const newProject = {
+        ...projectData,
+        id: `demo-${Date.now()}`,
+        created_at: new Date().toISOString(),
+        user_id: user?.id,
+        status: 'active'
+      };
+      setProjects(prev => [...prev, newProject]);
+      return newProject;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/projects`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(projectData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '프로젝트 생성에 실패했습니다.');
+    }
+
+    const data = await response.json();
+    await fetchProjects(); // 목록 새로고침
+    return data.project;
+  };
+
+  // 기준(Criteria) CRUD 함수들
+  const fetchCriteria = async (projectId: string) => {
+    if (isDemoMode) {
+      return DEMO_CRITERIA;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/criteria`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.criteria || [];
+      }
+    } catch (error) {
+      console.error('Failed to fetch criteria:', error);
+    }
+    return [];
+  };
+
+  const createCriteria = async (projectId: string, criteriaData: any) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/criteria`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...criteriaData, project_id: projectId }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '기준 추가에 실패했습니다.');
+    }
+
+    return response.json();
+  };
+
+  // 대안(Alternatives) CRUD 함수들
+  const fetchAlternatives = async (projectId: string) => {
+    if (isDemoMode) {
+      return DEMO_ALTERNATIVES;
+    }
+
+    const token = localStorage.getItem('token');
+    if (!token) return [];
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/alternatives`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.alternatives || [];
+      }
+    } catch (error) {
+      console.error('Failed to fetch alternatives:', error);
+    }
+    return [];
+  };
+
+  const createAlternative = async (projectId: string, alternativeData: any) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/alternatives`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ...alternativeData, project_id: projectId }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '대안 추가에 실패했습니다.');
+    }
+
+    return response.json();
+  };
+
+  // 평가 데이터 저장
+  const saveEvaluation = async (projectId: string, evaluationData: any) => {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error('로그인이 필요합니다.');
+
+    const response = await fetch(`${API_BASE_URL}/api/evaluate`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ project_id: projectId, ...evaluationData }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || '평가 저장에 실패했습니다.');
+    }
+
+    return response.json();
+  };
+
   const fetchUsers = useCallback(async () => {
     if (isDemoMode) {
       // 데모 모드에서는 샘플 사용자 데이터 사용
@@ -1329,6 +1482,15 @@ function App() {
             activeTab={activeTab}
             onTabChange={setActiveTab}
             onUserUpdate={setUser}
+            projects={projects}
+            onCreateProject={createProject}
+            onFetchCriteria={fetchCriteria}
+            onCreateCriteria={createCriteria}
+            onFetchAlternatives={fetchAlternatives}
+            onCreateAlternative={createAlternative}
+            onSaveEvaluation={saveEvaluation}
+            selectedProjectId={selectedProjectId}
+            onSelectProject={setSelectedProjectId}
           />
         );
 

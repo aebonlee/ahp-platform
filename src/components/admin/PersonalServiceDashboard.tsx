@@ -41,6 +41,15 @@ interface PersonalServiceProps {
     role: 'super_admin' | 'admin' | 'evaluator';
     admin_type?: 'super' | 'personal';
   }) => void;
+  projects?: any[];
+  onCreateProject?: (projectData: any) => Promise<any>;
+  onFetchCriteria?: (projectId: string) => Promise<any[]>;
+  onCreateCriteria?: (projectId: string, criteriaData: any) => Promise<any>;
+  onFetchAlternatives?: (projectId: string) => Promise<any[]>;
+  onCreateAlternative?: (projectId: string, alternativeData: any) => Promise<any>;
+  onSaveEvaluation?: (projectId: string, evaluationData: any) => Promise<any>;
+  selectedProjectId?: string | null;
+  onSelectProject?: (projectId: string | null) => void;
 }
 
 interface UserProject extends Omit<ProjectData, 'evaluation_method'> {
@@ -64,7 +73,16 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   user: initialUser, 
   activeTab: externalActiveTab,
   onTabChange: externalOnTabChange,
-  onUserUpdate
+  onUserUpdate,
+  projects: externalProjects,
+  onCreateProject,
+  onFetchCriteria,
+  onCreateCriteria,
+  onFetchAlternatives,
+  onCreateAlternative,
+  onSaveEvaluation,
+  selectedProjectId: externalSelectedProjectId,
+  onSelectProject: externalOnSelectProject
 }) => {
   // 사용자 정보 내부 상태 관리
   const [user, setUser] = useState(initialUser);
