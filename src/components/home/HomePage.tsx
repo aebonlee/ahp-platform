@@ -884,16 +884,16 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 </span>
               </div>
               <p className="text-sm mb-2" style={{ color: '#666' }}>
-                (주) 논문연구지원센터
+                한국직업능력개발센터
               </p>
               <p className="text-sm mb-2" style={{ color: '#666' }}>
-                사업자등록번호: 123-45-67890
+                사업자등록번호: 601-45-20154
               </p>
               <p className="text-sm mb-2" style={{ color: '#666' }}>
-                서울시 강남구 테헤란로 123, 4층
+                경기도 수원시 팔달구 매산로 45, 419호
               </p>
               <p className="text-sm" style={{ color: '#666' }}>
-                대표이사: 홍길동 | 통신판매업신고: 제2024-서울강남-1234호
+                대표이사: 이애본 | 통신판매신고: 제2024-수원팔달-0584호
               </p>
             </div>
 
