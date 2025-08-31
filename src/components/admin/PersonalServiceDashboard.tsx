@@ -1278,7 +1278,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
           {/* 그리드 뷰 */}
           {viewMode === 'grid' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8">
               {filteredProjects.map((project) => (
                 <div key={project.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
                   {/* 프로젝트 헤더 */}
