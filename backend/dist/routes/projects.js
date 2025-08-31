@@ -134,19 +134,105 @@ router.put('/:id', auth_1.authenticateToken, [
         res.status(500).json({ error: 'Failed to update project' });
     }
 });
+// 소프트 삭제 (휴지통으로 이동)
 router.delete('/:id', auth_1.authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user.id;
-        const result = await (0, connection_1.query)('DELETE FROM projects WHERE id = $1 AND admin_id = $2 RETURNING *', [id, userId]);
+        // 소프트 삭제 - status를 'deleted'로 변경하고 deleted_at 타임스탬프 추가
+        const result = await (0, connection_1.query)(`UPDATE projects 
+       SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1 AND admin_id = $2 AND (status IS NULL OR status != 'deleted')
+       RETURNING *`, [id, userId]);
         if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Project not found or access denied' });
+            return res.status(404).json({ error: 'Project not found, access denied, or already deleted' });
         }
-        res.json({ message: 'Project deleted successfully' });
+        res.json({
+            message: 'Project moved to trash successfully',
+            project: result.rows[0]
+        });
     }
     catch (error) {
-        console.error('Project deletion error:', error);
+        console.error('Project soft deletion error:', error);
         res.status(500).json({ error: 'Failed to delete project' });
+    }
+});
+// 휴지통 프로젝트 목록 조회
+router.get('/trash/list', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const result = await (0, connection_1.query)(`SELECT p.*, 
+              u.first_name || ' ' || u.last_name as admin_name,
+              COUNT(DISTINCT c.id) as criteria_count,
+              COUNT(DISTINCT a.id) as alternative_count
+       FROM projects p
+       LEFT JOIN users u ON p.admin_id = u.id
+       LEFT JOIN criteria c ON p.id = c.project_id
+       LEFT JOIN alternatives a ON p.id = a.project_id
+       WHERE p.admin_id = $1 AND p.status = 'deleted'
+       GROUP BY p.id, u.first_name, u.last_name
+       ORDER BY p.deleted_at DESC`, [userId]);
+        res.json({ projects: result.rows });
+    }
+    catch (error) {
+        console.error('Trash fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch trashed projects' });
+    }
+});
+// 프로젝트 복원
+router.put('/:id/restore', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        const result = await (0, connection_1.query)(`UPDATE projects 
+       SET status = 'active', deleted_at = NULL, updated_at = CURRENT_TIMESTAMP
+       WHERE id = $1 AND admin_id = $2 AND status = 'deleted'
+       RETURNING *`, [id, userId]);
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Project not found in trash or access denied' });
+        }
+        res.json({
+            message: 'Project restored successfully',
+            project: result.rows[0]
+        });
+    }
+    catch (error) {
+        console.error('Project restore error:', error);
+        res.status(500).json({ error: 'Failed to restore project' });
+    }
+});
+// 영구 삭제
+router.delete('/:id/permanent', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        // 트랜잭션으로 관련 데이터 모두 삭제
+        await (0, connection_1.query)('BEGIN');
+        try {
+            // 권한 확인
+            const checkResult = await (0, connection_1.query)('SELECT * FROM projects WHERE id = $1 AND admin_id = $2 AND status = \'deleted\'', [id, userId]);
+            if (checkResult.rows.length === 0) {
+                await (0, connection_1.query)('ROLLBACK');
+                return res.status(404).json({ error: 'Project not found in trash or access denied' });
+            }
+            // 관련 데이터 삭제 (CASCADE 설정이 없는 경우)
+            await (0, connection_1.query)('DELETE FROM pairwise_comparisons WHERE project_id = $1', [id]);
+            await (0, connection_1.query)('DELETE FROM project_evaluators WHERE project_id = $1', [id]);
+            await (0, connection_1.query)('DELETE FROM alternatives WHERE project_id = $1', [id]);
+            await (0, connection_1.query)('DELETE FROM criteria WHERE project_id = $1', [id]);
+            // 프로젝트 영구 삭제
+            await (0, connection_1.query)('DELETE FROM projects WHERE id = $1', [id]);
+            await (0, connection_1.query)('COMMIT');
+            res.json({ message: 'Project permanently deleted' });
+        }
+        catch (error) {
+            await (0, connection_1.query)('ROLLBACK');
+            throw error;
+        }
+    }
+    catch (error) {
+        console.error('Permanent deletion error:', error);
+        res.status(500).json({ error: 'Failed to permanently delete project' });
     }
 });
 // 워크플로우 상태 변경 API

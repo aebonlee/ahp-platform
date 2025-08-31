@@ -59,16 +59,7 @@ const TrashBin: React.FC<TrashBinProps> = ({
       if (projects && projects.length > 0) {
         debugLog.push(`✅ 휴지통 데이터 있음: ${JSON.stringify(projects[0], null, 2)}`);
       } else {
-        debugLog.push('⚠️ 휴지통이 비어있거나 데이터 로드 실패');
-        
-        // localStorage에서 직접 확인
-        const localTrash = localStorage.getItem('ahp_trash_projects');
-        debugLog.push(`🔍 localStorage 확인: ${localTrash ? '데이터 있음' : '데이터 없음'}`);
-        if (localTrash) {
-          const parsedTrash = JSON.parse(localTrash);
-          debugLog.push(`📦 localStorage 휴지통: ${parsedTrash.length}개`);
-          setTrashedProjects(parsedTrash);
-        }
+        debugLog.push('⚠️ 휴지통이 비어있습니다');
       }
       
       setTrashedProjects(projects || []);

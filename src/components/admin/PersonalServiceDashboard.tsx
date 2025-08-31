@@ -365,51 +365,23 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     const project = projects.find(p => p.id === projectId);
     const projectTitle = project?.title || '프로젝트';
     
-    console.log('🔍 삭제 대상 프로젝트 상세:', {
-      id: projectId,
-      title: projectTitle,
-      project: project,
-      totalProjects: projects.length
-    });
-    
     if (window.confirm(`"${projectTitle}"를 휴지통으로 이동하시겠습니까?\n\n휴지통에서 복원하거나 영구 삭제할 수 있습니다.`)) {
       try {
-        // 강제 삭제 - 모든 방법 동시 사용
-        console.log('🗑️ 강제 삭제 시작:', projectId, '현재 프로젝트 수:', projects.length);
-        
-        // 1. 즉시 로컬 상태에서 제거 (UI에서 바로 사라짐)
-        setProjects(prev => {
-          const updated = prev.filter(p => p.id !== projectId);
-          console.log('🔄 즉시 제거 완료. 남은 프로젝트:', updated.length);
-          return updated;
-        });
-        
-        // 2. dataService에서도 삭제 (영구 저장소)
-        try {
-          const success = await dataService.deleteProject(projectId);
-          console.log(success ? '✅ dataService 삭제 성공' : '❌ dataService 삭제 실패');
-        } catch (error) {
-          console.error('❌ dataService 삭제 오류:', error);
+        // onDeleteProject prop 사용 (백엔드 API 호출)
+        if (onDeleteProject) {
+          await onDeleteProject(projectId);
+          
+          // UI에서 즉시 제거
+          setProjects(prev => prev.filter(p => p.id !== projectId));
+          
+          alert(`"${projectTitle}"가 휴지통으로 이동되었습니다.`);
         }
-        
-        // 3. localStorage에서도 직접 제거 (안전장치)
-        try {
-          const existingProjects = localStorage.getItem('ahp_projects');
-          if (existingProjects) {
-            const projectList = JSON.parse(existingProjects);
-            const filteredList = projectList.filter((p: any) => p.id !== projectId);
-            localStorage.setItem('ahp_projects', JSON.stringify(filteredList));
-            console.log('🔒 localStorage에서도 제거 완료');
-          }
-        } catch (error) {
-          console.error('localStorage 제거 오류:', error);
-        }
-        
-        console.log('💥 강제 삭제 완료:', projectId);
-        alert(`"${projectTitle}"가 완전히 삭제되었습니다.`);
       } catch (error) {
         console.error('Project deletion error:', error);
         alert(error instanceof Error ? error.message : '프로젝트 삭제 중 오류가 발생했습니다.');
+        
+        // 실패 시 프로젝트 목록 다시 로드
+        await loadProjects();
       }
     }
   };
