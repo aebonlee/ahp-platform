@@ -4,9 +4,20 @@ import dataService, { ProjectData } from '../../services/dataService';
 interface MyProjectsProps {
   onProjectSelect?: (project: ProjectData) => void;
   onCreateNew?: () => void;
+  onEditProject?: (project: ProjectData) => void;
+  onDeleteProject?: (projectId: string) => void;
+  onModelBuilder?: (project: ProjectData) => void;
+  onAnalysis?: (project: ProjectData) => void;
 }
 
-const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew }) => {
+const MyProjects: React.FC<MyProjectsProps> = ({ 
+  onProjectSelect, 
+  onCreateNew, 
+  onEditProject, 
+  onDeleteProject, 
+  onModelBuilder, 
+  onAnalysis 
+}) => {
   const [projects, setProjects] = useState<ProjectData[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'active' | 'completed' | 'draft'>('all');
@@ -234,6 +245,67 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
               <div className="mt-4 pt-4 flex justify-between text-xs" style={{ borderTop: '1px solid var(--border-light)', color: 'var(--text-muted)' }}>
                 <span>생성: {new Date(project.created_at || Date.now()).toLocaleDateString('ko-KR')}</span>
                 <span>수정: {new Date(project.updated_at || Date.now()).toLocaleDateString('ko-KR')}</span>
+              </div>
+
+              {/* 액션 버튼 */}
+              <div className="mt-4 pt-4 flex justify-end space-x-2" style={{ borderTop: '1px solid var(--border-light)' }}>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onEditProject?.(project);
+                  }}
+                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  title="편집"
+                  type="button"
+                >
+                  ✏️
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onModelBuilder?.(project);
+                  }}
+                  className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                  title="모델 구축"
+                  type="button"
+                >
+                  🏗️
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onAnalysis?.(project);
+                  }}
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.color = 'var(--accent-primary)';
+                    e.currentTarget.style.backgroundColor = 'var(--bg-subtle)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.color = 'var(--text-muted)';
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
+                  title="결과 분석"
+                  type="button"
+                >
+                  📊
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onDeleteProject?.(project.id || '');
+                  }}
+                  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="삭제"
+                  type="button"
+                >
+                  🗑️
+                </button>
               </div>
             </div>
           ))}

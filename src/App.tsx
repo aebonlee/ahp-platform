@@ -1459,17 +1459,62 @@ function App() {
                           <span className="text-xs text-gray-500">
                             평가자: {project.evaluator_count}명 | 상태: {project.status}
                           </span>
-                          <div className="flex space-x-2">
+                          <div className="flex items-center space-x-2">
                             <button
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                // TODO: 편집 기능 구현
+                                console.log('편집:', project.id);
+                              }}
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="편집"
+                              type="button"
+                            >
+                              ✏️
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
                                 handleProjectSelect(project.id, project.title);
                                 setActiveTab('model-building');
                               }}
-                              className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                              title="모델 구축"
+                              type="button"
                             >
-                              모델 구성
+                              🏗️
                             </button>
-                            <span className="text-xs text-gray-500">
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleProjectSelect(project.id, project.title);
+                                setActiveTab('results-analysis');
+                              }}
+                              className="p-2 text-gray-400 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
+                              title="결과 분석"
+                              type="button"
+                            >
+                              📊
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                // TODO: 삭제 기능 구현
+                                if (window.confirm('정말로 이 프로젝트를 삭제하시겠습니까?')) {
+                                  console.log('삭제:', project.id);
+                                }
+                              }}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                              title="삭제"
+                              type="button"
+                            >
+                              🗑️
+                            </button>
+                            <span className="text-xs text-gray-500 ml-2">
                               {new Date(project.created_at).toLocaleDateString()}
                             </span>
                           </div>
