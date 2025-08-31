@@ -294,6 +294,22 @@ router.get('/:id/progress', auth_1.authenticateToken, async (req, res) => {
         res.status(500).json({ error: 'Failed to fetch project progress' });
     }
 });
+// 휴지통 프로젝트 조회
+router.get('/trash', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const result = await (0, connection_1.query)(`SELECT p.*, u.first_name || ' ' || u.last_name as admin_name
+       FROM projects p
+       LEFT JOIN users u ON p.admin_id = u.id
+       WHERE p.admin_id = $1 AND p.status = 'deleted'
+       ORDER BY p.deleted_at DESC`, [userId]);
+        res.json({ projects: result.rows });
+    }
+    catch (error) {
+        console.error('Trashed projects fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch trashed projects' });
+    }
+});
 // 프로젝트 삭제 (휴지통으로 이동)
 router.delete('/:id', auth_1.authenticateToken, async (req, res) => {
     try {

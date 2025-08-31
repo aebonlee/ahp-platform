@@ -371,6 +371,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           console.log('🗑️ 프로젝트 휴지통 이동:', projectId);
           await onDeleteProject(projectId);
           console.log('✅ 프로젝트가 휴지통으로 이동되었습니다:', projectId);
+          
+          // 프로젝트 목록 새로고침
+          await loadProjects();
         } else {
           // Fallback to dataService
           console.log('🗑️ 프로젝트 삭제 (dataService):', projectId);

@@ -1040,7 +1040,7 @@ function App() {
     if (!token) return [];
 
     try {
-      const response = await fetch(`${API_BASE_URL}/api/projects?status=deleted`, {
+      const response = await fetch(`${API_BASE_URL}/api/projects/trash`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
