@@ -13,6 +13,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
 
   // 스크롤 이벤트 처리
   useEffect(() => {
@@ -24,6 +25,33 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // 마우스 이동 효과
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  // 실시간 애니메이션 효과
+  useEffect(() => {
+    const animateElements = () => {
+      const elements = document.querySelectorAll('.floating-element');
+      elements.forEach((element, index) => {
+        const time = Date.now() * 0.001;
+        const yOffset = Math.sin(time + index) * 10;
+        const xOffset = Math.cos(time * 0.5 + index) * 5;
+        (element as HTMLElement).style.transform = `translate(${xOffset}px, ${yOffset}px)`;
+      });
+      requestAnimationFrame(animateElements);
+    };
+    
+    const animationId = requestAnimationFrame(animateElements);
+    return () => cancelAnimationFrame(animationId);
   }, []);
 
   // 테마 변경 감지
@@ -70,6 +98,14 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
     });
   };
 
+  // 부드러운 스크롤 함수
+  const scrollToSection = (sectionId: string) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen" style={{
       backgroundColor: 'var(--bg-primary, #ffffff)',
@@ -94,41 +130,76 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
             {/* 네비게이션 - 데스크톱 */}
             <nav className="hidden md:flex items-center gap-8">
-              <a href="#features" className="transition-colors text-decoration-none hover:text-decoration-none" style={{
-                color: 'var(--text-secondary)',
-                textDecoration: 'none'
-              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
-                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
+              <button 
+                onClick={() => scrollToSection('features')}
+                className="transition-colors" 
+                style={{
+                  color: 'var(--text-secondary)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} 
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
+              >
                 주요 기능
-              </a>
-              <a href="#how-it-works" className="transition-colors text-decoration-none hover:text-decoration-none" style={{
-                color: 'var(--text-secondary)',
-                textDecoration: 'none'
-              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
-                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
+              </button>
+              <button 
+                onClick={() => scrollToSection('how-it-works')}
+                className="transition-colors" 
+                style={{
+                  color: 'var(--text-secondary)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} 
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
+              >
                 이용 방법
-              </a>
-              <a href="#guide" className="transition-colors text-decoration-none hover:text-decoration-none" style={{
-                color: 'var(--text-secondary)',
-                textDecoration: 'none'
-              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
-                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
+              </button>
+              <button 
+                onClick={() => scrollToSection('guide')}
+                className="transition-colors" 
+                style={{
+                  color: 'var(--text-secondary)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} 
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
+              >
                 사용 가이드
-              </a>
-              <a href="#pricing" className="transition-colors text-decoration-none hover:text-decoration-none" style={{
-                color: 'var(--text-secondary)',
-                textDecoration: 'none'
-              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
-                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
+              </button>
+              <button 
+                onClick={() => scrollToSection('pricing')}
+                className="transition-colors" 
+                style={{
+                  color: 'var(--text-secondary)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} 
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
+              >
                 요금제
-              </a>
-              <a href="#research" className="transition-colors text-decoration-none hover:text-decoration-none" style={{
-                color: 'var(--text-secondary)',
-                textDecoration: 'none'
-              }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--accent-primary)'}
-                 onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = 'var(--text-secondary)'}>
+              </button>
+              <button 
+                onClick={() => scrollToSection('research')}
+                className="transition-colors" 
+                style={{
+                  color: 'var(--text-secondary)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} 
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
+              >
                 연구 사례
-              </a>
+              </button>
             </nav>
 
             {/* CTA 버튼들 및 테마 컨트롤 */}
@@ -181,11 +252,11 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
         {isMenuOpen && (
           <div className="md:hidden border-t" style={{ backgroundColor: 'var(--bg-secondary)' }}>
             <div className="px-6 py-4 space-y-3">
-              <a href="#features" className="block py-2" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>주요 기능</a>
-              <a href="#how-it-works" className="block py-2" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>이용 방법</a>
-              <a href="#guide" className="block py-2" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>사용 가이드</a>
-              <a href="#pricing" className="block py-2" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>요금제</a>
-              <a href="#research" className="block py-2" style={{ color: 'var(--text-secondary)', textDecoration: 'none' }}>연구 사례</a>
+              <button onClick={() => scrollToSection('features')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>주요 기능</button>
+              <button onClick={() => scrollToSection('how-it-works')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>이용 방법</button>
+              <button onClick={() => scrollToSection('guide')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>사용 가이드</button>
+              <button onClick={() => scrollToSection('pricing')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>요금제</button>
+              <button onClick={() => scrollToSection('research')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>연구 사례</button>
               
               {/* 모바일 테마 컨트롤 */}
               <div className="flex items-center gap-3 py-3 border-t" style={{ borderColor: 'var(--border-light)' }}>
@@ -207,89 +278,89 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       </header>
 
       {/* 히어로 섹션 - 풀스크린 세련된 디자인 */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden" style={{
+        background: `linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-subtle) 50%, var(--bg-secondary) 100%)`
+      }}>
         {/* 동적 배경 효과 */}
-        <div className="absolute inset-0" style={{
-          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f1f5f9 100%)'
-        }}></div>
+        <div className="absolute inset-0 pointer-events-none">
+          {/* 마우스 따라가는 그라디언트 */}
+          <div 
+            className="absolute w-96 h-96 rounded-full opacity-20 transition-all duration-1000 ease-out"
+            style={{
+              background: `radial-gradient(circle, var(--accent-primary) 0%, transparent 70%)`,
+              left: `${mousePosition.x - 192}px`,
+              top: `${mousePosition.y - 192}px`,
+              filter: 'blur(40px)'
+            }}
+          ></div>
+        </div>
         
-        {/* 플로팅 기하학적 요소들 */}
+        {/* 플로팅 기하학적 요소들 - 실시간 JavaScript 애니메이션 */}
         <div 
-          className="absolute animate-pulse" 
+          className="absolute floating-element" 
           style={{
             top: '15%',
             left: '10%',
             width: '120px',
             height: '120px',
             borderRadius: '50%',
-            background: 'linear-gradient(45deg, #0066cc, #3b82f6)',
-            opacity: 0.1,
-            animation: 'float 6s ease-in-out infinite'
+            background: `linear-gradient(45deg, var(--accent-primary), var(--accent-secondary))`,
+            opacity: 0.1
           }}
         ></div>
         <div 
-          className="absolute animate-pulse" 
+          className="absolute floating-element" 
           style={{
             top: '25%',
             right: '15%',
             width: '80px',
             height: '80px',
             borderRadius: '8px',
-            background: 'linear-gradient(45deg, #10b981, #059669)',
-            opacity: 0.15,
-            animation: 'float 8s ease-in-out infinite reverse'
+            background: `linear-gradient(45deg, var(--accent-light), var(--accent-secondary))`,
+            opacity: 0.15
           }}
         ></div>
         <div 
-          className="absolute animate-pulse" 
+          className="absolute floating-element" 
           style={{
             bottom: '30%',
             left: '15%',
             width: '100px',
             height: '100px',
             borderRadius: '50%',
-            background: 'linear-gradient(45deg, #8b5cf6, #7c3aed)',
-            opacity: 0.1,
-            animation: 'float 7s ease-in-out infinite'
+            background: `linear-gradient(45deg, var(--accent-light), var(--accent-primary))`,
+            opacity: 0.1
           }}
         ></div>
         
         <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
           <div className="space-y-8">
             {/* 세련된 배지 */}
-            <div className="inline-flex items-center px-6 py-2 text-sm font-semibold rounded-full backdrop-blur-sm" style={{
-              background: 'rgba(0, 102, 204, 0.1)',
-              color: '#0066cc',
-              border: '1px solid rgba(0, 102, 204, 0.2)'
+            <div className="inline-flex items-center px-6 py-2 text-sm font-semibold rounded-full backdrop-blur-sm border" style={{
+              backgroundColor: 'var(--bg-secondary)',
+              color: 'var(--accent-primary)',
+              borderColor: 'var(--border-light)'
             }}>
-              <span className="w-2 h-2 rounded-full mr-2 animate-pulse" style={{ backgroundColor: '#0066cc' }}></span>
+              <span className="w-2 h-2 rounded-full mr-2 animate-pulse" style={{ backgroundColor: 'var(--accent-primary)' }}></span>
               AHP 전문 연구 분석 플랫폼
             </div>
 
             {/* 메인 타이틀 - 적당한 크기와 세련된 타이포그래피 */}
             <h1 className="text-4xl md:text-6xl font-bold leading-tight" style={{ 
-              color: '#1e293b',
+              color: 'var(--text-primary)',
               fontWeight: '700',
-              letterSpacing: '-0.02em',
-              textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+              letterSpacing: '-0.02em'
             }}>
               논문 연구를 위한
               <br />
-              <span style={{ 
-                background: 'linear-gradient(135deg, #0066cc 0%, #3b82f6 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                backgroundClip: 'text',
-                display: 'inline-block',
-                marginTop: '0.5rem'
-              }}>
+              <span style={{ color: 'var(--accent-primary)' }}>
                 AHP 분석 도구
               </span>
             </h1>
 
             {/* 세련된 서브 타이틀 */}
             <p className="text-xl md:text-2xl font-light max-w-4xl mx-auto" style={{ 
-              color: '#64748b',
+              color: 'var(--text-secondary)',
               lineHeight: '1.6',
               marginBottom: '3rem'
             }}>
@@ -304,9 +375,11 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 onClick={onLoginClick}
                 className="group px-12 py-4 text-white rounded-xl font-semibold text-lg transition-all transform hover:scale-105 hover:shadow-2xl"
                 style={{ 
-                  background: 'linear-gradient(135deg, #0066cc 0%, #3b82f6 100%)',
-                  boxShadow: '0 10px 25px rgba(0, 102, 204, 0.3)'
+                  backgroundColor: 'var(--accent-primary)',
+                  boxShadow: '0 10px 25px rgba(var(--accent-primary-rgb), 0.3)'
                 }}
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-hover)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-primary)'}
               >
                 <span className="flex items-center justify-center">
                   연구 시작하기
@@ -318,20 +391,20 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               <button
                 className="px-12 py-4 rounded-xl font-semibold text-lg border-2 transition-all transform hover:scale-105 backdrop-blur-sm"
                 style={{ 
-                  backgroundColor: 'rgba(255, 255, 255, 0.9)',
-                  color: '#475569',
-                  borderColor: 'rgba(0, 102, 204, 0.2)',
+                  backgroundColor: 'var(--bg-primary)',
+                  color: 'var(--text-secondary)',
+                  borderColor: 'var(--border-medium)',
                   boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
                 }}
                 onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(0, 102, 204, 0.05)';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = '#0066cc';
-                  (e.currentTarget as HTMLButtonElement).style.color = '#0066cc';
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-secondary)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent-primary)';
+                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)';
                 }}
                 onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
-                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'rgba(0, 102, 204, 0.2)';
-                  (e.currentTarget as HTMLButtonElement).style.color = '#475569';
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary)';
+                  (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-medium)';
+                  (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
                 }}
               >
                 사용 가이드
@@ -342,17 +415,15 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div className="grid grid-cols-2 gap-16 max-w-md mx-auto">
               <div className="text-center">
                 <div className="text-4xl font-black mb-2" style={{ 
-                  color: '#0066cc',
-                  textShadow: '0 2px 4px rgba(0, 102, 204, 0.2)'
+                  color: 'var(--accent-primary)'
                 }}>1,000+</div>
-                <div className="text-sm font-medium" style={{ color: '#64748b' }}>논문 활용</div>
+                <div className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>논문 활용</div>
               </div>
               <div className="text-center">
                 <div className="text-4xl font-black mb-2" style={{ 
-                  color: '#0066cc',
-                  textShadow: '0 2px 4px rgba(0, 102, 204, 0.2)'
+                  color: 'var(--accent-primary)'
                 }}>98%</div>
-                <div className="text-sm font-medium" style={{ color: '#64748b' }}>연구자 만족도</div>
+                <div className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>연구자 만족도</div>
               </div>
             </div>
           </div>
