@@ -52,7 +52,7 @@ const TrashBin: React.FC<TrashBinProps> = ({
   const handleRestore = async (projectId: string, projectTitle: string) => {
     if (!onRestoreProject) return;
     
-    if (!confirm(`"${projectTitle}" 프로젝트를 복원하시겠습니까?`)) {
+    if (!window.confirm(`"${projectTitle}" 프로젝트를 복원하시겠습니까?`)) {
       return;
     }
 
@@ -75,12 +75,12 @@ const TrashBin: React.FC<TrashBinProps> = ({
   const handlePermanentDelete = async (projectId: string, projectTitle: string) => {
     if (!onPermanentDeleteProject) return;
     
-    if (!confirm(`"${projectTitle}" 프로젝트를 영구 삭제하시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없습니다!\n- 모든 평가 데이터\n- 기준 및 대안\n- 평가자 배정 정보\n\n모든 데이터가 완전히 삭제됩니다.`)) {
+    if (!window.confirm(`"${projectTitle}" 프로젝트를 영구 삭제하시겠습니까?\n\n⚠️ 이 작업은 되돌릴 수 없습니다!\n- 모든 평가 데이터\n- 기준 및 대안\n- 평가자 배정 정보\n\n모든 데이터가 완전히 삭제됩니다.`)) {
       return;
     }
 
     // 한 번 더 확인
-    if (!confirm(`정말로 "${projectTitle}"를 영구 삭제하시겠습니까?\n\n마지막 확인입니다.`)) {
+    if (!window.confirm(`정말로 "${projectTitle}"를 영구 삭제하시겠습니까?\n\n마지막 확인입니다.`)) {
       return;
     }
 
@@ -215,7 +215,7 @@ const TrashBin: React.FC<TrashBinProps> = ({
                         ↩️ 복원
                       </Button>
                       <Button
-                        variant="danger"
+                        variant="error"
                         size="sm"
                         onClick={() => handlePermanentDelete(project.id, project.title)}
                         disabled={actionLoading === project.id}

@@ -3015,9 +3015,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       case 'trash':
         return (
           <TrashBin
-            onFetchTrashedProjects={fetchTrashedProjects}
-            onRestoreProject={restoreProject}
-            onPermanentDeleteProject={permanentDeleteProject}
+            onFetchTrashedProjects={onFetchTrashedProjects}
+            onRestoreProject={onRestoreProject}
+            onPermanentDeleteProject={onPermanentDeleteProject}
             onBack={() => handleTabChange('dashboard')}
           />
         );
