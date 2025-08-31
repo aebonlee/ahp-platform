@@ -1007,7 +1007,12 @@ function App() {
   const deleteProject = async (projectId: string) => {
     if (isDemoMode) {
       // 데모 모드에서는 로컬 상태에서 제거
-      setProjects(prev => prev.filter(p => p.id !== projectId));
+      console.log('🗑️ 데모 모드 프로젝트 삭제:', projectId);
+      setProjects(prev => {
+        const updated = prev.filter(p => p.id !== projectId);
+        console.log('✅ 데모 모드 프로젝트 삭제 완료. 남은 프로젝트:', updated.length);
+        return updated;
+      });
       return;
     }
 
@@ -1533,6 +1538,7 @@ function App() {
       case 'project-creation':
       case 'model-builder':
       case 'evaluator-management':
+      case 'trash':
       case 'progress-monitoring':
       case 'results-analysis':
       case 'paper-management':

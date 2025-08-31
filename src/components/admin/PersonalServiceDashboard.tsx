@@ -373,6 +373,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           await onDeleteProject(projectId);
           console.log('✅ 프로젝트가 휴지통으로 이동되었습니다:', projectId);
           
+          // 로컬 상태에서도 프로젝트 제거
+          setProjects(prev => prev.filter(p => p.id !== projectId));
+          
           // 프로젝트 목록 새로고침
           await loadProjects();
           
@@ -948,7 +951,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         'decision-support': 'decision-support-system',
         'evaluation-test': 'evaluation-test',
         'settings': 'personal-settings',
-        'demographic-survey': 'demographic-survey'
+        'demographic-survey': 'demographic-survey',
+        'trash': 'trash'
       };
       const mappedTab = tabMap[tab] || 'personal-service';
       externalOnTabChange(mappedTab);

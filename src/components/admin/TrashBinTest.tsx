@@ -37,20 +37,18 @@ const TrashBinTest: React.FC<TrashBinTestProps> = ({
   }, []);
 
   const handleTestDelete = async (projectId: string, title: string) => {
-    if (window.confirm(`"${title}"를 휴지통으로 이동하시겠습니까?`)) {
-      try {
-        if (onDeleteProject) {
-          console.log('🗑️ 테스트 삭제 시작:', projectId);
-          await onDeleteProject(projectId);
-          console.log('✅ 테스트 삭제 완료:', projectId);
-          await loadTrashedProjects(); // 휴지통 새로고침
-        } else {
-          alert('삭제 함수가 전달되지 않았습니다.');
-        }
-      } catch (error) {
-        console.error('❌ 삭제 실패:', error);
-        alert('삭제 실패: ' + (error as Error).message);
+    try {
+      if (onDeleteProject) {
+        console.log('🗑️ 테스트 삭제 시작:', projectId);
+        await onDeleteProject(projectId);
+        console.log('✅ 테스트 삭제 완료:', projectId);
+        await loadTrashedProjects(); // 휴지통 새로고침
+      } else {
+        alert('삭제 함수가 전달되지 않았습니다.');
       }
+    } catch (error) {
+      console.error('❌ 삭제 실패:', error);
+      alert('삭제 실패: ' + (error as Error).message);
     }
   };
 
