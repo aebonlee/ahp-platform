@@ -712,6 +712,97 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       </section>
 
 
+      {/* Footer - AURI 스타일 */}
+      <footer className="border-t py-12" style={{ 
+        backgroundColor: '#f8f9fa',
+        borderColor: '#e5e7eb'
+      }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-8 items-center">
+            {/* 회사 정보 */}
+            <div>
+              <div className="flex items-center mb-4">
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3" style={{
+                  backgroundColor: '#0066cc'
+                }}>
+                  <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
+                    <path d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-10-5z"/>
+                  </svg>
+                </div>
+                <span className="text-lg font-bold" style={{ color: '#222' }}>
+                  AHP for Paper
+                </span>
+              </div>
+              <p className="text-sm mb-2" style={{ color: '#666' }}>
+                (주) 논문연구지원센터
+              </p>
+              <p className="text-sm mb-2" style={{ color: '#666' }}>
+                사업자등록번호: 123-45-67890
+              </p>
+              <p className="text-sm mb-2" style={{ color: '#666' }}>
+                서울시 강남구 테헤란로 123, 4층
+              </p>
+              <p className="text-sm" style={{ color: '#666' }}>
+                대표이사: 홍길동 | 통신판매업신고: 제2024-서울강남-1234호
+              </p>
+            </div>
+
+            {/* 저작권 및 연락처 */}
+            <div className="text-right">
+              <div className="mb-4">
+                <p className="text-sm mb-1" style={{ color: '#666' }}>
+                  고객지원: support@ahp-paper.com
+                </p>
+                <p className="text-sm mb-1" style={{ color: '#666' }}>
+                  사업문의: business@ahp-paper.com
+                </p>
+                <p className="text-sm" style={{ color: '#666' }}>
+                  전화: 02-1234-5678 (평일 09:00-18:00)
+                </p>
+              </div>
+              <div className="text-sm" style={{ color: '#888' }}>
+                <p>© 2024 AHP for Paper. All rights reserved.</p>
+                <p className="mt-1">
+                  이 웹사이트의 모든 콘텐츠는 저작권법의 보호를 받습니다.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* 하단 구분선 및 간단 링크 */}
+          <div className="border-t mt-8 pt-6" style={{ borderColor: '#e5e7eb' }}>
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div className="flex space-x-6 mb-4 md:mb-0">
+                <a href="#" className="text-sm transition-colors" style={{ 
+                  color: '#666',
+                  textDecoration: 'none'
+                }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#0066cc'}
+                   onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#666'}>
+                  이용약관
+                </a>
+                <a href="#" className="text-sm transition-colors" style={{ 
+                  color: '#666',
+                  textDecoration: 'none'
+                }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#0066cc'}
+                   onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#666'}>
+                  개인정보처리방침
+                </a>
+                <a href="#" className="text-sm transition-colors" style={{ 
+                  color: '#666',
+                  textDecoration: 'none'
+                }} onMouseEnter={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#0066cc'}
+                   onMouseLeave={(e) => (e.currentTarget as HTMLAnchorElement).style.color = '#666'}>
+                  환불정책
+                </a>
+              </div>
+              <div className="text-xs" style={{ color: '#999' }}>
+                Last updated: 2024.08.31
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+
       {/* Scroll to Top Button */}
       <button
         onClick={scrollToTop}
