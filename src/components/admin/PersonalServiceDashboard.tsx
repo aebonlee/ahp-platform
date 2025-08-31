@@ -19,6 +19,7 @@ import PersonalSettings from '../settings/PersonalSettings';
 import UsageManagement from './UsageManagement';
 import ValidityCheck from '../validity/ValidityCheck';
 import TrashBin from './TrashBin';
+import TrashBinTest from './TrashBinTest';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
 import { DEMO_CRITERIA, DEMO_ALTERNATIVES, DEMO_EVALUATORS } from '../../data/demoData';
@@ -708,11 +709,12 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
       </div>
 
-      {/* 주요 기능 5개 인라인 배치 */}
+      {/* 주요 기능 6개 인라인 배치 */}
       <div className="flex flex-wrap justify-center gap-4">
         {[
           { id: 'creation', label: '새 프로젝트', icon: '🚀', color: 'from-blue-500 to-blue-600' },
           { id: 'projects', label: '내 프로젝트', icon: '📂', color: 'from-green-500 to-green-600' },
+          { id: 'trash', label: '휴지통', icon: '🗑️', color: 'from-red-500 to-red-600' },
           { id: 'evaluators', label: '평가자 관리', icon: '👥', color: 'from-purple-500 to-purple-600' },
           { id: 'analysis', label: '결과 분석', icon: '📊', color: 'from-orange-500 to-orange-600' },
           { id: 'export', label: '보고서', icon: '📤', color: 'from-indigo-500 to-indigo-600' }
@@ -3017,11 +3019,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         );
       case 'trash':
         return (
-          <TrashBin
+          <TrashBinTest
             onFetchTrashedProjects={onFetchTrashedProjects}
             onRestoreProject={onRestoreProject}
             onPermanentDeleteProject={onPermanentDeleteProject}
-            onBack={() => handleTabChange('dashboard')}
+            onDeleteProject={onDeleteProject}
           />
         );
       case 'demographic-survey':
@@ -3829,11 +3831,12 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
         
         <div className="space-y-4">
-          {/* First Row - Core Functions (6 items) */}
-          <div className="grid grid-cols-3 lg:grid-cols-6 gap-4">
+          {/* First Row - Core Functions (7 items) */}
+          <div className="grid grid-cols-3 lg:grid-cols-7 gap-4">
             {[
               { id: 'dashboard', label: '대시보드', icon: '🏠', tooltip: '프로젝트 현황과 통계를 한눈에 확인', priority: 'high' },
               { id: 'projects', label: '내 프로젝트', icon: '📂', tooltip: '생성한 모든 프로젝트 관리 및 편집', priority: 'high' },
+              { id: 'trash', label: '휴지통', icon: '🗑️', tooltip: '삭제된 프로젝트 복원 및 영구 삭제', priority: 'high' },
               { id: 'creation', label: '새 프로젝트', icon: '➕', tooltip: '새로운 AHP 분석 프로젝트 생성', priority: 'high' },
               { id: 'model-builder', label: '모델 구축', icon: '🏗️', tooltip: '기준과 대안을 설정하여 모델 구성', priority: 'high' },
               { id: 'evaluators', label: '평가자 관리', icon: '👥', tooltip: '평가 참여자 초대 및 권한 관리' },
@@ -3893,7 +3896,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           {/* Second Row - Advanced Functions (8 items) */}
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4">
             {[
-              { id: 'trash', label: '휴지통', icon: '🗑️', tooltip: '삭제된 프로젝트 복원 및 영구 삭제' },
               { id: 'analysis', label: '결과 분석', icon: '📊', tooltip: 'AHP 분석 결과와 순위 확인' },
               { id: 'demographic-survey', label: '인구통계학적 설문조사', icon: '📋', tooltip: 'Google Forms 스타일 설문 생성 및 관리' },
               { id: 'export', label: '보고서', icon: '📤', tooltip: 'Excel, PDF, PPT 형식으로 내보내기' },
