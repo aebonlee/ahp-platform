@@ -157,8 +157,9 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map(project => (
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {filteredProjects.map(project => (
             <div
               key={project.id}
               onClick={() => onProjectSelect?.(project)}
@@ -236,6 +237,7 @@ const MyProjects: React.FC<MyProjectsProps> = ({ onProjectSelect, onCreateNew })
               </div>
             </div>
           ))}
+          </div>
         </div>
       )}
     </div>
