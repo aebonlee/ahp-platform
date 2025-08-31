@@ -1377,7 +1377,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             setSelectedProjectId(project.id || '');
                             setActiveProject(project.id || null);
                             if (externalOnTabChange) {
-                              externalOnTabChange('model-builder');
+                              externalOnTabChange('model-building');
                             }
                           }}
                           className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
@@ -1531,7 +1531,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                               setSelectedProjectId(project.id || '');
                               setActiveProject(project.id || null);
                               if (externalOnTabChange) {
-                                externalOnTabChange('model-builder');
+                                externalOnTabChange('model-building');
                               }
                             }}
                             className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
