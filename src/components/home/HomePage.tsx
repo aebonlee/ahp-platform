@@ -901,13 +901,10 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             <div className="text-right">
               <div className="mb-4">
                 <p className="text-sm mb-1" style={{ color: '#666' }}>
-                  고객지원: support@ahp-paper.com
-                </p>
-                <p className="text-sm mb-1" style={{ color: '#666' }}>
-                  사업문의: business@ahp-paper.com
+                  고객지원: aebon@naver.com
                 </p>
                 <p className="text-sm" style={{ color: '#666' }}>
-                  전화: 02-1234-5678 (평일 09:00-18:00)
+                  전화: 010-3700-0629 (평일: 09시 ~ 18시 - 이외 문자 및 카카오톡 상담 가능)
                 </p>
               </div>
               <div className="text-sm" style={{ color: '#888' }}>
