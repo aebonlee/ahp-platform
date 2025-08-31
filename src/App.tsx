@@ -1038,7 +1038,10 @@ function App() {
   // 휴지통 프로젝트 조회
   const fetchTrashedProjects = async () => {
     if (isDemoMode) {
-      return []; // 데모 모드에서는 휴지통 기능 없음
+      console.log('📊 데모 모드 휴지통 조회');
+      const trashedProjects = await dataService.getTrashedProjects();
+      console.log('🗑️ 휴지통 프로젝트 개수:', trashedProjects.length);
+      return trashedProjects;
     }
 
     const token = localStorage.getItem('token');

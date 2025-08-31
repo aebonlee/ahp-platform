@@ -8,7 +8,8 @@ const STORAGE_KEYS = {
   ALTERNATIVES: 'ahp_alternatives',
   EVALUATORS: 'ahp_evaluators',
   COMPARISONS: 'ahp_comparisons',
-  OFFLINE_MODE: 'ahp_offline_mode'
+  OFFLINE_MODE: 'ahp_offline_mode',
+  TRASH: 'ahp_trash_projects'
 } as const;
 
 // 오프라인 모드 확인 함수
@@ -186,16 +187,29 @@ class DataService {
   async deleteProject(id: string): Promise<boolean> {
     if (isOfflineMode()) {
       const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
-      const filteredProjects = projects.filter(p => p.id !== id);
-      storage.set(STORAGE_KEYS.PROJECTS, filteredProjects);
+      const projectToDelete = projects.find(p => p.id === id);
       
-      // 관련 데이터도 삭제
-      this.deleteCriteriaByProject(id);
-      this.deleteAlternativesByProject(id);
-      this.deleteEvaluatorsByProject(id);
-      this.deleteComparisonsByProject(id);
-      
-      return true;
+      if (projectToDelete) {
+        // 휴지통으로 이동 (소프트 삭제)
+        const trashedProject = {
+          ...projectToDelete,
+          status: 'deleted',
+          deleted_at: new Date().toISOString()
+        };
+        
+        // 휴지통에 추가
+        const trashedProjects = storage.get<ProjectData[]>(STORAGE_KEYS.TRASH, []);
+        trashedProjects.push(trashedProject);
+        storage.set(STORAGE_KEYS.TRASH, trashedProjects);
+        
+        // 활성 프로젝트에서 제거
+        const filteredProjects = projects.filter(p => p.id !== id);
+        storage.set(STORAGE_KEYS.PROJECTS, filteredProjects);
+        
+        console.log('🗑️ 프로젝트를 휴지통으로 이동:', id, '휴지통 개수:', trashedProjects.length);
+        return true;
+      }
+      return false;
     }
     
     try {
@@ -639,6 +653,85 @@ class DataService {
     }
   }
 
+  // === 휴지통 관리 ===
+  async getTrashedProjects(): Promise<ProjectData[]> {
+    if (isOfflineMode()) {
+      return storage.get<ProjectData[]>(STORAGE_KEYS.TRASH, []);
+    }
+    
+    try {
+      const response = await api.project.getTrashedProjects();
+      if (response.success && response.data) {
+        return response.data;
+      }
+    } catch (error) {
+      console.warn('Backend unavailable, using local trash data');
+    }
+    
+    return storage.get<ProjectData[]>(STORAGE_KEYS.TRASH, []);
+  }
+
+  async restoreProject(id: string): Promise<boolean> {
+    if (isOfflineMode()) {
+      const trashedProjects = storage.get<ProjectData[]>(STORAGE_KEYS.TRASH, []);
+      const projectToRestore = trashedProjects.find(p => p.id === id);
+      
+      if (projectToRestore) {
+        // 휴지통에서 제거
+        const filteredTrash = trashedProjects.filter(p => p.id !== id);
+        storage.set(STORAGE_KEYS.TRASH, filteredTrash);
+        
+        // 활성 프로젝트로 복원
+        const restoredProject = {
+          ...projectToRestore,
+          status: 'active',
+          deleted_at: undefined
+        };
+        
+        const activeProjects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
+        activeProjects.push(restoredProject);
+        storage.set(STORAGE_KEYS.PROJECTS, activeProjects);
+        
+        console.log('↩️ 프로젝트 복원 완료:', id);
+        return true;
+      }
+      return false;
+    }
+    
+    try {
+      const response = await api.project.restoreProject(id);
+      return response.success;
+    } catch (error) {
+      console.warn('Backend unavailable for restore');
+      return false;
+    }
+  }
+
+  async permanentDeleteProject(id: string): Promise<boolean> {
+    if (isOfflineMode()) {
+      const trashedProjects = storage.get<ProjectData[]>(STORAGE_KEYS.TRASH, []);
+      const filteredTrash = trashedProjects.filter(p => p.id !== id);
+      storage.set(STORAGE_KEYS.TRASH, filteredTrash);
+      
+      // 관련 데이터도 완전 삭제
+      this.deleteCriteriaByProject(id);
+      this.deleteAlternativesByProject(id);
+      this.deleteEvaluatorsByProject(id);
+      this.deleteComparisonsByProject(id);
+      
+      console.log('💀 프로젝트 영구 삭제:', id);
+      return true;
+    }
+    
+    try {
+      const response = await api.project.permanentDeleteProject(id);
+      return response.success;
+    } catch (error) {
+      console.warn('Backend unavailable for permanent delete');
+      return false;
+    }
+  }
+
   // === 데이터 초기화 ===
   clearAllData(): void {
     storage.remove(STORAGE_KEYS.PROJECTS);
@@ -646,6 +739,7 @@ class DataService {
     storage.remove(STORAGE_KEYS.ALTERNATIVES);
     storage.remove(STORAGE_KEYS.EVALUATORS);
     storage.remove(STORAGE_KEYS.COMPARISONS);
+    storage.remove(STORAGE_KEYS.TRASH);
   }
 }
 

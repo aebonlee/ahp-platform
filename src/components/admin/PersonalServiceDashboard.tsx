@@ -19,7 +19,6 @@ import PersonalSettings from '../settings/PersonalSettings';
 import UsageManagement from './UsageManagement';
 import ValidityCheck from '../validity/ValidityCheck';
 import TrashBin from './TrashBin';
-import TrashBinTest from './TrashBinTest';
 import dataService from '../../services/dataService';
 import type { ProjectData } from '../../services/dataService';
 import { DEMO_CRITERIA, DEMO_ALTERNATIVES, DEMO_EVALUATORS } from '../../data/demoData';
@@ -368,30 +367,26 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     
     if (window.confirm(`"${projectTitle}"를 휴지통으로 이동하시겠습니까?\n\n휴지통에서 복원하거나 영구 삭제할 수 있습니다.`)) {
       try {
-        if (onDeleteProject) {
-          console.log('🗑️ 프로젝트 휴지통 이동:', projectId);
-          await onDeleteProject(projectId);
-          console.log('✅ 프로젝트가 휴지통으로 이동되었습니다:', projectId);
+        // dataService를 직접 사용하여 삭제 (가장 확실한 방법)
+        console.log('🗑️ 프로젝트 삭제 시작:', projectId);
+        const success = await dataService.deleteProject(projectId);
+        
+        if (success) {
+          console.log('✅ dataService 삭제 성공:', projectId);
           
-          // 로컬 상태에서도 프로젝트 제거
-          setProjects(prev => prev.filter(p => p.id !== projectId));
+          // 로컬 상태에서도 즉시 제거
+          setProjects(prev => {
+            const updated = prev.filter(p => p.id !== projectId);
+            console.log('🔄 로컬 상태 업데이트. 남은 프로젝트:', updated.length);
+            return updated;
+          });
           
-          // 프로젝트 목록 새로고침
+          // 추가로 새로고침 (동기화 보장)
           await loadProjects();
           
-          alert(`"${projectTitle}"가 휴지통으로 이동되었습니다.\n\n🗑️ 휴지통 탭에서 복원하거나 영구 삭제할 수 있습니다.`);
+          alert(`"${projectTitle}"가 삭제되었습니다.`);
         } else {
-          // Fallback to dataService
-          console.log('🗑️ 프로젝트 삭제 (dataService):', projectId);
-          const success = await dataService.deleteProject(projectId);
-          
-          if (success) {
-            const updatedProjects = projects.filter(p => p.id !== projectId);
-            setProjects(updatedProjects);
-            console.log('✅ Project deleted successfully:', projectId);
-          } else {
-            alert('프로젝트 삭제에 실패했습니다.');
-          }
+          alert('프로젝트 삭제에 실패했습니다.');
         }
       } catch (error) {
         console.error('Project deletion error:', error);
@@ -3030,11 +3025,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         );
       case 'trash':
         return (
-          <TrashBinTest
+          <TrashBin
             onFetchTrashedProjects={onFetchTrashedProjects}
             onRestoreProject={onRestoreProject}
             onPermanentDeleteProject={onPermanentDeleteProject}
-            onDeleteProject={onDeleteProject}
           />
         );
       case 'demographic-survey':
