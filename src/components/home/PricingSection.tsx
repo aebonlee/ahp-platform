@@ -17,10 +17,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
         '사용 기간: 1개월',
         '프로젝트 수: 1개',
         '평가자 인원: 30명',
-        '대상: 대학원 논문, 단기 과제, 학술 발표 준비',
-        '인공지능 활용 (옵션: +₩50,000)',
-        '문헌정보 정리 (옵션: +₩50,000)',
-        '평가자 10명 단위 추가 (옵션: +₩50,000)'
+        '대상: 대학원 논문, 단기 과제, 학술 발표 준비'
       ],
       buttonText: '기본 플랜 시작',
       buttonVariant: 'outline' as const
@@ -36,10 +33,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
         '사용 기간: 1개월',
         '프로젝트 수: 3개',
         '평가자 인원: 50명',
-        '대상: 기업·기관 연구과제, 단일 컨설팅 프로젝트',
-        '인공지능 활용 (옵션: +₩50,000)',
-        '문헌정보 정리 (옵션: +₩50,000)',
-        '평가자 10명 단위 추가 (옵션: +₩50,000)'
+        '대상: 기업·기관 연구과제, 단일 컨설팅 프로젝트'
       ],
       buttonText: '프로 플랜 시작',
       buttonVariant: 'primary' as const
@@ -55,10 +49,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
         '사용 기간: 1개월',
         '프로젝트 수: 3개',
         '평가자 인원: 100명',
-        '대상: 공공기관·대규모 연구 프로젝트 단위 사용',
-        '인공지능 활용 (옵션: +₩50,000)',
-        '문헌정보 정리 (옵션: +₩50,000)',
-        '평가자 10명 단위 추가 (옵션: +₩50,000)'
+        '대상: 공공기관·대규모 연구 프로젝트 단위 사용'
       ],
       buttonText: '연구기관 문의',
       buttonVariant: 'secondary' as const
