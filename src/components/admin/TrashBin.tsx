@@ -34,16 +34,22 @@ const TrashBin: React.FC<TrashBinProps> = ({
 
   const loadTrashedProjects = async () => {
     if (!onFetchTrashedProjects) {
+      console.log('❌ onFetchTrashedProjects 함수가 전달되지 않았습니다');
       setLoading(false);
       return;
     }
 
     try {
       setLoading(true);
+      console.log('🔄 휴지통 프로젝트 로드 시작...');
       const projects = await onFetchTrashedProjects();
-      setTrashedProjects(projects);
+      console.log('📊 휴지통 프로젝트 로드 결과:', {
+        count: projects?.length || 0,
+        projects: projects
+      });
+      setTrashedProjects(projects || []);
     } catch (error) {
-      console.error('Failed to load trashed projects:', error);
+      console.error('❌ 휴지통 프로젝트 로드 실패:', error);
     } finally {
       setLoading(false);
     }
