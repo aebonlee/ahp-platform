@@ -1,4 +1,4 @@
-import api from './api';
+import { projectApi, criteriaApi, alternativeApi, evaluatorApi, evaluationApi } from './api';
 import { ProjectData, CriteriaData, AlternativeData, EvaluatorData, PairwiseComparisonData } from './api';
 
 // 로컬 스토리지 키 상수
@@ -71,7 +71,7 @@ class DataService {
     }
     
     try {
-      const response = await api.project.getProjects();
+      const response = await projectApi.getProjects();
       if (response.success && response.data) {
         // 백엔드 데이터를 로컬에도 백업
         storage.set(STORAGE_KEYS.PROJECTS, response.data);
@@ -91,7 +91,7 @@ class DataService {
     }
     
     try {
-      const response = await api.project.getProject(id);
+      const response = await projectApi.getProject(id);
       if (response.success && response.data) {
         return response.data;
       }
@@ -120,7 +120,7 @@ class DataService {
     }
     
     try {
-      const response = await api.project.createProject(data);
+      const response = await projectApi.createProject(data);
       if (response.success && response.data) {
         // 백엔드 성공시 로컬도 업데이트
         const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
@@ -157,7 +157,7 @@ class DataService {
     }
     
     try {
-      const response = await api.project.updateProject(id, updateData);
+      const response = await projectApi.updateProject(id, updateData);
       if (response.success && response.data) {
         // 로컬 데이터도 업데이트
         const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
@@ -193,7 +193,7 @@ class DataService {
         // 휴지통으로 이동 (소프트 삭제)
         const trashedProject = {
           ...projectToDelete,
-          status: 'deleted',
+          status: 'deleted' as const,
           deleted_at: new Date().toISOString()
         };
         
@@ -213,7 +213,7 @@ class DataService {
     }
     
     try {
-      const response = await api.project.deleteProject(id);
+      const response = await projectApi.deleteProject(id);
       if (response.success) {
         // 로컬 데이터도 삭제
         const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
@@ -240,7 +240,7 @@ class DataService {
     }
     
     try {
-      const response = await api.criteria.getCriteria(projectId);
+      const response = await criteriaApi.getCriteria(projectId);
       if (response.success && response.data) {
         return response.data;
       }
@@ -266,7 +266,7 @@ class DataService {
     }
     
     try {
-      const response = await api.criteria.createCriteria(data);
+      const response = await criteriaApi.createCriteria(data);
       if (response.success && response.data) {
         const allCriteria = storage.get<CriteriaData[]>(STORAGE_KEYS.CRITERIA, []);
         allCriteria.push(response.data);
@@ -296,7 +296,7 @@ class DataService {
     }
     
     try {
-      const response = await api.criteria.updateCriteria(id, data);
+      const response = await criteriaApi.updateCriteria(id, data);
       if (response.success && response.data) {
         const allCriteria = storage.get<CriteriaData[]>(STORAGE_KEYS.CRITERIA, []);
         const index = allCriteria.findIndex(c => c.id === id);
@@ -330,7 +330,7 @@ class DataService {
     }
     
     try {
-      const response = await api.criteria.deleteCriteria(id);
+      const response = await criteriaApi.deleteCriteria(id);
       if (response.success) {
         const allCriteria = storage.get<CriteriaData[]>(STORAGE_KEYS.CRITERIA, []);
         const filtered = allCriteria.filter(c => c.id !== id);
@@ -362,7 +362,7 @@ class DataService {
     }
     
     try {
-      const response = await api.alternative.getAlternatives(projectId);
+      const response = await alternativeApi.getAlternatives(projectId);
       if (response.success && response.data) {
         return response.data;
       }
@@ -388,7 +388,7 @@ class DataService {
     }
     
     try {
-      const response = await api.alternative.createAlternative(data);
+      const response = await alternativeApi.createAlternative(data);
       if (response.success && response.data) {
         const allAlternatives = storage.get<AlternativeData[]>(STORAGE_KEYS.ALTERNATIVES, []);
         allAlternatives.push(response.data);
@@ -418,7 +418,7 @@ class DataService {
     }
     
     try {
-      const response = await api.alternative.updateAlternative(id, data);
+      const response = await alternativeApi.updateAlternative(id, data);
       if (response.success && response.data) {
         const allAlternatives = storage.get<AlternativeData[]>(STORAGE_KEYS.ALTERNATIVES, []);
         const index = allAlternatives.findIndex(a => a.id === id);
@@ -452,7 +452,7 @@ class DataService {
     }
     
     try {
-      const response = await api.alternative.deleteAlternative(id);
+      const response = await alternativeApi.deleteAlternative(id);
       if (response.success) {
         const allAlternatives = storage.get<AlternativeData[]>(STORAGE_KEYS.ALTERNATIVES, []);
         const filtered = allAlternatives.filter(a => a.id !== id);
@@ -484,7 +484,7 @@ class DataService {
     }
     
     try {
-      const response = await api.evaluator.getEvaluators(projectId);
+      const response = await evaluatorApi.getEvaluators(projectId);
       if (response.success && response.data) {
         return response.data;
       }
@@ -511,7 +511,7 @@ class DataService {
     }
     
     try {
-      const response = await api.evaluator.addEvaluator(data);
+      const response = await evaluatorApi.addEvaluator(data);
       if (response.success && response.data) {
         const allEvaluators = storage.get<EvaluatorData[]>(STORAGE_KEYS.EVALUATORS, []);
         allEvaluators.push(response.data);
@@ -537,7 +537,7 @@ class DataService {
     }
     
     try {
-      const response = await api.evaluator.removeEvaluator(id);
+      const response = await evaluatorApi.removeEvaluator(id);
       if (response.success) {
         const allEvaluators = storage.get<EvaluatorData[]>(STORAGE_KEYS.EVALUATORS, []);
         const filtered = allEvaluators.filter(e => e.id !== id);
@@ -576,7 +576,7 @@ class DataService {
     }
     
     try {
-      const response = await api.evaluation.savePairwiseComparison(data);
+      const response = await evaluationApi.savePairwiseComparison(data);
       if (response.success && response.data) {
         const allComparisons = storage.get<PairwiseComparisonData[]>(STORAGE_KEYS.COMPARISONS, []);
         allComparisons.push(response.data);
@@ -604,7 +604,7 @@ class DataService {
     }
     
     try {
-      const response = await api.evaluation.getPairwiseComparisons(projectId, evaluatorId);
+      const response = await evaluationApi.getPairwiseComparisons(projectId, evaluatorId);
       if (response.success && response.data) {
         return response.data;
       }
@@ -660,7 +660,7 @@ class DataService {
     }
     
     try {
-      const response = await api.project.getTrashedProjects();
+      const response = await projectApi.getTrashedProjects();
       if (response.success && response.data) {
         return response.data;
       }
@@ -684,7 +684,7 @@ class DataService {
         // 활성 프로젝트로 복원
         const restoredProject = {
           ...projectToRestore,
-          status: 'active',
+          status: 'active' as const,
           deleted_at: undefined
         };
         
@@ -699,7 +699,7 @@ class DataService {
     }
     
     try {
-      const response = await api.project.restoreProject(id);
+      const response = await projectApi.restoreProject(id);
       return response.success;
     } catch (error) {
       console.warn('Backend unavailable for restore');
@@ -724,7 +724,7 @@ class DataService {
     }
     
     try {
-      const response = await api.project.permanentDeleteProject(id);
+      const response = await projectApi.permanentDeleteProject(id);
       return response.success;
     } catch (error) {
       console.warn('Backend unavailable for permanent delete');

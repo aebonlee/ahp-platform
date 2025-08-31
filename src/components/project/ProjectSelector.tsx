@@ -12,7 +12,7 @@ interface UserProject {
   title: string;
   description: string;
   objective: string;
-  status: 'draft' | 'active' | 'completed';
+  status: 'draft' | 'active' | 'completed' | 'deleted';
   evaluation_mode: EvaluationMode;
   workflow_stage: WorkflowStage;
   created_at: string;

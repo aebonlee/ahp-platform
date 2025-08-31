@@ -14,11 +14,12 @@ export interface ProjectData {
   title: string;
   description: string;
   objective?: string;
-  status: 'draft' | 'active' | 'completed';
+  status: 'draft' | 'active' | 'completed' | 'deleted';
   evaluation_mode: 'practical' | 'theoretical' | 'direct_input';
   workflow_stage: 'creating' | 'waiting' | 'evaluating' | 'completed';
   created_at?: string;
   updated_at?: string;
+  deleted_at?: string;
   criteria_count?: number;
   alternatives_count?: number;
 }
@@ -135,9 +136,25 @@ export const projectApi = {
       body: JSON.stringify(data)
     }),
 
-  // 프로젝트 삭제
+  // 프로젝트 삭제 (휴지통으로 이동)
   deleteProject: (id: string) =>
     makeRequest<void>(`/api/projects/${id}`, {
+      method: 'DELETE'
+    }),
+
+  // 휴지통 프로젝트 조회
+  getTrashedProjects: () =>
+    makeRequest<ProjectData[]>('/api/projects/trash'),
+
+  // 프로젝트 복원
+  restoreProject: (id: string) =>
+    makeRequest<void>(`/api/projects/${id}/restore`, {
+      method: 'PUT'
+    }),
+
+  // 프로젝트 영구 삭제
+  permanentDeleteProject: (id: string) =>
+    makeRequest<void>(`/api/projects/${id}/permanent`, {
       method: 'DELETE'
     })
 };
