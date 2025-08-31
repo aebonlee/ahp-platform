@@ -73,51 +73,82 @@ interface UserSettings {
 const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUserUpdate }) => {
   const { currentTheme, changeColorTheme } = useColorTheme();
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'workflow' | 'notifications' | 'display' | 'privacy' | 'data'>('profile');
-  const [settings, setSettings] = useState<UserSettings>({
-    profile: {
-      firstName: user.first_name,
-      lastName: user.last_name,
-      email: user.email,
-      organization: '',
-      department: '',
-      phone: '',
-      profileImage: ''
-    },
-    security: {
-      twoFactorEnabled: false,
-      sessionTimeout: 30,
-      loginAlerts: true
-    },
-    workflow: {
-      autoSaveInterval: 60,
-      defaultTemplate: 'standard',
-      screenLayout: 'standard',
-      defaultViewMode: 'grid',
-      showTutorials: true
-    },
-    notifications: {
-      emailNotifications: true,
-      evaluationComplete: true,
-      projectStatusChange: true,
-      weeklyReport: false,
-      systemUpdates: false,
-      deadlineReminders: true
-    },
-    display: {
-      theme: currentTheme,
-      darkMode: false,
-      language: 'ko',
-      dateFormat: 'YYYY-MM-DD',
-      numberFormat: '1,234.56',
-      timezone: 'Asia/Seoul'
-    },
-    privacy: {
-      profileVisibility: 'team',
-      showEmail: false,
-      showPhone: false,
-      activityTracking: true
+  
+  // 오프라인 저장된 설정 복원
+  const getInitialSettings = (): UserSettings => {
+    // 1. 먼저 오프라인 저장 설정 확인
+    const offlineSettings = localStorage.getItem('user_settings_offline');
+    if (offlineSettings) {
+      try {
+        const parsed = JSON.parse(offlineSettings);
+        console.log('📥 오프라인 설정 복원:', parsed);
+        return parsed;
+      } catch (e) {
+        console.warn('오프라인 설정 파싱 실패:', e);
+      }
     }
-  });
+    
+    // 2. userSettings 확인 (기존 방식)
+    const savedSettings = localStorage.getItem('userSettings');
+    if (savedSettings) {
+      try {
+        const parsed = JSON.parse(savedSettings);
+        console.log('📥 기존 설정 복원:', parsed);
+        return parsed;
+      } catch (e) {
+        console.warn('기존 설정 파싱 실패:', e);
+      }
+    }
+    
+    // 3. 기본값 반환
+    return {
+      profile: {
+        firstName: user.first_name,
+        lastName: user.last_name,
+        email: user.email,
+        organization: '',
+        department: '',
+        phone: '',
+        profileImage: ''
+      },
+      security: {
+        twoFactorEnabled: false,
+        sessionTimeout: 30,
+        loginAlerts: true
+      },
+      workflow: {
+        autoSaveInterval: 60,
+        defaultTemplate: 'standard',
+        screenLayout: 'standard',
+        defaultViewMode: 'grid',
+        showTutorials: true
+      },
+      notifications: {
+        emailNotifications: true,
+        evaluationComplete: true,
+        projectStatusChange: true,
+        weeklyReport: false,
+        systemUpdates: false,
+        deadlineReminders: true
+      },
+      display: {
+        theme: currentTheme,
+        darkMode: false,
+        language: 'ko',
+        dateFormat: 'YYYY-MM-DD',
+        numberFormat: '1,234.56',
+        timezone: 'Asia/Seoul'
+      },
+      privacy: {
+        profileVisibility: 'team',
+        showEmail: false,
+        showPhone: false,
+        activityTracking: true
+      }
+    };
+  };
+  
+  const [settings, setSettings] = useState<UserSettings>(getInitialSettings());
 
   const [passwordForm, setPasswordForm] = useState({
     currentPassword: '',
@@ -127,15 +158,32 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
 
-  // 로컬 스토리지에서 설정 불러오기
+  // 로컬 스토리지에서 설정 불러오기 및 동기화 체크
   useEffect(() => {
-    const savedSettings = localStorage.getItem('userSettings');
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings);
-        setSettings(prevSettings => ({ ...prevSettings, ...parsed }));
-      } catch (error) {
-        console.error('Failed to load settings:', error);
+    // 초기 설정 로드는 getInitialSettings에서 처리됨
+    
+    // 동기화 필요 여부 확인
+    const pendingSync = localStorage.getItem('user_settings_pending_sync');
+    if (pendingSync === 'true') {
+      console.log('⚠️ DB 동기화 대기 중인 설정이 있습니다.');
+      
+      // 백그라운드에서 동기화 재시도
+      const token = localStorage.getItem('token');
+      if (token) {
+        fetch(`${API_BASE_URL}/api/users/profile`, {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }).then(response => {
+          if (response.ok) {
+            console.log('📡 서버 연결 가능 - 동기화 시도');
+            // 서버가 살아있으면 현재 설정을 다시 저장 시도
+            saveSettings();
+          }
+        }).catch(() => {
+          console.log('📴 서버 연결 불가 - 오프라인 모드 유지');
+        });
       }
     }
   }, []);
@@ -193,14 +241,28 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
             
             if (!token) {
               console.warn('⚠️ 토큰 없음 - localStorage만 사용');
+              // 토큰이 없어도 localStorage에 영구 저장 표시
+              localStorage.setItem('user_settings_offline', JSON.stringify({
+                ...settings,
+                lastModified: new Date().toISOString()
+              }));
               return;
             }
 
+            // 전체 사용자 데이터 준비
             const requestData = {
               first_name: settings.profile.firstName,
-              last_name: settings.profile.lastName
+              last_name: settings.profile.lastName,
+              email: settings.profile.email,
+              phone: settings.profile.phone,
+              organization: settings.profile.organization,
+              department: settings.profile.department,
+              theme: settings.theme.colorScheme,
+              language: settings.preferences.language,
+              notifications: settings.notifications
             };
 
+            // DB 저장 시도 (실패해도 localStorage는 유지)
             const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
               method: 'PUT',
               headers: {
@@ -213,12 +275,30 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
             if (response.ok) {
               const result = await response.json();
               console.log('✅ 백그라운드 DB 저장 성공!', result);
+              
+              // DB 동기화 성공 표시
+              localStorage.setItem('user_settings_synced', new Date().toISOString());
+              localStorage.removeItem('user_settings_pending_sync');
             } else {
               const errorText = await response.text();
-              console.warn('⚠️ 백그라운드 DB 저장 실패:', errorText);
+              console.warn('⚠️ 백그라운드 DB 저장 실패:', response.status, errorText);
+              
+              // DB 동기화 필요 표시
+              localStorage.setItem('user_settings_pending_sync', 'true');
+              localStorage.setItem('user_settings_offline', JSON.stringify({
+                ...settings,
+                lastModified: new Date().toISOString()
+              }));
             }
           } catch (dbError) {
             console.warn('⚠️ 백그라운드 DB 저장 에러:', dbError);
+            
+            // 오프라인 모드로 전환 - localStorage에 완전 백업
+            localStorage.setItem('user_settings_pending_sync', 'true');
+            localStorage.setItem('user_settings_offline', JSON.stringify({
+              ...settings,
+              lastModified: new Date().toISOString()
+            }));
           }
         }, 0);
       }
