@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.requireRole = exports.requireEvaluator = exports.requireAdmin = exports.authenticateToken = void 0;
 const auth_1 = require("../utils/auth");
 const authenticateToken = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+    // 쿠키에서 토큰 읽기
+    const token = req.cookies?.token;
     if (!token) {
         return res.status(401).json({
             error: 'Access token required',

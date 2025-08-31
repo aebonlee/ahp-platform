@@ -27,14 +27,13 @@ class APIClient {
     options: RequestInit = {}
   ): Promise<APIResponse<T>> {
     try {
-      const token = localStorage.getItem('token');
       const headers = {
         'Content-Type': 'application/json',
-        ...(token && { 'Authorization': `Bearer ${token}` }),
         ...options.headers,
       };
 
       const response = await fetch(`${this.baseURL}${endpoint}`, {
+        credentials: 'include',
         ...options,
         headers,
       });

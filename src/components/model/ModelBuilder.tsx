@@ -68,12 +68,10 @@ const ModelBuilder: React.FC<ModelBuilderProps> = ({ projectId, onSave, demoMode
         return;
       }
 
-      const token = localStorage.getItem('token');
-      if (!token) return;
-      
       // 프로젝트 정보 조회
       const projectResponse = await fetch(`${API_BASE_URL}/api/projects/${projectId}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!projectResponse.ok) throw new Error('Failed to fetch project');
@@ -81,7 +79,8 @@ const ModelBuilder: React.FC<ModelBuilderProps> = ({ projectId, onSave, demoMode
 
       // 기준 조회
       const criteriaResponse = await fetch(`${API_BASE_URL}/api/criteria/${projectId}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       let criteria: Criterion[] = [];
@@ -92,7 +91,8 @@ const ModelBuilder: React.FC<ModelBuilderProps> = ({ projectId, onSave, demoMode
 
       // 대안 조회
       const alternativesResponse = await fetch(`${API_BASE_URL}/api/alternatives/${projectId}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       let alternatives: Alternative[] = [];
@@ -146,17 +146,14 @@ const ModelBuilder: React.FC<ModelBuilderProps> = ({ projectId, onSave, demoMode
   const addCriterion = async (parentId: string | null = null) => {
     if (!newCriterionName.trim()) return;
 
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       setSaving(true);
       const level = parentId ? getLevel(parentId) + 1 : 1;
       
       const response = await fetch(`${API_BASE_URL}/api/criteria`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -185,16 +182,13 @@ const ModelBuilder: React.FC<ModelBuilderProps> = ({ projectId, onSave, demoMode
   const addAlternative = async () => {
     if (!newAlternativeName.trim()) return;
 
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       setSaving(true);
       
       const response = await fetch(`${API_BASE_URL}/api/alternatives`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -219,13 +213,11 @@ const ModelBuilder: React.FC<ModelBuilderProps> = ({ projectId, onSave, demoMode
   };
 
   const deleteCriterion = async (id: string) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/criteria/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) throw new Error('Failed to delete criterion');
@@ -236,13 +228,11 @@ const ModelBuilder: React.FC<ModelBuilderProps> = ({ projectId, onSave, demoMode
   };
 
   const deleteAlternative = async (id: string) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/alternatives/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) throw new Error('Failed to delete alternative');

@@ -68,12 +68,10 @@ const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ projectId, projectT
         return;
       }
 
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
       // Fetch criteria
       const criteriaResponse = await fetch(`${API_BASE_URL}/api/criteria/${projectId}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
       
       if (!criteriaResponse.ok) throw new Error('Failed to fetch criteria');
@@ -82,7 +80,8 @@ const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ projectId, projectT
 
       // Fetch alternatives
       const alternativesResponse = await fetch(`${API_BASE_URL}/api/alternatives/${projectId}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
       
       if (!alternativesResponse.ok) throw new Error('Failed to fetch alternatives');
@@ -91,7 +90,8 @@ const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ projectId, projectT
 
       // Fetch all comparisons
       const comparisonsResponse = await fetch(`${API_BASE_URL}/api/comparisons/${projectId}`, {
-        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
       });
       
       if (!comparisonsResponse.ok) throw new Error('Failed to fetch comparisons');

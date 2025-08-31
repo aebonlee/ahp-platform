@@ -21,11 +21,10 @@ class SubscriptionService {
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${this.baseUrl}${endpoint}`, {
+      credentials: 'include',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': token ? `Bearer ${token}` : '',
         ...options.headers,
       },
       ...options,

@@ -161,8 +161,8 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
   // DB에서 사용자 정보 불러오기 및 동기화
   useEffect(() => {
     const loadUserDataFromDB = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
+      // Cookie-based authentication - no token check needed
+      try {
         console.log('🔒 토큰 없음 - 로그인 필요');
         return;
       }
@@ -171,8 +171,9 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
         // DB에서 최신 사용자 정보 가져오기
         const response = await fetch(`${API_BASE_URL}/api/users/profile`, {
           method: 'GET',
+          credentials: 'include',
           headers: {
-            'Authorization': `Bearer ${token}`
+            'Content-Type': 'application/json'
           }
         });
 
@@ -314,7 +315,7 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
               method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
+                'Content-Type': 'application/json'
               },
               body: JSON.stringify(requestData)
             });

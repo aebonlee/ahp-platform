@@ -70,10 +70,8 @@ export interface PairwiseComparisonData {
 
 // HTTP 헤더 생성 함수
 const getAuthHeaders = (): HeadersInit => {
-  const token = localStorage.getItem('token');
   return {
     'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` })
   };
 };
 
@@ -85,6 +83,7 @@ const makeRequest = async <T>(
   try {
     const url = `${API_BASE_URL}${endpoint}`;
     const response = await fetch(url, {
+      credentials: 'include',
       ...options,
       headers: {
         ...getAuthHeaders(),

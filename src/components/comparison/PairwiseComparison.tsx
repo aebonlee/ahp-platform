@@ -96,15 +96,13 @@ const PairwiseComparison: React.FC<PairwiseComparisonProps> = ({
   }, [elements]);
 
   const fetchComparisons = useCallback(async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       setLoading(true);
       const response = await fetch(
         `${API_BASE_URL}/api/comparisons/${projectId}/matrix/${criterionId}`,
         {
-          headers: { 'Authorization': `Bearer ${token}` },
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
         }
       );
 
@@ -139,9 +137,6 @@ const PairwiseComparison: React.FC<PairwiseComparisonProps> = ({
   }, [fetchComparisons]);
 
   const saveComparison = async (element1: Criterion | Alternative, element2: Criterion | Alternative, value: number) => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       setSaving(true);
       
@@ -178,8 +173,8 @@ const PairwiseComparison: React.FC<PairwiseComparisonProps> = ({
 
       const response = await fetch(`${API_BASE_URL}/api/comparisons`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),

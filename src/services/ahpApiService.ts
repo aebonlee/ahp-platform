@@ -5,18 +5,15 @@
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
-// 토큰 가져오기 헬퍼
-const getAuthToken = () => localStorage.getItem('token');
 
 // API 요청 헬퍼
 const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
-  const token = getAuthToken();
   const defaultHeaders = {
     'Content-Type': 'application/json',
-    ...(token && { 'Authorization': `Bearer ${token}` }),
   };
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    credentials: 'include',
     ...options,
     headers: {
       ...defaultHeaders,
@@ -156,10 +153,10 @@ class AHPApiService {
    * GET /api/export/excel/:projectId
    */
   async exportToExcel(projectId: number): Promise<Blob> {
-    const token = getAuthToken();
     const response = await fetch(`${API_BASE_URL}/export/excel/${projectId}`, {
+      credentials: 'include',
       headers: {
-        ...(token && { 'Authorization': `Bearer ${token}` }),
+        'Content-Type': 'application/json',
       },
     });
 

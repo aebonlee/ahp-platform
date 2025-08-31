@@ -280,14 +280,14 @@ function App() {
         // 데모 모드에서 세션 복구
         if (isDemoMode || process.env.NODE_ENV === 'production') {
           // 저장된 사용자 정보가 있는지 확인
-          const savedUserData = localStorage.getItem('saved_user_data');
+          const savedUserData = sessionStorage.getItem('saved_user_data');
           
           if (savedUserData) {
             try {
               let userData = JSON.parse(savedUserData);
               
               // userSettings에서 최신 이름 정보 확인 및 병합
-              const userSettings = localStorage.getItem('userSettings');
+              const userSettings = sessionStorage.getItem('userSettings');
               if (userSettings) {
                 try {
                   const settingsData = JSON.parse(userSettings);
@@ -311,7 +311,7 @@ function App() {
               setSelectedProjectId(DEMO_PROJECTS[0].id);
               
               // 저장된 탭 정보가 있으면 복원
-              const savedTab = localStorage.getItem('current_tab');
+              const savedTab = sessionStorage.getItem('current_tab');
               if (savedTab && protectedTabs.includes(savedTab)) {
                 setActiveTab(savedTab);
                 console.log(`✅ 세션 및 탭 복구 완료: ${savedTab}`);
@@ -330,14 +330,14 @@ function App() {
               return;
             } catch (error) {
               console.error('사용자 데이터 파싱 오류:', error);
-              localStorage.removeItem('saved_user_data');
+              sessionStorage.removeItem('saved_user_data');
             }
           }
         }
       } else {
         // 세션이 만료된 경우 저장된 데이터 정리
-        localStorage.removeItem('saved_user_data');
-        localStorage.removeItem('current_tab');
+        sessionStorage.removeItem('saved_user_data');
+        sessionStorage.removeItem('current_tab');
         console.log('⚠️ 세션 만료 - 저장된 데이터 정리');
       }
     };
@@ -397,6 +397,7 @@ function App() {
       
       const response = await fetch(`${API_BASE_URL}/api/health`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Accept': 'application/json',
         },
@@ -412,10 +413,8 @@ function App() {
         setShowApiErrorModal(false);
         setIsNavigationReady(true);
         
-        const token = localStorage.getItem('token');
-        if (token) {
-          validateToken(token);
-        }
+        // 서버에서 쿠키로 세션 검증
+        validateSession();
       } else {
         fallbackToDemoMode();
       }
@@ -438,6 +437,7 @@ function App() {
       
       const response = await fetch(`${API_BASE_URL}/api/health`, {
         method: 'GET',
+        credentials: 'include',
         headers: {
           'Accept': 'application/json',
         },
@@ -456,11 +456,12 @@ function App() {
     }
   };
 
-  const validateToken = async (token: string) => {
+  const validateSession = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
       
@@ -469,14 +470,9 @@ function App() {
         setUser(data.user);
         // 프로젝트 목록 로드
         fetchProjects();
-      } else {
-        localStorage.removeItem('token');
-        localStorage.removeItem('refreshToken');
       }
     } catch (error) {
-      console.error('Token validation failed:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
+      console.error('Session validation failed:', error);
     }
   };
 
@@ -608,7 +604,7 @@ function App() {
           sessionService.startSession(demoToken);
           
           // 사용자 데이터 저장 (새로고침 시 복구용)
-          localStorage.setItem('saved_user_data', JSON.stringify(authenticatedUser));
+          sessionStorage.setItem('saved_user_data', JSON.stringify(authenticatedUser));
           
           setUser(authenticatedUser);
           setProjects(DEMO_PROJECTS);
@@ -625,7 +621,7 @@ function App() {
           }
           
           setActiveTab(targetTab);
-          localStorage.setItem('current_tab', targetTab);
+          sessionStorage.setItem('current_tab', targetTab);
           
           console.log('✅ 로그인 성공 - 역할:', authenticatedUser.role, '탭:', targetTab);
           return;
@@ -634,6 +630,7 @@ function App() {
         // PostgreSQL 백엔드 로그인
         const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
           method: 'POST',
+          credentials: 'include',
           headers: {
             'Content-Type': 'application/json',
           },
@@ -647,12 +644,7 @@ function App() {
           sessionService.startSession(data.token);
           
           // 사용자 데이터 저장 (새로고침 시 복구용)
-          localStorage.setItem('saved_user_data', JSON.stringify(data.user));
-          
-          localStorage.setItem('token', data.token);
-          if (data.refreshToken) {
-            localStorage.setItem('refreshToken', data.refreshToken);
-          }
+          sessionStorage.setItem('saved_user_data', JSON.stringify(data.user));
           setUser(data.user);
           
           // 기본 탭 설정 및 저장
@@ -665,7 +657,7 @@ function App() {
             targetTab = 'personal-service';
           }
           setActiveTab(targetTab);
-          localStorage.setItem('current_tab', targetTab);
+          sessionStorage.setItem('current_tab', targetTab);
           
           console.log('✅ PostgreSQL 백엔드 로그인 성공');
           // 프로젝트 목록 로드
@@ -685,13 +677,11 @@ function App() {
     // 세션 서비스를 통한 로그아웃
     sessionService.logout();
     
-    // 토큰 및 저장된 데이터 정리
-    localStorage.removeItem('token');
-    localStorage.removeItem('refreshToken');
-    localStorage.removeItem('lastActiveTab');
-    localStorage.removeItem('selectedProjectId');
-    localStorage.removeItem('saved_user_data');
-    localStorage.removeItem('current_tab');
+    // 저장된 데이터 정리 (sessionStorage 사용)
+    sessionStorage.removeItem('lastActiveTab');
+    sessionStorage.removeItem('selectedProjectId');
+    sessionStorage.removeItem('saved_user_data');
+    sessionStorage.removeItem('current_tab');
     
     // 상태 초기화
     setUser(null);
@@ -733,7 +723,7 @@ function App() {
       }
       
       // URL에 탭이 없으면 마지막 활성 탭 복원
-      const lastTab = localStorage.getItem('lastActiveTab');
+      const lastTab = sessionStorage.getItem('lastActiveTab');
       if (lastTab && protectedTabs.includes(lastTab)) {
         setActiveTab(lastTab);
         return;
@@ -748,7 +738,7 @@ function App() {
       // 다른 경우에는 현재 탭 유지 (자동 이동하지 않음)
       
       // 선택된 프로젝트 복원
-      const savedProjectId = localStorage.getItem('selectedProjectId');
+      const savedProjectId = sessionStorage.getItem('selectedProjectId');
       if (savedProjectId && !selectedProjectId) {
         setSelectedProjectId(savedProjectId);
       }
@@ -758,14 +748,14 @@ function App() {
   // 탭 변경 시 저장
   useEffect(() => {
     if (user && activeTab && protectedTabs.includes(activeTab)) {
-      localStorage.setItem('lastActiveTab', activeTab);
+      sessionStorage.setItem('lastActiveTab', activeTab);
     }
   }, [activeTab, user, protectedTabs]);
   
   // 프로젝트 선택 시 저장
   useEffect(() => {
     if (selectedProjectId) {
-      localStorage.setItem('selectedProjectId', selectedProjectId);
+      sessionStorage.setItem('selectedProjectId', selectedProjectId);
     }
   }, [selectedProjectId]);
 
@@ -825,14 +815,12 @@ function App() {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects`, {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -866,13 +854,10 @@ function App() {
       return newProject;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/projects`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(projectData),
@@ -894,13 +879,11 @@ function App() {
       return DEMO_CRITERIA;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) return [];
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/criteria`, {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -915,13 +898,10 @@ function App() {
   };
 
   const createCriteria = async (projectId: string, criteriaData: any) => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/criteria`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ ...criteriaData, project_id: projectId }),
@@ -941,13 +921,11 @@ function App() {
       return DEMO_ALTERNATIVES;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) return [];
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/alternatives`, {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -962,13 +940,10 @@ function App() {
   };
 
   const createAlternative = async (projectId: string, alternativeData: any) => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/alternatives`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ ...alternativeData, project_id: projectId }),
@@ -984,13 +959,10 @@ function App() {
 
   // 평가 데이터 저장
   const saveEvaluation = async (projectId: string, evaluationData: any) => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/evaluate`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ project_id: projectId, ...evaluationData }),
@@ -1017,13 +989,11 @@ function App() {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     });
 
@@ -1038,13 +1008,11 @@ function App() {
 
   // 휴지통 프로젝트 조회
   const fetchTrashedProjects = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return [];
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects/trash/list`, {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -1060,13 +1028,11 @@ function App() {
 
   // 휴지통에서 복원
   const restoreProject = async (projectId: string) => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/restore`, {
       method: 'PUT',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     });
 
@@ -1081,13 +1047,11 @@ function App() {
 
   // 영구 삭제
   const permanentDeleteProject = async (projectId: string) => {
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}/permanent`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     });
 
@@ -1137,14 +1101,12 @@ function App() {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     setLoading(true);
     try {
       const response = await fetch(`${API_BASE_URL}/api/users`, {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       });
 
@@ -1174,13 +1136,10 @@ function App() {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/users`, {
       method: 'POST',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(userData),
@@ -1204,13 +1163,10 @@ function App() {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
       method: 'PUT',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(userData),
@@ -1232,13 +1188,11 @@ function App() {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) throw new Error('로그인이 필요합니다.');
-
     const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
       method: 'DELETE',
+      credentials: 'include',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
     });
 
@@ -1257,14 +1211,11 @@ function App() {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) return;
-
     try {
       const response = await fetch(`${API_BASE_URL}/api/projects`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -1288,10 +1239,10 @@ function App() {
     if (projectId) {
       setSelectedProjectId(projectId);
       setSelectedProjectTitle(projectTitle || '');
-      localStorage.setItem('selectedProjectId', projectId);
-      localStorage.setItem('selectedProjectTitle', projectTitle || '');
+      sessionStorage.setItem('selectedProjectId', projectId);
+      sessionStorage.setItem('selectedProjectTitle', projectTitle || '');
     }
-    localStorage.setItem('lastActiveTab', newTab);
+    sessionStorage.setItem('lastActiveTab', newTab);
     console.log(`📦 탭 전환: ${newTab}${projectId ? ` (프로젝트: ${projectTitle})` : ''}`);
   }, []);
   
@@ -1331,15 +1282,15 @@ function App() {
     changeTab('personal-projects');
     setSelectedProjectId(null);
     setSelectedProjectTitle('');
-    localStorage.removeItem('selectedProjectId');
-    localStorage.removeItem('selectedProjectTitle');
+    sessionStorage.removeItem('selectedProjectId');
+    sessionStorage.removeItem('selectedProjectTitle');
   };
 
   const handleProjectSelect = (projectId: string, projectTitle: string) => {
     setSelectedProjectId(projectId);
     setSelectedProjectTitle(projectTitle);
-    localStorage.setItem('selectedProjectId', projectId);
-    localStorage.setItem('selectedProjectTitle', projectTitle);
+    sessionStorage.setItem('selectedProjectId', projectId);
+    sessionStorage.setItem('selectedProjectTitle', projectTitle);
     console.log(`📋 프로젝트 선택됨: ${projectTitle}`);
   };
 
@@ -1357,8 +1308,8 @@ function App() {
     changeTab('evaluator-dashboard');
     setSelectedProjectId(null);
     setSelectedProjectTitle('');
-    localStorage.removeItem('selectedProjectId');
-    localStorage.removeItem('selectedProjectTitle');
+    sessionStorage.removeItem('selectedProjectId');
+    sessionStorage.removeItem('selectedProjectTitle');
     console.log('✅ 평가자 평가 완료');
   };
 

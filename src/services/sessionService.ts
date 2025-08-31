@@ -1,15 +1,10 @@
-// 세션 관리 서비스
+// 세션 관리 서비스 (Cookie 기반)
 class SessionService {
   private static instance: SessionService;
   private sessionTimer: NodeJS.Timeout | null = null;
   private warningTimer: NodeJS.Timeout | null = null;
   private readonly SESSION_DURATION = 30 * 60 * 1000; // 30분 (밀리초)
   private readonly WARNING_TIME = 5 * 60 * 1000; // 5분 전 경고 (밀리초)
-  private readonly STORAGE_KEYS = {
-    TOKEN: 'auth_token',
-    LOGIN_TIME: 'login_time',
-    LAST_ACTIVITY: 'last_activity'
-  };
 
   private constructor() {
     this.initializeSession();
@@ -22,36 +17,15 @@ class SessionService {
     return SessionService.instance;
   }
 
-  // 세션 초기화 (새로고침 시에도 호출)
+  // 세션 초기화 (Cookie 기반 인증으로 변경)
   private initializeSession(): void {
-    const token = localStorage.getItem(this.STORAGE_KEYS.TOKEN);
-    const lastActivity = localStorage.getItem(this.STORAGE_KEYS.LAST_ACTIVITY);
-    
-    if (token && lastActivity) {
-      const lastActivityTime = parseInt(lastActivity, 10);
-      const currentTime = Date.now();
-      const timeDiff = currentTime - lastActivityTime;
-      
-      // 30분이 지나지 않았다면 세션 복구
-      if (timeDiff < this.SESSION_DURATION) {
-        this.startSessionTimer();
-        this.updateLastActivity();
-        console.log('세션이 복구되었습니다.');
-      } else {
-        console.log('세션이 만료되어 로그아웃됩니다.');
-        this.forceLogout();
-      }
-    }
+    // 쿠키 기반 인증에서는 서버가 세션 관리를 담당
+    // 클라이언트는 세션 상태 확인만 수행
+    this.checkSessionStatus();
   }
 
-  // 로그인 시 세션 시작
-  public startSession(token: string): void {
-    const currentTime = Date.now();
-    
-    localStorage.setItem(this.STORAGE_KEYS.TOKEN, token);
-    localStorage.setItem(this.STORAGE_KEYS.LOGIN_TIME, currentTime.toString());
-    localStorage.setItem(this.STORAGE_KEYS.LAST_ACTIVITY, currentTime.toString());
-    
+  // 로그인 시 세션 시작 (Cookie 기반)
+  public startSession(): void {
     this.startSessionTimer();
     console.log('세션이 시작되었습니다. (30분)');
   }
@@ -73,56 +47,44 @@ class SessionService {
 
   // 세션 연장
   public extendSession(): void {
-    const token = localStorage.getItem(this.STORAGE_KEYS.TOKEN);
-    if (!token) {
-      console.warn('로그인 상태가 아닙니다.');
-      return;
-    }
-
-    const currentTime = Date.now();
-    localStorage.setItem(this.STORAGE_KEYS.LAST_ACTIVITY, currentTime.toString());
-    
+    // 서버에 세션 연장 요청
+    this.refreshSession();
     this.startSessionTimer(); // 타이머 재시작
     this.hideSessionWarning();
     console.log('세션이 30분 연장되었습니다.');
   }
 
-  // 마지막 활동 시간 업데이트
+  // 마지막 활동 시간 업데이트 (Cookie 기반에서는 불필요)
   public updateLastActivity(): void {
-    const token = localStorage.getItem(this.STORAGE_KEYS.TOKEN);
-    if (token) {
-      const currentTime = Date.now();
-      localStorage.setItem(this.STORAGE_KEYS.LAST_ACTIVITY, currentTime.toString());
-    }
+    // 쿠키 기반 인증에서는 서버가 자동으로 세션 활동을 추적
+    // 클라이언트에서는 별도 저장 불필요
   }
 
-  // 세션 상태 확인
-  public isSessionValid(): boolean {
-    const token = localStorage.getItem(this.STORAGE_KEYS.TOKEN);
-    const lastActivity = localStorage.getItem(this.STORAGE_KEYS.LAST_ACTIVITY);
-    
-    if (!token || !lastActivity) {
+  // 세션 상태 확인 (서버에서 확인)
+  public async isSessionValid(): Promise<boolean> {
+    try {
+      const response = await fetch('/api/auth/session', {
+        credentials: 'include',
+        method: 'GET'
+      });
+      return response.ok;
+    } catch (error) {
       return false;
     }
-    
-    const lastActivityTime = parseInt(lastActivity, 10);
-    const currentTime = Date.now();
-    const timeDiff = currentTime - lastActivityTime;
-    
-    return timeDiff < this.SESSION_DURATION;
   }
 
-  // 남은 세션 시간 (분 단위)
-  public getRemainingTime(): number {
-    const lastActivity = localStorage.getItem(this.STORAGE_KEYS.LAST_ACTIVITY);
-    if (!lastActivity) return 0;
-    
-    const lastActivityTime = parseInt(lastActivity, 10);
-    const currentTime = Date.now();
-    const timeDiff = currentTime - lastActivityTime;
-    const remaining = this.SESSION_DURATION - timeDiff;
-    
-    return Math.max(0, Math.floor(remaining / 60000)); // 분 단위
+  // 남은 세션 시간 (서버에서 조회)
+  public async getRemainingTime(): Promise<number> {
+    try {
+      const response = await fetch('/api/auth/session-info', {
+        credentials: 'include',
+        method: 'GET'
+      });
+      const data = await response.json();
+      return data.remainingTime || 0;
+    } catch (error) {
+      return 0;
+    }
   }
 
   // 세션 경고 표시
@@ -166,14 +128,19 @@ class SessionService {
   }
 
   // 강제 로그아웃
-  private forceLogout(): void {
+  private async forceLogout(): Promise<void> {
     this.clearTimers();
     this.hideSessionWarning();
     
-    // 로컬 스토리지에서 인증 정보 제거
-    localStorage.removeItem(this.STORAGE_KEYS.TOKEN);
-    localStorage.removeItem(this.STORAGE_KEYS.LOGIN_TIME);
-    localStorage.removeItem(this.STORAGE_KEYS.LAST_ACTIVITY);
+    // 서버에 로그아웃 요청
+    try {
+      await fetch('/api/auth/logout', {
+        credentials: 'include',
+        method: 'POST'
+      });
+    } catch (error) {
+      console.error('로그아웃 요청 실패:', error);
+    }
     
     // 페이지 새로고침으로 로그인 페이지로 이동
     console.log('세션이 만료되어 로그아웃되었습니다.');
@@ -181,13 +148,19 @@ class SessionService {
   }
 
   // 수동 로그아웃
-  public logout(): void {
+  public async logout(): Promise<void> {
     this.clearTimers();
     this.hideSessionWarning();
     
-    localStorage.removeItem(this.STORAGE_KEYS.TOKEN);
-    localStorage.removeItem(this.STORAGE_KEYS.LOGIN_TIME);
-    localStorage.removeItem(this.STORAGE_KEYS.LAST_ACTIVITY);
+    // 서버에 로그아웃 요청
+    try {
+      await fetch('/api/auth/logout', {
+        credentials: 'include',
+        method: 'POST'
+      });
+    } catch (error) {
+      console.error('로그아웃 요청 실패:', error);
+    }
     
     console.log('로그아웃되었습니다.');
   }
@@ -204,12 +177,21 @@ class SessionService {
     }
   }
 
-  // 현재 토큰 반환
-  public getToken(): string | null {
-    if (this.isSessionValid()) {
-      return localStorage.getItem(this.STORAGE_KEYS.TOKEN);
+  // 세션 상태 확인 (Cookie 기반에서는 토큰 반환 불필요)
+  public async checkSessionStatus(): Promise<boolean> {
+    return await this.isSessionValid();
+  }
+
+  // 세션 새로고침
+  private async refreshSession(): Promise<void> {
+    try {
+      await fetch('/api/auth/refresh-session', {
+        credentials: 'include',
+        method: 'POST'
+      });
+    } catch (error) {
+      console.error('세션 새로고침 실패:', error);
     }
-    return null;
   }
 }
 

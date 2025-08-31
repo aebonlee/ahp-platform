@@ -62,11 +62,26 @@ router.post('/register', registerValidation, async (req: Request, res: Response)
     const token = generateToken(user);
     const refreshToken = generateRefreshToken(user);
     
+    // httpOnly 쿠키로 토큰 설정
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24시간
+      path: '/'
+    });
+    
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      path: '/'
+    });
+    
     res.status(201).json({
       message: 'User registered successfully',
-      user: userResponse,
-      token,
-      refreshToken
+      user: userResponse
     });
     
   } catch (error) {
@@ -128,11 +143,27 @@ router.post('/login', loginValidation, async (req: Request, res: Response) => {
     const refreshToken = generateRefreshToken(user);
     
     console.log('Login successful');
+    
+    // httpOnly 쿠키로 토큰 설정
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24시간
+      path: '/'
+    });
+    
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7일
+      path: '/'
+    });
+    
     res.json({
       message: 'Login successful',
-      user: userResponse,
-      token,
-      refreshToken
+      user: userResponse
     });
     
   } catch (error) {
@@ -204,6 +235,36 @@ router.get('/profile', authenticateToken, async (req, res) => {
     res.status(500).json({
       error: 'Internal server error',
       code: 'PROFILE_FETCH_FAILED'
+    });
+  }
+});
+
+// 로그아웃 엔드포인트 추가
+router.post('/logout', (req: Request, res: Response) => {
+  try {
+    // 모든 인증 쿠키 제거
+    res.clearCookie('token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/'
+    });
+    
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      path: '/'
+    });
+    
+    res.json({
+      message: 'Logged out successfully'
+    });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      error: 'Failed to logout',
+      code: 'LOGOUT_FAILED'
     });
   }
 });

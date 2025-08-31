@@ -52,8 +52,9 @@ const UsageManagement: React.FC<UsageManagementProps> = ({ user, onBack }) => {
   const loadSubscriptionData = async () => {
     try {
       const response = await fetch('/api/subscription/status', {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
       });
       
@@ -69,8 +70,9 @@ const UsageManagement: React.FC<UsageManagementProps> = ({ user, onBack }) => {
   const loadUsageData = async () => {
     try {
       const response = await fetch('/api/subscription/usage', {
+        credentials: 'include',
         headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         }
       });
       
@@ -89,9 +91,10 @@ const UsageManagement: React.FC<UsageManagementProps> = ({ user, onBack }) => {
     try {
       const response = await fetch('/api/subscription/extend', {
         method: 'POST',
+        credentials: 'include',
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
           days, 
@@ -125,9 +128,10 @@ const UsageManagement: React.FC<UsageManagementProps> = ({ user, onBack }) => {
     try {
       const response = await fetch('/api/subscription/reset-data', {
         method: 'POST',
+        credentials: 'include',
+        credentials: 'include',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ 
           confirmPassword: resetConfirm,

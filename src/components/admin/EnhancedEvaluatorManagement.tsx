@@ -66,23 +66,18 @@ const EnhancedEvaluatorManagement: React.FC<EnhancedEvaluatorManagementProps> = 
   const loadEvaluators = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('token');
-      const isDemoMode = !token;
-
-      if (isDemoMode) {
-        // 데모 모드에서는 빈 배열로 시작
-        setEvaluators([]);
-      } else {
-        const response = await fetch(`${API_BASE_URL}/api/evaluators${projectId ? `?projectId=${projectId}` : ''}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setEvaluators(data.evaluators || []);
+      const response = await fetch(`${API_BASE_URL}/api/evaluators${projectId ? `?projectId=${projectId}` : ''}`, {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
         }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setEvaluators(data.evaluators || []);
+      } else {
+        setEvaluators([]);
       }
     } catch (error) {
       console.error('Failed to load evaluators:', error);
@@ -140,29 +135,24 @@ const EnhancedEvaluatorManagement: React.FC<EnhancedEvaluatorManagementProps> = 
     };
 
     try {
-      const token = localStorage.getItem('token');
-      const isDemoMode = !token;
+      const response = await fetch(`${API_BASE_URL}/api/evaluators`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          ...formData,
+          projectId
+        })
+      });
 
-      if (isDemoMode) {
-        // 데모 모드에서는 로컬에만 추가
-        setEvaluators([newEvaluator, ...evaluators]);
+      if (response.ok) {
+        const data = await response.json();
+        setEvaluators([data.evaluator, ...evaluators]);
       } else {
-        const response = await fetch(`${API_BASE_URL}/api/evaluators`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            ...formData,
-            projectId
-          })
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setEvaluators([data.evaluator, ...evaluators]);
-        }
+        // 실패 시 로컬에만 추가 (데모 모드)
+        setEvaluators([newEvaluator, ...evaluators]);
       }
 
       setFormData({ email: '', name: '', phone: '' });
@@ -219,12 +209,11 @@ ${inviteData.message}
         };
 
         // 실제 이메일 발송 (백엔드 API 또는 이메일 서비스 사용)
-        const token = localStorage.getItem('token');
-        if (token) {
+        try {
           await fetch(`${API_BASE_URL}/api/evaluators/invite`, {
             method: 'POST',
+            credentials: 'include',
             headers: {
-              'Authorization': `Bearer ${token}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
@@ -234,6 +223,8 @@ ${inviteData.message}
               shortLink
             })
           });
+        } catch (error) {
+          console.log('이메일 발송 실패 (데모 모드):', error);
         }
 
         // SMS 발송 (옵션)
@@ -264,16 +255,13 @@ ${inviteData.message}
   const handleDeleteEvaluator = async (evaluatorId: string) => {
     if (window.confirm('평가자를 삭제하시겠습니까? 배정된 프로젝트에서 제외되며 평가 데이터가 삭제됩니다.')) {
       try {
-        const token = localStorage.getItem('token');
-        
-        if (token) {
-          await fetch(`${API_BASE_URL}/api/evaluators/${evaluatorId}`, {
-            method: 'DELETE',
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          });
-        }
+        await fetch(`${API_BASE_URL}/api/evaluators/${evaluatorId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
         
         setEvaluators(evaluators.filter(e => e.id !== evaluatorId));
       } catch (error) {
