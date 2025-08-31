@@ -1045,7 +1045,7 @@ const EnhancedResultsDashboard: React.FC<EnhancedResultsDashboardProps> = ({
             <div className="text-gray-600 mb-4">
               평가 결과를 다양한 형식으로 내보내기할 수 있습니다
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Button variant="primary" onClick={exportToExcel}>
                 📊 Excel 파일
               </Button>

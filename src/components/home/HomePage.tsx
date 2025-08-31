@@ -320,7 +320,8 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-10">
             {/* 기능 카드 1 */}
             <div className="rounded-2xl p-8 shadow-sm hover:shadow-xl transition-all duration-300 border" style={{
               backgroundColor: 'var(--bg-primary)',
@@ -380,6 +381,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 여러 전문가의 의견을 수집하고 통합하여 집단 의사결정을 지원합니다
               </p>
             </div>
+            </div>
           </div>
         </div>
       </section>
@@ -396,7 +398,8 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-10">
             {/* 단계 1 */}
             <div className="relative">
               <div className="flex flex-col items-center text-center">
@@ -444,6 +447,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   우선순위와 일관성 비율을 확인하고 최적 대안을 도출합니다
                 </p>
               </div>
+            </div>
             </div>
           </div>
         </div>

@@ -915,6 +915,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   const handleProjectSelect = (project: UserProject) => {
     setActiveProject(project.id || null);
+    setSelectedProjectId(project.id || '');
     setShowProjectSelector(false);
     
     if (projectSelectorConfig) {
@@ -1170,7 +1171,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               {/* 평가 방법 선택 */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">평가 방법</label>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
                     { value: 'pairwise', label: '쌍대비교', desc: '두 요소를 비교하여 평가', icon: '⚖️' },
                     { value: 'direct_input', label: '직접입력', desc: '직접 점수를 입력하여 평가', icon: '📝' },
@@ -1232,7 +1233,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setIsProjectFormOpen(true)}>
             ➕ 새 프로젝트 생성
           </Button>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="text-2xl mb-2">🎯</div>
               <h4 className="font-medium mb-1">목표 설정</h4>
@@ -1277,7 +1278,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
           {/* 그리드 뷰 */}
           {viewMode === 'grid' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {filteredProjects.map((project) => (
                 <div key={project.id} className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 overflow-hidden">
                   {/* 프로젝트 헤더 */}
@@ -1615,7 +1616,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
       <Card title="프로젝트 상세 정보">
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="text-center p-4 border-2 border-blue-200 bg-blue-50 rounded-lg">
               <div className="text-2xl mb-2">📋</div>
               <h4 className="font-medium text-gray-900 mb-1">기본 정보</h4>
@@ -1803,7 +1804,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">진행률 모니터링</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card title="전체 진행률">
           <div className="text-center">
             <div className="text-3xl font-bold text-blue-600">85%</div>
@@ -1923,7 +1924,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               return project ? (
                 <div className="space-y-6">
                   <Card title={`결과 분석: ${project.title}`}>
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                       <div>
                         <h4 className="font-medium mb-3">프로젝트 개요</h4>
                         <div className="space-y-2 text-sm">
@@ -2017,7 +2018,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
                   {/* 추가 분석 도구 */}
                   <Card title="🔍 고급 분석 도구">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <button className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
                         <div className="text-2xl mb-2">📊</div>
                         <h5 className="font-medium mb-1">민감도 분석</h5>
@@ -2206,7 +2207,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">보고서 내보내기</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         <Card title="Excel 보고서">
           <div className="space-y-4">
             <div className="text-sm text-gray-600">
@@ -2531,8 +2532,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="max-w-5xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* 테스트 프로젝트 선택 */}
             <Card 
               title="테스트 프로젝트" 
@@ -2675,7 +2676,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               🚀 평가 테스트 시작
             </Button>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-center">
               <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-elevated)' }}>
                 <div className="text-2xl mb-2">📝</div>
                 <h4 className="font-semibold mb-1">쌍대비교 평가</h4>
@@ -3042,7 +3043,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
         
         {/* 요금제 할당량 정보 - 각 섹션을 개별 박스로 구분 */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* 프로젝트 개수 박스 */}
           <div 
             className="rounded-xl p-6 transition-all duration-300"
