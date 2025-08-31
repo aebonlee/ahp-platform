@@ -187,6 +187,20 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 요금제
               </button>
               <button 
+                onClick={() => scrollToSection('news')}
+                className="transition-colors" 
+                style={{
+                  color: 'var(--text-secondary)',
+                  background: 'none',
+                  border: 'none',
+                  cursor: 'pointer'
+                }} 
+                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
+                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
+              >
+                AHP NEWS
+              </button>
+              <button 
                 onClick={() => scrollToSection('research')}
                 className="transition-colors" 
                 style={{
@@ -256,6 +270,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               <button onClick={() => scrollToSection('how-it-works')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>이용 방법</button>
               <button onClick={() => scrollToSection('guide')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>사용 가이드</button>
               <button onClick={() => scrollToSection('pricing')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>요금제</button>
+              <button onClick={() => scrollToSection('news')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>AHP NEWS</button>
               <button onClick={() => scrollToSection('research')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>연구 사례</button>
               
               {/* 모바일 테마 컨트롤 */}
@@ -680,6 +695,188 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 </div>
               </div>
 
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* AHP NEWS 섹션 - AURI 스타일 */}
+      <section id="news" className="py-20" style={{ backgroundColor: 'var(--bg-subtle)' }}>
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ 
+              color: 'var(--text-primary)',
+              fontWeight: '700'
+            }}>
+              AHP NEWS
+            </h2>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
+              최신 연구 동향과 플랫폼 업데이트 소식을 확인하세요
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto">
+            <div className="space-y-4">
+              
+              {/* 뉴스 아이템 1 */}
+              <div className="group bg-white rounded-lg p-6 border transition-all hover:shadow-md hover:border-blue-200" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <span className="inline-block px-3 py-1 text-xs font-medium rounded-full mr-3" style={{
+                        backgroundColor: 'var(--accent-light)',
+                        color: 'var(--accent-primary)'
+                      }}>
+                        플랫폼 업데이트
+                      </span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>2024.08.31</span>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                      AURI 스타일 UI/UX 개편 완료 - 더욱 직관적인 사용자 경험 제공
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      사용자 피드백을 반영하여 전면적인 디자인 개선을 완료했습니다. 미니멀하고 깔끔한 인터페이스로 연구 효율성을 높였습니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 뉴스 아이템 2 */}
+              <div className="group bg-white rounded-lg p-6 border transition-all hover:shadow-md hover:border-blue-200" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <span className="inline-block px-3 py-1 text-xs font-medium rounded-full mr-3" style={{
+                        backgroundColor: '#e8f5e8',
+                        color: '#22c55e'
+                      }}>
+                        연구 성과
+                      </span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>2024.08.25</span>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                      국내 주요 대학 1,000+ 논문에서 AHP 분석 도구 활용 검증
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      서울대, 연세대, 고려대 등 주요 대학의 논문 연구에서 우리 플랫폼을 활용한 AHP 분석 결과가 높은 신뢰도를 보였습니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 뉴스 아이템 3 */}
+              <div className="group bg-white rounded-lg p-6 border transition-all hover:shadow-md hover:border-blue-200" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <span className="inline-block px-3 py-1 text-xs font-medium rounded-full mr-3" style={{
+                        backgroundColor: '#fef3e2',
+                        color: '#f59e0b'
+                      }}>
+                        기능 개선
+                      </span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>2024.08.20</span>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                      다중 평가자 협업 기능 강화 - 실시간 동기화 및 진행률 추적
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      여러 연구자가 동시에 작업할 수 있는 협업 환경을 개선하고, 실시간 진행률 추적 기능을 추가했습니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 뉴스 아이템 4 */}
+              <div className="group bg-white rounded-lg p-6 border transition-all hover:shadow-md hover:border-blue-200" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <span className="inline-block px-3 py-1 text-xs font-medium rounded-full mr-3" style={{
+                        backgroundColor: '#f3e8ff',
+                        color: '#8b5cf6'
+                      }}>
+                        연구 논문
+                      </span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>2024.08.15</span>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                      AHP 방법론의 신뢰성 향상을 위한 일관성 검증 알고리즘 개발
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      더욱 정확한 의사결정을 위한 새로운 일관성 검증 알고리즘을 개발하여 연구의 신뢰성을 한층 높였습니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 뉴스 아이템 5 */}
+              <div className="group bg-white rounded-lg p-6 border transition-all hover:shadow-md hover:border-blue-200" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <span className="inline-block px-3 py-1 text-xs font-medium rounded-full mr-3" style={{
+                        backgroundColor: '#ecfdf5',
+                        color: '#10b981'
+                      }}>
+                        파트너십
+                      </span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>2024.08.10</span>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                      한국연구재단과의 연구 지원 프로그램 협약 체결
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      국가 R&D 과제에서 AHP 분석 도구 활용을 지원하는 공식 파트너십을 체결했습니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* 뉴스 아이템 6 */}
+              <div className="group bg-white rounded-lg p-6 border transition-all hover:shadow-md hover:border-blue-200" style={{ borderColor: 'var(--border-light)' }}>
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center mb-2">
+                      <span className="inline-block px-3 py-1 text-xs font-medium rounded-full mr-3" style={{
+                        backgroundColor: '#fef2f2',
+                        color: '#ef4444'
+                      }}>
+                        보안 강화
+                      </span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>2024.08.05</span>
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors" style={{ color: 'var(--text-primary)' }}>
+                      데이터 보안 및 개인정보 보호 시스템 강화 완료
+                    </h3>
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      연구 데이터의 안전한 보관과 개인정보 보호를 위한 보안 시스템을 한층 강화했습니다.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* 더보기 버튼 */}
+            <div className="text-center mt-12">
+              <button className="px-8 py-3 rounded-lg border-2 font-medium transition-all hover:scale-105" style={{
+                backgroundColor: 'var(--bg-primary)',
+                color: 'var(--text-secondary)',
+                borderColor: 'var(--border-medium)'
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-primary)';
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-inverse)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--accent-primary)';
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary)';
+                (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)';
+                (e.currentTarget as HTMLButtonElement).style.borderColor = 'var(--border-medium)';
+              }}>
+                더 많은 소식 보기
+              </button>
             </div>
           </div>
         </div>
