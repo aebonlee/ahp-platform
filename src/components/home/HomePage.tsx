@@ -399,13 +399,13 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   backgroundColor: '#0066cc',
                   color: 'white'
                 }}>
-                  01
+                  1
                 </div>
                 <h3 className="text-xl font-bold mb-4" style={{ color: '#222' }}>
-                  프로젝트 설정
+                  계층 구조 설계
                 </h3>
                 <p className="leading-relaxed" style={{ color: '#666' }}>
-                  연구 목표를 설정하고 평가할 기준과 대안들을 입력합니다
+                  연구 목표와 평가 기준, 대안을 체계적으로 구성합니다
                 </p>
               </div>
 
@@ -415,13 +415,13 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   backgroundColor: '#0066cc',
                   color: 'white'
                 }}>
-                  02
+                  2
                 </div>
                 <h3 className="text-xl font-bold mb-4" style={{ color: '#222' }}>
                   쌍대 비교
                 </h3>
                 <p className="leading-relaxed" style={{ color: '#666' }}>
-                  각 요소를 쌍으로 비교하여 상대적 중요도를 평가합니다
+                  각 요소들을 1:1로 비교하여 상대적 중요도를 평가합니다
                 </p>
               </div>
 
@@ -431,13 +431,13 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                   backgroundColor: '#0066cc',
                   color: 'white'
                 }}>
-                  03
+                  3
                 </div>
                 <h3 className="text-xl font-bold mb-4" style={{ color: '#222' }}>
-                  결과 확인
+                  결과 분석
                 </h3>
                 <p className="leading-relaxed" style={{ color: '#666' }}>
-                  우선순위 결과와 일관성을 확인하고 논문에 활용합니다
+                  우선순위와 일관성 비율을 확인하고 최적 대안을 도출합니다
                 </p>
               </div>
 
