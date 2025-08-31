@@ -1375,7 +1375,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             e.preventDefault();
                             e.stopPropagation();
                             setSelectedProjectId(project.id || '');
-                            handleTabChange('model-builder');
+                            setActiveProject(project.id || null);
+                            if (externalOnTabChange) {
+                              externalOnTabChange('model-builder');
+                            }
                           }}
                           className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                           title="모델 구성"
@@ -1388,7 +1391,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             e.preventDefault();
                             e.stopPropagation();
                             setSelectedProjectId(project.id || '');
-                            handleTabChange('analysis');
+                            setActiveProject(project.id || null);
+                            if (externalOnTabChange) {
+                              externalOnTabChange('results-analysis');
+                            }
                           }}
                           className="p-2 rounded-lg transition-colors"
                           style={{ color: 'var(--text-muted)' }}
@@ -1523,7 +1529,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                               e.preventDefault();
                               e.stopPropagation();
                               setSelectedProjectId(project.id || '');
-                              handleTabChange('model-builder');
+                              setActiveProject(project.id || null);
+                              if (externalOnTabChange) {
+                                externalOnTabChange('model-builder');
+                              }
                             }}
                             className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
                             title="모델 구성"
@@ -1536,7 +1545,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                               e.preventDefault();
                               e.stopPropagation();
                               setSelectedProjectId(project.id || '');
-                              handleTabChange('analysis');
+                              setActiveProject(project.id || null);
+                              if (externalOnTabChange) {
+                                externalOnTabChange('results-analysis');
+                              }
                             }}
                             className="p-2 rounded-lg transition-colors"
                           style={{ color: 'var(--text-muted)' }}
