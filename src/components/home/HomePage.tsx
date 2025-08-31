@@ -526,16 +526,16 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
       </section>
 
       {/* 이용 방법 섹션 - AURI 스타일 심플 */}
-      <section id="how-it-works" className="py-20" style={{ backgroundColor: 'white' }}>
+      <section id="how-it-works" className="py-20" style={{ backgroundColor: 'var(--bg-primary)' }}>
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold mb-4" style={{ 
-              color: '#222',
+              color: 'var(--text-primary)',
               fontWeight: '700'
             }}>
               이용 방법
             </h2>
-            <p className="text-lg max-w-2xl mx-auto" style={{ color: '#666' }}>
+            <p className="text-lg max-w-2xl mx-auto" style={{ color: 'var(--text-secondary)' }}>
               3단계 간단한 프로세스로 전문적인 AHP 분석을 완성하세요
             </p>
           </div>
@@ -546,15 +546,15 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               {/* 단계 1 - AURI 스타일 */}
               <div className="text-center">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-6 mx-auto" style={{
-                  backgroundColor: '#0066cc',
-                  color: 'white'
+                  backgroundColor: 'var(--accent-primary)',
+                  color: 'var(--text-inverse)'
                 }}>
                   1
                 </div>
-                <h3 className="text-xl font-bold mb-4" style={{ color: '#222' }}>
+                <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
                   계층 구조 설계
                 </h3>
-                <p className="leading-relaxed" style={{ color: '#666' }}>
+                <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   연구 목표와 평가 기준, 대안을 체계적으로 구성합니다
                 </p>
               </div>
@@ -562,15 +562,15 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               {/* 단계 2 */}
               <div className="text-center">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-6 mx-auto" style={{
-                  backgroundColor: '#0066cc',
-                  color: 'white'
+                  backgroundColor: 'var(--accent-primary)',
+                  color: 'var(--text-inverse)'
                 }}>
                   2
                 </div>
-                <h3 className="text-xl font-bold mb-4" style={{ color: '#222' }}>
+                <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
                   쌍대 비교
                 </h3>
-                <p className="leading-relaxed" style={{ color: '#666' }}>
+                <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   각 요소들을 1:1로 비교하여 상대적 중요도를 평가합니다
                 </p>
               </div>
@@ -578,15 +578,15 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
               {/* 단계 3 */}
               <div className="text-center">
                 <div className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold mb-6 mx-auto" style={{
-                  backgroundColor: '#0066cc',
-                  color: 'white'
+                  backgroundColor: 'var(--accent-primary)',
+                  color: 'var(--text-inverse)'
                 }}>
                   3
                 </div>
-                <h3 className="text-xl font-bold mb-4" style={{ color: '#222' }}>
+                <h3 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
                   결과 분석
                 </h3>
-                <p className="leading-relaxed" style={{ color: '#666' }}>
+                <p className="leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                   우선순위와 일관성 비율을 확인하고 최적 대안을 도출합니다
                 </p>
               </div>
