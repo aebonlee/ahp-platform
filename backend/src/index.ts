@@ -123,7 +123,7 @@ app.get('/api/admin/users', async (req, res) => {
 app.post('/api/admin/create-test-user', async (req, res) => {
   try {
     const { query } = await import('./database/connection');
-    const bcrypt = await import('bcrypt');
+    const bcrypt = require('bcrypt');
     
     const hashedPassword = await bcrypt.hash('test123', 10);
     
