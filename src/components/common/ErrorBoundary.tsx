@@ -75,7 +75,7 @@ class ErrorBoundary extends Component<Props, State> {
               <div className="mt-6 pt-4 border-t text-sm text-gray-500">
                 <p>AHP for Paper v2.4.0</p>
                 <a 
-                  href="https://github.com/aebonlee/ahp-research-platform" 
+                  href="https://github.com/aebonlee/ahp-platform" 
                   className="text-blue-600 hover:underline"
                   target="_blank"
                   rel="noopener noreferrer"

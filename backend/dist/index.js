@@ -76,9 +76,7 @@ app.use((0, helmet_1.default)({
 // Enhanced CORS configuration for production
 const allowedOrigins = [
     'http://localhost:3000',
-    'https://aebonlee.github.io',
     'https://aebonlee.github.io/ahp-platform',
-    'https://ahp-frontend-render.onrender.com',
     'https://ahp-platform.onrender.com'
 ];
 app.use((0, cors_1.default)({
