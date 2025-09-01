@@ -3,6 +3,8 @@ import ThemeModeToggle from '../common/ThemeModeToggle';
 import ColorThemeButton from '../common/ColorThemeButton';
 import ParticleBackground from '../common/ParticleBackground';
 import PricingSection from './PricingSection';
+import SupportPage from '../support/SupportPage';
+import NewsPage from '../support/NewsPage';
 
 interface HomePageProps {
   onLoginClick: () => void;
@@ -14,6 +16,8 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [showSupportPage, setShowSupportPage] = useState(false);
+  const [showNewsPage, setShowNewsPage] = useState(false);
 
   // 스크롤 이벤트 처리
   useEffect(() => {
@@ -106,6 +110,16 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
     }
   };
 
+  // 고객지원 페이지 표시
+  if (showSupportPage) {
+    return <SupportPage onBackClick={() => setShowSupportPage(false)} />;
+  }
+
+  // 뉴스 페이지 표시
+  if (showNewsPage) {
+    return <NewsPage onBackClick={() => setShowNewsPage(false)} />;
+  }
+
   return (
     <div className="min-h-screen" style={{
       backgroundColor: 'var(--bg-primary, #ffffff)',
@@ -142,21 +156,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
                 onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
               >
-                주요 기능
-              </button>
-              <button 
-                onClick={() => scrollToSection('how-it-works')}
-                className="transition-colors" 
-                style={{
-                  color: 'var(--text-secondary)',
-                  background: 'none',
-                  border: 'none',
-                  cursor: 'pointer'
-                }} 
-                onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
-                onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
-              >
-                이용 방법
+                기능 및 이용방법
               </button>
               <button 
                 onClick={() => scrollToSection('guide')}
@@ -187,7 +187,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 요금제
               </button>
               <button 
-                onClick={() => scrollToSection('news')}
+                onClick={() => setShowNewsPage(true)}
                 className="transition-colors" 
                 style={{
                   color: 'var(--text-secondary)',
@@ -198,10 +198,10 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
                 onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
               >
-                AHP NEWS
+                소식 및 사례
               </button>
               <button 
-                onClick={() => scrollToSection('research')}
+                onClick={() => setShowSupportPage(true)}
                 className="transition-colors" 
                 style={{
                   color: 'var(--text-secondary)',
@@ -212,7 +212,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--accent-primary)'}
                 onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'}
               >
-                연구 사례
+                고객지원
               </button>
             </nav>
 
@@ -266,12 +266,11 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
         {isMenuOpen && (
           <div className="md:hidden border-t" style={{ backgroundColor: 'var(--bg-secondary)' }}>
             <div className="px-6 py-4 space-y-3">
-              <button onClick={() => scrollToSection('features')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>주요 기능</button>
-              <button onClick={() => scrollToSection('how-it-works')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>이용 방법</button>
+              <button onClick={() => scrollToSection('features')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>기능 및 이용방법</button>
               <button onClick={() => scrollToSection('guide')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>사용 가이드</button>
               <button onClick={() => scrollToSection('pricing')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>요금제</button>
-              <button onClick={() => scrollToSection('news')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>AHP NEWS</button>
-              <button onClick={() => scrollToSection('research')} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>연구 사례</button>
+              <button onClick={() => { setShowNewsPage(true); setIsMenuOpen(false); }} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>소식 및 사례</button>
+              <button onClick={() => { setShowSupportPage(true); setIsMenuOpen(false); }} className="block py-2 w-full text-left" style={{ color: 'var(--text-secondary)', background: 'none', border: 'none' }}>고객지원</button>
               
               {/* 모바일 테마 컨트롤 */}
               <div className="flex items-center gap-3 py-3 border-t" style={{ borderColor: 'var(--border-light)' }}>
@@ -627,7 +626,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
           </div>
 
           <div className="max-w-6xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid md:grid-cols-3 gap-6 mb-12">
               
               {/* 초보자 가이드 - AURI 스타일 */}
               <div className="bg-white rounded-lg p-6 border hover:shadow-md transition-shadow" style={{ borderColor: '#e5e7eb' }}>
@@ -695,6 +694,70 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 </div>
               </div>
 
+            </div>
+
+            {/* 역할별 서비스 이용 버튼 */}
+            <div className="mt-16 text-center">
+              <h3 className="text-2xl font-bold mb-8" style={{ color: '#222' }}>
+                역할에 맞는 서비스 이용하기
+              </h3>
+              <div className="flex flex-col md:flex-row gap-6 justify-center max-w-2xl mx-auto">
+                
+                {/* 연구자 모드 버튼 */}
+                <button
+                  onClick={onLoginClick}
+                  className="flex-1 bg-white rounded-xl p-8 border-2 hover:shadow-lg transition-all transform hover:scale-105"
+                  style={{ borderColor: 'var(--accent-primary)' }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-primary)';
+                    (e.currentTarget as HTMLButtonElement).style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'white';
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
+                  }}
+                >
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{
+                    backgroundColor: 'var(--accent-light)'
+                  }}>
+                    <svg className="w-8 h-8" fill="none" stroke="var(--accent-primary)" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-xl font-bold mb-3">연구자 모드</h4>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    프로젝트 생성, 기준 설정, 평가자 관리 등 연구 전체를 책임지는 관리자 역할
+                  </p>
+                </button>
+
+                {/* 평가자 모드 버튼 */}
+                <button
+                  onClick={onLoginClick}
+                  className="flex-1 bg-white rounded-xl p-8 border-2 hover:shadow-lg transition-all transform hover:scale-105"
+                  style={{ borderColor: 'var(--accent-secondary)' }}
+                  onMouseEnter={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--accent-secondary)';
+                    (e.currentTarget as HTMLButtonElement).style.color = 'white';
+                  }}
+                  onMouseLeave={(e) => {
+                    (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'white';
+                    (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)';
+                  }}
+                >
+                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{
+                    backgroundColor: 'var(--secondary-light, #e8f5e8)'
+                  }}>
+                    <svg className="w-8 h-8" fill="none" stroke="var(--accent-secondary)" viewBox="0 0 24 24" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <h4 className="text-xl font-bold mb-3">평가자 모드</h4>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                    배정받은 프로젝트의 쌍대비교를 수행하고 평가 데이터를 제공하는 역할
+                  </p>
+                </button>
+
+              </div>
             </div>
           </div>
         </div>

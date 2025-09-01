@@ -1,0 +1,51 @@
+name: Preview Environment
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  create-preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: |
+          npm ci
+          cd backend && npm ci
+          
+      - name: Run tests
+        run: |
+          npm test -- --coverage --watchAll=false
+          cd backend && npm test
+          
+      - name: Build frontend
+        run: npm run build:frontend
+        
+      - name: Build backend
+        run: cd backend && npm run build
+        
+      - name: Deploy to Render Preview
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+        run: |
+          echo "Preview environment will be created automatically by Render"
+          echo "Check PR comments for preview URL"
+          
+      - name: Comment PR with preview URL
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🚀 Preview environment is being created! Check Render dashboard for URL.'
+            })

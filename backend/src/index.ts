@@ -7,6 +7,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
+import path from 'path';
 import { runMigrations } from './database/migrate';
 import { initDatabase } from './database/connection';
 import WorkshopSyncService from './services/workshopSync';
@@ -116,6 +117,22 @@ app.use('/api/matrix', matrixRoutes);
 app.use('/api/compute', computeRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/subscription', subscriptionRoutes);
+
+// Serve static files from React build in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the React app
+  const buildPath = path.join(__dirname, '../../build');
+  app.use(express.static(buildPath));
+
+  // Handle React routing, return all requests to React app
+  app.get('*', (req, res) => {
+    // Skip API routes
+    if (req.path.startsWith('/api')) {
+      return res.status(404).json({ error: 'API endpoint not found' });
+    }
+    res.sendFile(path.join(buildPath, 'index.html'));
+  });
+}
 
 // Error handling middleware
 app.use((err: any, req: any, res: any, next: any) => {

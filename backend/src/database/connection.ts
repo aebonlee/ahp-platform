@@ -9,25 +9,49 @@ let initDatabase: () => Promise<void>;
 
 // PostgreSQL 연결 설정
 const databaseUrl = process.env.DATABASE_URL;
-const pool = new Pool({
+
+// DATABASE_URL이 없으면 경고만 표시하고 계속 진행
+if (!databaseUrl) {
+  console.warn('⚠️ DATABASE_URL not set. Database features will be disabled.');
+  console.warn('To enable database, set DATABASE_URL environment variable in Render.com dashboard.');
+}
+
+const pool = databaseUrl ? new Pool({
   connectionString: databaseUrl,
-  ssl: databaseUrl?.includes('render.com') ? { rejectUnauthorized: false } : false
-});
+  ssl: databaseUrl.includes('render.com') || databaseUrl.includes('postgresql://') 
+    ? { rejectUnauthorized: false } 
+    : false
+}) : null as any;
 
-console.log('Connecting to PostgreSQL:', databaseUrl ? 'Remote Render.com database' : 'Local database');
+if (pool) {
+  console.log('Connecting to PostgreSQL:', databaseUrl.includes('render.com') ? 'Remote Render.com database' : 'PostgreSQL database');
+} else {
+  console.log('Running without database connection');
+}
 
-pool.on('error', (err: any) => {
-  console.error('Unexpected error on idle client', err);
-  process.exit(-1);
-});
+if (pool) {
+  pool.on('error', (err: any) => {
+    console.error('Unexpected error on idle client', err);
+    process.exit(-1);
+  });
 
-pool.on('connect', () => {
-  console.log('Connected to PostgreSQL database');
-});
+  pool.on('connect', () => {
+    console.log('Connected to PostgreSQL database');
+  });
+}
 
-query = (text: string, params?: any[]) => pool.query(text, params);
+query = pool ? (text: string, params?: any[]) => pool.query(text, params) : 
+  async () => { 
+    console.warn('Database query attempted but DATABASE_URL not configured');
+    throw new Error('Database not configured');
+  };
 
 initDatabase = async () => {
+  if (!pool) {
+    console.warn('⚠️ Skipping database initialization - DATABASE_URL not configured');
+    return;
+  }
+  
   try {
     console.log('Initializing PostgreSQL database...');
     

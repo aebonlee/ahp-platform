@@ -41,7 +41,9 @@
     "backend:dev": "cd backend && npm run dev",
     "dev:all": "concurrently \"npm run backend:dev\" \"npm run start:frontend\"",
     "install:all": "npm install && npm run backend:install",
-    "build:all": "npm run build:frontend && npm run backend:build"
+    "build:all": "npm run build:frontend && npm run backend:build",
+    "build:render": "npm install && cd backend && npm install && cd .. && npm run build:frontend && cd backend && npm run build",
+    "start:render": "cd backend && npm start"
   },
   "eslintConfig": {
     "extends": [
