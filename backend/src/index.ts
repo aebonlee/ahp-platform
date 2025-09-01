@@ -8,6 +8,7 @@ import morgan from 'morgan';
 import cookieParser from 'cookie-parser';
 import { createServer } from 'http';
 import path from 'path';
+import fs from 'fs';
 import { runMigrations } from './database/migrate';
 import { initDatabase } from './database/connection';
 import WorkshopSyncService from './services/workshopSync';
@@ -120,18 +121,23 @@ app.use('/api/subscription', subscriptionRoutes);
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the React app
   const buildPath = path.join(__dirname, '../../build');
-  app.use(express.static(buildPath));
+  
+  // Check if build directory exists
+  if (fs.existsSync(buildPath)) {
+    console.log('✅ Serving static files from:', buildPath);
+    app.use(express.static(buildPath));
 
-  // Handle React routing, return all requests to React app
-  app.get('*', (req, res) => {
-    // Skip API routes
-    if (req.path.startsWith('/api')) {
-      return res.status(404).json({ error: 'API endpoint not found' });
-    }
-    res.sendFile(path.join(buildPath, 'index.html'));
-  });
+    // Handle React routing for non-API routes only
+    app.get(/^(?!\/api).*/, (req, res) => {
+      res.sendFile(path.join(buildPath, 'index.html'));
+    });
+  } else {
+    console.warn('⚠️ Build directory not found:', buildPath);
+    app.get('/', (req, res) => {
+      res.json({ message: 'AHP Platform Backend - Frontend build not found' });
+    });
+  }
 }
 
 // Error handling middleware
