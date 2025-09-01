@@ -207,7 +207,12 @@ function App() {
         if (response.ok) {
           const data = await response.json();
           console.log('🔄 페이지 새로고침 - 세션 복구 성공');
-          setUser(data.user);
+          // admin 역할일 때 admin_type을 'personal'로 설정
+          const userWithAdminType = {
+            ...data.user,
+            admin_type: data.user.role === 'admin' ? 'personal' : data.user.admin_type
+          };
+          setUser(userWithAdminType);
         } else {
           console.log('❌ 세션 만료 또는 로그인 필요');
           setUser(null);
@@ -322,7 +327,12 @@ function App() {
       
       if (response.ok) {
         const data = await response.json();
-        setUser(data.user);
+        // admin 역할일 때 admin_type을 'personal'로 설정
+        const userWithAdminType = {
+          ...data.user,
+          admin_type: data.user.role === 'admin' ? 'personal' : data.user.admin_type
+        };
+        setUser(userWithAdminType);
         console.log('✅ 세션 복구 성공:', data.user.email);
       }
     } catch (error) {
@@ -387,7 +397,12 @@ function App() {
       const data = await response.json();
       
       if (response.ok) {
-        setUser(data.user);
+        // admin 역할일 때 admin_type을 'personal'로 설정
+        const userWithAdminType = {
+          ...data.user,
+          admin_type: data.user.role === 'admin' ? 'personal' : data.user.admin_type
+        };
+        setUser(userWithAdminType);
         
         // 기본 탭 설정
         let targetTab = '';
