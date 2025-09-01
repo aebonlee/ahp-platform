@@ -498,7 +498,8 @@ const EnhancedSuperAdminDashboard: React.FC<EnhancedSuperAdminDashboardProps> = 
             <select className="border rounded px-3 py-2">
               <option value="">모든 역할</option>
               <option value="super_admin">고급 관리자</option>
-              <option value="personal_admin">개인 관리자</option>
+              <option value="admin">관리자</option>
+              <option value="service_tester">서비스 테스터</option>
               <option value="evaluator">평가자</option>
             </select>
             <select className="border rounded px-3 py-2">

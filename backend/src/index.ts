@@ -35,6 +35,7 @@ const PORT = process.env.PORT || 5000;
 
 // Initialize WebSocket service (disabled for deployment)
 const workshopSync = new WorkshopSyncService(httpServer);
+console.log('🚀 AHP Platform Backend v2.3.0 - Role System Updated');
 
 // Trust proxy for Render.com
 app.set('trust proxy', 1);
