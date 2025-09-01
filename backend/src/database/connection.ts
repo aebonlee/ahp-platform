@@ -412,12 +412,10 @@ initDatabase = async () => {
       console.log('Admin user already exists, skipping...');
     }
 
-    // 샘플 데이터 생성 (개발 환경에서만)
-    if (process.env.NODE_ENV !== 'production') {
-      await createSampleData();
-      await createSampleNewsData();
-      await createSampleSupportData();
-    }
+    // 샘플 데이터 생성
+    await createSampleData();
+    await createSampleNewsData();
+    await createSampleSupportData();
 
     console.log('PostgreSQL database initialized successfully');
   } catch (error) {
