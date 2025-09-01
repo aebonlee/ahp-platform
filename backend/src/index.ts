@@ -108,6 +108,21 @@ app.post('/api/admin/migrate', async (req, res) => {
   }
 });
 
+// Sample data creation endpoint for production
+app.post('/api/admin/create-sample-data', async (req, res) => {
+  try {
+    console.log('🔧 Creating sample data...');
+    const { createSampleData, createSampleNewsData, createSampleSupportData } = require('./database/connection');
+    await createSampleData();
+    await createSampleNewsData();
+    await createSampleSupportData();
+    res.json({ success: true, message: 'Sample data created successfully' });
+  } catch (error) {
+    console.error('❌ Sample data creation failed:', error);
+    res.status(500).json({ success: false, error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/projects', projectRoutes);

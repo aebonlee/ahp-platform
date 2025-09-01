@@ -594,5 +594,5 @@ async function createSampleSupportData() {
   }
 }
 
-export { query, initDatabase };
+export { query, initDatabase, createSampleData, createSampleNewsData, createSampleSupportData };
 export default pool;
