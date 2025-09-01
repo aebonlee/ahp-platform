@@ -45,7 +45,27 @@ function App() {
     admin_type?: 'super' | 'personal'; // 관리자 유형 구분
     canSwitchModes?: boolean; // 모드 전환 가능 여부
   } | null>(null);
-  const [activeTab, setActiveTab] = useState('landing');
+  const [activeTab, setActiveTab] = useState(() => {
+    // URL 파라미터에서 초기 탭 결정
+    const urlParams = new URLSearchParams(window.location.search);
+    const tabParam = urlParams.get('tab');
+    
+    // tab 파라미터가 있고 유효한 탭이면 해당 탭으로, 아니면 'home'
+    const validTabs = [
+      'home', 'user-guide', 'evaluator-mode',
+      'personal-service', 'demographic-survey', 
+      'my-projects', 'project-creation', 'model-builder',
+      'evaluator-management', 'progress-monitoring', 'results-analysis',
+      'paper-management', 'export-reports', 'workshop-management',
+      'decision-support-system', 'personal-settings', 'landing'
+    ];
+    
+    if (tabParam && validTabs.includes(tabParam)) {
+      return tabParam;
+    }
+    
+    return 'home';
+  });
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [registerMode, setRegisterMode] = useState<'service' | 'admin' | null>(null);
@@ -447,16 +467,43 @@ function App() {
         return;
       }
       
-      // 기본 탭 설정
-      if (user.role === 'super_admin' && user.admin_type === 'super') {
+      // URL에 탭이 없으면 마지막 활성 탭 복원
+      const lastTab = localStorage.getItem('lastActiveTab');
+      if (lastTab && protectedTabs.includes(lastTab)) {
+        setActiveTab(lastTab);
+        return;
+      }
+      
+      // 둘 다 없으면 기본 탭 설정 (자동 이동 최소화)
+      if (user.role === 'super_admin') {
         setActiveTab('super-admin');
       } else if (user.role === 'evaluator') {
         setActiveTab('evaluator-dashboard');
       } else {
         setActiveTab('personal-service');
       }
+      
+      // 저장된 프로젝트 ID 복원
+      const savedProjectId = localStorage.getItem('selectedProjectId');
+      if (savedProjectId && !selectedProjectId) {
+        setSelectedProjectId(savedProjectId);
+      }
     }
-  }, [user, protectedTabs]);
+  }, [user, protectedTabs, selectedProjectId]);
+  
+  // 탭 변경 시 저장
+  useEffect(() => {
+    if (user && activeTab && protectedTabs.includes(activeTab)) {
+      localStorage.setItem('lastActiveTab', activeTab);
+    }
+  }, [activeTab, user, protectedTabs]);
+  
+  // 프로젝트 선택 시 저장
+  useEffect(() => {
+    if (selectedProjectId) {
+      localStorage.setItem('selectedProjectId', selectedProjectId);
+    }
+  }, [selectedProjectId]);
 
   // 관리자 유형 선택 핸들러 (더 이상 사용하지 않음 - 통합 대시보드로 대체)
   // const handleAdminTypeSelect = (adminType: 'super' | 'personal') => {
