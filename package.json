@@ -2,7 +2,7 @@
   "name": "ahp-decision-system",
   "version": "2.2.0",
   "private": true,
-  "homepage": "https://aebonlee.github.io/ahp-platform/",
+  "homepage": ".",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.6.4",
