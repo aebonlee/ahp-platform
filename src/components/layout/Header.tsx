@@ -38,12 +38,27 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
   useEffect(() => {
     // 세션 상태 확인 및 시간 업데이트
     const updateSessionStatus = async () => {
-      const sessionValid = await sessionService.isSessionValid();
-      setIsLoggedIn(sessionValid);
-      
-      if (sessionValid) {
-        const remaining = await sessionService.getRemainingTime();
-        setRemainingTime(remaining);
+      // 사용자가 로그인 상태면 세션 활성화로 간주
+      if (user) {
+        setIsLoggedIn(true);
+        
+        // 세션 시간 계산 (기본 30분)
+        const loginTime = localStorage.getItem('login_time');
+        if (loginTime) {
+          const elapsed = Math.floor((Date.now() - parseInt(loginTime)) / 60000); // 분 단위
+          const remaining = Math.max(0, 30 - elapsed);
+          setRemainingTime(remaining);
+        } else {
+          // 로그인 시간 설정
+          localStorage.setItem('login_time', Date.now().toString());
+          setRemainingTime(30);
+        }
+        
+        // 마지막 활동 시간 업데이트
+        localStorage.setItem('last_activity', Date.now().toString());
+      } else {
+        setIsLoggedIn(false);
+        setRemainingTime(0);
       }
     };
 
@@ -51,6 +66,9 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
       updateSessionStatus();
       const interval = setInterval(updateSessionStatus, 60000); // 1분마다 업데이트
       return () => clearInterval(interval);
+    } else {
+      setIsLoggedIn(false);
+      setRemainingTime(0);
     }
   }, [user]);
 

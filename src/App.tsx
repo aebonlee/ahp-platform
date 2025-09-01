@@ -402,6 +402,11 @@ function App() {
           ...data.user,
           admin_type: data.user.role === 'admin' ? 'personal' : data.user.admin_type
         };
+        
+        // 로그인 시간 저장 (세션 관리를 위해)
+        localStorage.setItem('login_time', Date.now().toString());
+        localStorage.setItem('last_activity', Date.now().toString());
+        
         setUser(userWithAdminType);
         
         // 기본 탭 설정
@@ -431,6 +436,10 @@ function App() {
   };
 
   const handleLogout = async () => {
+    // 세션 정보 삭제
+    localStorage.removeItem('login_time');
+    localStorage.removeItem('last_activity');
+    
     try {
       // 백엔드 로그아웃 API 호출
       await fetch(`${API_BASE_URL}/api/auth/logout`, {
@@ -957,11 +966,13 @@ function App() {
 
 
   const renderContent = () => {
-    switch (activeTab) {
-      case 'home':
-        return <HomePage onLoginClick={handleLoginClick} />;
+    // 로그인하지 않은 상태에서는 메인페이지와 관련 페이지만 렌더링
+    if (!user) {
+      switch (activeTab) {
+        case 'home':
+          return <HomePage onLoginClick={handleLoginClick} />;
         
-      case 'login':
+        case 'login':
         return (
           <LoginForm
             onLogin={handleLogin}
@@ -971,25 +982,43 @@ function App() {
           />
         );
 
+        case 'register':
+          if (!registerMode) return null;
+          return (
+            <RegisterForm
+              onRegister={handleRegister}
+              onBackToLogin={handleBackToLogin}
+              loading={loginLoading}
+              error={loginError}
+              mode={registerMode}
+            />
+          );
+        
+        default:
+          // 로그인하지 않은 상태에서 다른 페이지 접근 시 홈으로 리다이렉트
+          return <HomePage onLoginClick={handleLoginClick} />;
+      }
+    }
+    
+    // 로그인한 상태에서의 라우팅
+    switch (activeTab) {
+      case 'home':
+        // 로그인한 상태에서 홈 접근 시 서비스 대시보드로 리다이렉트
+        setActiveTab('personal-service');
+        return null;
+        
       case 'register':
-        if (!registerMode) return null;
-        return (
-          <RegisterForm
-            onRegister={handleRegister}
-            onBackToLogin={handleBackToLogin}
-            loading={loginLoading}
-            error={loginError}
-            mode={registerMode}
-          />
-        );
+        // 로그인한 상태에서 회원가입 페이지 접근 시 서비스로 리다이렉트
+        setActiveTab('personal-service');
+        return null;
 
       case 'welcome':
-        if (!user) return null;
         return (
           <PersonalServiceDashboard 
             user={user}
             activeTab='welcome'
             onTabChange={setActiveTab}
+            onUserUpdate={setUser}
           />
         );
 
@@ -1003,7 +1032,6 @@ function App() {
       case 'settings':
       case 'backup':
       case 'system':
-        if (!user) return null;
         return (
           <EnhancedSuperAdminDashboard 
             user={{
@@ -1034,6 +1062,8 @@ function App() {
             />
           );
         }
+        // 평가자 설문 정보가 없으면 대시보드로
+        setActiveTab('personal-service');
         return null;
 
       case 'user-guide':
@@ -1050,23 +1080,6 @@ function App() {
         return <EvaluationTest />;
 
       case 'evaluator-mode':
-        // 평가자 모드 - 로그인 필요
-        if (!user) {
-          return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-              <div className="text-center">
-                <h2 className="text-xl font-semibold mb-4">로그인이 필요합니다</h2>
-                <button
-                  onClick={() => setActiveTab('login')}
-                  className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-                >
-                  로그인하기
-                </button>
-              </div>
-            </div>
-          );
-        }
-
         // 로그인한 사용자의 경우
         if (user.role === 'evaluator') {
           return (
@@ -1112,33 +1125,6 @@ function App() {
       case 'workshop-management':
       case 'decision-support-system':
       case 'personal-settings':
-        if (!user) {
-          // demographic-survey 직접 접근 시 자동 데모 로그인
-          if (activeTab === 'demographic-survey') {
-            console.log('🚀 설문조사 페이지 직접 접근 - 자동 데모 로그인 처리');
-            
-            // 즉시 데모 사용자 설정
-            setUser({
-              ...DEMO_USER,
-              id: 'auto-demo-user',
-              email: 'demo@ahp-system.com',
-              role: 'admin',
-              admin_type: 'personal'
-            });
-            setProjects([]);
-            
-            // 로딩 상태를 잠시 보여준 후 페이지 렌더링
-            return (
-              <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">설문조사 페이지를 준비하고 있습니다...</p>
-                </div>
-              </div>
-            );
-          }
-          return null;
-        }
         console.log('🎯 PersonalServiceDashboard 렌더링:', { activeTab, userId: user.id, userRole: user.role });
         return (
           <PersonalServiceDashboard 
@@ -1163,7 +1149,6 @@ function App() {
         );
 
       case 'landing':
-        if (!user) return null;
         return (
           <LandingPage 
             user={user}
@@ -1547,25 +1532,12 @@ function App() {
   };
 
 
-  // 백엔드 연결 문제 시 임시로 데모 사용자로 메뉴 표시
-  const needsLayout = (user && protectedTabs.includes(activeTab)) || activeTab === 'evaluation-test' || 
-    (backendStatus === 'unavailable' && ['home', 'landing', 'personal-service'].includes(activeTab));
-
-  if (needsLayout) {
-    // 백엔드 연결 불가 시 임시 데모 사용자 생성
-    const effectiveUser = user || (backendStatus === 'unavailable' ? {
-      id: 'demo-offline-user',
-      first_name: 'Demo',
-      last_name: 'User',
-      email: 'demo@ahp-system.com',
-      role: 'admin' as const,
-      admin_type: 'personal' as const
-    } : null);
-
+  // 로그인한 사용자만 Layout과 함께 렌더링
+  if (user) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Layout
-          user={effectiveUser}
+          user={user}
           activeTab={activeTab}
           onTabChange={changeTab}
           onLogout={handleLogout}
@@ -1582,7 +1554,7 @@ function App() {
     );
   }
 
-  // 홈페이지나 로그인 페이지는 Layout 없이 렌더링
+  // 로그인하지 않은 사용자는 Layout 없이 렌더링 (홈페이지, 로그인, 회원가입)
   return (
     <div className="min-h-screen bg-gray-50">
       {renderContent()}

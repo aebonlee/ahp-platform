@@ -47,8 +47,10 @@ class SessionService {
 
   // 세션 연장
   public extendSession(): void {
-    // 서버에 세션 연장 요청
-    this.refreshSession();
+    // 로그인 시간 갱신
+    localStorage.setItem('login_time', Date.now().toString());
+    localStorage.setItem('last_activity', Date.now().toString());
+    
     this.startSessionTimer(); // 타이머 재시작
     this.hideSessionWarning();
     console.log('세션이 30분 연장되었습니다.');
@@ -60,31 +62,25 @@ class SessionService {
     // 클라이언트에서는 별도 저장 불필요
   }
 
-  // 세션 상태 확인 (서버에서 확인)
+  // 세션 상태 확인 (클라이언트 사이드)
   public async isSessionValid(): Promise<boolean> {
-    try {
-      const response = await fetch('/api/auth/profile', {
-        credentials: 'include',
-        method: 'GET'
-      });
-      return response.ok;
-    } catch (error) {
-      return false;
-    }
+    // localStorage에서 로그인 시간 확인
+    const loginTime = localStorage.getItem('login_time');
+    if (!loginTime) return false;
+    
+    // 30분 경과 여부 확인
+    const elapsed = Date.now() - parseInt(loginTime);
+    return elapsed < this.SESSION_DURATION;
   }
 
-  // 남은 세션 시간 (서버에서 조회)
+  // 남은 세션 시간 (클라이언트 사이드 계산)
   public async getRemainingTime(): Promise<number> {
-    try {
-      const response = await fetch('/api/auth/profile', {
-        credentials: 'include',
-        method: 'GET'
-      });
-      const data = await response.json();
-      return data.remainingTime || 0;
-    } catch (error) {
-      return 0;
-    }
+    const loginTime = localStorage.getItem('login_time');
+    if (!loginTime) return 0;
+    
+    const elapsed = Date.now() - parseInt(loginTime);
+    const remaining = Math.max(0, this.SESSION_DURATION - elapsed);
+    return Math.floor(remaining / 60000); // 분 단위로 반환
   }
 
   // 세션 경고 표시
