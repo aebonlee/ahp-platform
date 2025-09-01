@@ -5,6 +5,17 @@
 [![Node.js](https://img.shields.io/badge/Node.js-18.0.0+-green.svg)](https://nodejs.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
+## 🌐 서비스 접속 정보
+
+### ✅ **현재 운영 중인 서비스**
+- **메인 URL**: https://ahp-platform.onrender.com
+- **로그인 정보**: 
+  - 이메일: `admin@ahp-system.com`
+  - 비밀번호: `password123`
+- **상태**: 정상 운영 중 (Render.com 통합 배포)
+
+> ⚠️ **주의**: 첫 접속 시 30-60초 로딩 시간이 필요할 수 있습니다 (무료 플랜 특성)
+
 ## 📊 프로젝트 소개
 
 AHP(Analytic Hierarchy Process) 의사결정 분석 시스템은 복잡한 의사결정 문제를 체계적으로 분석하기 위한 웹 기반 플랫폼입니다. 학술 연구 및 실무에서 활용 가능한 전문적인 AHP 분석 도구를 제공합니다.
