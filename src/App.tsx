@@ -41,27 +41,7 @@ function App() {
     admin_type?: 'super' | 'personal'; // 관리자 유형 구분
     canSwitchModes?: boolean; // 모드 전환 가능 여부
   } | null>(null);
-  const [activeTab, setActiveTab] = useState(() => {
-    // URL 파라미터에서 초기 탭 결정
-    const urlParams = new URLSearchParams(window.location.search);
-    const tabParam = urlParams.get('tab');
-    
-    // tab 파라미터가 있고 유효한 탭이면 해당 탭으로, 아니면 'home'
-    const validTabs = [
-      'home', 'user-guide', 'evaluator-mode',
-      'personal-service', 'demographic-survey', 
-      'my-projects', 'project-creation', 'model-builder',
-      'evaluator-management', 'progress-monitoring', 'results-analysis',
-      'paper-management', 'export-reports', 'workshop-management',
-      'decision-support-system', 'personal-settings'
-    ];
-    
-    if (tabParam && validTabs.includes(tabParam)) {
-      return tabParam;
-    }
-    
-    return 'home';
-  });
+  const [activeTab, setActiveTab] = useState('home');
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [registerMode, setRegisterMode] = useState<'service' | 'admin' | null>(null);
@@ -79,8 +59,10 @@ function App() {
   const [surveyToken, setSurveyToken] = useState<string>('');
 
 
-  // URL 파라미터 변경 감지 및 자동 로그인 처리
+  // URL 파라미터 변경 감지 (로그인 후에만 적용)
   useEffect(() => {
+    if (!user) return; // 로그인하지 않은 경우 URL 파라미터 무시
+    
     const handlePopState = () => {
       const urlParams = new URLSearchParams(window.location.search);
       const tabParam = urlParams.get('tab');
@@ -99,8 +81,12 @@ function App() {
     };
 
     window.addEventListener('popstate', handlePopState);
+    
+    // 초기 로드 시에도 URL 파라미터 체크
+    handlePopState();
+    
     return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+  }, [user]);
 
   const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
   const [showApiErrorModal, setShowApiErrorModal] = useState(false);
