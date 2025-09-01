@@ -1533,13 +1533,25 @@ function App() {
   };
 
 
-  const needsLayout = (user && protectedTabs.includes(activeTab)) || activeTab === 'evaluation-test';
+  // 백엔드 연결 문제 시 임시로 데모 사용자로 메뉴 표시
+  const needsLayout = (user && protectedTabs.includes(activeTab)) || activeTab === 'evaluation-test' || 
+    (backendStatus === 'unavailable' && ['home', 'landing', 'personal-service'].includes(activeTab));
 
   if (needsLayout) {
+    // 백엔드 연결 불가 시 임시 데모 사용자 생성
+    const effectiveUser = user || (backendStatus === 'unavailable' ? {
+      id: 'demo-offline-user',
+      first_name: 'Demo',
+      last_name: 'User',
+      email: 'demo@ahp-system.com',
+      role: 'admin' as const,
+      admin_type: 'personal' as const
+    } : null);
+
     return (
       <div className="min-h-screen bg-gray-50">
         <Layout
-          user={user}
+          user={effectiveUser}
           activeTab={activeTab}
           onTabChange={changeTab}
           onLogout={handleLogout}
