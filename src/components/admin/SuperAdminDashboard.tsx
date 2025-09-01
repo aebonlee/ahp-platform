@@ -34,7 +34,7 @@ interface AdminUser {
   firstName: string;
   lastName: string;
   email: string;
-  role: 'super_admin' | 'admin' | 'evaluator';
+  role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
   status: 'active' | 'inactive' | 'suspended';
   createdAt: string;
   lastLogin?: string;

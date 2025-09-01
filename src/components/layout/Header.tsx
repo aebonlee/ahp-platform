@@ -10,7 +10,7 @@ interface HeaderProps {
   user?: {
     first_name: string;
     last_name: string;
-    role: 'super_admin' | 'admin' | 'evaluator';
+    role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
     admin_type?: 'super' | 'personal';
   } | null;
   onLogout?: () => void;

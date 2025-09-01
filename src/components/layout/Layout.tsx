@@ -9,7 +9,7 @@ interface LayoutProps {
     first_name: string;
     last_name: string;
     email: string;
-    role: 'super_admin' | 'admin' | 'evaluator';
+    role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
     admin_type?: 'super' | 'personal';
     canSwitchModes?: boolean;
   } | null;
@@ -33,11 +33,13 @@ const Layout: React.FC<LayoutProps> = ({
     // 사용자 상태에 따라 적절한 메인 페이지로 이동
     if (user) {
       if (user.role === 'super_admin') {
-        onTabChange('admin-type-selection');
+        onTabChange('super-admin');
       } else if (user.role === 'admin' && user.admin_type === 'personal') {
         onTabChange('personal-service');
       } else if (user.role === 'admin') {
         onTabChange('admin-type-selection');
+      } else if (user.role === 'service_tester') {
+        onTabChange('personal-service');
       } else if (user.role === 'evaluator') {
         onTabChange('evaluator-dashboard');
       } else {

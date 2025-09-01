@@ -5,7 +5,7 @@ import Button from '../common/Button';
 interface ComprehensiveUserGuideProps {
   onNavigateToService?: () => void;
   onNavigateToEvaluator?: () => void;
-  userRole?: 'super_admin' | 'admin' | 'evaluator' | null;
+  userRole?: 'super_admin' | 'admin' | 'service_tester' | 'evaluator' | null;
   isLoggedIn?: boolean;
 }
 

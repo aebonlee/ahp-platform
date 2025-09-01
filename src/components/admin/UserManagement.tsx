@@ -9,7 +9,7 @@ interface User {
   email: string;
   first_name: string;
   last_name: string;
-  role: 'super_admin' | 'admin' | 'evaluator';
+  role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
   created_at: string;
   last_login?: string;
   status: 'active' | 'inactive';
@@ -35,13 +35,13 @@ const UserManagement: React.FC<UserManagementProps> = ({
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState<'all' | 'super_admin' | 'admin' | 'evaluator'>('all');
+  const [roleFilter, setRoleFilter] = useState<'all' | 'super_admin' | 'admin' | 'service_tester' | 'evaluator'>('all');
   const [createLoading, setCreateLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     first_name: '',
     last_name: '',
-    role: 'evaluator' as 'super_admin' | 'admin' | 'evaluator',
+    role: 'evaluator' as 'super_admin' | 'admin' | 'service_tester' | 'evaluator',
     password: '',
     confirmPassword: '',
     status: 'active' as 'active' | 'inactive'

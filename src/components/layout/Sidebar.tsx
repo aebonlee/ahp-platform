@@ -2,7 +2,7 @@ import React from 'react';
 
 interface SidebarProps {
   isCollapsed: boolean;
-  userRole: 'super_admin' | 'admin' | 'evaluator' | null;
+  userRole: 'super_admin' | 'admin' | 'service_tester' | 'evaluator' | null;
   adminType?: 'super' | 'personal';
   activeTab: string;
   onTabChange: (tab: string) => void;
@@ -65,15 +65,18 @@ const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, userRole, adminType, act
   ];
 
   const getMenuItems = () => {
-    if (userRole === 'admin') {
+    if (userRole === 'super_admin') {
+      return superAdminMenuItems;
+    } else if (userRole === 'admin') {
       if (adminType === 'super') {
         return superAdminMenuItems;
       } else if (adminType === 'personal') {
         return personalServiceMenuItems;
       } else {
-        // 관리자 유형이 선택되지 않은 경우 모드 선택만 표시
         return [{ id: 'admin-type-selection', label: '모드 선택', icon: '🔄' }];
       }
+    } else if (userRole === 'service_tester') {
+      return personalServiceMenuItems; // Service tester gets same menu as personal admin
     }
     return evaluatorMenuItems;
   };

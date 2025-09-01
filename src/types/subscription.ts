@@ -87,7 +87,7 @@ export interface ExtendedUser {
   email: string;
   first_name: string;
   last_name: string;
-  role: 'super_admin' | 'personal_admin' | 'evaluator';
+  role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
   subscription?: UserSubscription;
   parentAdminId?: string; // 개인 관리자의 경우 총괄 관리자 ID
   createdBy?: string; // 누가 생성했는지

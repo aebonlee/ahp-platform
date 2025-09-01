@@ -41,7 +41,7 @@ function App() {
     first_name: string;
     last_name: string;
     email: string;
-    role: 'super_admin' | 'admin' | 'evaluator';
+    role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
     admin_type?: 'super' | 'personal'; // 관리자 유형 구분
     canSwitchModes?: boolean; // 모드 전환 가능 여부
   } | null>(null);
@@ -372,6 +372,8 @@ function App() {
           targetTab = 'evaluator-dashboard';
         } else if (data.user.role === 'super_admin') {
           targetTab = 'super-admin';
+        } else if (data.user.role === 'service_tester') {
+          targetTab = 'personal-service';
         } else {
           targetTab = 'personal-service';
         }

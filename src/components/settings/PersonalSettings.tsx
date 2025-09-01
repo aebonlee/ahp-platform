@@ -10,7 +10,7 @@ interface PersonalSettingsProps {
     first_name: string;
     last_name: string;
     email: string;
-    role: 'super_admin' | 'admin' | 'evaluator';
+    role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
     admin_type?: 'super' | 'personal';
   };
   onBack?: () => void;
@@ -19,7 +19,7 @@ interface PersonalSettingsProps {
     first_name: string;
     last_name: string;
     email: string;
-    role: 'super_admin' | 'admin' | 'evaluator';
+    role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
     admin_type?: 'super' | 'personal';
   }) => void;
 }

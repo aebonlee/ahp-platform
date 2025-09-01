@@ -61,7 +61,7 @@ exports.initDatabase = initDatabase = async () => {
         password_hash VARCHAR(255) NOT NULL,
         first_name VARCHAR(100) NOT NULL,
         last_name VARCHAR(100) NOT NULL,
-        role VARCHAR(20) CHECK(role IN ('admin', 'evaluator')) NOT NULL DEFAULT 'evaluator',
+        role VARCHAR(20) CHECK(role IN ('super_admin', 'admin', 'service_tester', 'evaluator')) NOT NULL DEFAULT 'evaluator',
         is_active BOOLEAN NOT NULL DEFAULT true,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -374,36 +374,63 @@ exports.initDatabase = initDatabase = async () => {
       LEFT JOIN pairwise_comparisons pc ON p.id = pc.project_id
       GROUP BY p.id, p.name, p.title, p.workflow_stage;
     `);
-        // 기본 관리자 계정 생성
-        const hashedPassword = await bcryptjs_1.default.hash('password123', 10);
-        try {
-            await query(`
-        INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
-        VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (email) DO NOTHING
-      `, ['admin@ahp-system.com', hashedPassword, 'Admin', 'User', 'admin', true]);
-        }
-        catch (error) {
-            console.log('Admin user already exists, skipping...');
-        }
-        // 테스트 관리자 계정 생성
-        const testHashedPassword = await bcryptjs_1.default.hash('tester@', 10);
-        try {
-            await query(`
-        INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
-        VALUES ($1, $2, $3, $4, $5, $6)
-        ON CONFLICT (email) DO UPDATE SET
-          password_hash = $2,
-          first_name = $3,
-          last_name = $4,
-          role = $5,
-          is_active = $6
-      `, ['test@ahp.com', testHashedPassword, 'Test', 'Admin', 'admin', true]);
-            console.log('✅ Test user created/updated: test@ahp.com / tester@');
-        }
-        catch (error) {
-            console.log('Error creating test user:', error);
-        }
+        // 기본 계정들 생성
+        console.log('🔧 Creating default user accounts...');
+        // 1. Super Admin (최고 관리자)
+        const superAdminPassword = await bcryptjs_1.default.hash('superadmin123', 10);
+        await query(`
+      INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (email) DO UPDATE SET
+        password_hash = $2,
+        role = $5,
+        updated_at = CURRENT_TIMESTAMP
+    `, ['superadmin@ahp-system.com', superAdminPassword, 'Super', 'Admin', 'super_admin', true]);
+        console.log('✅ Super Admin created: superadmin@ahp-system.com / superadmin123');
+        // 2. Admin (일반 관리자)
+        const adminPassword = await bcryptjs_1.default.hash('admin123', 10);
+        await query(`
+      INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (email) DO UPDATE SET
+        password_hash = $2,
+        role = $5,
+        updated_at = CURRENT_TIMESTAMP
+    `, ['admin@ahp-system.com', adminPassword, 'Admin', 'User', 'admin', true]);
+        console.log('✅ Admin created: admin@ahp-system.com / admin123');
+        // 3. Service Tester (서비스 테스터)
+        const testerPassword = await bcryptjs_1.default.hash('tester123', 10);
+        await query(`
+      INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (email) DO UPDATE SET
+        password_hash = $2,
+        role = $5,
+        updated_at = CURRENT_TIMESTAMP
+    `, ['tester@ahp-service.com', testerPassword, 'Service', 'Tester', 'service_tester', true]);
+        console.log('✅ Service Tester created: tester@ahp-service.com / tester123');
+        // 4. Evaluator (평가자)
+        const evaluatorPassword = await bcryptjs_1.default.hash('evaluator123', 10);
+        await query(`
+      INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (email) DO UPDATE SET
+        password_hash = $2,
+        role = $5,
+        updated_at = CURRENT_TIMESTAMP
+    `, ['evaluator@ahp-service.com', evaluatorPassword, 'Test', 'Evaluator', 'evaluator', true]);
+        console.log('✅ Evaluator created: evaluator@ahp-service.com / evaluator123');
+        // 5. Demo Evaluator (데모 평가자)
+        const demoPassword = await bcryptjs_1.default.hash('demo123', 10);
+        await query(`
+      INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (email) DO UPDATE SET
+        password_hash = $2,
+        role = $5,
+        updated_at = CURRENT_TIMESTAMP
+    `, ['demo@ahp-service.com', demoPassword, 'Demo', 'Evaluator', 'evaluator', true]);
+        console.log('✅ Demo Evaluator created: demo@ahp-service.com / demo123');
         // 샘플 데이터 생성
         await createSampleData();
         await createSampleNewsData();
