@@ -23,11 +23,13 @@
     "xlsx": "^0.18.5",
     "zustand": "^5.0.7"
   },
+  "main": "backend/dist/index.js",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=8.0.0"
   },
   "scripts": {
+    "start": "cd backend && node dist/index.js",
     "start:frontend": "react-scripts start",
     "build": "cd backend && npm install && npm run build",
     "build:frontend": "react-scripts build",
