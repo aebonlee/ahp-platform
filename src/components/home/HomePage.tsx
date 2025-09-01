@@ -41,22 +41,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  // 실시간 애니메이션 효과
-  useEffect(() => {
-    const animateElements = () => {
-      const elements = document.querySelectorAll('.floating-element');
-      elements.forEach((element, index) => {
-        const time = Date.now() * 0.001;
-        const yOffset = Math.sin(time + index) * 10;
-        const xOffset = Math.cos(time * 0.5 + index) * 5;
-        (element as HTMLElement).style.transform = `translate(${xOffset}px, ${yOffset}px)`;
-      });
-      requestAnimationFrame(animateElements);
-    };
-    
-    const animationId = requestAnimationFrame(animateElements);
-    return () => cancelAnimationFrame(animationId);
-  }, []);
+  // 애니메이션 효과 비활성화 (안정성 확보)
 
   // 테마 변경 감지
   useEffect(() => {
