@@ -221,7 +221,7 @@ function App() {
       console.log('🔍 백엔드 연결 확인 중...');
       
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
       
       const response = await fetch(`${API_BASE_URL}/api/health`, {
         method: 'GET',
@@ -267,7 +267,7 @@ function App() {
   const checkApiConnection = async () => {
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3초 타임아웃
+      const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5초 타임아웃
       
       const response = await fetch(`${API_BASE_URL}/api/health`, {
         method: 'GET',
