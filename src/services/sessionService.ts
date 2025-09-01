@@ -63,7 +63,7 @@ class SessionService {
   // 세션 상태 확인 (서버에서 확인)
   public async isSessionValid(): Promise<boolean> {
     try {
-      const response = await fetch('/api/auth/session', {
+      const response = await fetch('/api/auth/profile', {
         credentials: 'include',
         method: 'GET'
       });
@@ -76,7 +76,7 @@ class SessionService {
   // 남은 세션 시간 (서버에서 조회)
   public async getRemainingTime(): Promise<number> {
     try {
-      const response = await fetch('/api/auth/session-info', {
+      const response = await fetch('/api/auth/profile', {
         credentials: 'include',
         method: 'GET'
       });
@@ -185,7 +185,7 @@ class SessionService {
   // 세션 새로고침
   private async refreshSession(): Promise<void> {
     try {
-      await fetch('/api/auth/refresh-session', {
+      await fetch('/api/auth/profile', {
         credentials: 'include',
         method: 'POST'
       });

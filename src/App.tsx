@@ -92,9 +92,9 @@ function App() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, [user]);
 
-  const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
+  const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('unavailable');
   const [showApiErrorModal, setShowApiErrorModal] = useState(false);
-  const [isNavigationReady, setIsNavigationReady] = useState(true); // 기본값을 true로 변경
+  const [isNavigationReady, setIsNavigationReady] = useState(true);
 
   // 초기 로딩 및 백엔드 연결 체크 (한 번만 실행)
   useEffect(() => {
@@ -249,6 +249,9 @@ function App() {
     } catch (error) {
       console.log('⚠️ 백엔드 연결 실패:', error);
       setBackendStatus('unavailable');
+    } finally {
+      // 백엔드 연결 상태와 관계없이 앱 UI는 표시
+      setIsNavigationReady(true);
     }
   };
 
@@ -299,8 +302,7 @@ function App() {
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
-        // 프로젝트 목록 로드
-        fetchProjects();
+        console.log('✅ 세션 복구 성공:', data.user.email);
       }
     } catch (error) {
       console.error('Session validation failed:', error);
