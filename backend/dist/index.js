@@ -278,8 +278,8 @@ if (process.env.NODE_ENV === 'production') {
     if (fs_1.default.existsSync(buildPath)) {
         console.log('✅ Serving static files from:', buildPath);
         app.use(express_1.default.static(buildPath));
-        // Handle React routing for non-API routes only
-        app.get(/^(?!\/api).*/, (req, res) => {
+        // Handle React routing - exclude API routes and static files
+        app.get(/^(?!\/api|\/static).*/, (req, res) => {
             res.sendFile(path_1.default.join(buildPath, 'index.html'));
         });
     }

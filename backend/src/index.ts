@@ -268,8 +268,8 @@ if (process.env.NODE_ENV === 'production') {
     console.log('✅ Serving static files from:', buildPath);
     app.use(express.static(buildPath));
 
-    // Handle React routing for non-API routes only
-    app.get(/^(?!\/api).*/, (req, res) => {
+    // Handle React routing - exclude API routes and static files
+    app.get(/^(?!\/api|\/static).*/, (req, res) => {
       res.sendFile(path.join(buildPath, 'index.html'));
     });
   } else {
