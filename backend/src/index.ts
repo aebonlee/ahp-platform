@@ -46,7 +46,7 @@ app.use(helmet({
 // Enhanced CORS configuration for production
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://aebonlee.github.io/ahp-platform',
+  'https://aebonlee.github.io',
   'https://ahp-platform.onrender.com'
 ];
 
