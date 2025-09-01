@@ -17,7 +17,7 @@ class SubscriptionService {
   constructor() {
     this.baseUrl = process.env.NODE_ENV === 'development' 
       ? 'http://localhost:5000' 
-      : 'https://ahp-forpaper.onrender.com';
+      : 'https://ahp-platform.onrender.com';
   }
 
   private async request<T>(endpoint: string, options: RequestInit = {}): Promise<T> {

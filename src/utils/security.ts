@@ -170,7 +170,7 @@ export function generateCSPHeader(): string {
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https:",
     "font-src 'self' https:",
-    "connect-src 'self' https://ahp-forpaper.onrender.com",
+    "connect-src 'self' https://ahp-platform.onrender.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'"

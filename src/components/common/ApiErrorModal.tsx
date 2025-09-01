@@ -35,8 +35,8 @@ const ApiErrorModal: React.FC<ApiErrorModalProps> = ({
             <div className="text-xs text-blue-600 space-y-1">
               <div>
                 <strong>서버 주소:</strong> 
-                <a href="https://ahp-forpaper.onrender.com" target="_blank" rel="noopener noreferrer" className="underline ml-1">
-                  https://ahp-forpaper.onrender.com
+                <a href="https://ahp-platform.onrender.com" target="_blank" rel="noopener noreferrer" className="underline ml-1">
+                  https://ahp-platform.onrender.com
                 </a>
               </div>
               <div><strong>기능:</strong> PostgreSQL 데이터베이스, JWT 인증, 실시간 CRUD</div>

@@ -81,7 +81,7 @@ const PairwiseComparison: React.FC<PairwiseComparisonProps> = ({
 
   const API_BASE_URL = process.env.NODE_ENV === 'development' 
     ? 'http://localhost:5000' 
-    : 'https://ahp-forpaper.onrender.com';
+    : 'https://ahp-platform.onrender.com';
 
   // Generate all possible pairs
   const pairs = React.useMemo(() => {

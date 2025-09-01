@@ -53,7 +53,7 @@ const ResultsDashboard: React.FC<ResultsDashboardProps> = ({ projectId, projectT
 
   const API_BASE_URL = process.env.NODE_ENV === 'development' 
     ? 'http://localhost:5000' 
-    : 'https://ahp-forpaper.onrender.com';
+    : 'https://ahp-platform.onrender.com';
 
   const fetchData = useCallback(async () => {
     try {

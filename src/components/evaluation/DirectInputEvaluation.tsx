@@ -35,7 +35,7 @@ const DirectInputEvaluation: React.FC<DirectInputEvaluationProps> = ({
 
   const API_BASE_URL = process.env.NODE_ENV === 'development' 
     ? 'http://localhost:5000' 
-    : 'https://ahp-forpaper.onrender.com';
+    : 'https://ahp-platform.onrender.com';
 
   useEffect(() => {
     // 초기값 설정

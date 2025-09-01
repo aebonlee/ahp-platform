@@ -1138,7 +1138,7 @@ export const DEMO_LOGIN_CREDENTIALS = {
 // Demo mode check
 export const isBackendAvailable = async (): Promise<boolean> => {
   try {
-    const response = await fetch('https://ahp-forpaper.onrender.com/api/health', {
+    const response = await fetch('https://ahp-platform.onrender.com/api/health', {
       method: 'GET',
       timeout: 5000
     } as any);
