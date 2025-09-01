@@ -1111,7 +1111,6 @@ function App() {
               admin_type: 'personal'
             });
             setProjects([]);
-            setIsDemoMode(true);
             
             // 로딩 상태를 잠시 보여준 후 페이지 렌더링
             return (
