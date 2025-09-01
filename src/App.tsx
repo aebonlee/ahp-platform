@@ -94,7 +94,7 @@ function App() {
 
   const [backendStatus, setBackendStatus] = useState<'checking' | 'available' | 'unavailable'>('checking');
   const [showApiErrorModal, setShowApiErrorModal] = useState(false);
-  const [isNavigationReady, setIsNavigationReady] = useState(false);
+  const [isNavigationReady, setIsNavigationReady] = useState(true); // 기본값을 true로 변경
 
   // 초기 로딩 및 백엔드 연결 체크 (한 번만 실행)
   useEffect(() => {
@@ -227,46 +227,28 @@ function App() {
 
   const checkBackendAndInitialize = async () => {
     try {
-      setBackendStatus('checking');
       console.log('🔍 백엔드 연결 확인 중...');
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3초 타임아웃
+      setBackendStatus('checking');
       
       const response = await fetch(`${API_BASE_URL}/api/health`, {
         method: 'GET',
         credentials: 'include',
         headers: {
           'Accept': 'application/json',
-        },
-        signal: controller.signal
+        }
       });
-      
-      clearTimeout(timeoutId);
       
       if (response.ok) {
         console.log('✅ 백엔드 연결 성공');
         setBackendStatus('available');
-        setShowApiErrorModal(false);
-        
-        // 서버에서 쿠키로 세션 검증
-        try {
-          await validateSession();
-        } catch (sessionError) {
-          console.log('세션 검증 실패, 로그인 필요');
-        }
+        validateSession(); // 비동기로 세션 검증
       } else {
-        console.log('⚠️ 백엔드 응답 오류, 개발 모드로 진행');
+        console.log('⚠️ 백엔드 응답 오류');
         setBackendStatus('unavailable');
-        setShowApiErrorModal(false);
       }
     } catch (error) {
-      console.log('⚠️ 백엔드 연결 실패, 개발 모드로 진행');
+      console.log('⚠️ 백엔드 연결 실패:', error);
       setBackendStatus('unavailable');
-      setShowApiErrorModal(false);
-    } finally {
-      // 어떤 경우든 앱 초기화 완료
-      setIsNavigationReady(true);
     }
   };
 
@@ -908,19 +890,6 @@ function App() {
 
 
   const renderContent = () => {
-    // 앱 초기화 중일 때 로딩 스피너 표시
-    if (!isNavigationReady) {
-      return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">AHP 플랫폼을 초기화하고 있습니다...</p>
-            <p className="text-sm text-gray-500 mt-2">백엔드 연결 상태: {backendStatus}</p>
-          </div>
-        </div>
-      );
-    }
-
     switch (activeTab) {
       case 'home':
         return <HomePage onLoginClick={handleLoginClick} />;
