@@ -37,7 +37,7 @@ function App() {
   const basePath = process.env.NODE_ENV === 'production' ? '/ahp-platform' : '';
   const getFullPath = (path: string) => basePath + path;
   const [user, setUser] = useState<{
-    id: string;
+    id: string | number;  // 백엔드는 number로 보냄
     first_name: string;
     last_name: string;
     email: string;
@@ -940,7 +940,7 @@ function App() {
         return (
           <EnhancedSuperAdminDashboard 
             user={{
-              id: user.id || '1',
+              id: String(user.id) || '1',
               first_name: user.first_name || '',
               last_name: user.last_name || '',
               email: user.email || '',
@@ -1005,7 +1005,7 @@ function App() {
           return (
             <EvaluatorDashboard 
               user={{
-                id: user.id,
+                id: String(user.id),
                 firstName: user.first_name,
                 lastName: user.last_name,
                 email: user.email,
@@ -1020,7 +1020,7 @@ function App() {
           return (
             <EvaluatorDashboard 
               user={{
-                id: user.id,
+                id: String(user.id),
                 firstName: user.first_name,
                 lastName: user.last_name,
                 email: user.email,

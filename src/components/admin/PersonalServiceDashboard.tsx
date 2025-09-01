@@ -25,7 +25,7 @@ import { DEMO_CRITERIA, DEMO_ALTERNATIVES, DEMO_EVALUATORS } from '../../data/de
 
 interface PersonalServiceProps {
   user: {
-    id: string;
+    id: string | number;  // 백엔드는 number로 보냄
     first_name: string;
     last_name: string;
     email: string;
@@ -35,7 +35,7 @@ interface PersonalServiceProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
   onUserUpdate?: (updatedUser: {
-    id: string;
+    id: string | number;  // 백엔드는 number로 보냄
     first_name: string;
     last_name: string;
     email: string;

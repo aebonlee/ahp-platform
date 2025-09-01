@@ -386,6 +386,24 @@ exports.initDatabase = initDatabase = async () => {
         catch (error) {
             console.log('Admin user already exists, skipping...');
         }
+        // 테스트 관리자 계정 생성
+        const testHashedPassword = await bcryptjs_1.default.hash('tester@', 10);
+        try {
+            await query(`
+        INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
+        VALUES ($1, $2, $3, $4, $5, $6)
+        ON CONFLICT (email) DO UPDATE SET
+          password_hash = $2,
+          first_name = $3,
+          last_name = $4,
+          role = $5,
+          is_active = $6
+      `, ['test@ahp.com', testHashedPassword, 'Test', 'Admin', 'admin', true]);
+            console.log('✅ Test user created/updated: test@ahp.com / tester@');
+        }
+        catch (error) {
+            console.log('Error creating test user:', error);
+        }
         // 샘플 데이터 생성
         await createSampleData();
         await createSampleNewsData();

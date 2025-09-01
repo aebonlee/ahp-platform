@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 interface LayoutProps {
   children: React.ReactNode;
   user?: {
-    id: string;
+    id: string | number;  // 백엔드는 number로 보냄
     first_name: string;
     last_name: string;
     email: string;
