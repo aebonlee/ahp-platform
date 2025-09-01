@@ -26,6 +26,8 @@ import matrixRoutes from './routes/matrix';
 import computeRoutes from './routes/compute';
 import exportRoutes from './routes/export';
 import subscriptionRoutes from './routes/subscription';
+import supportRoutes from './routes/support';
+import newsRoutes from './routes/news';
 
 const app = express();
 const httpServer = createServer(app);
@@ -83,7 +85,9 @@ app.get('/', (req, res) => {
     endpoints: {
       health: '/api/health',
       auth: '/api/auth',
-      projects: '/api/projects'
+      projects: '/api/projects',
+      support: '/api/support',
+      news: '/api/news'
     }
   });
 });
@@ -118,6 +122,8 @@ app.use('/api/matrix', matrixRoutes);
 app.use('/api/compute', computeRoutes);
 app.use('/api/export', exportRoutes);
 app.use('/api/subscription', subscriptionRoutes);
+app.use('/api/support', supportRoutes);
+app.use('/api/news', newsRoutes);
 
 // Serve static files from React build in production
 if (process.env.NODE_ENV === 'production') {

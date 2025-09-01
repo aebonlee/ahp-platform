@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
 
+const API_BASE_URL = process.env.NODE_ENV === 'production' 
+  ? '' 
+  : 'http://localhost:5000';
+
 interface SupportPost {
   id: number;
   title: string;
   content: string;
-  author: string;
+  author_name: string;
+  author_email?: string;
   created_at: string;
   category: string;
   status: 'open' | 'answered' | 'closed';
-  replies: number;
+  reply_count: number;
   views: number;
 }
 
@@ -23,8 +28,12 @@ const SupportPage: React.FC<SupportPageProps> = ({ onBackClick }) => {
   const [newPost, setNewPost] = useState({
     title: '',
     content: '',
-    category: 'general'
+    category: 'general',
+    author_name: '',
+    author_email: ''
   });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string>('');
 
   const categories = [
     { value: 'all', label: '전체' },
@@ -35,68 +44,72 @@ const SupportPage: React.FC<SupportPageProps> = ({ onBackClick }) => {
     { value: 'bug', label: '버그 신고' }
   ];
 
-  const samplePosts: SupportPost[] = [
-    {
-      id: 1,
-      title: 'AHP 분석 결과의 일관성 비율이 0.1을 초과할 때 해결 방법',
-      content: '쌍대비교를 진행했는데 일관성 비율이 0.15가 나왔습니다. 어떻게 개선할 수 있을까요?',
-      author: '연구자김',
-      created_at: '2024-08-30',
-      category: 'technical',
-      status: 'answered',
-      replies: 3,
-      views: 127
-    },
-    {
-      id: 2,
-      title: '평가자 초대 메일이 발송되지 않는 문제',
-      content: '프로젝트에 평가자를 초대했는데 메일이 발송되지 않고 있습니다.',
-      author: '교수박',
-      created_at: '2024-08-29',
-      category: 'bug',
-      status: 'open',
-      replies: 1,
-      views: 89
-    },
-    {
-      id: 3,
-      title: '기관 플랜 할인 문의',
-      content: '대학교에서 단체로 이용할 예정인데 할인 혜택이 있나요?',
-      author: '관리자이',
-      created_at: '2024-08-28',
-      category: 'billing',
-      status: 'answered',
-      replies: 2,
-      views: 156
+  // API 함수들
+  const fetchPosts = async () => {
+    try {
+      setLoading(true);
+      const url = `${API_BASE_URL}/api/support/posts?category=${selectedCategory}&limit=50`;
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (data.success) {
+        setPosts(data.posts);
+      } else {
+        setError('게시글을 불러오는데 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      setError('서버 연결에 실패했습니다.');
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  const submitPost = async () => {
+    if (!newPost.title.trim() || !newPost.content.trim() || !newPost.author_name.trim()) {
+      setError('제목, 내용, 작성자명은 필수입니다.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/support/posts`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newPost)
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        setNewPost({ title: '', content: '', category: 'general', author_name: '', author_email: '' });
+        setShowNewPostForm(false);
+        setError('');
+        await fetchPosts(); // 목록 새로고침
+      } else {
+        setError(data.error || '게시글 작성에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('Error submitting post:', error);
+      setError('서버 연결에 실패했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   useEffect(() => {
-    setPosts(samplePosts);
-  }, []);
+    fetchPosts();
+  }, [selectedCategory]);
 
   const filteredPosts = selectedCategory === 'all' 
     ? posts 
     : posts.filter(post => post.category === selectedCategory);
 
   const handleSubmitPost = () => {
-    if (!newPost.title.trim() || !newPost.content.trim()) return;
-
-    const post: SupportPost = {
-      id: posts.length + 1,
-      title: newPost.title,
-      content: newPost.content,
-      author: '사용자',
-      created_at: new Date().toISOString().split('T')[0],
-      category: newPost.category,
-      status: 'open',
-      replies: 0,
-      views: 0
-    };
-
-    setPosts([post, ...posts]);
-    setNewPost({ title: '', content: '', category: 'general' });
-    setShowNewPostForm(false);
+    submitPost();
   };
 
   const getStatusBadge = (status: string) => {
@@ -224,6 +237,18 @@ const SupportPage: React.FC<SupportPageProps> = ({ onBackClick }) => {
           {/* 메인 컨텐츠 */}
           <div className="lg:col-span-3">
             
+            {/* 에러 메시지 표시 */}
+            {error && (
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm text-red-600 font-medium">{error}</p>
+                </div>
+              </div>
+            )}
+
             {/* 게시글 목록 */}
             <div className="bg-white rounded-lg border" style={{ borderColor: 'var(--border-light)' }}>
               <div className="p-6 border-b" style={{ borderColor: 'var(--border-light)' }}>
@@ -237,7 +262,23 @@ const SupportPage: React.FC<SupportPageProps> = ({ onBackClick }) => {
                 </div>
               </div>
 
-              <div className="divide-y" style={{ borderColor: 'var(--border-light)' }}>
+              {loading ? (
+                <div className="p-12 text-center">
+                  <div className="flex items-center justify-center mb-4">
+                    <svg className="animate-spin h-8 w-8" fill="none" viewBox="0 0 24 24" style={{ color: 'var(--accent-primary)' }}>
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                    게시글을 불러오는 중...
+                  </h3>
+                  <p style={{ color: 'var(--text-secondary)' }}>
+                    잠시만 기다려주세요
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y" style={{ borderColor: 'var(--border-light)' }}>
                 {filteredPosts.length === 0 ? (
                   <div className="p-12 text-center">
                     <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{
@@ -272,17 +313,18 @@ const SupportPage: React.FC<SupportPageProps> = ({ onBackClick }) => {
                             {post.content}
                           </p>
                           <div className="flex items-center text-xs space-x-4" style={{ color: 'var(--text-muted)' }}>
-                            <span>작성자: {post.author}</span>
-                            <span>{post.created_at}</span>
-                            <span>답글 {post.replies}</span>
+                            <span>작성자: {post.author_name}</span>
+                            <span>{new Date(post.created_at).toLocaleDateString('ko-KR')}</span>
+                            <span>답글 {post.reply_count || 0}</span>
                             <span>조회 {post.views}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                  ))
-                )}
-              </div>
+                    ))
+                  )}
+                </div>
+              )}
             </div>
 
           </div>
@@ -329,10 +371,40 @@ const SupportPage: React.FC<SupportPageProps> = ({ onBackClick }) => {
                 </select>
               </div>
 
+              {/* 작성자 정보 */}
+              <div className="grid md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                    작성자명 *
+                  </label>
+                  <input
+                    type="text"
+                    value={newPost.author_name}
+                    onChange={(e) => setNewPost({...newPost, author_name: e.target.value})}
+                    placeholder="이름을 입력하세요"
+                    className="w-full px-4 py-3 rounded-lg border"
+                    style={{ borderColor: 'var(--border-medium)' }}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
+                    이메일 (선택)
+                  </label>
+                  <input
+                    type="email"
+                    value={newPost.author_email}
+                    onChange={(e) => setNewPost({...newPost, author_email: e.target.value})}
+                    placeholder="답변 받을 이메일"
+                    className="w-full px-4 py-3 rounded-lg border"
+                    style={{ borderColor: 'var(--border-medium)' }}
+                  />
+                </div>
+              </div>
+
               {/* 제목 입력 */}
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
-                  제목
+                  제목 *
                 </label>
                 <input
                   type="text"
