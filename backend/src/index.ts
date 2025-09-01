@@ -35,7 +35,7 @@ const PORT = process.env.PORT || 5000;
 
 // Initialize WebSocket service (disabled for deployment)
 const workshopSync = new WorkshopSyncService(httpServer);
-console.log('🚀 AHP Platform Backend v2.3.1 - Role System Updated');
+console.log('🚀 AHP Platform Backend v2.3.2 - Auth Routes Fix');
 
 // Trust proxy for Render.com
 app.set('trust proxy', 1);
@@ -263,7 +263,7 @@ app.use('/api/news', newsRoutes);
 app.get('/', (req, res) => {
   res.json({ 
     message: 'AHP Platform Backend API Server',
-    version: '2.2.0',
+    version: '2.3.2',
     status: 'running',
     endpoints: {
       health: '/api/health',
