@@ -260,26 +260,20 @@ app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/news', newsRoutes);
 
-// Serve static files from React build in production
-if (process.env.NODE_ENV === 'production') {
-  const buildPath = path.join(__dirname, '../../build');
-  
-  // Check if build directory exists
-  if (fs.existsSync(buildPath)) {
-    console.log('✅ Serving static files from:', buildPath);
-    app.use(express.static(buildPath));
-
-    // Handle React routing - exclude API routes and static files
-    app.get(/^(?!\/api|\/static).*/, (req, res) => {
-      res.sendFile(path.join(buildPath, 'index.html'));
-    });
-  } else {
-    console.warn('⚠️ Build directory not found:', buildPath);
-    app.get('/', (req, res) => {
-      res.json({ message: 'AHP Platform Backend - Frontend build not found' });
-    });
-  }
-}
+// API-only backend - no static file serving
+app.get('/', (req, res) => {
+  res.json({ 
+    message: 'AHP Platform Backend API Server',
+    version: '2.2.0',
+    status: 'running',
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth/*',
+      users: '/api/users/*',
+      projects: '/api/projects/*'
+    }
+  });
+});
 
 // Error handling middleware
 app.use((err: any, req: any, res: any, next: any) => {

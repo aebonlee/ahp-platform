@@ -44,8 +44,6 @@ const helmet_1 = __importDefault(require("helmet"));
 const morgan_1 = __importDefault(require("morgan"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const http_1 = require("http");
-const path_1 = __importDefault(require("path"));
-const fs_1 = __importDefault(require("fs"));
 const migrate_1 = require("./database/migrate");
 const connection_1 = require("./database/connection");
 const workshopSync_1 = __importDefault(require("./services/workshopSync"));
@@ -272,25 +270,20 @@ app.use('/api/export', export_1.default);
 app.use('/api/subscription', subscription_1.default);
 app.use('/api/support', support_1.default);
 app.use('/api/news', news_1.default);
-// Serve static files from React build in production
-if (process.env.NODE_ENV === 'production') {
-    const buildPath = path_1.default.join(__dirname, '../../build');
-    // Check if build directory exists
-    if (fs_1.default.existsSync(buildPath)) {
-        console.log('✅ Serving static files from:', buildPath);
-        app.use(express_1.default.static(buildPath));
-        // Handle React routing - exclude API routes and static files
-        app.get(/^(?!\/api|\/static).*/, (req, res) => {
-            res.sendFile(path_1.default.join(buildPath, 'index.html'));
-        });
-    }
-    else {
-        console.warn('⚠️ Build directory not found:', buildPath);
-        app.get('/', (req, res) => {
-            res.json({ message: 'AHP Platform Backend - Frontend build not found' });
-        });
-    }
-}
+// API-only backend - no static file serving
+app.get('/', (req, res) => {
+    res.json({
+        message: 'AHP Platform Backend API Server',
+        version: '2.2.0',
+        status: 'running',
+        endpoints: {
+            health: '/api/health',
+            auth: '/api/auth/*',
+            users: '/api/users/*',
+            projects: '/api/projects/*'
+        }
+    });
+});
 // Error handling middleware
 app.use((err, req, res, next) => {
     console.error('Error:', err);
