@@ -108,6 +108,42 @@ app.post('/api/admin/migrate', async (req, res) => {
   }
 });
 
+// Check users in database
+app.get('/api/admin/users', async (req, res) => {
+  try {
+    const { query } = await import('./database/connection');
+    const result = await query('SELECT id, email, first_name, last_name, role, is_active FROM users ORDER BY id');
+    res.json({ users: result.rows });
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
+// Create test user endpoint
+app.post('/api/admin/create-test-user', async (req, res) => {
+  try {
+    const { query } = await import('./database/connection');
+    const bcrypt = await import('bcrypt');
+    
+    const hashedPassword = await bcrypt.hash('test123', 10);
+    
+    await query(`
+      INSERT INTO users (email, password_hash, first_name, last_name, role, is_active) 
+      VALUES ($1, $2, $3, $4, $5, $6)
+      ON CONFLICT (email) DO UPDATE SET 
+        password_hash = EXCLUDED.password_hash,
+        first_name = EXCLUDED.first_name,
+        last_name = EXCLUDED.last_name,
+        role = EXCLUDED.role,
+        is_active = EXCLUDED.is_active
+    `, ['test@ahp.com', hashedPassword, 'Test', 'User', 'admin', true]);
+    
+    res.json({ success: true, message: 'Test user created: test@ahp.com / test123' });
+  } catch (error) {
+    res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
+  }
+});
+
 // Sample data creation endpoint for production
 app.post('/api/admin/create-sample-data', async (req, res) => {
   try {
