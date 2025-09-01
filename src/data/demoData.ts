@@ -1130,10 +1130,7 @@ export const DEMO_WORKFLOW_STATUS = {
   ]
 };
 
-export const DEMO_LOGIN_CREDENTIALS = {
-  email: 'admin@ahp-system.com',
-  password: 'password123'
-};
+// 개발용 로그인 정보 제거됨 - 실제 서비스 계정 사용
 
 // Demo mode check
 export const isBackendAvailable = async (): Promise<boolean> => {
