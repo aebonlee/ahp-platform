@@ -77,21 +77,6 @@ app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Root endpoint
-app.get('/', (req, res) => {
-  res.json({ 
-    message: 'AHP Decision System API', 
-    version: '1.6.2',
-    endpoints: {
-      health: '/api/health',
-      auth: '/api/auth',
-      projects: '/api/projects',
-      support: '/api/support',
-      news: '/api/news'
-    }
-  });
-});
-
 app.get('/api/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
