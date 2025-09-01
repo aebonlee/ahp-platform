@@ -27,6 +27,7 @@ import EvaluationTest from './components/evaluation/EvaluationTest';
 import { API_BASE_URL } from './config/api';
 import { useColorTheme } from './hooks/useColorTheme';
 import { useTheme } from './hooks/useTheme';
+import { DEMO_USER } from './data/demoData';
 
 function App() {
   // Initialize theme systems
@@ -1097,6 +1098,31 @@ function App() {
       case 'decision-support-system':
       case 'personal-settings':
         if (!user) {
+          // demographic-survey 직접 접근 시 자동 데모 로그인
+          if (activeTab === 'demographic-survey') {
+            console.log('🚀 설문조사 페이지 직접 접근 - 자동 데모 로그인 처리');
+            
+            // 즉시 데모 사용자 설정
+            setUser({
+              ...DEMO_USER,
+              id: 'auto-demo-user',
+              email: 'demo@ahp-system.com',
+              role: 'admin',
+              admin_type: 'personal'
+            });
+            setProjects([]);
+            setIsDemoMode(true);
+            
+            // 로딩 상태를 잠시 보여준 후 페이지 렌더링
+            return (
+              <div className="min-h-screen flex items-center justify-center">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">설문조사 페이지를 준비하고 있습니다...</p>
+                </div>
+              </div>
+            );
+          }
           return null;
         }
         console.log('🎯 PersonalServiceDashboard 렌더링:', { activeTab, userId: user.id, userRole: user.role });
