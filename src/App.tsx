@@ -32,6 +32,10 @@ function App() {
   // Initialize theme systems
   useColorTheme();
   useTheme();
+
+  // GitHub Pages 하위 경로 처리
+  const basePath = process.env.NODE_ENV === 'production' ? '/ahp-platform' : '';
+  const getFullPath = (path: string) => basePath + path;
   const [user, setUser] = useState<{
     id: string;
     first_name: string;
@@ -92,19 +96,22 @@ function App() {
   const [showApiErrorModal, setShowApiErrorModal] = useState(false);
   const [isNavigationReady, setIsNavigationReady] = useState(false);
 
-  // 초기 로딩 및 백엔드 연결 체크
+  // 초기 로딩 및 백엔드 연결 체크 (한 번만 실행)
   useEffect(() => {
     console.log('🚀 앱 초기화 - 백엔드 연결 확인');
     checkBackendAndInitialize();
-    
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 백엔드 연결 상태 모니터링 (별도 useEffect)
+  useEffect(() => {
+    if (backendStatus !== 'available') return;
+
     const intervalId = setInterval(() => {
-      if (backendStatus === 'available') {
-        checkApiConnection();
-      }
+      checkApiConnection();
     }, 5 * 60 * 1000);
 
     return () => clearInterval(intervalId);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [backendStatus]);
   
   // 브라우저 내비게이션 처리 (뒤로가기/앞으로가기)
@@ -150,7 +157,10 @@ function App() {
       urlParams.delete('project');
     }
     
-    const newPath = window.location.pathname + '?' + urlParams.toString();
+    const currentPath = window.location.pathname;
+    const basePath = process.env.NODE_ENV === 'production' ? '/ahp-platform' : '';
+    const cleanPath = currentPath.startsWith(basePath) ? currentPath : basePath + '/';
+    const newPath = cleanPath + '?' + urlParams.toString();
     window.history.pushState(currentState, '', newPath);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, selectedProjectId, selectedProjectTitle, user, isNavigationReady]);
@@ -221,7 +231,7 @@ function App() {
       console.log('🔍 백엔드 연결 확인 중...');
       
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3초 타임아웃
       
       const response = await fetch(`${API_BASE_URL}/api/health`, {
         method: 'GET',
@@ -238,20 +248,24 @@ function App() {
         console.log('✅ 백엔드 연결 성공');
         setBackendStatus('available');
         setShowApiErrorModal(false);
-        setIsNavigationReady(true);
         
         // 서버에서 쿠키로 세션 검증
-        validateSession();
+        try {
+          await validateSession();
+        } catch (sessionError) {
+          console.log('세션 검증 실패, 로그인 필요');
+        }
       } else {
-        // DB 연결 실패해도 개발 계속 진행
-        console.log('⚠️ 백엔드 연결 실패, 개발 모드로 진행');
+        console.log('⚠️ 백엔드 응답 오류, 개발 모드로 진행');
         setBackendStatus('unavailable');
-        setIsNavigationReady(true);
+        setShowApiErrorModal(false);
       }
     } catch (error) {
-      // DB 연결 실패해도 개발 계속 진행
       console.log('⚠️ 백엔드 연결 실패, 개발 모드로 진행');
       setBackendStatus('unavailable');
+      setShowApiErrorModal(false);
+    } finally {
+      // 어떤 경우든 앱 초기화 완료
       setIsNavigationReady(true);
     }
   };
@@ -894,6 +908,19 @@ function App() {
 
 
   const renderContent = () => {
+    // 앱 초기화 중일 때 로딩 스피너 표시
+    if (!isNavigationReady) {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">AHP 플랫폼을 초기화하고 있습니다...</p>
+            <p className="text-sm text-gray-500 mt-2">백엔드 연결 상태: {backendStatus}</p>
+          </div>
+        </div>
+      );
+    }
+
     switch (activeTab) {
       case 'home':
         return <HomePage onLoginClick={handleLoginClick} />;
