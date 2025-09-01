@@ -908,7 +908,9 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
 
             {/* 더보기 버튼 */}
             <div className="text-center mt-12">
-              <button className="px-8 py-3 rounded-lg border-2 font-medium transition-all hover:scale-105" style={{
+              <button 
+                onClick={() => setShowNewsPage(true)}
+                className="px-8 py-3 rounded-lg border-2 font-medium transition-all hover:scale-105" style={{
                 backgroundColor: 'var(--bg-primary)',
                 color: 'var(--text-secondary)',
                 borderColor: 'var(--border-medium)'
