@@ -45,7 +45,7 @@ function App() {
     admin_type?: 'super' | 'personal'; // 관리자 유형 구분
     canSwitchModes?: boolean; // 모드 전환 가능 여부
   } | null>(null);
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTab] = useState('landing');
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [registerMode, setRegisterMode] = useState<'service' | 'admin' | null>(null);
@@ -428,7 +428,7 @@ function App() {
     'progress-monitoring', 'results-analysis', 'paper-management', 'export-reports', 
     'workshop-management', 'decision-support-system', 'personal-settings', 
     'user-guide', 'dashboard', 'users', 'projects', 'monitoring', 'database', 'audit', 
-    'settings', 'backup', 'system', 'landing', 'model-building', 
+    'settings', 'backup', 'system', 'landing', 'home', 'model-building', 
     'evaluation-results', 'project-completion', 'personal-projects', 
     'personal-users', 'results', 'evaluator-dashboard', 'pairwise-evaluation', 
     'direct-evaluation', 'evaluator-status', 'evaluations', 'progress',
