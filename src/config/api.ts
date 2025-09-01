@@ -2,7 +2,7 @@
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 
   (process.env.NODE_ENV === 'development' 
     ? 'http://localhost:5000' 
-    : 'https://ahp-forpaper.onrender.com');
+    : 'https://ahp-platform.onrender.com');
 
 // 데이터 저장 모드 설정
 export const DATA_STORAGE_MODE = process.env.REACT_APP_DATA_MODE || 
