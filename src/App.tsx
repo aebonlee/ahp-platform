@@ -8,6 +8,7 @@ import HomePage from './components/home/HomePage';
 // import WelcomeDashboard from './components/admin/WelcomeDashboard'; // 더 이상 사용하지 않음
 import Card from './components/common/Card';
 import ApiErrorModal from './components/common/ApiErrorModal';
+import TrashOverflowModal from './components/common/TrashOverflowModal';
 import PairwiseComparison from './components/comparison/PairwiseComparison';
 import ResultsDashboard from './components/results/ResultsDashboard';
 import LandingPage from './components/admin/LandingPage';
@@ -83,6 +84,13 @@ function App() {
   const [isEvaluatorSurvey, setIsEvaluatorSurvey] = useState(false);
   const [surveyId, setSurveyId] = useState<string>('');
   const [surveyToken, setSurveyToken] = useState<string>('');
+
+  // 휴지통 오버플로우 관리 상태
+  const [trashOverflowData, setTrashOverflowData] = useState<{
+    trashedProjects: any[];
+    projectToDelete: string;
+    isVisible: boolean;
+  } | null>(null);
 
   // 세션 서비스 초기화
   useEffect(() => {
@@ -817,6 +825,23 @@ function App() {
 
   // 프로젝트 삭제 (휴지통으로 이동)
   const deleteProject = async (projectId: string) => {
+    // 휴지통 개수 확인
+    try {
+      const trashedProjects = await fetchTrashedProjects();
+      if (trashedProjects.length >= 3) {
+        // 휴지통이 가득 찬 경우 레이어 팝업 표시
+        setTrashOverflowData({
+          trashedProjects,
+          projectToDelete: projectId,
+          isVisible: true
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('휴지통 개수 확인 실패:', error);
+    }
+
+    // 휴지통에 여유가 있으면 바로 삭제
     const response = await fetch(`${API_BASE_URL}/api/projects/${projectId}`, {
       method: 'DELETE',
       credentials: 'include',
@@ -889,6 +914,38 @@ function App() {
     }
 
     return response.json();
+  };
+
+  // 휴지통 오버플로우 처리
+  const handleTrashOverflow = async (projectToDeleteAfterCleanup: string) => {
+    try {
+      // 오버플로우 상태 닫기
+      setTrashOverflowData(null);
+      
+      // 선택된 프로젝트를 영구 삭제한 후 원래 프로젝트를 휴지통으로 이동
+      const response = await fetch(`${API_BASE_URL}/api/projects/${projectToDeleteAfterCleanup}`, {
+        method: 'DELETE',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || '프로젝트 삭제에 실패했습니다.');
+      }
+
+      await fetchProjects(); // 목록 새로고침
+      return response.json();
+    } catch (error) {
+      console.error('휴지통 오버플로우 처리 실패:', error);
+      throw error;
+    }
+  };
+
+  const handleTrashOverflowCancel = () => {
+    setTrashOverflowData(null);
   };
 
   const fetchUsers = useCallback(async () => {
@@ -1666,6 +1723,15 @@ function App() {
           onClose={handleCloseApiError}
           onRetry={handleApiRetry}
         />
+        {trashOverflowData && (
+          <TrashOverflowModal
+            trashedProjects={trashOverflowData.trashedProjects}
+            projectToDelete={trashOverflowData.projectToDelete}
+            onPermanentDelete={permanentDeleteProject}
+            onCancel={handleTrashOverflowCancel}
+            onDeleteAfterCleanup={handleTrashOverflow}
+          />
+        )}
       </div>
     );
   }
@@ -1679,6 +1745,15 @@ function App() {
         onClose={handleCloseApiError}
         onRetry={handleApiRetry}
       />
+      {trashOverflowData && (
+        <TrashOverflowModal
+          trashedProjects={trashOverflowData.trashedProjects}
+          projectToDelete={trashOverflowData.projectToDelete}
+          onPermanentDelete={permanentDeleteProject}
+          onCancel={handleTrashOverflowCancel}
+          onDeleteAfterCleanup={handleTrashOverflow}
+        />
+      )}
     </div>
   );
 }
