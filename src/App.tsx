@@ -229,6 +229,12 @@ function App() {
             admin_type: data.user.role === 'admin' ? 'personal' : data.user.admin_type
           };
           setUser(userWithAdminType);
+          
+          // 세션 타이머 시작 (페이지 새로고침 후에도 세션 관리 유지)
+          if (!localStorage.getItem('login_time')) {
+            localStorage.setItem('login_time', Date.now().toString());
+          }
+          sessionService.startSession();
         } else {
           console.log('❌ 세션 만료 또는 로그인 필요');
           setUser(null);
@@ -350,6 +356,12 @@ function App() {
         };
         setUser(userWithAdminType);
         console.log('✅ 세션 복구 성공:', data.user.email);
+        
+        // 세션 타이머 시작 (세션 검증 후에도 세션 관리 유지)
+        if (!localStorage.getItem('login_time')) {
+          localStorage.setItem('login_time', Date.now().toString());
+        }
+        sessionService.startSession();
       }
     } catch (error) {
       console.error('Session validation failed:', error);

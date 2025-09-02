@@ -23,6 +23,19 @@ class SessionService {
     // 쿠키 기반 인증에서는 서버가 세션 관리를 담당
     // 클라이언트는 세션 상태 확인만 수행
     this.checkSessionStatus();
+    
+    // 페이지 로드 시 기존 세션이 있으면 타이머 재시작
+    const loginTime = localStorage.getItem('login_time');
+    if (loginTime) {
+      const elapsed = Date.now() - parseInt(loginTime);
+      if (elapsed < this.SESSION_DURATION) {
+        // 남은 시간만큼 타이머 설정
+        this.resumeSessionTimer(this.SESSION_DURATION - elapsed);
+      } else {
+        // 세션 만료
+        this.forceLogout();
+      }
+    }
   }
 
   // 로그인 시 세션 시작 (Cookie 기반)
@@ -44,6 +57,28 @@ class SessionService {
     this.sessionTimer = setTimeout(() => {
       this.forceLogout();
     }, this.SESSION_DURATION);
+  }
+
+  // 세션 타이머 재개 (페이지 새로고침 후)
+  private resumeSessionTimer(remainingTime: number): void {
+    this.clearTimers();
+    
+    console.log(`세션 타이머 재개: 남은 시간 ${Math.floor(remainingTime / 60000)}분`);
+    
+    // 5분 이상 남았으면 경고 타이머 설정
+    if (remainingTime > this.WARNING_TIME) {
+      this.warningTimer = setTimeout(() => {
+        this.showSessionWarning();
+      }, remainingTime - this.WARNING_TIME);
+    } else if (remainingTime > 0) {
+      // 5분 이하 남았으면 바로 경고 표시
+      this.showSessionWarning();
+    }
+    
+    // 남은 시간 후 자동 로그아웃
+    this.sessionTimer = setTimeout(() => {
+      this.forceLogout();
+    }, remainingTime);
   }
 
   // 세션 연장
@@ -86,24 +121,69 @@ class SessionService {
 
   // 세션 경고 표시
   private showSessionWarning(): void {
+    // 이미 경고가 표시되어 있으면 제거
+    this.hideSessionWarning();
+    
     // 경고 알림 표시
     const warningDiv = document.createElement('div');
     warningDiv.id = 'session-warning';
-    warningDiv.className = 'fixed top-4 right-4 z-50 bg-orange-500 text-white p-4 rounded-lg shadow-lg';
+    warningDiv.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      background-color: #f97316;
+      color: white;
+      padding: 16px;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      min-width: 350px;
+      animation: slideIn 0.3s ease-out;
+    `;
+    
     warningDiv.innerHTML = `
-      <div class="flex items-center justify-between">
+      <div style="display: flex; align-items: center; justify-content: space-between;">
         <div>
-          <h4 class="font-semibold">세션 만료 경고</h4>
-          <p class="text-sm mt-1">5분 후 자동 로그아웃됩니다.</p>
+          <h4 style="font-weight: 600; font-size: 16px; margin: 0;">⚠️ 세션 만료 경고</h4>
+          <p style="font-size: 14px; margin-top: 4px; margin-bottom: 0;">5분 후 자동 로그아웃됩니다.</p>
+          <p style="font-size: 12px; margin-top: 4px; opacity: 0.9;">작업 내용을 저장하세요.</p>
         </div>
         <button 
           id="extend-session-btn"
-          class="ml-4 bg-white text-orange-500 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100"
+          style="
+            margin-left: 16px;
+            background-color: white;
+            color: #f97316;
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+          "
+          onmouseover="this.style.backgroundColor='#f3f4f6'"
+          onmouseout="this.style.backgroundColor='white'"
         >
-          연장하기
+          30분 연장
         </button>
       </div>
     `;
+    
+    // 애니메이션 CSS 추가
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes slideIn {
+        from {
+          transform: translateX(400px);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+    `;
+    document.head.appendChild(style);
     
     document.body.appendChild(warningDiv);
     
@@ -114,6 +194,18 @@ class SessionService {
         this.extendSession();
       });
     }
+    
+    // 5초마다 남은 시간 업데이트
+    let countdown = 5;
+    const countdownInterval = setInterval(() => {
+      countdown--;
+      const pElement = warningDiv.querySelector('p');
+      if (pElement && countdown > 0) {
+        pElement.textContent = `${countdown}분 후 자동 로그아웃됩니다.`;
+      } else {
+        clearInterval(countdownInterval);
+      }
+    }, 60000); // 1분마다 업데이트
   }
 
   // 세션 경고 숨기기
@@ -134,18 +226,50 @@ class SessionService {
     this.clearTimers();
     this.hideSessionWarning();
     
-    // localStorage 세션 정보 삭제
-    localStorage.removeItem('login_time');
-    localStorage.removeItem('last_activity');
+    // 세션 만료 알림 표시
+    const logoutDiv = document.createElement('div');
+    logoutDiv.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10000;
+      background-color: #dc2626;
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+      text-align: center;
+      min-width: 400px;
+    `;
     
-    console.log('세션이 만료되어 로그아웃되었습니다.');
+    logoutDiv.innerHTML = `
+      <div>
+        <h3 style="font-weight: 700; font-size: 20px; margin: 0 0 8px 0;">🔒 세션 만료</h3>
+        <p style="font-size: 16px; margin: 0 0 16px 0;">30분 세션이 만료되어 자동 로그아웃되었습니다.</p>
+        <p style="font-size: 14px; opacity: 0.9; margin: 0;">다시 로그인해주세요.</p>
+      </div>
+    `;
     
-    // 콜백을 통해 App 상태 업데이트
-    if (this.logoutCallback) {
-      this.logoutCallback();
-    } else {
-      window.location.reload();
-    }
+    document.body.appendChild(logoutDiv);
+    
+    // 3초 후 로그아웃 처리
+    setTimeout(() => {
+      logoutDiv.remove();
+      
+      // localStorage 세션 정보 삭제
+      localStorage.removeItem('login_time');
+      localStorage.removeItem('last_activity');
+      
+      console.log('세션이 만료되어 로그아웃되었습니다.');
+      
+      // 콜백을 통해 App 상태 업데이트
+      if (this.logoutCallback) {
+        this.logoutCallback();
+      } else {
+        window.location.reload();
+      }
+    }, 3000);
   }
 
   // 수동 로그아웃

@@ -115,8 +115,8 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
 
     const assignData = {
       project_id: Number(projectId),
-      evaluator_code: evaluatorData.code,
       evaluator_name: evaluatorData.name,
+      evaluator_email: evaluatorData.email || undefined,
       weight: 1.0 // 기본 가중치
     };
 

@@ -20,8 +20,8 @@ router.post('/assign',
   requireRole(['admin']),
   [
     body('project_id').isInt().withMessage('Project ID must be an integer'),
-    body('evaluator_code').isString().isLength({min: 1, max: 50}).withMessage('Evaluator code is required'),
     body('evaluator_name').isString().isLength({min: 1}).withMessage('Evaluator name is required'),
+    body('evaluator_email').optional().isEmail().withMessage('Valid email format required'),
     body('weight').optional().isFloat({min: 0.1, max: 10}).withMessage('Weight must be between 0.1 and 10')
   ],
   async (req, res) => {
@@ -34,7 +34,8 @@ router.post('/assign',
         });
       }
 
-      const { project_id, evaluator_code, evaluator_name, weight = 1.0 } = req.body;
+      const { project_id, evaluator_name, evaluator_email, weight = 1.0 } = req.body;
+      const evaluator_code = `EVL${Date.now().toString().slice(-6)}`; // 임시 코드 생성
       const adminId = (req as any).user.userId;
 
       // 프로젝트 소유권 확인
@@ -47,21 +48,22 @@ router.post('/assign',
         return res.status(403).json({ error: 'Access denied to this project' });
       }
 
-      // 평가자 코드 중복 확인
+      // 평가자 중복 확인 (이름 기반)
       const duplicateCheck = await query(
-        'SELECT * FROM project_evaluators WHERE project_id = $1 AND evaluator_code = $2',
-        [project_id, evaluator_code.toUpperCase()]
+        'SELECT * FROM project_evaluators pe JOIN users u ON pe.evaluator_id = u.id WHERE pe.project_id = $1 AND u.first_name = $2',
+        [project_id, evaluator_name]
       );
 
       if (duplicateCheck.rowCount > 0) {
-        return res.status(400).json({ error: 'Evaluator code already exists in this project' });
+        return res.status(400).json({ error: 'Evaluator already exists in this project' });
       }
 
       // 평가자 계정 생성 또는 조회
       let evaluatorUser;
+      const emailToUse = evaluator_email || `${evaluator_code.toLowerCase()}@evaluator.local`;
       const existingUser = await query(
         'SELECT * FROM users WHERE email = $1',
-        [`${evaluator_code.toLowerCase()}@evaluator.local`]
+        [emailToUse]
       );
 
       if (existingUser.rowCount > 0) {
@@ -73,7 +75,7 @@ router.post('/assign',
            VALUES ($1, $2, $3, $4, 'evaluator')
            RETURNING *`,
           [
-            `${evaluator_code.toLowerCase()}@evaluator.local`,
+            emailToUse,
             await hashPassword('defaultpassword'), // 임시 비밀번호
             evaluator_name,
             'Evaluator'
@@ -181,40 +183,40 @@ router.get('/project/:projectId',
         return res.status(403).json({ error: 'Access denied to this project' });
       }
 
-      // 평가자 목록 조회
+      // 평가자 목록 조회 (기존 테이블 구조 사용)
       const evaluators = await query(
         `SELECT 
           u.id,
-          u.name,
+          u.first_name || ' ' || u.last_name as name,
           u.email,
-          pe.evaluator_code,
-          pe.access_key,
-          ew.weight,
-          ep.completion_rate,
-          ep.is_completed,
-          ep.completed_at,
-          pe.created_at as assigned_at
+          pe.assigned_at,
+          COALESCE(ew.weight, 1.0) as weight,
+          COALESCE(ep.completion_rate, 0) as completion_rate,
+          COALESCE(ep.is_completed, false) as is_completed,
+          ep.completed_at
          FROM project_evaluators pe
          JOIN users u ON pe.evaluator_id = u.id
          LEFT JOIN evaluator_weights ew ON pe.project_id = ew.project_id AND pe.evaluator_id = ew.evaluator_id
          LEFT JOIN evaluator_progress ep ON pe.project_id = ep.project_id AND pe.evaluator_id = ep.evaluator_id
          WHERE pe.project_id = $1
-         ORDER BY pe.evaluator_code`,
+         ORDER BY pe.assigned_at DESC`,
         [projectId]
       );
 
       res.json({
         evaluators: evaluators.rows.map(row => ({
           id: row.id,
-          code: row.evaluator_code,
+          code: `EVL${row.id}`, // ID 기반으로 코드 생성
           name: row.name,
-          email: userRole === 'admin' ? row.email : undefined, // 이메일은 관리자만 조회
-          access_key: userRole === 'admin' ? row.access_key : undefined, // 접속키는 관리자만 조회
-          weight: row.weight || 1.0,
-          completion_rate: row.completion_rate || 0,
-          is_completed: row.is_completed || false,
+          email: userRole === 'admin' ? row.email : undefined,
+          access_key: userRole === 'admin' ? generateAccessKey(`EVL${row.id}`, projectId) : undefined,
+          weight: row.weight,
+          completion_rate: row.completion_rate,
+          is_completed: row.is_completed,
           completed_at: row.completed_at,
-          assigned_at: row.assigned_at
+          assigned_at: row.assigned_at,
+          status: row.is_completed ? 'completed' : 'active',
+          progress: Math.round(row.completion_rate)
         }))
       });
 
@@ -386,9 +388,10 @@ router.post('/',
         const accessKey = generateAccessKey(evaluatorCode, projectId);
         
         await query(
-          `INSERT INTO project_evaluators (project_id, evaluator_id, evaluator_code, access_key)
-           VALUES ($1, $2, $3, $4)`,
-          [projectId, evaluator.id, evaluatorCode, accessKey]
+          `INSERT INTO project_evaluators (project_id, evaluator_id)
+           VALUES ($1, $2)
+           ON CONFLICT (project_id, evaluator_id) DO NOTHING`,
+          [projectId, evaluator.id]
         );
       }
 
@@ -694,23 +697,22 @@ router.get('/progress/:projectId',
         return res.status(403).json({ error: 'Access denied to this project' });
       }
 
-      // 진행상황 조회
+      // 진행상황 조회 (기존 테이블 구조 사용)
       const progress = await query(
         `SELECT 
           u.id as evaluator_id,
-          u.name as evaluator_name,
-          pe.evaluator_code,
-          ep.total_tasks,
-          ep.completed_tasks,
-          ep.completion_rate,
-          ep.is_completed,
+          u.first_name || ' ' || u.last_name as evaluator_name,
+          COALESCE(ep.total_tasks, 0) as total_tasks,
+          COALESCE(ep.completed_tasks, 0) as completed_tasks,
+          COALESCE(ep.completion_rate, 0) as completion_rate,
+          COALESCE(ep.is_completed, false) as is_completed,
           ep.completed_at,
           ep.updated_at
-         FROM evaluator_progress ep
-         JOIN project_evaluators pe ON ep.project_id = pe.project_id AND ep.evaluator_id = pe.evaluator_id
-         JOIN users u ON ep.evaluator_id = u.id
-         WHERE ep.project_id = $1
-         ORDER BY ep.completion_rate DESC, pe.evaluator_code`,
+         FROM project_evaluators pe
+         JOIN users u ON pe.evaluator_id = u.id
+         LEFT JOIN evaluator_progress ep ON pe.project_id = ep.project_id AND pe.evaluator_id = ep.evaluator_id
+         WHERE pe.project_id = $1
+         ORDER BY pe.assigned_at DESC`,
         [projectId]
       );
 
@@ -756,21 +758,33 @@ router.post('/auth/access-key',
 
       const { access_key } = req.body;
 
-      // 접속키로 평가자 정보 조회
+      // 접속키로 평가자 정보 조회 (기본 패턴 사용)
+      const accessKeyPattern = access_key.toUpperCase();
+      const parts = accessKeyPattern.split('-');
+      
+      if (parts.length !== 2) {
+        return res.status(401).json({ error: 'Invalid access key format' });
+      }
+      
+      const evaluatorCode = parts[0]; // EVL123
+      const projectCode = parts[1];   // 0001
+      
+      // EVL 제거하고 ID 추출
+      const evaluatorId = evaluatorCode.replace('EVL', '');
+      const projectId = parseInt(projectCode);
+      
       const evaluatorInfo = await query(
         `SELECT 
           pe.project_id,
           pe.evaluator_id,
-          pe.evaluator_code,
-          pe.access_key,
-          u.name as evaluator_name,
+          u.first_name || ' ' || u.last_name as evaluator_name,
           p.title as project_title,
           p.description as project_description
          FROM project_evaluators pe
          JOIN users u ON pe.evaluator_id = u.id
          JOIN projects p ON pe.project_id = p.id
-         WHERE pe.access_key = $1`,
-        [access_key.toUpperCase()]
+         WHERE pe.evaluator_id = $1 AND pe.project_id = $2`,
+        [evaluatorId, projectId]
       );
 
       if (evaluatorInfo.rowCount === 0) {
@@ -782,7 +796,7 @@ router.post('/auth/access-key',
       res.json({
         valid: true,
         evaluator_id: info.evaluator_id,
-        evaluator_code: info.evaluator_code,
+        evaluator_code: `EVL${info.evaluator_id}`,
         evaluator_name: info.evaluator_name,
         project_id: info.project_id,
         project_title: info.project_title,
