@@ -391,6 +391,64 @@ app.get('/api/quick-cleanup-phantoms', async (req, res) => {
         });
     }
 });
+// Reset project 104 to clean state (remove all phantom data)
+app.post('/api/emergency/reset-project-104', async (req, res) => {
+    try {
+        const { confirm } = req.body;
+        if (confirm !== 'RESET_PROJECT_104') {
+            return res.status(400).json({
+                success: false,
+                message: 'To confirm reset, send { "confirm": "RESET_PROJECT_104" }'
+            });
+        }
+        console.log('🔄 프로젝트 104 완전 초기화 시작...');
+        const { query } = await Promise.resolve().then(() => __importStar(require('./database/connection')));
+        // 프로젝트 104 존재 확인
+        const projectCheck = await query('SELECT id, title FROM projects WHERE id = 104');
+        if (projectCheck.rows.length === 0) {
+            return res.json({
+                success: false,
+                message: '프로젝트 104가 존재하지 않습니다.'
+            });
+        }
+        console.log(`🗑️ 프로젝트 104 "${projectCheck.rows[0].title}" 모든 데이터 삭제 중...`);
+        // 1. 비교 데이터 삭제
+        const deletedComparisons = await query('DELETE FROM pairwise_comparisons WHERE project_id = 104 RETURNING id');
+        // 2. 평가 결과 삭제
+        const deletedResults = await query('DELETE FROM evaluation_results WHERE project_id = 104 RETURNING id');
+        // 3. 워크샵 세션 삭제
+        const deletedSessions = await query('DELETE FROM workshop_sessions WHERE project_id = 104 RETURNING id');
+        // 4. 프로젝트 평가자 삭제
+        const deletedEvaluators = await query('DELETE FROM project_evaluators WHERE project_id = 104 RETURNING id');
+        // 5. 대안 삭제
+        const deletedAlternatives = await query('DELETE FROM alternatives WHERE project_id = 104 RETURNING id');
+        // 6. 기준 삭제 (계층적 삭제)
+        const deletedCriteria = await query('DELETE FROM criteria WHERE project_id = 104 RETURNING id');
+        const resetSummary = {
+            deleted_comparisons: deletedComparisons.rows.length,
+            deleted_results: deletedResults.rows.length,
+            deleted_sessions: deletedSessions.rows.length,
+            deleted_evaluators: deletedEvaluators.rows.length,
+            deleted_alternatives: deletedAlternatives.rows.length,
+            deleted_criteria: deletedCriteria.rows.length
+        };
+        console.log(`✅ 프로젝트 104 완전 초기화 완료:`, resetSummary);
+        res.json({
+            success: true,
+            message: '프로젝트 104가 완전히 초기화되었습니다. 이제 처음부터 시작할 수 있습니다.',
+            project_title: projectCheck.rows[0].title,
+            reset_summary: resetSummary
+        });
+    }
+    catch (error) {
+        console.error('❌ 프로젝트 104 초기화 중 오류:', error);
+        res.status(500).json({
+            success: false,
+            message: '프로젝트 104 초기화 중 오류가 발생했습니다.',
+            error: error.message
+        });
+    }
+});
 // Project 104 inspection endpoint (temporary - no auth)
 app.get('/api/inspect-project-104', async (req, res) => {
     try {
