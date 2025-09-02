@@ -424,7 +424,9 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                   }}
                   icon="⏰"
                   title="세션 30분 연장"
-                />
+                >
+                  연장
+                </UnifiedButton>
               </div>
             )}
             
