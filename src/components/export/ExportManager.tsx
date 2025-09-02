@@ -273,10 +273,11 @@ const ExportManager: React.FC<ExportManagerProps> = ({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="w-full space-y-6">
       {/* 내보내기 형식 선택 */}
-      <Card title="내보내기 형식 선택">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="w-full">
+        <Card title="내보내기 형식 선택">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
           {formatOptions.map((option) => (
             <div
               key={option.value}
@@ -295,10 +296,12 @@ const ExportManager: React.FC<ExportManagerProps> = ({
             </div>
           ))}
         </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* 내보내기 옵션 */}
-      <Card title="내보내기 옵션">
+      <div className="w-full">
+        <Card title="내보내기 옵션">
         <div className="space-y-4">
           {/* 제목 설정 */}
           <div>
@@ -355,10 +358,11 @@ const ExportManager: React.FC<ExportManagerProps> = ({
             />
           </div>
         </div>
-      </Card>
+        </Card>
+      </div>
 
       {/* 액션 버튼들 */}
-      <div className="flex flex-wrap gap-4">
+      <div className="w-full flex flex-wrap gap-4">
         <Button
           onClick={generatePreview}
           variant="secondary"
