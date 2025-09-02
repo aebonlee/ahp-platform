@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import dataService from './services/dataService';
+import sessionService from './services/sessionService';
 import Layout from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
 import RegisterForm from './components/auth/RegisterForm';
@@ -83,6 +84,13 @@ function App() {
   const [surveyId, setSurveyId] = useState<string>('');
   const [surveyToken, setSurveyToken] = useState<string>('');
 
+  // 세션 서비스 초기화
+  useEffect(() => {
+    sessionService.setLogoutCallback(() => {
+      setUser(null);
+      setActiveTab('home');
+    });
+  }, []);
 
   // URL 파라미터 변경 감지 (로그인 후에만 적용)
   useEffect(() => {
@@ -407,6 +415,9 @@ function App() {
         localStorage.setItem('login_time', Date.now().toString());
         localStorage.setItem('last_activity', Date.now().toString());
         
+        // 세션 타이머 시작
+        sessionService.startSession();
+        
         setUser(userWithAdminType);
         
         // 기본 탭 설정
@@ -436,6 +447,9 @@ function App() {
   };
 
   const handleLogout = async () => {
+    // 세션 서비스 로그아웃 처리
+    await sessionService.logout();
+    
     // 세션 정보 삭제
     localStorage.removeItem('login_time');
     localStorage.removeItem('last_activity');

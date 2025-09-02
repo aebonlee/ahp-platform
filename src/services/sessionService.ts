@@ -5,6 +5,7 @@ class SessionService {
   private warningTimer: NodeJS.Timeout | null = null;
   private readonly SESSION_DURATION = 30 * 60 * 1000; // 30분 (밀리초)
   private readonly WARNING_TIME = 5 * 60 * 1000; // 5분 전 경고 (밀리초)
+  private logoutCallback: (() => void) | null = null;
 
   private constructor() {
     this.initializeSession();
@@ -123,24 +124,28 @@ class SessionService {
     }
   }
 
+  // 로그아웃 콜백 설정
+  public setLogoutCallback(callback: () => void): void {
+    this.logoutCallback = callback;
+  }
+
   // 강제 로그아웃
   private async forceLogout(): Promise<void> {
     this.clearTimers();
     this.hideSessionWarning();
     
-    // 서버에 로그아웃 요청
-    try {
-      await fetch('/api/auth/logout', {
-        credentials: 'include',
-        method: 'POST'
-      });
-    } catch (error) {
-      console.error('로그아웃 요청 실패:', error);
-    }
+    // localStorage 세션 정보 삭제
+    localStorage.removeItem('login_time');
+    localStorage.removeItem('last_activity');
     
-    // 페이지 새로고침으로 로그인 페이지로 이동
     console.log('세션이 만료되어 로그아웃되었습니다.');
-    window.location.reload();
+    
+    // 콜백을 통해 App 상태 업데이트
+    if (this.logoutCallback) {
+      this.logoutCallback();
+    } else {
+      window.location.reload();
+    }
   }
 
   // 수동 로그아웃

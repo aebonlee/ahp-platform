@@ -3107,17 +3107,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 className="text-xs font-medium uppercase tracking-wider px-3 py-1 rounded-full border"
                 style={{ 
                   color: 'var(--accent-primary)',
-                  borderColor: 'var(--accent-light)',
-                  backgroundColor: 'var(--accent-light)'
+                  borderColor: 'var(--accent-light)'
                 }}
               >
                 Pro Plan 🔵
-              </span>
-              <span 
-                className="text-lg font-bold"
-                style={{ color: 'var(--accent-primary)' }}
-              >
-                $99/월
               </span>
               <div 
                 className="w-12 h-0.5 rounded-full"
@@ -3134,12 +3127,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
         
         {/* 요금제 할당량 정보 - 각 섹션을 개별 박스로 구분 */}
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* 프로젝트 개수 박스 */}
           <div 
             className="rounded-xl p-6 transition-all duration-300"
             style={{
-              backgroundColor: 'var(--bg-secondary)',
               border: '1px solid var(--border-medium)',
               boxShadow: 'var(--shadow-md)'
             }}
@@ -3190,7 +3182,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div 
             className="rounded-xl p-6 transition-all duration-300"
             style={{
-              backgroundColor: 'var(--bg-secondary)',
               border: '1px solid var(--border-medium)',
               boxShadow: 'var(--shadow-md)'
             }}
@@ -3241,7 +3232,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div 
             className="rounded-xl p-6 transition-all duration-300"
             style={{
-              backgroundColor: 'var(--bg-secondary)',
               border: '1px solid var(--border-medium)',
               boxShadow: 'var(--shadow-md)'
             }}

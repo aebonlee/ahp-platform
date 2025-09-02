@@ -45,6 +45,8 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
         } else {
           localStorage.setItem('login_time', Date.now().toString());
           setRemainingTime(30);
+          // 첫 로그인 시 세션 타이머 시작
+          sessionService.startSession();
         }
         
         localStorage.setItem('last_activity', Date.now().toString());
