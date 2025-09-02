@@ -95,9 +95,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 }) => {
   // 사용자 정보 내부 상태 관리
   const [user, setUser] = useState(initialUser);
-  
-  // projects 안전하게 처리
-  const projects = Array.isArray(externalProjects) ? externalProjects : [];
+
+  // props의 projects가 변경될 때 내부 상태 업데이트
+  useEffect(() => {
+    if (Array.isArray(externalProjects)) {
+      setProjects(externalProjects);
+    }
+  }, [externalProjects]);
 
   // props의 user가 변경될 때 내부 상태도 업데이트
   useEffect(() => {
@@ -132,7 +136,12 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       onUserUpdate(newUserObject);
     }
   };
-  const [projects, setProjects] = useState<UserProject[]>([]);
+  
+  const [projects, setProjects] = useState<UserProject[]>(() => {
+    // props에서 받은 프로젝트를 안전하게 초기값으로 설정
+    return Array.isArray(externalProjects) ? externalProjects : [];
+  });
+  
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeProject, setActiveProject] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState<'overview' | 'projects' | 'criteria' | 'alternatives' | 'evaluators' | 'finalize'>('overview');
