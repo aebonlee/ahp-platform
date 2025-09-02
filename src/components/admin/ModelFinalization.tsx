@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import HierarchyTreeVisualization from '../common/HierarchyTreeVisualization';
-import { apiService } from '../../services/apiService';
+import apiService from '../../services/apiService';
 
 interface ModelFinalizationProps {
   projectId: string;
@@ -29,14 +29,14 @@ const ModelFinalization: React.FC<ModelFinalizationProps> = ({
         
         // 실제 프로젝트 데이터 로드
         const [criteriaResponse, alternativesResponse, evaluatorsResponse] = await Promise.all([
-          apiService.get(`/projects/${projectId}/criteria`),
-          apiService.get(`/projects/${projectId}/alternatives`),
-          apiService.get(`/projects/${projectId}/evaluators`)
+          apiService.criteriaAPI.fetch(Number(projectId)),
+          apiService.alternativesAPI.fetch(Number(projectId)),
+          apiService.evaluatorAPI.fetchByProject(Number(projectId))
         ]);
         
-        setCriteria(criteriaResponse.criteria || []);
-        setAlternatives(alternativesResponse.alternatives || []);
-        setEvaluators(evaluatorsResponse.evaluators || []);
+        setCriteria((criteriaResponse.data as any)?.criteria || (criteriaResponse.data as any) || []);
+        setAlternatives((alternativesResponse.data as any)?.alternatives || (alternativesResponse.data as any) || []);
+        setEvaluators((evaluatorsResponse.data as any)?.evaluators || (evaluatorsResponse.data as any) || []);
         
       } catch (error) {
         console.error('Failed to load project data:', error);
