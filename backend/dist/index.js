@@ -240,6 +240,56 @@ app.post('/api/emergency/cleanup-phantom-projects', async (req, res) => {
         });
     }
 });
+// Quick phantom cleanup endpoint (temporary - no auth)
+app.get('/api/quick-cleanup-phantoms', async (req, res) => {
+    try {
+        console.log('🧹 퀵 허수 프로젝트 정리 실행...');
+        const { query } = await Promise.resolve().then(() => __importStar(require('./database/connection')));
+        // 현재 프로젝트 개수 확인
+        const countBefore = await query('SELECT COUNT(*) as count FROM projects');
+        console.log(`📊 정리 전 프로젝트 개수: ${countBefore.rows[0].count}개`);
+        // 허수 프로젝트 식별 및 삭제
+        const deleteResult = await query(`
+      DELETE FROM projects 
+      WHERE 
+        title ILIKE '%테스트%' OR 
+        title ILIKE '%test%' OR 
+        title ILIKE '%sample%' OR 
+        title ILIKE '%demo%' OR
+        title ILIKE '%AI 개발 활용%' OR
+        title ILIKE '%스마트폰 선택%' OR
+        title ILIKE '%직원 채용%' OR
+        title ILIKE '%투자 포트폴리오%' OR
+        title ILIKE '%중요도 분석%' OR
+        admin_id IN (SELECT id FROM users WHERE email = 'test@ahp.com') OR
+        (
+          id NOT IN (SELECT DISTINCT project_id FROM criteria WHERE project_id IS NOT NULL) AND
+          id NOT IN (SELECT DISTINCT project_id FROM alternatives WHERE project_id IS NOT NULL) AND
+          id NOT IN (SELECT DISTINCT project_id FROM project_evaluators WHERE project_id IS NOT NULL)
+        )
+    `);
+        // 정리 후 개수 확인
+        const countAfter = await query('SELECT COUNT(*) as count FROM projects');
+        const deletedCount = parseInt(countBefore.rows[0].count) - parseInt(countAfter.rows[0].count);
+        console.log(`✅ ${deletedCount}개 허수 프로젝트 삭제 완료`);
+        console.log(`📊 정리 후 프로젝트 개수: ${countAfter.rows[0].count}개`);
+        res.json({
+            success: true,
+            message: `${deletedCount}개의 허수 프로젝트가 정리되었습니다.`,
+            deleted_count: deletedCount,
+            remaining_count: parseInt(countAfter.rows[0].count),
+            before_count: parseInt(countBefore.rows[0].count)
+        });
+    }
+    catch (error) {
+        console.error('❌ 퀵 정리 중 오류:', error);
+        res.status(500).json({
+            success: false,
+            message: '허수 프로젝트 정리 중 오류가 발생했습니다.',
+            error: error.message
+        });
+    }
+});
 // Sample data creation endpoint for production
 app.post('/api/admin/create-sample-data', async (req, res) => {
     try {
