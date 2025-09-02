@@ -3082,7 +3082,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       <div className="py-6">
         {/* 환영 메시지 (기존 스타일) */}
         <div className="text-center lg:text-left space-y-6">
-          <div className="space-y-3">
+          <div className="space-y-3 p-6 rounded-xl" 
+               style={{
+                 border: '1px solid var(--border-light)',
+                 boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+               }}>
             <h1 
               className="text-4xl lg:text-5xl font-light tracking-wide"
               style={{ 
@@ -3132,8 +3136,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div 
             className="rounded-xl p-6 transition-all duration-300"
             style={{
-              border: '1px solid var(--border-medium)',
-              boxShadow: 'var(--shadow-md)'
+              border: '1px solid var(--border-light)',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
             }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}
@@ -3182,8 +3186,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div 
             className="rounded-xl p-6 transition-all duration-300"
             style={{
-              border: '1px solid var(--border-medium)',
-              boxShadow: 'var(--shadow-md)'
+              border: '1px solid var(--border-light)',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
             }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}
@@ -3232,8 +3236,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div 
             className="rounded-xl p-6 transition-all duration-300"
             style={{
-              border: '1px solid var(--border-medium)',
-              boxShadow: 'var(--shadow-md)'
+              border: '1px solid var(--border-light)',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
             }}
             onMouseEnter={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-lg)'}
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = 'var(--shadow-md)'}
