@@ -96,12 +96,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   // 사용자 정보 내부 상태 관리
   const [user, setUser] = useState(initialUser);
 
-  // props의 projects가 변경될 때 내부 상태 업데이트
-  useEffect(() => {
-    if (Array.isArray(externalProjects)) {
-      setProjects(externalProjects);
-    }
-  }, [externalProjects]);
+  // props에서 projects를 직접 사용하므로 useEffect 불필요
 
   // props의 user가 변경될 때 내부 상태도 업데이트
   useEffect(() => {
@@ -137,10 +132,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     }
   };
   
-  const [projects, setProjects] = useState<UserProject[]>(() => {
-    // props에서 받은 프로젝트를 안전하게 초기값으로 설정
-    return Array.isArray(externalProjects) ? externalProjects : [];
-  });
+  // props에서 받은 projects를 직접 사용 (내부 state 제거)
+  const projects = Array.isArray(externalProjects) ? externalProjects : [];
   
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeProject, setActiveProject] = useState<string | null>(null);
@@ -270,79 +263,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     }
   }, [externalActiveTab]);
 
-  useEffect(() => {
-    loadProjects();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // projects는 App.tsx에서 관리하므로 여기서 별도 로드 불필요
 
-  // 활성 메뉴가 변경될 때 프로젝트 관련 탭이면 데이터를 다시 로드
-  useEffect(() => {
-    if (activeMenu === 'projects' || activeMenu === 'dashboard') {
-      loadProjects();
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeMenu]);
-
-  const loadProjects = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      console.log('📊 통합 데이터 서비스에서 프로젝트 로드');
-      
-      // 통합 데이터 서비스 사용 (자동으로 온라인/오프라인 모드 처리)
-      const projectsData = await dataService.getProjects();
-      
-      // ProjectData를 UserProject로 변환
-      const convertedProjects: UserProject[] = projectsData.map((project: ProjectData) => ({
-        ...project,
-        evaluator_count: 0, // 실제 DB에서 조회
-        completion_rate: 85, // 실제 진행률
-        criteria_count: 0, // 실제 DB에서 조회
-        alternatives_count: 0, // 실제 DB에서 조회
-        last_modified: project.updated_at ? new Date(project.updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
-        evaluation_method: 'pairwise' as const // 쌍대비교 방식
-      }));
-      
-      // 빈 프로젝트 목록인 경우 샘플 프로젝트 생성
-      if (convertedProjects.length === 0) {
-        console.log('📝 샘플 프로젝트 생성');
-        const sampleProject = await dataService.createProject({
-          title: 'AI 개발 활용 방안 AHP 분석',
-          description: '인공지능 기술의 개발 및 활용 방안에 대한 의사결정 분석',
-          objective: 'AI 기술 도입의 최적 방안 선정',
-          status: 'draft',
-          evaluation_mode: 'practical',
-          workflow_stage: 'creating'
-        });
-        
-        if (sampleProject) {
-          const sampleUserProject: UserProject = {
-            ...sampleProject,
-            evaluator_count: 0, // 실제 DB에서 조회
-            completion_rate: 85, // 실제 진행률
-            criteria_count: 0, // 실제 DB에서 조회
-            alternatives_count: 0, // 실제 DB에서 조회
-            last_modified: new Date().toISOString().split('T')[0],
-            evaluation_method: 'pairwise' as const
-          };
-          setProjects([sampleUserProject]);
-        } else {
-          setProjects([]);
-        }
-      } else {
-        setProjects(convertedProjects);
-      }
-      
-      console.log(`✅ ${convertedProjects.length}개 프로젝트 로드 완료`);
-    } catch (error: any) {
-      console.error('Error loading projects:', error);
-      setError('프로젝트를 불러오는데 실패했습니다.');
-      setProjects([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // loadProjects 함수 제거 - App.tsx에서 관리
 
   const resetProjectForm = () => {
     setProjectForm({
@@ -386,8 +309,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           await onDeleteProject(projectId);
           console.log('✅ 백엔드 삭제 완료');
           
-          // 프로젝트 목록 새로고침
-          await loadProjects();
+          // 삭제는 App.tsx에서 관리됨
           console.log('✅ 프로젝트 목록 새로고침 완료');
           
           alert(`"${projectTitle}"가 휴지통으로 이동되었습니다.`);
@@ -399,8 +321,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         console.error('❌ Project deletion error:', error);
         alert(error instanceof Error ? error.message : '프로젝트 삭제 중 오류가 발생했습니다.');
         
-        // 실패 시 프로젝트 목록 다시 로드
-        await loadProjects();
+        // 실패시에도 App.tsx에서 관리됨
       }
     }
   };
@@ -438,10 +359,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             evaluation_method: projectForm.evaluation_method
           };
           
-          const updatedProjects = (projects || []).map(p => 
-            p.id === editingProject.id ? updatedUserProject : p
-          );
-          setProjects(updatedProjects);
+          // 프로젝트 수정은 App.tsx에서 관리됨
           console.log('✅ 프로젝트 수정 완료');
         } else {
           throw new Error('프로젝트 수정에 실패했습니다.');
@@ -485,9 +403,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             last_modified: new Date().toISOString().split('T')[0],
             evaluation_method: projectForm.evaluation_method
           };
-          
-          const updatedProjects = [...projects, newUserProject];
-          setProjects(updatedProjects);
+          // 새 프로젝트는 App.tsx에서 관리됨
           setSelectedProjectId(newProject.id || '');
           console.log('✅ 새 프로젝트 생성 완료');
         } else {
@@ -513,22 +429,16 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   // 프로젝트의 기준 개수 업데이트
   const handleCriteriaCountUpdate = (count: number) => {
     if (selectedProjectId) {
-      setProjects(prev => prev.map(project => 
-        project.id === selectedProjectId 
-          ? { ...project, criteria_count: count }
-          : project
-      ));
+      // 기준 수 업데이트는 App.tsx에서 관리
+      console.log('🔢 기준 수 업데이트:', count);
     }
   };
 
   // 프로젝트의 대안 개수 업데이트
   const handleAlternativesCountUpdate = (count: number) => {
     if (selectedProjectId) {
-      setProjects(prev => prev.map(project => 
-        project.id === selectedProjectId 
-          ? { ...project, alternatives_count: count }
-          : project
-      ));
+      // 대안 수 업데이트는 App.tsx에서 관리
+      console.log('🔢 대안 수 업데이트:', count);
     }
   };
 
@@ -579,8 +489,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         evaluation_method: projectForm.evaluation_method || 'pairwise'
       };
 
-      const updatedProjects = [...projects, newProject];
-      setProjects(updatedProjects);
+      // 새 프로젝트 추가는 App.tsx에서 관리됨
       setSelectedProjectId(newProject.id || '');
       
       console.log('Project created successfully:', newProject);
@@ -911,9 +820,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             onFinalize={() => {
               setCurrentStep('overview');
               // 프로젝트 상태를 활성화로 변경
-              setProjects(prev => prev.map(p => 
-                p.id === selectedProjectId ? { ...p, status: 'active' as const } : p
-              ));
+              // 프로젝트 상태 변경은 App.tsx에서 관리됨
+              console.log('✅ 프로젝트 활성화됨:', selectedProjectId);
             }}
             isReadyToFinalize={true}
           />
