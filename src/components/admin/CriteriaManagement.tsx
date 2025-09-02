@@ -4,6 +4,7 @@ import Button from '../common/Button';
 import Input from '../common/Input';
 import HierarchyTreeVisualization from '../common/HierarchyTreeVisualization';
 import BulkCriteriaInput from '../criteria/BulkCriteriaInput';
+import apiService from '../../services/apiService';
 
 interface Criterion {
   id: string;
@@ -30,24 +31,34 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
   const [showBulkInput, setShowBulkInput] = useState(false);
 
   useEffect(() => {
-    // 프로젝트별 기준 데이터 로드 (localStorage에서)
-    const loadProjectCriteria = () => {
-      const storageKey = `ahp_criteria_${projectId}`;
-      const savedCriteria = localStorage.getItem(storageKey);
-      
-      if (savedCriteria) {
-        try {
-          const parsed = JSON.parse(savedCriteria);
-          setCriteria(parsed);
-          console.log(`Loaded ${getAllCriteria(parsed).length} criteria for project ${projectId}`);
-        } catch (error) {
-          console.error('Failed to parse saved criteria:', error);
+    // 백엔드에서 실제 프로젝트별 기준 데이터 로드
+    const loadProjectCriteria = async () => {
+      try {
+        const response = await apiService.criteriaAPI.fetch(Number(projectId));
+        if (response.data) {
+          const criteriaData = (response.data as any).criteria || response.data || [];
+          setCriteria(criteriaData);
+          console.log(`Loaded ${criteriaData.length} criteria from API for project ${projectId}`);
+        } else {
+          setCriteria([]);
+          console.log(`No criteria found for project ${projectId}`);
+        }
+      } catch (error) {
+        console.error('Failed to load criteria from API:', error);
+        // 폴백으로 localStorage 확인
+        const storageKey = `ahp_criteria_${projectId}`;
+        const savedCriteria = localStorage.getItem(storageKey);
+        if (savedCriteria) {
+          try {
+            const parsed = JSON.parse(savedCriteria);
+            setCriteria(parsed);
+            console.log(`Fallback: Loaded ${parsed.length} criteria from localStorage`);
+          } catch (e) {
+            setCriteria([]);
+          }
+        } else {
           setCriteria([]);
         }
-      } else {
-        // 새 프로젝트는 빈 배열로 시작
-        setCriteria([]);
-        console.log(`New project ${projectId} - starting with empty criteria`);
       }
     };
 
@@ -136,12 +147,11 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
     return flat;
   };
 
-  const handleAddCriterion = () => {
+  const handleAddCriterion = async () => {
     if (!validateCriterion(newCriterion.name)) {
       return;
     }
 
-    const newId = Date.now().toString();
     // 부모가 있으면 부모 레벨 + 1, 없으면 1레벨
     let level = 1;
     if (newCriterion.parentId) {
@@ -155,63 +165,61 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
       return;
     }
     
-    const criterion: Criterion = {
-      id: newId,
+    const criterionData = {
+      project_id: Number(projectId),
       name: newCriterion.name,
-      description: newCriterion.description,
+      description: newCriterion.description || null,
       parent_id: newCriterion.parentId || null,
-      level
+      level,
+      order_index: getAllCriteria(criteria).filter(c => c.level === level).length + 1
     };
 
-    let updatedCriteria: Criterion[];
-    
-    if (newCriterion.parentId) {
-      // Add as child - 재귀적으로 부모 찾기
-      const addToParent = (items: Criterion[]): Criterion[] => {
-        return items.map(item => {
-          if (item.id === newCriterion.parentId) {
-            return {
-              ...item,
-              children: [...(item.children || []), criterion]
-            };
-          } else if (item.children && item.children.length > 0) {
-            return {
-              ...item,
-              children: addToParent(item.children)
-            };
-          }
-          return item;
-        });
-      };
-      updatedCriteria = addToParent(criteria);
-    } else {
-      // Add as top-level criterion
-      updatedCriteria = [...criteria, criterion];
-    }
+    try {
+      const response = await apiService.criteriaAPI.create(criterionData);
+      
+      if (response.error) {
+        setErrors({ name: response.error });
+        return;
+      }
 
-    setCriteria(updatedCriteria);
-    saveProjectCriteria(updatedCriteria);
-    setNewCriterion({ name: '', description: '', parentId: '' });
-    setErrors({});
+      // 성공 시 데이터 다시 로드
+      const updatedResponse = await apiService.criteriaAPI.fetch(Number(projectId));
+      if (updatedResponse.data) {
+        const criteriaData = (updatedResponse.data as any).criteria || updatedResponse.data || [];
+        setCriteria(criteriaData);
+      }
+      
+      setNewCriterion({ name: '', description: '', parentId: '' });
+      setErrors({});
+      console.log('✅ 기준이 PostgreSQL에 저장되었습니다.');
+    } catch (error) {
+      console.error('Failed to save criterion to API:', error);
+      setErrors({ name: '기준 저장 중 오류가 발생했습니다.' });
+    }
   };
 
-  const handleDeleteCriterion = (id: string) => {
+  const handleDeleteCriterion = async (id: string) => {
     console.log('기준 삭제:', id);
     
-    const filter = (items: Criterion[]): Criterion[] => {
-      return items.filter(item => {
-        if (item.id === id) return false;
-        if (item.children) {
-          item.children = filter(item.children);
-        }
-        return true;
-      });
-    };
-    
-    const updatedCriteria = filter(criteria);
-    setCriteria(updatedCriteria);
-    saveProjectCriteria(updatedCriteria);
-    console.log('기준 삭제 완료:', id);
+    try {
+      const response = await apiService.criteriaAPI.delete(id);
+      
+      if (response.error) {
+        console.error('Failed to delete criterion:', response.error);
+        return;
+      }
+
+      // 성공 시 데이터 다시 로드
+      const updatedResponse = await apiService.criteriaAPI.fetch(Number(projectId));
+      if (updatedResponse.data) {
+        const criteriaData = (updatedResponse.data as any).criteria || updatedResponse.data || [];
+        setCriteria(criteriaData);
+      }
+      
+      console.log('✅ 기준이 PostgreSQL에서 삭제되었습니다:', id);
+    } catch (error) {
+      console.error('Failed to delete criterion from API:', error);
+    }
   };
 
 
@@ -246,16 +254,26 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
     }
   };
 
-  const handleClearAllData = () => {
+  const handleClearAllData = async () => {
     if (window.confirm('경고: 모든 기준 데이터를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.')) {
-      setCriteria([]);
-      saveProjectCriteria([]);
-      setNewCriterion({ name: '', description: '', parentId: '' });
-      setErrors({});
+      try {
+        // 모든 기준을 PostgreSQL에서 삭제
+        for (const criterion of criteria) {
+          await apiService.criteriaAPI.delete(criterion.id);
+        }
+        
+        setCriteria([]);
+        setNewCriterion({ name: '', description: '', parentId: '' });
+        setErrors({});
+        console.log('✅ 모든 기준이 PostgreSQL에서 삭제되었습니다.');
+      } catch (error) {
+        console.error('Failed to clear all criteria:', error);
+        alert('❌ 데이터 삭제 중 오류가 발생했습니다.');
+      }
     }
   };
 
-  const handleLoadTemplateData = () => {
+  const handleLoadTemplateData = async () => {
     if (criteria.length > 0) {
       if (!window.confirm('⚠️ 기존 데이터가 있습니다. 템플릿으로 교체하시겠습니까?')) {
         return;
@@ -263,50 +281,92 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
     }
     
     // 기본 AHP 템플릿 구조
-    const timestamp = Date.now();
-    const goalId = `template_goal_${timestamp}`;
-    
-    const templateCriteria: Criterion[] = [
+    const templateCriteria = [
       {
-        id: goalId,
+        project_id: Number(projectId),
         name: '프로젝트 목표',
         description: '최종 달성하고자 하는 목표를 입력하세요',
         parent_id: null,
-        level: 1
+        level: 1,
+        order_index: 1
       },
       {
-        id: `template_c1_${timestamp + 1}`,
+        project_id: Number(projectId),
         name: '기준 1',
         description: '첫 번째 평가 기준',
-        parent_id: goalId,
-        level: 2
+        parent_id: null,
+        level: 2,
+        order_index: 1
       },
       {
-        id: `template_c2_${timestamp + 2}`,
+        project_id: Number(projectId),
         name: '기준 2', 
         description: '두 번째 평가 기준',
-        parent_id: goalId,
-        level: 2
+        parent_id: null,
+        level: 2,
+        order_index: 2
       }
     ];
     
-    setCriteria(templateCriteria);
-    saveProjectCriteria(templateCriteria);
-    setNewCriterion({ name: '', description: '', parentId: '' });
-    setErrors({});
-    alert('✅ 기본 템플릿이 로드되었습니다. 필요에 따라 수정하세요.');
+    try {
+      // 기존 데이터 삭제 후 템플릿 생성
+      for (const criterion of criteria) {
+        await apiService.criteriaAPI.delete(criterion.id);
+      }
+      
+      // 템플릿 데이터 생성
+      for (const criterionData of templateCriteria) {
+        await apiService.criteriaAPI.create(criterionData);
+      }
+      
+      // 데이터 다시 로드
+      const response = await apiService.criteriaAPI.fetch(Number(projectId));
+      if (response.data) {
+        const criteriaData = (response.data as any).criteria || response.data || [];
+        setCriteria(criteriaData);
+      }
+      
+      setNewCriterion({ name: '', description: '', parentId: '' });
+      setErrors({});
+      alert('✅ 기본 템플릿이 PostgreSQL에 저장되었습니다.');
+    } catch (error) {
+      console.error('Failed to load template data:', error);
+      alert('❌ 템플릿 로드 중 오류가 발생했습니다.');
+    }
   };
 
-  const handleBulkImport = (importedCriteria: Criterion[]) => {
-    // 기존 기준과 새로 가져온 기준을 병합
-    const updatedCriteria = [...criteria, ...importedCriteria];
-    setCriteria(updatedCriteria);
-    saveProjectCriteria(updatedCriteria);
-    setShowBulkInput(false);
-    
-    // 성공 메시지
-    const count = getAllCriteria(importedCriteria).length;
-    alert(`✅ ${count}개의 기준이 성공적으로 추가되었습니다.`);
+  const handleBulkImport = async (importedCriteria: Criterion[]) => {
+    try {
+      // 가져온 기준들을 PostgreSQL에 저장
+      for (const criterion of importedCriteria) {
+        const criterionData = {
+          project_id: Number(projectId),
+          name: criterion.name,
+          description: criterion.description || null,
+          parent_id: criterion.parent_id,
+          level: criterion.level,
+          order_index: criterion.level
+        };
+        
+        await apiService.criteriaAPI.create(criterionData);
+      }
+      
+      // 데이터 다시 로드
+      const response = await apiService.criteriaAPI.fetch(Number(projectId));
+      if (response.data) {
+        const criteriaData = (response.data as any).criteria || response.data || [];
+        setCriteria(criteriaData);
+      }
+      
+      setShowBulkInput(false);
+      
+      // 성공 메시지
+      const count = getAllCriteria(importedCriteria).length;
+      alert(`✅ ${count}개의 기준이 PostgreSQL에 저장되었습니다.`);
+    } catch (error) {
+      console.error('Failed to bulk import criteria:', error);
+      alert('❌ 일괄 가져오기 중 오류가 발생했습니다.');
+    }
   };
 
   const renderHelpModal = () => {

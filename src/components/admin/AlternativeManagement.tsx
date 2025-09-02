@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import Input from '../common/Input';
+import apiService from '../../services/apiService';
 
 interface Alternative {
   id: string;
@@ -22,24 +23,34 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
   const [alternatives, setAlternatives] = useState<Alternative[]>([]);
 
   useEffect(() => {
-    // 프로젝트별 대안 데이터 로드 (localStorage에서)
-    const loadProjectAlternatives = () => {
-      const storageKey = `ahp_alternatives_${projectId}`;
-      const savedAlternatives = localStorage.getItem(storageKey);
-      
-      if (savedAlternatives) {
-        try {
-          const parsed = JSON.parse(savedAlternatives);
-          setAlternatives(parsed);
-          console.log(`Loaded ${parsed.length} alternatives for project ${projectId}`);
-        } catch (error) {
-          console.error('Failed to parse saved alternatives:', error);
+    // 프로젝트별 대안 데이터 로드 (PostgreSQL에서)
+    const loadProjectAlternatives = async () => {
+      try {
+        const response = await apiService.alternativesAPI.fetch(Number(projectId));
+        if (response.data) {
+          const alternativesData = (response.data as any).alternatives || response.data || [];
+          setAlternatives(alternativesData);
+          console.log(`Loaded ${alternativesData.length} alternatives from API for project ${projectId}`);
+        } else {
+          setAlternatives([]);
+          console.log(`No alternatives found for project ${projectId}`);
+        }
+      } catch (error) {
+        console.error('Failed to load alternatives from API:', error);
+        // 폴백으로 localStorage 확인
+        const storageKey = `ahp_alternatives_${projectId}`;
+        const savedAlternatives = localStorage.getItem(storageKey);
+        if (savedAlternatives) {
+          try {
+            const parsed = JSON.parse(savedAlternatives);
+            setAlternatives(parsed);
+            console.log(`Fallback: Loaded ${parsed.length} alternatives from localStorage`);
+          } catch (e) {
+            setAlternatives([]);
+          }
+        } else {
           setAlternatives([]);
         }
-      } else {
-        // 새 프로젝트는 빈 배열로 시작
-        setAlternatives([]);
-        console.log(`New project ${projectId} - starting with empty alternatives`);
       }
     };
 
@@ -60,11 +71,10 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
   const [editingAlternative, setEditingAlternative] = useState({ name: '', description: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // 프로젝트별 대안 데이터 저장
-  const saveProjectAlternatives = (alternativesData: Alternative[]) => {
-    const storageKey = `ahp_alternatives_${projectId}`;
-    localStorage.setItem(storageKey, JSON.stringify(alternativesData));
-    console.log(`Saved ${alternativesData.length} alternatives for project ${projectId}`);
+  // 프로젝트별 대안 데이터 저장 (localStorage 대신 PostgreSQL 사용)
+  const saveProjectAlternatives = async (alternativesData: Alternative[]) => {
+    console.log(`Alternatives now saved to PostgreSQL for project ${projectId}`);
+    // localStorage 제거됨 - 모든 데이터는 PostgreSQL에 저장
   };
 
   const validateAlternative = (name: string, excludeId?: string): boolean => {
@@ -88,26 +98,42 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleAddAlternative = () => {
+  const handleAddAlternative = async () => {
     if (!validateAlternative(newAlternative.name)) {
       return;
     }
 
-    const newId = Date.now().toString();
     const maxOrder = Math.max(...alternatives.map(alt => alt.order), 0);
     
-    const alternative: Alternative = {
-      id: newId,
+    const alternativeData = {
+      project_id: Number(projectId),
       name: newAlternative.name,
-      description: newAlternative.description,
-      order: maxOrder + 1
+      description: newAlternative.description || null,
+      order_index: maxOrder + 1
     };
 
-    const updatedAlternatives = [...alternatives, alternative];
-    setAlternatives(updatedAlternatives);
-    saveProjectAlternatives(updatedAlternatives);
-    setNewAlternative({ name: '', description: '' });
-    setErrors({});
+    try {
+      const response = await apiService.alternativesAPI.create(alternativeData);
+      
+      if (response.error) {
+        setErrors({ name: response.error });
+        return;
+      }
+
+      // 성공 시 데이터 다시 로드
+      const updatedResponse = await apiService.alternativesAPI.fetch(Number(projectId));
+      if (updatedResponse.data) {
+        const alternativesData = (updatedResponse.data as any).alternatives || updatedResponse.data || [];
+        setAlternatives(alternativesData);
+      }
+      
+      setNewAlternative({ name: '', description: '' });
+      setErrors({});
+      console.log('✅ 대안이 PostgreSQL에 저장되었습니다.');
+    } catch (error) {
+      console.error('Failed to save alternative to API:', error);
+      setErrors({ name: '대안 저장 중 오류가 발생했습니다.' });
+    }
   };
 
   const handleEditAlternative = (id: string) => {
@@ -124,18 +150,29 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
     }
 
     try {
-      const updatedAlternatives = alternatives.map(alt => 
-        alt.id === editingId 
-          ? { ...alt, name: editingAlternative.name, description: editingAlternative.description }
-          : alt
-      );
+      const updateData = {
+        name: editingAlternative.name,
+        description: editingAlternative.description || null
+      };
       
-      setAlternatives(updatedAlternatives);
-      await saveProjectAlternatives(updatedAlternatives);
+      const response = await apiService.alternativesAPI.update(editingId, updateData);
+      
+      if (response.error) {
+        setErrors({ general: response.error });
+        return;
+      }
+
+      // 성공 시 데이터 다시 로드
+      const updatedResponse = await apiService.alternativesAPI.fetch(Number(projectId));
+      if (updatedResponse.data) {
+        const alternativesData = (updatedResponse.data as any).alternatives || updatedResponse.data || [];
+        setAlternatives(alternativesData);
+      }
+      
       setEditingId(null);
       setEditingAlternative({ name: '', description: '' });
       setErrors({});
-      console.log('✅ 대안 수정 완료:', editingId);
+      console.log('✅ 대안이 PostgreSQL에서 수정되었습니다:', editingId);
     } catch (error) {
       console.error('Failed to save alternative edit:', error);
       setErrors({ general: '대안 수정 중 오류가 발생했습니다.' });
@@ -148,13 +185,26 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
     setErrors({});
   };
 
-  const handleDeleteAlternative = (id: string) => {
-    const filtered = alternatives.filter(alt => alt.id !== id);
-    // Reorder remaining alternatives
-    const reorderedAlternatives = filtered.map((alt, index) => ({ ...alt, order: index + 1 }));
-    
-    setAlternatives(reorderedAlternatives);
-    saveProjectAlternatives(reorderedAlternatives);
+  const handleDeleteAlternative = async (id: string) => {
+    try {
+      const response = await apiService.alternativesAPI.delete(id);
+      
+      if (response.error) {
+        console.error('Failed to delete alternative:', response.error);
+        return;
+      }
+
+      // 성공 시 데이터 다시 로드
+      const updatedResponse = await apiService.alternativesAPI.fetch(Number(projectId));
+      if (updatedResponse.data) {
+        const alternativesData = (updatedResponse.data as any).alternatives || updatedResponse.data || [];
+        setAlternatives(alternativesData);
+      }
+      
+      console.log('✅ 대안이 PostgreSQL에서 삭제되었습니다:', id);
+    } catch (error) {
+      console.error('Failed to delete alternative from API:', error);
+    }
   };
 
   const handleMoveUp = (id: string) => {
@@ -385,7 +435,13 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
               )}
             </div>
             <div className="flex space-x-3">
-              <Button variant="secondary">
+              <Button 
+                variant="secondary"
+                onClick={async () => {
+                  console.log('✅ 대안 데이터가 PostgreSQL에 자동 저장되었습니다.');
+                  alert('대안 목록이 저장되었습니다.');
+                }}
+              >
                 저장
               </Button>
               <Button

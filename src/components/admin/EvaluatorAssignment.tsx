@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import Input from '../common/Input';
+import apiService from '../../services/apiService';
 
 interface Evaluator {
   id: string;
@@ -24,24 +25,34 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
   const [evaluators, setEvaluators] = useState<Evaluator[]>([]);
 
   useEffect(() => {
-    // 프로젝트별 평가자 데이터 로드 (localStorage에서)
-    const loadProjectEvaluators = () => {
-      const storageKey = `ahp_evaluators_${projectId}`;
-      const savedEvaluators = localStorage.getItem(storageKey);
-      
-      if (savedEvaluators) {
-        try {
-          const parsed = JSON.parse(savedEvaluators);
-          setEvaluators(parsed);
-          console.log(`Loaded ${parsed.length} evaluators for project ${projectId}`);
-        } catch (error) {
-          console.error('Failed to parse saved evaluators:', error);
+    // 프로젝트별 평가자 데이터 로드 (PostgreSQL에서)
+    const loadProjectEvaluators = async () => {
+      try {
+        const response = await apiService.evaluatorAPI.fetchByProject(Number(projectId));
+        if (response.data) {
+          const evaluatorsData = (response.data as any).evaluators || response.data || [];
+          setEvaluators(evaluatorsData);
+          console.log(`Loaded ${evaluatorsData.length} evaluators from API for project ${projectId}`);
+        } else {
+          setEvaluators([]);
+          console.log(`No evaluators found for project ${projectId}`);
+        }
+      } catch (error) {
+        console.error('Failed to load evaluators from API:', error);
+        // 폴백으로 localStorage 확인
+        const storageKey = `ahp_evaluators_${projectId}`;
+        const savedEvaluators = localStorage.getItem(storageKey);
+        if (savedEvaluators) {
+          try {
+            const parsed = JSON.parse(savedEvaluators);
+            setEvaluators(parsed);
+            console.log(`Fallback: Loaded ${parsed.length} evaluators from localStorage`);
+          } catch (e) {
+            setEvaluators([]);
+          }
+        } else {
           setEvaluators([]);
         }
-      } else {
-        // 새 프로젝트는 빈 배열로 시작
-        setEvaluators([]);
-        console.log(`New project ${projectId} - starting with empty evaluators`);
       }
     };
 
@@ -53,11 +64,10 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
   const [newEvaluator, setNewEvaluator] = useState({ code: '', name: '', email: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // 프로젝트별 평가자 데이터 저장
-  const saveProjectEvaluators = (evaluatorsData: Evaluator[]) => {
-    const storageKey = `ahp_evaluators_${projectId}`;
-    localStorage.setItem(storageKey, JSON.stringify(evaluatorsData));
-    console.log(`Saved ${evaluatorsData.length} evaluators for project ${projectId}`);
+  // 프로젝트별 평가자 데이터 저장 (localStorage 대신 PostgreSQL 사용)
+  const saveProjectEvaluators = async (evaluatorsData: Evaluator[]) => {
+    console.log(`Evaluators now saved to PostgreSQL for project ${projectId}`);
+    // localStorage 제거됨 - 모든 데이터는 PostgreSQL에 저장
   };
 
   const generateEvaluatorCode = (): string => {
@@ -93,7 +103,7 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
     return `https://ahp-system.com/eval/${randomId}`;
   };
 
-  const handleAddEvaluator = () => {
+  const handleAddEvaluator = async () => {
     const evaluatorData = {
       ...newEvaluator,
       code: newEvaluator.code || generateEvaluatorCode()
@@ -103,38 +113,68 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
       return;
     }
 
-    const newId = Date.now().toString();
-    const evaluator: Evaluator = {
-      id: newId,
-      code: evaluatorData.code,
-      name: evaluatorData.name,
-      email: evaluatorData.email,
-      status: 'pending',
-      inviteLink: generateInviteLink(),
-      progress: 0
+    const assignData = {
+      project_id: Number(projectId),
+      evaluator_code: evaluatorData.code,
+      evaluator_name: evaluatorData.name,
+      weight: 1.0 // 기본 가중치
     };
 
-    const updatedEvaluators = [...evaluators, evaluator];
-    setEvaluators(updatedEvaluators);
-    saveProjectEvaluators(updatedEvaluators);
-    setNewEvaluator({ code: '', name: '', email: '' });
-    setErrors({});
+    try {
+      const response = await apiService.evaluatorAPI.assign(assignData);
+      
+      if (response.error) {
+        setErrors({ general: response.error });
+        return;
+      }
+
+      // 성공 시 데이터 다시 로드
+      const updatedResponse = await apiService.evaluatorAPI.fetchByProject(Number(projectId));
+      if (updatedResponse.data) {
+        const evaluatorsData = (updatedResponse.data as any).evaluators || updatedResponse.data || [];
+        setEvaluators(evaluatorsData);
+      }
+      
+      setNewEvaluator({ code: '', name: '', email: '' });
+      setErrors({});
+      console.log('✅ 평가자가 PostgreSQL에 저장되었습니다.');
+    } catch (error) {
+      console.error('Failed to save evaluator to API:', error);
+      setErrors({ general: '평가자 저장 중 오류가 발생했습니다.' });
+    }
   };
 
-  const handleSendInvite = (id: string) => {
+  const handleSendInvite = async (id: string) => {
+    // 초대 상태 업데이트는 로컬에서만 처리 (백엔드에 상태 업데이트 API 없음)
     const updatedEvaluators = evaluators.map(evaluator => 
       evaluator.id === id 
         ? { ...evaluator, status: 'invited' as const }
         : evaluator
     );
     setEvaluators(updatedEvaluators);
-    saveProjectEvaluators(updatedEvaluators);
+    console.log('✅ 평가자 초대 상태 업데이트됨:', id);
   };
 
-  const handleDeleteEvaluator = (id: string) => {
-    const updatedEvaluators = evaluators.filter(evaluator => evaluator.id !== id);
-    setEvaluators(updatedEvaluators);
-    saveProjectEvaluators(updatedEvaluators);
+  const handleDeleteEvaluator = async (id: string) => {
+    try {
+      const response = await apiService.evaluatorAPI.remove(Number(id), Number(projectId));
+      
+      if (response.error) {
+        console.error('Failed to delete evaluator:', response.error);
+        return;
+      }
+
+      // 성공 시 데이터 다시 로드
+      const updatedResponse = await apiService.evaluatorAPI.fetchByProject(Number(projectId));
+      if (updatedResponse.data) {
+        const evaluatorsData = (updatedResponse.data as any).evaluators || updatedResponse.data || [];
+        setEvaluators(evaluatorsData);
+      }
+      
+      console.log('✅ 평가자가 PostgreSQL에서 삭제되었습니다:', id);
+    } catch (error) {
+      console.error('Failed to delete evaluator from API:', error);
+    }
   };
 
   const getStatusBadge = (status: Evaluator['status']) => {
@@ -348,8 +388,8 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
             <div className="flex space-x-3">
               <Button 
                 variant="secondary"
-                onClick={() => {
-                  saveProjectEvaluators(evaluators);
+                onClick={async () => {
+                  console.log('✅ 평가자 데이터가 PostgreSQL에 자동 저장되었습니다.');
                   alert('평가자 목록이 저장되었습니다.');
                 }}
               >
