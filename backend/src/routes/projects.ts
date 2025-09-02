@@ -168,31 +168,51 @@ router.put('/:id',
   }
 );
 
-// 소프트 삭제 (휴지통으로 이동)
+// 프로젝트 삭제 (관리자는 하드 삭제, 일반 사용자는 소프트 삭제)
 router.delete('/:id', authenticateToken, async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const userId = (req as AuthenticatedRequest).user.id;
+    const userRole = (req as AuthenticatedRequest).user.role;
 
-    // 소프트 삭제 - status를 'deleted'로 변경하고 deleted_at 타임스탬프 추가
-    const result = await query(
-      `UPDATE projects 
-       SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $1 AND admin_id = $2 AND (status IS NULL OR status != 'deleted')
-       RETURNING *`,
-      [id, userId]
-    );
+    // 관리자인 경우 하드 삭제
+    if (userRole === 'admin') {
+      console.log(`🗑️ 관리자 하드 삭제: 프로젝트 ${id}`);
+      
+      const result = await query(
+        'DELETE FROM projects WHERE id = $1 RETURNING *',
+        [id]
+      );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ error: 'Project not found, access denied, or already deleted' });
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Project not found' });
+      }
+
+      res.json({ 
+        message: 'Project permanently deleted',
+        project: result.rows[0]
+      });
+    } else {
+      // 일반 사용자는 소프트 삭제
+      const result = await query(
+        `UPDATE projects 
+         SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $1 AND admin_id = $2 AND (status IS NULL OR status != 'deleted')
+         RETURNING *`,
+        [id, userId]
+      );
+
+      if (result.rows.length === 0) {
+        return res.status(404).json({ error: 'Project not found, access denied, or already deleted' });
+      }
+
+      res.json({ 
+        message: 'Project moved to trash successfully',
+        project: result.rows[0]
+      });
     }
-
-    res.json({ 
-      message: 'Project moved to trash successfully',
-      project: result.rows[0]
-    });
   } catch (error) {
-    console.error('Project soft deletion error:', error);
+    console.error('Project deletion error:', error);
     res.status(500).json({ error: 'Failed to delete project' });
   }
 });
