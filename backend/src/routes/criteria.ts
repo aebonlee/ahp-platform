@@ -94,8 +94,8 @@ router.post('/',
     body('name').trim().isLength({ min: 1, max: 255 }).withMessage('Name is required and must be less than 255 characters'),
     body('description').optional().isLength({ max: 1000 }).withMessage('Description must be less than 1000 characters'),
     body('parent_id').optional().isInt().withMessage('Parent ID must be an integer'),
-    body('level').optional().isInt({ min: 1, max: 4 }).withMessage('Level must be between 1 and 4'),
-    body('position').optional().isInt({ min: 0 }).withMessage('Position must be non-negative')
+    body('level').optional().isInt({ min: 1, max: 5 }).withMessage('Level must be between 1 and 5'),
+    body('order_index').optional().isInt({ min: 0 }).withMessage('Order index must be non-negative')
   ],
   async (req: Request, res: Response) => {
     try {
@@ -107,7 +107,7 @@ router.post('/',
         });
       }
 
-      const { project_id, name, description, parent_id, level, position } = req.body;
+      const { project_id, name, description, parent_id, level, order_index } = req.body;
       const userId = (req as AuthenticatedRequest).user.id;
       const userRole = (req as AuthenticatedRequest).user.role;
 
@@ -135,14 +135,14 @@ router.post('/',
         if (parentResult.rows.length === 0) {
           return res.status(404).json({ error: 'Parent criterion not found' });
         }
-        if (parentResult.rows[0].level >= 4) {
-          return res.status(400).json({ error: 'Cannot create more than 4 levels of criteria hierarchy' });
+        if (parentResult.rows[0].level >= 5) {
+          return res.status(400).json({ error: 'Cannot create more than 5 levels of criteria hierarchy' });
         }
       }
 
       // 다음 위치 계산
-      let nextPosition = position || 0;
-      if (!position && position !== 0) {
+      let nextPosition = order_index || 0;
+      if (!order_index && order_index !== 0) {
         const positionResult = await query(
           'SELECT MAX(order_index) as max_position FROM criteria WHERE project_id = $1 AND level = $2',
           [project_id, level || 1]
@@ -195,7 +195,7 @@ router.put('/:id',
     body('name').optional().trim().isLength({ min: 1, max: 255 }).withMessage('Name must be between 1 and 255 characters'),
     body('description').optional().isLength({ max: 1000 }).withMessage('Description must be less than 1000 characters'),
     body('weight').optional().isFloat({ min: 0, max: 1 }).withMessage('Weight must be between 0 and 1'),
-    body('position').optional().isInt({ min: 0 }).withMessage('Position must be non-negative')
+    body('order_index').optional().isInt({ min: 0 }).withMessage('Order index must be non-negative')
   ],
   async (req: Request, res: Response) => {
     try {
@@ -245,9 +245,9 @@ router.put('/:id',
         updateFields.push(`weight = $${paramIndex++}`);
         updateValues.push(updates.weight);
       }
-      if (updates.position !== undefined) {
+      if (updates.order_index !== undefined) {
         updateFields.push(`order_index = $${paramIndex++}`);
-        updateValues.push(updates.position);
+        updateValues.push(updates.order_index);
       }
 
       if (updateFields.length === 0) {
