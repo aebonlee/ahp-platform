@@ -14,7 +14,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
       subtitle: '개인 연구자를 위한 기본 플랜',
       popular: false,
       features: [
-        '사용 기간: 1개월',
+        '사용 기간: 7일',
         '프로젝트 수: 1개',
         '평가자 인원: 30명',
         '대상: 대학원 논문, 단기 과제, 학술 발표 준비'
@@ -30,7 +30,7 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
       subtitle: '전문 연구자를 위한 고급 플랜',
       popular: true,
       features: [
-        '사용 기간: 1개월',
+        '사용 기간: 15일',
         '프로젝트 수: 3개',
         '평가자 인원: 50명',
         '대상: 기업·기관 연구과제, 단일 컨설팅 프로젝트'
@@ -257,10 +257,10 @@ const PricingSection: React.FC<PricingSectionProps> = ({ onLoginClick }) => {
               borderColor: 'var(--border-light)' 
             }}>
               <h4 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>
-                Q. 무료 체험 기간이 있나요?
+                Q. 가이드 학습을 제공하나요?
               </h4>
               <p style={{ color: 'var(--text-secondary)' }}>
-                모든 플랜에서 14일 무료 체험을 제공합니다. 체험 기간 중 언제든 취소 가능합니다.
+                네, 수준별 맞춤 가이드를 제공합니다. 초보자부터 전문가까지 단계별 학습이 가능합니다.
               </p>
             </div>
             <div className="rounded-xl p-6 shadow-sm border" style={{ 

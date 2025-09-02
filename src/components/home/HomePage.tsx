@@ -1097,13 +1097,13 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             전문적인 AHP 분석으로 연구의 품질을 높이세요
           </p>
           <button
-            onClick={onLoginClick}
+            onClick={() => scrollToSection('guide')}
             className="px-10 py-4 text-white rounded-xl transition-all transform hover:scale-105 font-semibold text-lg shadow-xl"
             style={{ backgroundColor: 'var(--bg-primary)', color: 'var(--accent-primary)' }}
             onMouseEnter={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-secondary)'}
             onMouseLeave={(e) => (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'var(--bg-primary)'}
           >
-            14일 무료 체험 시작
+            가이드 안내
           </button>
         </div>
       </section>
