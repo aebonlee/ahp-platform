@@ -412,26 +412,59 @@ app.post('/api/emergency/reset-project-104', async (req, res) => {
             });
         }
         console.log(`🗑️ 프로젝트 104 "${projectCheck.rows[0].title}" 모든 데이터 삭제 중...`);
-        // 1. 비교 데이터 삭제
-        const deletedComparisons = await query('DELETE FROM pairwise_comparisons WHERE project_id = 104 RETURNING id');
-        // 2. 평가 결과 삭제
-        const deletedResults = await query('DELETE FROM evaluation_results WHERE project_id = 104 RETURNING id');
-        // 3. 워크샵 세션 삭제
-        const deletedSessions = await query('DELETE FROM workshop_sessions WHERE project_id = 104 RETURNING id');
-        // 4. 프로젝트 평가자 삭제
-        const deletedEvaluators = await query('DELETE FROM project_evaluators WHERE project_id = 104 RETURNING id');
-        // 5. 대안 삭제
-        const deletedAlternatives = await query('DELETE FROM alternatives WHERE project_id = 104 RETURNING id');
-        // 6. 기준 삭제 (계층적 삭제)
-        const deletedCriteria = await query('DELETE FROM criteria WHERE project_id = 104 RETURNING id');
-        const resetSummary = {
-            deleted_comparisons: deletedComparisons.rows.length,
-            deleted_results: deletedResults.rows.length,
-            deleted_sessions: deletedSessions.rows.length,
-            deleted_evaluators: deletedEvaluators.rows.length,
-            deleted_alternatives: deletedAlternatives.rows.length,
-            deleted_criteria: deletedCriteria.rows.length
+        // 순차적으로 모든 관련 데이터 삭제 (외래키 제약조건 고려)
+        let resetSummary = {
+            deleted_comparisons: 0,
+            deleted_sessions: 0,
+            deleted_evaluators: 0,
+            deleted_alternatives: 0,
+            deleted_criteria: 0
         };
+        try {
+            // 1. 비교 데이터 삭제
+            const deletedComparisons = await query('DELETE FROM pairwise_comparisons WHERE project_id = 104 RETURNING id');
+            resetSummary.deleted_comparisons = deletedComparisons.rows.length;
+            console.log(`🗑️ 비교 데이터 ${resetSummary.deleted_comparisons}개 삭제`);
+        }
+        catch (e) {
+            console.log('비교 데이터 테이블 없음 또는 이미 비어있음');
+        }
+        try {
+            // 2. 워크샵 세션 삭제
+            const deletedSessions = await query('DELETE FROM workshop_sessions WHERE project_id = 104 RETURNING id');
+            resetSummary.deleted_sessions = deletedSessions.rows.length;
+            console.log(`🗑️ 워크샵 세션 ${resetSummary.deleted_sessions}개 삭제`);
+        }
+        catch (e) {
+            console.log('워크샵 세션 테이블 없음 또는 이미 비어있음');
+        }
+        try {
+            // 3. 프로젝트 평가자 삭제
+            const deletedEvaluators = await query('DELETE FROM project_evaluators WHERE project_id = 104 RETURNING id');
+            resetSummary.deleted_evaluators = deletedEvaluators.rows.length;
+            console.log(`🗑️ 평가자 ${resetSummary.deleted_evaluators}개 삭제`);
+        }
+        catch (e) {
+            console.log('평가자 테이블 없음 또는 이미 비어있음');
+        }
+        try {
+            // 4. 대안 삭제
+            const deletedAlternatives = await query('DELETE FROM alternatives WHERE project_id = 104 RETURNING id');
+            resetSummary.deleted_alternatives = deletedAlternatives.rows.length;
+            console.log(`🗑️ 대안 ${resetSummary.deleted_alternatives}개 삭제`);
+        }
+        catch (e) {
+            console.log('대안 테이블 없음 또는 이미 비어있음');
+        }
+        try {
+            // 5. 기준 삭제 (계층적 삭제)
+            const deletedCriteria = await query('DELETE FROM criteria WHERE project_id = 104 RETURNING id');
+            resetSummary.deleted_criteria = deletedCriteria.rows.length;
+            console.log(`🗑️ 기준 ${resetSummary.deleted_criteria}개 삭제`);
+        }
+        catch (e) {
+            console.log('기준 테이블 없음 또는 이미 비어있음');
+        }
         console.log(`✅ 프로젝트 104 완전 초기화 완료:`, resetSummary);
         res.json({
             success: true,
