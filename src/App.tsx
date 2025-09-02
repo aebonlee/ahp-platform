@@ -593,9 +593,16 @@ function App() {
   };
 
   const fetchProjects = useCallback(async () => {
+    // 로그인하지 않은 상태에서는 프로젝트 로드하지 않음
+    if (!user) {
+      console.log('⚠️ 로그인하지 않은 상태 - 프로젝트 로드 스킵');
+      setProjects([]);
+      return;
+    }
+
     setLoading(true);
     try {
-      console.log('🔍 App.tsx fetchProjects 시작...');
+      console.log('🔍 App.tsx fetchProjects 시작... (사용자:', user.email, ')');
       const response = await fetch(`${API_BASE_URL}/api/projects`, {
         credentials: 'include',
         headers: {
@@ -607,15 +614,29 @@ function App() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('📊 fetchProjects 데이터 구조:', data);
+        console.log('📊 fetchProjects 원본 데이터:', data);
         
         // API 응답 구조에 따라 안전하게 프로젝트 배열 추출
-        const projects = Array.isArray(data) ? data : 
-                        Array.isArray(data.data) ? data.data : 
-                        Array.isArray(data.projects) ? data.projects : [];
+        let projects = [];
+        if (Array.isArray(data)) {
+          projects = data;
+        } else if (Array.isArray(data.data)) {
+          projects = data.data;
+        } else if (Array.isArray(data.projects)) {
+          projects = data.projects;
+        } else {
+          console.warn('⚠️ 예상치 못한 API 응답 구조:', data);
+          projects = [];
+        }
         
         console.log('✅ 추출된 프로젝트 수:', projects.length);
+        console.log('📋 프로젝트 목록:', projects);
         setProjects(projects);
+      } else if (response.status === 401 || response.status === 403) {
+        console.warn('🔐 인증 실패 - 로그아웃 처리');
+        setProjects([]);
+        // 인증 실패 시 로그아웃 처리
+        handleLogout();
       } else {
         console.error('❌ fetchProjects 실패:', response.status);
         setProjects([]);
@@ -626,7 +647,7 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   // 프로젝트 생성 함수 (DB 저장)
   const createProject = async (projectData: any) => {
@@ -1004,9 +1025,13 @@ function App() {
 
   useEffect(() => {
     if (user && (activeTab === 'personal-projects' || activeTab === 'personal-service' || activeTab === 'welcome' || activeTab === 'my-projects')) {
+      console.log('🔄 사용자 로그인 확인됨 - 프로젝트 로드 시작');
       fetchProjects();
     } else if (user && activeTab === 'personal-users' && user.role === 'admin') {
       fetchUsers();
+    } else if (!user) {
+      console.log('⚠️ 로그인하지 않은 상태 - 프로젝트 초기화');
+      setProjects([]);
     }
   }, [user, activeTab, fetchProjects, fetchUsers]);
 

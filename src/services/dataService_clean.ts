@@ -12,17 +12,40 @@ class CleanDataService {
     try {
       console.log('🔍 실제 DB에서 프로젝트 조회 시작...');
       const response = await projectApi.getProjects();
+      
+      console.log('📡 DB 응답 상세:', {
+        success: response.success,
+        data: response.data,
+        error: response.error
+      });
+      
       if (response.success && response.data) {
-        // 배열인지 확인
-        const projects = Array.isArray(response.data) ? response.data : [];
-        console.log('✅ 프로젝트 조회 성공:', projects.length, '개');
-        return projects;
+        // 배열인지 확인하고 각 프로젝트 데이터 검증
+        const rawData = response.data;
+        const projects = Array.isArray(rawData) ? rawData : [];
+        
+        // 각 프로젝트 데이터 무결성 검증
+        const validProjects = projects.filter(project => {
+          const isValid = project && 
+                         typeof project.id !== 'undefined' && 
+                         typeof project.title === 'string' &&
+                         typeof project.status === 'string';
+          
+          if (!isValid) {
+            console.warn('⚠️ 잘못된 프로젝트 데이터 발견:', project);
+          }
+          return isValid;
+        });
+        
+        console.log('✅ 유효한 프로젝트 조회 성공:', validProjects.length, '개');
+        console.log('📋 유효한 프로젝트 목록:', validProjects);
+        return validProjects;
       }
-      console.error('❌ 프로젝트 조회 실패: response.success =', response.success, 'data =', response.data);
+      console.error('❌ 프로젝트 조회 실패: response.success =', response.success, 'data =', response.data, 'error =', response.error);
       return [];
     } catch (error) {
       console.error('❌ 프로젝트 조회 중 오류:', error);
-      return []; // throw 대신 빈 배열 반환
+      return [];
     }
   }
 
