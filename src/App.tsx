@@ -629,9 +629,46 @@ function App() {
           projects = [];
         }
         
-        console.log('✅ 추출된 프로젝트 수:', projects.length);
-        console.log('📋 프로젝트 목록:', projects);
-        setProjects(projects);
+        // 각 프로젝트의 실제 관련 데이터 수를 조회하여 정확한 정보 제공
+        const projectsWithCounts = await Promise.all(
+          projects.map(async (project: any) => {
+            try {
+              const [criteriaResponse, alternativesResponse, evaluatorsResponse] = await Promise.all([
+                fetch(`${API_BASE_URL}/api/projects/${project.id}/criteria`, { credentials: 'include' }),
+                fetch(`${API_BASE_URL}/api/projects/${project.id}/alternatives`, { credentials: 'include' }),
+                fetch(`${API_BASE_URL}/api/projects/${project.id}/evaluators`, { credentials: 'include' })
+              ]);
+
+              const criteriaCount = criteriaResponse.ok ? (await criteriaResponse.json()).data?.length || 0 : 0;
+              const alternativesCount = alternativesResponse.ok ? (await alternativesResponse.json()).data?.length || 0 : 0;
+              const evaluatorCount = evaluatorsResponse.ok ? (await evaluatorsResponse.json()).data?.length || 0 : 0;
+
+              // 진행률 계산: 기준(40%) + 대안(40%) + 평가자(20%)
+              const progress = ((criteriaCount >= 3 ? 40 : 0) + (alternativesCount >= 2 ? 40 : 0) + (evaluatorCount >= 1 ? 20 : 0));
+
+              return {
+                ...project,
+                criteria_count: criteriaCount,
+                alternatives_count: alternativesCount,
+                evaluator_count: evaluatorCount,
+                completion_rate: progress
+              };
+            } catch (error) {
+              console.error('❌ 프로젝트 관련 데이터 조회 실패:', project.id, error);
+              return {
+                ...project,
+                criteria_count: 0,
+                alternatives_count: 0,
+                evaluator_count: 0,
+                completion_rate: 0
+              };
+            }
+          })
+        );
+
+        console.log('✅ 실제 DB 데이터로 보강된 프로젝트 수:', projectsWithCounts.length);
+        console.log('📋 보강된 프로젝트 목록:', projectsWithCounts);
+        setProjects(projectsWithCounts);
       } else if (response.status === 401 || response.status === 403) {
         console.warn('🔐 인증 실패 - 로그아웃 처리');
         setProjects([]);

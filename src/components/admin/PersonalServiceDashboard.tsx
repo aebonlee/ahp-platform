@@ -394,18 +394,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         console.log('✅ 프로젝트 생성 결과:', newProject);
         
         if (newProject) {
-          const newUserProject: UserProject = {
-            ...newProject,
-            evaluator_count: 0, // 실제 DB에서 조회
-            completion_rate: 85, // 실제 진행률
-            criteria_count: 0, // 실제 DB에서 조회
-            alternatives_count: 0, // 실제 DB에서 조회
-            last_modified: new Date().toISOString().split('T')[0],
-            evaluation_method: projectForm.evaluation_method
-          };
-          // 새 프로젝트는 App.tsx에서 관리됨
+          // 새 프로젝트 생성 완료 - App.tsx에서 관리됨
           setSelectedProjectId(newProject.id || '');
-          console.log('✅ 새 프로젝트 생성 완료');
+          console.log('✅ 새 프로젝트 생성 완료:', newProject.title);
         } else {
           throw new Error('프로젝트 생성에 실패했습니다.');
         }
