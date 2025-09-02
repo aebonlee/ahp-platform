@@ -130,6 +130,115 @@ app.post('/api/admin/create-test-user', async (req, res) => {
   }
 });
 
+// Emergency phantom project cleanup endpoint (no auth required)
+app.post('/api/emergency/cleanup-phantom-projects', async (req, res) => {
+  try {
+    const { confirm } = req.body;
+    
+    if (confirm !== 'CLEANUP_PHANTOM_PROJECTS_EMERGENCY') {
+      return res.status(400).json({
+        success: false,
+        message: 'To confirm cleanup, send { "confirm": "CLEANUP_PHANTOM_PROJECTS_EMERGENCY" }'
+      });
+    }
+    
+    console.log('🚨 긴급 허수 프로젝트 정리 시작...');
+    
+    const { query } = await import('./database/connection');
+    
+    // 1. 현재 프로젝트 목록 확인
+    const projectsResult = await query(`
+      SELECT p.id, p.title, p.name, p.description, p.status, p.admin_id, p.created_at,
+             u.email as admin_email,
+             (SELECT COUNT(*) FROM criteria WHERE project_id = p.id) as criteria_count,
+             (SELECT COUNT(*) FROM alternatives WHERE project_id = p.id) as alternatives_count,
+             (SELECT COUNT(*) FROM project_evaluators WHERE project_id = p.id) as evaluators_count
+      FROM projects p
+      LEFT JOIN users u ON p.admin_id = u.id
+      ORDER BY p.created_at DESC
+    `);
+    console.log(`📊 현재 프로젝트 총 개수: ${projectsResult.rows.length}개`);
+    
+    // 2. 허수/테스트 데이터 식별
+    const phantomProjects = projectsResult.rows.filter((project: any) => {
+      const title = (project.title || '').toLowerCase();
+      const description = (project.description || '').toLowerCase();
+      const name = (project.name || '').toLowerCase();
+      
+      // 테스트 관련 키워드
+      const testKeywords = [
+        '테스트', 'test', 'sample', 'demo', 'example', 'prototype',
+        'ai 개발 활용', '스마트폰 선택', '직원 채용', '투자 포트폴리오',
+        'artificial', 'smartphone', 'employee', 'investment', '중요도 분석'
+      ];
+      
+      // 빈 프로젝트 (criteria, alternatives, evaluators 모두 0인 경우)
+      const isEmpty = project.criteria_count === 0 && 
+                     project.alternatives_count === 0 && 
+                     project.evaluators_count === 0;
+      
+      // 키워드 매칭
+      const hasTestKeyword = testKeywords.some(keyword => 
+        title.includes(keyword) || description.includes(keyword) || name.includes(keyword)
+      );
+      
+      // 관리자가 test@ahp.com인 경우 (테스트 계정)
+      const isTestAccount = project.admin_email === 'test@ahp.com';
+      
+      return hasTestKeyword || isEmpty || isTestAccount;
+    });
+    
+    console.log(`🔍 발견된 허수/테스트 프로젝트: ${phantomProjects.length}개`);
+    console.log('삭제 대상:', phantomProjects.map(p => `${p.id}: "${p.title}"`));
+    
+    if (phantomProjects.length === 0) {
+      return res.json({
+        success: true,
+        message: '삭제할 허수 데이터가 없습니다.',
+        deleted_count: 0,
+        remaining_count: projectsResult.rows.length
+      });
+    }
+    
+    // 3. 허수 프로젝트 삭제 (CASCADE로 관련 데이터 자동 삭제)
+    console.log('🗑️ 허수 프로젝트 삭제 중...');
+    const phantomProjectIds = phantomProjects.map((p: any) => p.id);
+    
+    // 배치 삭제
+    await query('DELETE FROM projects WHERE id = ANY($1)', [phantomProjectIds]);
+    
+    // 4. 정리 후 상태 확인
+    const finalResult = await query('SELECT COUNT(*) as count FROM projects');
+    const remainingCount = parseInt(finalResult.rows[0].count);
+    
+    console.log(`✅ ${phantomProjects.length}개 허수 프로젝트 삭제 완료`);
+    console.log(`📊 정리 후 프로젝트 개수: ${remainingCount}개`);
+    
+    res.json({
+      success: true,
+      message: `${phantomProjects.length}개의 허수 프로젝트가 성공적으로 삭제되었습니다.`,
+      deleted_count: phantomProjects.length,
+      remaining_count: remainingCount,
+      deleted_projects: phantomProjects.map((p: any) => ({ 
+        id: p.id, 
+        title: p.title,
+        admin_email: p.admin_email,
+        criteria_count: p.criteria_count,
+        alternatives_count: p.alternatives_count,
+        evaluators_count: p.evaluators_count
+      }))
+    });
+    
+  } catch (error: any) {
+    console.error('❌ 긴급 허수 프로젝트 정리 중 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: '허수 프로젝트 정리 중 오류가 발생했습니다.',
+      error: error.message
+    });
+  }
+});
+
 // Sample data creation endpoint for production
 app.post('/api/admin/create-sample-data', async (req, res) => {
   try {
