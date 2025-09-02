@@ -225,6 +225,45 @@ app.post('/api/emergency/cleanup-phantom-projects', async (req, res) => {
         }
         console.log('🚨 긴급 허수 프로젝트 정리 시작...');
         const { query } = await Promise.resolve().then(() => __importStar(require('./database/connection')));
+        // 특정 프로젝트 ID가 제공된 경우 해당 프로젝트의 허수 데이터만 정리
+        if (req.body.project_id) {
+            const projectId = req.body.project_id;
+            console.log(`🎯 프로젝트 ${projectId} 전용 허수 데이터 정리 시작...`);
+            // 프로젝트 존재 확인
+            const projectCheck = await query('SELECT id, title FROM projects WHERE id = $1', [projectId]);
+            if (projectCheck.rows.length === 0) {
+                return res.json({
+                    success: false,
+                    message: `프로젝트 ${projectId}가 존재하지 않습니다.`
+                });
+            }
+            // 1. 빈 비교 데이터 삭제
+            const deletedComparisons = await query('DELETE FROM pairwise_comparisons WHERE project_id = $1 AND (value IS NULL OR value = 0) RETURNING id', [projectId]);
+            // 2. 빈 평가 세션 정리
+            const deletedSessions = await query('DELETE FROM workshop_sessions WHERE project_id = $1 AND status = $2 RETURNING id', [projectId, 'created']);
+            // 3. 중복된 평가자 정리
+            const duplicateEvaluators = await query(`
+        DELETE FROM project_evaluators 
+        WHERE id IN (
+          SELECT id FROM (
+            SELECT id, ROW_NUMBER() OVER (PARTITION BY project_id, evaluator_id ORDER BY id) as rn
+            FROM project_evaluators 
+            WHERE project_id = $1
+          ) t WHERE rn > 1
+        ) RETURNING id
+      `, [projectId]);
+            console.log(`✅ 프로젝트 ${projectId} 허수 데이터 정리 완료`);
+            return res.json({
+                success: true,
+                message: `프로젝트 ${projectId}의 허수 데이터가 정리되었습니다.`,
+                project_title: projectCheck.rows[0].title,
+                cleanup_summary: {
+                    deleted_comparisons: deletedComparisons.rows.length,
+                    deleted_sessions: deletedSessions.rows.length,
+                    deleted_duplicate_evaluators: duplicateEvaluators.rows.length
+                }
+            });
+        }
         // 1. 현재 프로젝트 목록 확인
         const projectsResult = await query(`
       SELECT p.id, p.title, p.name, p.description, p.status, p.admin_id, p.created_at,
