@@ -181,6 +181,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     evaluation_mode: 'practical' as EvaluationMode,
     workflow_stage: 'creating' as WorkflowStage
   });
+  const [newProjectStep, setNewProjectStep] = useState(1);
+  const [newProjectId, setNewProjectId] = useState<string | null>(null);
+  const [projectEvaluators, setProjectEvaluators] = useState<any[]>([]);
   const [showProjectSelector, setShowProjectSelector] = useState(false);
   const [projectSelectorConfig, setProjectSelectorConfig] = useState<{
     title: string;
@@ -316,6 +319,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     });
     setProjectTemplate('blank');
     setEditingProject(null);
+    setNewProjectStep(1);
+    setNewProjectId(null);
+    setProjectEvaluators([]);
     setIsProjectFormOpen(false);
     setError(null);
   };
@@ -520,19 +526,15 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
       // 새 프로젝트 추가는 App.tsx에서 관리됨
       setSelectedProjectId(newProject.id || '');
+      setNewProjectId(newProject.id || '');
       
       console.log('Project created successfully:', newProject);
       setError(null);
       
-      // 템플렛에 따라 기본 데이터 설정
-      if (projectTemplate !== 'blank') {
-        setCurrentStep('criteria');
-        handleTabChange('model-builder');
-      } else {
-        handleTabChange('projects');
-      }
-
-      resetProjectForm();
+      // 프로젝트 생성 후 평가자 배정 단계로 이동
+      setNewProjectStep(2);
+      
+      // 폼 데이터는 유지 (평가자 배정 후 완전히 리셋)
     } catch (error: any) {
       console.error('Project creation error:', error);
       // dataService가 자동으로 오프라인 모드로 처리하므로 에러 메시지를 사용자 친화적으로 변경
@@ -1681,82 +1683,132 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         </div>
       </Card>
 
-      <Card title="프로젝트 상세 정보">
+      <Card title="프로젝트 생성 단계">
         <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center p-4 border-2 border-blue-200 bg-blue-50 rounded-lg">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className={`text-center p-4 border-2 rounded-lg ${newProjectStep === 1 ? 'border-blue-200 bg-blue-50' : 'border-gray-200'}`}>
               <div className="text-2xl mb-2">📋</div>
-              <h4 className="font-medium text-gray-900 mb-1">기본 정보</h4>
+              <h4 className="font-medium text-gray-900 mb-1">1. 기본 정보</h4>
               <p className="text-xs text-gray-600">프로젝트명, 설명, 목적</p>
             </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl mb-2">🎯</div>
-              <h4 className="font-medium text-gray-900 mb-1">목표 설정</h4>
-              <p className="text-xs text-gray-600">의사결정 목표 및 범위</p>
+            <div className={`text-center p-4 border-2 rounded-lg ${newProjectStep === 2 ? 'border-blue-200 bg-blue-50' : 'border-gray-200'}`}>
+              <div className="text-2xl mb-2">👥</div>
+              <h4 className="font-medium text-gray-900 mb-1">2. 평가자 배정</h4>
+              <p className="text-xs text-gray-600">2-3명 평가자 추가</p>
             </div>
-            <div className="text-center p-4 border rounded-lg">
-              <div className="text-2xl mb-2">⚖️</div>
-              <h4 className="font-medium text-gray-900 mb-1">평가 방법</h4>
-              <p className="text-xs text-gray-600">AHP 평가 방식 선택</p>
+            <div className={`text-center p-4 border-2 rounded-lg ${newProjectStep === 3 ? 'border-blue-200 bg-blue-50' : 'border-gray-200'}`}>
+              <div className="text-2xl mb-2">🎯</div>
+              <h4 className="font-medium text-gray-900 mb-1">3. 기준 설정</h4>
+              <p className="text-xs text-gray-600">평가 기준 정의</p>
+            </div>
+            <div className={`text-center p-4 border-2 rounded-lg ${newProjectStep === 4 ? 'border-blue-200 bg-blue-50' : 'border-gray-200'}`}>
+              <div className="text-2xl mb-2">✅</div>
+              <h4 className="font-medium text-gray-900 mb-1">4. 완료</h4>
+              <p className="text-xs text-gray-600">프로젝트 생성 완료</p>
             </div>
           </div>
 
-          <form className="space-y-4" onSubmit={(e) => {
-            e.preventDefault();
-            handleCreateNewProject();
-          }}>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">프로젝트명</label>
-              <input 
-                type="text" 
-                value={projectForm.title}
-                onChange={(e) => setProjectForm({...projectForm, title: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2" 
-                placeholder="예: AI 도구 선택을 위한 중요도 분석" 
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">설명</label>
-              <textarea 
-                value={projectForm.description}
-                onChange={(e) => setProjectForm({...projectForm, description: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2 h-20" 
-                placeholder="프로젝트의 목적과 배경을 설명해주세요"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">분석 목표</label>
-              <textarea 
-                value={projectForm.objective}
-                onChange={(e) => setProjectForm({...projectForm, objective: e.target.value})}
-                className="w-full border border-gray-300 rounded px-3 py-2 h-16" 
-                placeholder="이 분석을 통해 달성하고자 하는 구체적인 목표"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">평가 방법</label>
-              <select className="w-full border border-gray-300 rounded px-3 py-2">
-                <option>쌍대비교 (권장)</option>
-                <option>직접입력</option>
-                <option>혼합 방식</option>
-              </select>
-            </div>
-            
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-md p-3">
-                <div className="text-sm text-red-700">{error}</div>
+          {/* Step 1: 기본 정보 */}
+          {newProjectStep === 1 && (
+            <form className="space-y-4" onSubmit={(e) => {
+              e.preventDefault();
+              handleCreateNewProject();
+            }}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">프로젝트명</label>
+                <input 
+                  type="text" 
+                  value={projectForm.title}
+                  onChange={(e) => setProjectForm({...projectForm, title: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2" 
+                  placeholder="예: AI 도구 선택을 위한 중요도 분석" 
+                />
               </div>
-            )}
-            
-            <div className="flex justify-end space-x-3">
-              <Button variant="secondary" type="button" onClick={() => handleTabChange('projects')}>
-                취소
-              </Button>
-              <Button variant="primary" type="submit" disabled={loading}>
-                {loading ? '생성 중...' : '프로젝트 생성'}
-              </Button>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">설명</label>
+                <textarea 
+                  value={projectForm.description}
+                  onChange={(e) => setProjectForm({...projectForm, description: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2 h-20" 
+                  placeholder="프로젝트의 목적과 배경을 설명해주세요"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">분석 목표</label>
+                <textarea 
+                  value={projectForm.objective}
+                  onChange={(e) => setProjectForm({...projectForm, objective: e.target.value})}
+                  className="w-full border border-gray-300 rounded px-3 py-2 h-16" 
+                  placeholder="이 분석을 통해 달성하고자 하는 구체적인 목표"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">평가 방법</label>
+                <select className="w-full border border-gray-300 rounded px-3 py-2">
+                  <option>쌍대비교 (권장)</option>
+                  <option>직접입력</option>
+                  <option>혼합 방식</option>
+                </select>
+              </div>
+              
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-md p-3">
+                  <div className="text-sm text-red-700">{error}</div>
+                </div>
+              )}
+              
+              <div className="flex justify-end space-x-3">
+                <Button variant="secondary" type="button" onClick={() => handleTabChange('projects')}>
+                  취소
+                </Button>
+                <Button variant="primary" type="submit" disabled={loading}>
+                  {loading ? '생성 중...' : '다음: 평가자 배정'}
+                </Button>
+              </div>
+            </form>
+          )}
+
+          {/* Step 2: 평가자 배정 */}
+          {newProjectStep === 2 && newProjectId && (
+            <div className="space-y-4">
+              <EvaluatorAssignment 
+                projectId={newProjectId} 
+                onComplete={() => setNewProjectStep(3)} 
+              />
+              <div className="flex justify-between">
+                <Button variant="secondary" onClick={() => setNewProjectStep(1)}>
+                  이전
+                </Button>
+                <Button variant="primary" onClick={() => {
+                  if (projectEvaluators.length > 0) {
+                    setNewProjectStep(3);
+                  } else {
+                    alert('최소 1명 이상의 평가자를 추가해주세요.');
+                  }
+                }}>
+                  다음: 기준 설정
+                </Button>
+              </div>
             </div>
-          </form>
+          )}
+
+          {/* Step 3: 기준 설정 */}
+          {newProjectStep === 3 && (
+            <div className="space-y-4">
+              <div className="text-center py-8">
+                <h3 className="text-lg font-semibold mb-4">평가 기준 설정</h3>
+                <p className="text-gray-600 mb-6">프로젝트 생성이 완료되었습니다. 모델 구축에서 기준을 설정하세요.</p>
+                <Button variant="primary" onClick={() => {
+                  setCurrentStep('criteria');
+                  handleTabChange('model-builder');
+                  setNewProjectStep(1);
+                  setNewProjectId(null);
+                }}>
+                  모델 구축으로 이동
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </Card>
     </div>
