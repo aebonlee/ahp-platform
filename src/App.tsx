@@ -1010,13 +1010,7 @@ function App() {
     }
   }, [user, activeTab, fetchProjects, fetchUsers]);
 
-  // 로그인 후 URL 기반 리다이렉트 처리 (무한 루프 방지)
-  useEffect(() => {
-    if (user && (activeTab === 'home' || activeTab === 'register')) {
-      console.log('🔄 로그인된 사용자 리다이렉트:', activeTab, '→ personal-service');
-      setActiveTab('personal-service');
-    }
-  }, [user, activeTab]);
+  // 로그인 후 리다이렉트 처리를 렌더링 시점에서 직접 처리
 
   const renderContent = () => {
     // 로그인하지 않은 상태에서는 메인페이지와 관련 페이지만 렌더링
@@ -1057,21 +1051,13 @@ function App() {
     switch (activeTab) {
       case 'home':
       case 'register':
-        // useEffect에서 리다이렉트 처리하므로 여기서는 로딩 표시
-        return (
-          <div className="flex items-center justify-center h-64">
-            <div className="text-center">
-              <div className="text-4xl mb-4">•••</div>
-              <p className="text-gray-600">페이지 로딩 중...</p>
-            </div>
-          </div>
-        );
-
+      case 'personal-service':
       case 'welcome':
+        // 로그인 후에는 모두 personal-service로 통합
         return (
           <PersonalServiceDashboard 
             user={user}
-            activeTab='welcome'
+            activeTab={activeTab}
             onTabChange={setActiveTab}
             onUserUpdate={setUser}
             projects={projects}
