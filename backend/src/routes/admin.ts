@@ -45,23 +45,7 @@ router.delete('/cleanup-test-data', authenticateToken, requireAdmin, async (req:
     // 3. 관련 데이터 먼저 삭제 (외래키 제약조건 때문)
     console.log('🗑️ 관련 데이터 삭제 중...');
     
-    for (const project of testProjects) {
-      const projectId = project.id;
-      
-      // 쌍대비교 데이터 삭제
-      await query('DELETE FROM pairwise_comparisons WHERE project_id = $1', [projectId]);
-      
-      // 평가자 삭제
-      await query('DELETE FROM workshop_participants WHERE workshop_session_id IN (SELECT id FROM workshop_sessions WHERE project_id = $1)', [projectId]);
-      
-      // 대안 삭제
-      await query('DELETE FROM alternatives WHERE project_id = $1', [projectId]);
-      
-      // 기준 삭제
-      await query('DELETE FROM criteria WHERE project_id = $1', [projectId]);
-      
-      console.log(`✅ 프로젝트 ${projectId} 관련 데이터 삭제 완료`);
-    }
+    // 3. CASCADE 삭제로 관련 데이터 자동 삭제
     
     // 4. 테스트 프로젝트 삭제
     const testProjectIds = testProjects.map((p: any) => p.id);
@@ -100,7 +84,7 @@ router.get('/projects', authenticateToken, requireAdmin, async (req: any, res) =
         p.*,
         (SELECT COUNT(*) FROM criteria WHERE project_id = p.id) as criteria_count,
         (SELECT COUNT(*) FROM alternatives WHERE project_id = p.id) as alternatives_count,
-        (SELECT COUNT(*) FROM workshop_participants WHERE workshop_session_id IN (SELECT id FROM workshop_sessions WHERE project_id = p.id)) as evaluator_count
+        (SELECT COUNT(*) FROM workshop_sessions WHERE project_id = p.id) as evaluator_count
       FROM projects p 
       ORDER BY p.created_at DESC
     `);
