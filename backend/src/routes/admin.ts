@@ -1,13 +1,14 @@
-const express = require('express');
+import express from 'express';
+import { requireAuth, requireAdmin } from '../middleware/auth';
+
 const router = express.Router();
-const { requireAuth, requireAdmin } = require('../middleware/auth');
 
 /**
  * 관리자 전용 데이터 관리 API
  */
 
 // 테스트/허수 데이터 정리 API
-router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req, res) => {
+router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req: any, res) => {
   try {
     console.log('🧹 관리자 요청: 테스트 데이터 정리 시작...');
     
@@ -18,7 +19,7 @@ router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req, res) 
     console.log(`📊 현재 프로젝트 총 개수: ${projectsResult.rows.length}개`);
     
     // 2. 테스트/허수 데이터 식별
-    const testProjects = projectsResult.rows.filter(project => {
+    const testProjects = projectsResult.rows.filter((project: any) => {
       return project.title.includes('테스트') || 
              project.title.includes('Test') ||
              project.title.includes('sample') ||
@@ -64,7 +65,7 @@ router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req, res) 
     }
     
     // 4. 테스트 프로젝트 삭제
-    const testProjectIds = testProjects.map(p => p.id);
+    const testProjectIds = testProjects.map((p: any) => p.id);
     await client.query('DELETE FROM projects WHERE id = ANY($1)', [testProjectIds]);
     
     // 5. 정리 후 상태 확인
@@ -79,10 +80,10 @@ router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req, res) 
       message: `${testProjects.length}개의 테스트 데이터가 성공적으로 삭제되었습니다.`,
       deleted_count: testProjects.length,
       remaining_count: remainingCount,
-      deleted_projects: testProjects.map(p => ({ id: p.id, title: p.title }))
+      deleted_projects: testProjects.map((p: any) => ({ id: p.id, title: p.title }))
     });
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ 테스트 데이터 정리 중 오류:', error);
     res.status(500).json({
       success: false,
@@ -93,7 +94,7 @@ router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req, res) 
 });
 
 // 프로젝트 목록 조회 (관리자용 - 상세 정보 포함)
-router.get('/projects', requireAuth, requireAdmin, async (req, res) => {
+router.get('/projects', requireAuth, requireAdmin, async (req: any, res) => {
   try {
     const client = req.db;
     
@@ -113,7 +114,7 @@ router.get('/projects', requireAuth, requireAdmin, async (req, res) => {
       total: result.rows.length
     });
     
-  } catch (error) {
+  } catch (error: any) {
     console.error('❌ 관리자 프로젝트 목록 조회 오류:', error);
     res.status(500).json({
       success: false,
@@ -123,4 +124,4 @@ router.get('/projects', requireAuth, requireAdmin, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;

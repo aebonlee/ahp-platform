@@ -28,7 +28,7 @@ import exportRoutes from './routes/export';
 import subscriptionRoutes from './routes/subscription';
 import supportRoutes from './routes/support';
 import newsRoutes from './routes/news';
-import adminRoutes from '../routes/admin';
+import adminRoutes from './routes/admin';
 
 const app = express();
 const httpServer = createServer(app);
