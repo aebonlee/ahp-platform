@@ -151,6 +151,68 @@ app.post('/api/admin/create-test-user', async (req, res) => {
         res.status(500).json({ error: error instanceof Error ? error.message : String(error) });
     }
 });
+// Emergency phantom data cleanup for specific project
+app.post('/api/emergency/cleanup-project-phantoms', async (req, res) => {
+    try {
+        const { project_id, confirm } = req.body;
+        if (confirm !== 'CLEANUP_PROJECT_PHANTOMS' || !project_id) {
+            return res.status(400).json({
+                success: false,
+                message: 'To confirm cleanup, send { "project_id": number, "confirm": "CLEANUP_PROJECT_PHANTOMS" }'
+            });
+        }
+        console.log(`🧹 프로젝트 ${project_id} 허수 데이터 정리 시작...`);
+        const { query } = await Promise.resolve().then(() => __importStar(require('./database/connection')));
+        // 프로젝트 존재 확인
+        const projectCheck = await query('SELECT id, title FROM projects WHERE id = $1', [project_id]);
+        if (projectCheck.rows.length === 0) {
+            return res.json({
+                success: false,
+                message: `프로젝트 ${project_id}가 존재하지 않습니다.`
+            });
+        }
+        console.log(`📊 프로젝트 "${projectCheck.rows[0].title}" (ID: ${project_id}) 허수 데이터 정리 중...`);
+        // 1. 빈 비교 데이터 삭제
+        const deletedComparisons = await query('DELETE FROM pairwise_comparisons WHERE project_id = $1 AND (value IS NULL OR value = 0) RETURNING id', [project_id]);
+        // 2. 가중치가 0인 기준들 확인 및 정리
+        const zeroCriteria = await query('SELECT id, name, weight FROM criteria WHERE project_id = $1 AND weight = 0', [project_id]);
+        // 3. 빈 평가 세션 정리
+        const deletedSessions = await query('DELETE FROM workshop_sessions WHERE project_id = $1 AND status = $2 RETURNING id', [project_id, 'created']);
+        // 4. 중복된 평가자 정리
+        const duplicateEvaluators = await query(`
+      DELETE FROM project_evaluators 
+      WHERE id IN (
+        SELECT id FROM (
+          SELECT id, ROW_NUMBER() OVER (PARTITION BY project_id, evaluator_id ORDER BY id) as rn
+          FROM project_evaluators 
+          WHERE project_id = $1
+        ) t WHERE rn > 1
+      ) RETURNING id
+    `, [project_id]);
+        const cleanupSummary = {
+            deleted_comparisons: deletedComparisons.rows.length,
+            zero_weight_criteria: zeroCriteria.rows.length,
+            deleted_sessions: deletedSessions.rows.length,
+            deleted_duplicate_evaluators: duplicateEvaluators.rows.length
+        };
+        console.log(`✅ 프로젝트 ${project_id} 허수 데이터 정리 완료:`, cleanupSummary);
+        res.json({
+            success: true,
+            message: `프로젝트 ${project_id}의 허수 데이터가 정리되었습니다.`,
+            project_title: projectCheck.rows[0].title,
+            cleanup_summary: cleanupSummary,
+            zero_criteria: zeroCriteria.rows
+        });
+    }
+    catch (error) {
+        console.error('❌ 프로젝트 허수 데이터 정리 중 오류:', error);
+        res.status(500).json({
+            success: false,
+            message: '프로젝트 허수 데이터 정리 중 오류가 발생했습니다.',
+            error: error.message
+        });
+    }
+});
 // Emergency phantom project cleanup endpoint (no auth required)
 app.post('/api/emergency/cleanup-phantom-projects', async (req, res) => {
     try {
