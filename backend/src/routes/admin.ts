@@ -52,7 +52,7 @@ router.delete('/cleanup-test-data', authenticateToken, requireAdmin, async (req:
       await query('DELETE FROM pairwise_comparisons WHERE project_id = $1', [projectId]);
       
       // 평가자 삭제
-      await query('DELETE FROM evaluators WHERE project_id = $1', [projectId]);
+      await query('DELETE FROM workshop_participants WHERE workshop_session_id IN (SELECT id FROM workshop_sessions WHERE project_id = $1)', [projectId]);
       
       // 대안 삭제
       await query('DELETE FROM alternatives WHERE project_id = $1', [projectId]);
@@ -100,7 +100,7 @@ router.get('/projects', authenticateToken, requireAdmin, async (req: any, res) =
         p.*,
         (SELECT COUNT(*) FROM criteria WHERE project_id = p.id) as criteria_count,
         (SELECT COUNT(*) FROM alternatives WHERE project_id = p.id) as alternatives_count,
-        (SELECT COUNT(*) FROM evaluators WHERE project_id = p.id) as evaluator_count
+        (SELECT COUNT(*) FROM workshop_participants WHERE workshop_session_id IN (SELECT id FROM workshop_sessions WHERE project_id = p.id)) as evaluator_count
       FROM projects p 
       ORDER BY p.created_at DESC
     `);
