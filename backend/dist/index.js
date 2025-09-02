@@ -482,14 +482,14 @@ app.post('/api/emergency/reset-project-104', async (req, res) => {
         });
     }
 });
-// Project 104 inspection endpoint (temporary - no auth)
-app.get('/api/inspect-project-104', async (req, res) => {
+// Project 104 detailed inspection - show all data flow
+app.get('/api/debug-project-104-flow', async (req, res) => {
     try {
-        console.log('🔍 프로젝트 104 상세 조회...');
+        console.log('🔍 프로젝트 104 순차적 데이터 흐름 분석...');
         const { query } = await Promise.resolve().then(() => __importStar(require('./database/connection')));
-        // 프로젝트 104 기본 정보
+        // 1. 프로젝트 기본 정보
         const projectResult = await query(`
-      SELECT p.*, u.email as admin_email
+      SELECT p.*, u.email as admin_email, u.first_name, u.last_name
       FROM projects p
       LEFT JOIN users u ON p.admin_id = u.id
       WHERE p.id = 104
@@ -501,54 +501,101 @@ app.get('/api/inspect-project-104', async (req, res) => {
             });
         }
         const project = projectResult.rows[0];
-        // 기준(criteria) 조회
+        console.log(`📋 프로젝트: "${project.title}" (관리자: ${project.admin_email})`);
+        // 2. 1단계: 기준(criteria) 데이터
         const criteriaResult = await query(`
       SELECT id, name, description, parent_id, level, weight, order_index, created_at
       FROM criteria 
       WHERE project_id = 104 
-      ORDER BY level ASC, order_index ASC
+      ORDER BY level ASC, order_index ASC, created_at ASC
     `);
-        // 대안(alternatives) 조회
+        console.log(`📏 1단계 - 기준: ${criteriaResult.rows.length}개`);
+        // 3. 2단계: 대안(alternatives) 데이터  
         const alternativesResult = await query(`
       SELECT id, name, description, order_index, created_at
       FROM alternatives 
       WHERE project_id = 104 
-      ORDER BY order_index ASC
+      ORDER BY order_index ASC, created_at ASC
     `);
-        // 평가자(evaluators) 조회
+        console.log(`🎯 2단계 - 대안: ${alternativesResult.rows.length}개`);
+        // 4. 3단계: 평가자(evaluators) 데이터
         const evaluatorsResult = await query(`
-      SELECT pe.*, u.email as evaluator_email
+      SELECT pe.id, pe.evaluator_id, pe.role, pe.created_at, u.email as evaluator_email, u.first_name, u.last_name
       FROM project_evaluators pe
       LEFT JOIN users u ON pe.evaluator_id = u.id
       WHERE pe.project_id = 104
+      ORDER BY pe.created_at ASC
     `);
-        // 비교 데이터 조회
+        console.log(`👥 3단계 - 평가자: ${evaluatorsResult.rows.length}개`);
+        // 5. 4단계: 비교 데이터 (쌍대비교)
         const comparisonsResult = await query(`
-      SELECT COUNT(*) as count
-      FROM pairwise_comparisons 
-      WHERE project_id = 104
+      SELECT pc.*, c1.name as element1_name, c2.name as element2_name, crit.name as criterion_name
+      FROM pairwise_comparisons pc
+      LEFT JOIN criteria c1 ON pc.element1_id = c1.id
+      LEFT JOIN criteria c2 ON pc.element2_id = c2.id  
+      LEFT JOIN criteria crit ON pc.criterion_id = crit.id
+      WHERE pc.project_id = 104
+      ORDER BY pc.created_at ASC
     `);
-        console.log(`📊 프로젝트 104 - 기준: ${criteriaResult.rows.length}개, 대안: ${alternativesResult.rows.length}개, 평가자: ${evaluatorsResult.rows.length}개`);
+        console.log(`⚖️ 4단계 - 쌍대비교: ${comparisonsResult.rows.length}개`);
+        // 6. 워크샵/세션 데이터
+        const sessionsResult = await query(`
+      SELECT ws.*, u.email as participant_email
+      FROM workshop_sessions ws
+      LEFT JOIN users u ON ws.participant_id = u.id
+      WHERE ws.project_id = 104
+      ORDER BY ws.created_at ASC
+    `);
+        console.log(`🏢 워크샵 세션: ${sessionsResult.rows.length}개`);
+        // 7. 데이터 생성 시간 패턴 분석
+        const timelineAnalysis = {
+            project_created: project.created_at,
+            first_criterion: criteriaResult.rows.length > 0 ? criteriaResult.rows[0].created_at : null,
+            first_alternative: alternativesResult.rows.length > 0 ? alternativesResult.rows[0].created_at : null,
+            first_evaluator: evaluatorsResult.rows.length > 0 ? evaluatorsResult.rows[0].created_at : null,
+            first_comparison: comparisonsResult.rows.length > 0 ? comparisonsResult.rows[0].created_at : null
+        };
         res.json({
             success: true,
-            project: project,
-            criteria: criteriaResult.rows,
-            alternatives: alternativesResult.rows,
-            evaluators: evaluatorsResult.rows,
-            comparisons_count: parseInt(comparisonsResult.rows[0].count),
-            summary: {
-                criteria_count: criteriaResult.rows.length,
-                alternatives_count: alternativesResult.rows.length,
-                evaluators_count: evaluatorsResult.rows.length,
-                comparisons_count: parseInt(comparisonsResult.rows[0].count)
-            }
+            project_info: {
+                id: project.id,
+                title: project.title,
+                description: project.description,
+                admin_email: project.admin_email,
+                created_at: project.created_at,
+                status: project.status
+            },
+            data_flow: {
+                step1_criteria: {
+                    count: criteriaResult.rows.length,
+                    items: criteriaResult.rows
+                },
+                step2_alternatives: {
+                    count: alternativesResult.rows.length,
+                    items: alternativesResult.rows
+                },
+                step3_evaluators: {
+                    count: evaluatorsResult.rows.length,
+                    items: evaluatorsResult.rows
+                },
+                step4_comparisons: {
+                    count: comparisonsResult.rows.length,
+                    items: comparisonsResult.rows.slice(0, 10) // 처음 10개만
+                },
+                workshop_sessions: {
+                    count: sessionsResult.rows.length,
+                    items: sessionsResult.rows
+                }
+            },
+            timeline_analysis: timelineAnalysis,
+            is_clean_state: criteriaResult.rows.length === 0 && alternativesResult.rows.length === 0
         });
     }
     catch (error) {
-        console.error('❌ 프로젝트 104 조회 중 오류:', error);
+        console.error('❌ 프로젝트 104 흐름 분석 중 오류:', error);
         res.status(500).json({
             success: false,
-            message: '프로젝트 104 조회 중 오류가 발생했습니다.',
+            message: '프로젝트 104 흐름 분석 중 오류가 발생했습니다.',
             error: error.message
         });
     }
