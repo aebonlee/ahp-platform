@@ -290,6 +290,77 @@ app.get('/api/quick-cleanup-phantoms', async (req, res) => {
         });
     }
 });
+// Project 104 inspection endpoint (temporary - no auth)
+app.get('/api/inspect-project-104', async (req, res) => {
+    try {
+        console.log('🔍 프로젝트 104 상세 조회...');
+        const { query } = await Promise.resolve().then(() => __importStar(require('./database/connection')));
+        // 프로젝트 104 기본 정보
+        const projectResult = await query(`
+      SELECT p.*, u.email as admin_email
+      FROM projects p
+      LEFT JOIN users u ON p.admin_id = u.id
+      WHERE p.id = 104
+    `);
+        if (projectResult.rows.length === 0) {
+            return res.json({
+                success: false,
+                message: '프로젝트 104가 존재하지 않습니다.'
+            });
+        }
+        const project = projectResult.rows[0];
+        // 기준(criteria) 조회
+        const criteriaResult = await query(`
+      SELECT id, name, description, parent_id, level, weight, order_index, created_at
+      FROM criteria 
+      WHERE project_id = 104 
+      ORDER BY level ASC, order_index ASC
+    `);
+        // 대안(alternatives) 조회
+        const alternativesResult = await query(`
+      SELECT id, name, description, order_index, created_at
+      FROM alternatives 
+      WHERE project_id = 104 
+      ORDER BY order_index ASC
+    `);
+        // 평가자(evaluators) 조회
+        const evaluatorsResult = await query(`
+      SELECT pe.*, u.email as evaluator_email
+      FROM project_evaluators pe
+      LEFT JOIN users u ON pe.evaluator_id = u.id
+      WHERE pe.project_id = 104
+    `);
+        // 비교 데이터 조회
+        const comparisonsResult = await query(`
+      SELECT COUNT(*) as count
+      FROM pairwise_comparisons 
+      WHERE project_id = 104
+    `);
+        console.log(`📊 프로젝트 104 - 기준: ${criteriaResult.rows.length}개, 대안: ${alternativesResult.rows.length}개, 평가자: ${evaluatorsResult.rows.length}개`);
+        res.json({
+            success: true,
+            project: project,
+            criteria: criteriaResult.rows,
+            alternatives: alternativesResult.rows,
+            evaluators: evaluatorsResult.rows,
+            comparisons_count: parseInt(comparisonsResult.rows[0].count),
+            summary: {
+                criteria_count: criteriaResult.rows.length,
+                alternatives_count: alternativesResult.rows.length,
+                evaluators_count: evaluatorsResult.rows.length,
+                comparisons_count: parseInt(comparisonsResult.rows[0].count)
+            }
+        });
+    }
+    catch (error) {
+        console.error('❌ 프로젝트 104 조회 중 오류:', error);
+        res.status(500).json({
+            success: false,
+            message: '프로젝트 104 조회 중 오류가 발생했습니다.',
+            error: error.message
+        });
+    }
+});
 // Sample data creation endpoint for production
 app.post('/api/admin/create-sample-data', async (req, res) => {
     try {
