@@ -134,26 +134,41 @@ router.put('/:id', auth_1.authenticateToken, [
         res.status(500).json({ error: 'Failed to update project' });
     }
 });
-// 소프트 삭제 (휴지통으로 이동)
+// 프로젝트 삭제 (관리자는 하드 삭제, 일반 사용자는 소프트 삭제)
 router.delete('/:id', auth_1.authenticateToken, async (req, res) => {
     try {
         const { id } = req.params;
         const userId = req.user.id;
-        // 소프트 삭제 - status를 'deleted'로 변경하고 deleted_at 타임스탬프 추가
-        const result = await (0, connection_1.query)(`UPDATE projects 
-       SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
-       WHERE id = $1 AND admin_id = $2 AND (status IS NULL OR status != 'deleted')
-       RETURNING *`, [id, userId]);
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'Project not found, access denied, or already deleted' });
+        const userRole = req.user.role;
+        // 관리자인 경우 하드 삭제
+        if (userRole === 'admin') {
+            console.log(`🗑️ 관리자 하드 삭제: 프로젝트 ${id}`);
+            const result = await (0, connection_1.query)('DELETE FROM projects WHERE id = $1 RETURNING *', [id]);
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Project not found' });
+            }
+            res.json({
+                message: 'Project permanently deleted',
+                project: result.rows[0]
+            });
         }
-        res.json({
-            message: 'Project moved to trash successfully',
-            project: result.rows[0]
-        });
+        else {
+            // 일반 사용자는 소프트 삭제
+            const result = await (0, connection_1.query)(`UPDATE projects 
+         SET status = 'deleted', deleted_at = CURRENT_TIMESTAMP, updated_at = CURRENT_TIMESTAMP
+         WHERE id = $1 AND admin_id = $2 AND (status IS NULL OR status != 'deleted')
+         RETURNING *`, [id, userId]);
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Project not found, access denied, or already deleted' });
+            }
+            res.json({
+                message: 'Project moved to trash successfully',
+                project: result.rows[0]
+            });
+        }
     }
     catch (error) {
-        console.error('Project soft deletion error:', error);
+        console.error('Project deletion error:', error);
         res.status(500).json({ error: 'Failed to delete project' });
     }
 });
@@ -481,6 +496,143 @@ router.delete('/:id/permanent', auth_1.authenticateToken, async (req, res) => {
     catch (error) {
         console.error('Permanent project deletion error:', error);
         res.status(500).json({ error: 'Failed to permanently delete project' });
+    }
+});
+// 프로젝트의 기준 목록 조회 (프록시 라우트)
+router.get('/:id/criteria', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        const userRole = req.user.role;
+        // 프로젝트 접근 권한 확인
+        let accessQuery = 'SELECT id FROM projects WHERE id = $1';
+        let accessParams = [id];
+        if (userRole === 'evaluator') {
+            accessQuery += ` AND (admin_id = $2 OR EXISTS (
+        SELECT 1 FROM project_evaluators pe WHERE pe.project_id = $3 AND pe.evaluator_id = $4
+      ))`;
+            accessParams = [id, userId, id, userId];
+        }
+        else {
+            accessQuery += ' AND admin_id = $2';
+            accessParams.push(userId);
+        }
+        const accessResult = await (0, connection_1.query)(accessQuery, accessParams);
+        if (accessResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Project not found or access denied' });
+        }
+        // 기준 목록 조회
+        const criteriaResult = await (0, connection_1.query)(`SELECT 
+        id,
+        project_id,
+        name,
+        description,
+        parent_id,
+        level,
+        weight,
+        order_index,
+        created_at,
+        updated_at
+       FROM criteria 
+       WHERE project_id = $1 
+       ORDER BY level ASC, order_index ASC, name ASC`, [id]);
+        res.json({
+            criteria: criteriaResult.rows,
+            total: criteriaResult.rows.length
+        });
+    }
+    catch (error) {
+        console.error('Criteria fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch criteria' });
+    }
+});
+// 프로젝트의 대안 목록 조회 (프록시 라우트)
+router.get('/:id/alternatives', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        const userRole = req.user.role;
+        // 프로젝트 접근 권한 확인
+        let accessQuery = 'SELECT id FROM projects WHERE id = $1';
+        let accessParams = [id];
+        if (userRole === 'evaluator') {
+            accessQuery += ` AND (admin_id = $2 OR EXISTS (
+        SELECT 1 FROM project_evaluators pe WHERE pe.project_id = $3 AND pe.evaluator_id = $4
+      ))`;
+            accessParams = [id, userId, id, userId];
+        }
+        else {
+            accessQuery += ' AND admin_id = $2';
+            accessParams.push(userId);
+        }
+        const accessResult = await (0, connection_1.query)(accessQuery, accessParams);
+        if (accessResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Project not found or access denied' });
+        }
+        // 대안 목록 조회
+        const alternativesResult = await (0, connection_1.query)(`SELECT 
+        id,
+        project_id,
+        name,
+        description,
+        cost,
+        order_index,
+        created_at,
+        updated_at
+       FROM alternatives 
+       WHERE project_id = $1 
+       ORDER BY order_index ASC, name ASC`, [id]);
+        res.json({
+            alternatives: alternativesResult.rows,
+            total: alternativesResult.rows.length
+        });
+    }
+    catch (error) {
+        console.error('Alternatives fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch alternatives' });
+    }
+});
+// 프로젝트의 평가자 목록 조회 (프록시 라우트)
+router.get('/:id/evaluators', auth_1.authenticateToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        const userRole = req.user.role;
+        // 프로젝트 접근 권한 확인
+        let accessQuery = 'SELECT id FROM projects WHERE id = $1';
+        let accessParams = [id];
+        if (userRole === 'evaluator') {
+            accessQuery += ` AND (admin_id = $2 OR EXISTS (
+        SELECT 1 FROM project_evaluators pe WHERE pe.project_id = $3 AND pe.evaluator_id = $4
+      ))`;
+            accessParams = [id, userId, id, userId];
+        }
+        else {
+            accessQuery += ' AND admin_id = $2';
+            accessParams.push(userId);
+        }
+        const accessResult = await (0, connection_1.query)(accessQuery, accessParams);
+        if (accessResult.rows.length === 0) {
+            return res.status(404).json({ error: 'Project not found or access denied' });
+        }
+        // 평가자 목록 조회
+        const evaluatorsResult = await (0, connection_1.query)(`SELECT 
+        u.id,
+        u.first_name || ' ' || u.last_name as name,
+        u.email,
+        pe.created_at as assigned_at
+       FROM project_evaluators pe
+       JOIN users u ON pe.evaluator_id = u.id
+       WHERE pe.project_id = $1
+       ORDER BY pe.created_at ASC`, [id]);
+        res.json({
+            evaluators: evaluatorsResult.rows,
+            total: evaluatorsResult.rows.length
+        });
+    }
+    catch (error) {
+        console.error('Evaluators fetch error:', error);
+        res.status(500).json({ error: 'Failed to fetch evaluators' });
     }
 });
 exports.default = router;

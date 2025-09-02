@@ -31,16 +31,16 @@ router.get('/:projectId', auth_1.authenticateToken, [
         const userId = req.user.id;
         const userRole = req.user.role;
         // 프로젝트 접근 권한 확인
-        let accessQuery = 'SELECT id FROM projects WHERE id = ?';
+        let accessQuery = 'SELECT id FROM projects WHERE id = $1';
         let accessParams = [projectId];
         if (userRole === 'evaluator') {
-            accessQuery += ` AND (admin_id = ? OR EXISTS (
-          SELECT 1 FROM project_evaluators pe WHERE pe.project_id = ? AND pe.evaluator_id = ?
+            accessQuery += ` AND (admin_id = $2 OR EXISTS (
+          SELECT 1 FROM project_evaluators pe WHERE pe.project_id = $3 AND pe.evaluator_id = $4
         ))`;
             accessParams = [projectId, userId, projectId, userId];
         }
         else {
-            accessQuery += ' AND admin_id = ?';
+            accessQuery += ' AND admin_id = $2';
             accessParams.push(userId);
         }
         const accessResult = await (0, connection_1.query)(accessQuery, accessParams);
@@ -54,12 +54,12 @@ router.get('/:projectId', auth_1.authenticateToken, [
           name,
           description,
           cost,
-          position,
+          order_index,
           created_at,
           updated_at
          FROM alternatives 
-         WHERE project_id = ? 
-         ORDER BY position ASC, name ASC`, [projectId]);
+         WHERE project_id = $1 
+         ORDER BY order_index ASC, name ASC`, [projectId]);
         res.json({
             alternatives: alternativesResult.rows,
             total: alternativesResult.rows.length
@@ -97,24 +97,25 @@ router.post('/', auth_1.authenticateToken, [
             return res.status(403).json({ error: 'Only project admins can create alternatives' });
         }
         // 프로젝트 소유권 확인
-        const accessResult = await (0, connection_1.query)('SELECT id FROM projects WHERE id = ? AND admin_id = ?', [project_id, userId]);
+        const accessResult = await (0, connection_1.query)('SELECT id FROM projects WHERE id = $1 AND admin_id = $2', [project_id, userId]);
         if (accessResult.rows.length === 0) {
             return res.status(404).json({ error: 'Project not found or access denied' });
         }
         // 중복 이름 확인
-        const duplicateResult = await (0, connection_1.query)('SELECT id FROM alternatives WHERE project_id = ? AND name = ?', [project_id, name]);
+        const duplicateResult = await (0, connection_1.query)('SELECT id FROM alternatives WHERE project_id = $1 AND name = $2', [project_id, name]);
         if (duplicateResult.rows.length > 0) {
             return res.status(400).json({ error: 'Alternative with this name already exists' });
         }
         // 다음 위치 계산
         let nextPosition = position || 0;
         if (!position && position !== 0) {
-            const positionResult = await (0, connection_1.query)('SELECT MAX(position) as max_position FROM alternatives WHERE project_id = ?', [project_id]);
+            const positionResult = await (0, connection_1.query)('SELECT MAX(order_index) as max_position FROM alternatives WHERE project_id = $1', [project_id]);
             nextPosition = (positionResult.rows[0]?.max_position || 0) + 1;
         }
         // 대안 생성
-        const result = await (0, connection_1.query)(`INSERT INTO alternatives (project_id, name, description, cost, position)
-         VALUES (?, ?, ?, ?, ?)`, [
+        const result = await (0, connection_1.query)(`INSERT INTO alternatives (project_id, name, description, cost, order_index)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id`, [
             project_id,
             name,
             description || null,
@@ -122,7 +123,7 @@ router.post('/', auth_1.authenticateToken, [
             nextPosition
         ]);
         // 생성된 대안 조회
-        const createdAlternative = await (0, connection_1.query)('SELECT * FROM alternatives WHERE id = ?', [result.lastID]);
+        const createdAlternative = await (0, connection_1.query)('SELECT * FROM alternatives WHERE id = $1', [result.rows[0].id]);
         res.status(201).json({
             message: 'Alternative created successfully',
             alternative: createdAlternative.rows[0]
@@ -176,20 +177,21 @@ router.put('/:id', auth_1.authenticateToken, [
         // 업데이트 필드 구성
         const updateFields = [];
         const updateValues = [];
+        let paramIndex = 1;
         if (updates.name !== undefined) {
-            updateFields.push('name = ?');
+            updateFields.push(`name = $${paramIndex++}`);
             updateValues.push(updates.name);
         }
         if (updates.description !== undefined) {
-            updateFields.push('description = ?');
+            updateFields.push(`description = $${paramIndex++}`);
             updateValues.push(updates.description);
         }
         if (updates.cost !== undefined) {
-            updateFields.push('cost = ?');
+            updateFields.push(`cost = $${paramIndex++}`);
             updateValues.push(updates.cost);
         }
         if (updates.position !== undefined) {
-            updateFields.push('position = ?');
+            updateFields.push(`order_index = $${paramIndex++}`);
             updateValues.push(updates.position);
         }
         if (updateFields.length === 0) {
@@ -198,9 +200,9 @@ router.put('/:id', auth_1.authenticateToken, [
         updateFields.push('updated_at = CURRENT_TIMESTAMP');
         updateValues.push(id);
         // 대안 업데이트
-        await (0, connection_1.query)(`UPDATE alternatives SET ${updateFields.join(', ')} WHERE id = ?`, updateValues);
+        await (0, connection_1.query)(`UPDATE alternatives SET ${updateFields.join(', ')} WHERE id = $${updateValues.length}`, updateValues);
         // 업데이트된 대안 조회
-        const updatedAlternative = await (0, connection_1.query)('SELECT * FROM alternatives WHERE id = ?', [id]);
+        const updatedAlternative = await (0, connection_1.query)('SELECT * FROM alternatives WHERE id = $1', [id]);
         res.json({
             message: 'Alternative updated successfully',
             alternative: updatedAlternative.rows[0]
@@ -240,14 +242,14 @@ router.delete('/:id', auth_1.authenticateToken, [
             return res.status(403).json({ error: 'Access denied. Only project admin can delete alternatives' });
         }
         // 대안과 관련된 비교 데이터 확인
-        const comparisonsResult = await (0, connection_1.query)('SELECT COUNT(*) as count FROM pairwise_comparisons WHERE element_a_id = ? OR element_b_id = ?', [id, id]);
+        const comparisonsResult = await (0, connection_1.query)('SELECT COUNT(*) as count FROM pairwise_comparisons WHERE element1_id = $1 OR element2_id = $2', [id, id]);
         if (comparisonsResult.rows[0].count > 0) {
             return res.status(400).json({
                 error: 'Cannot delete alternative with existing comparisons. Please delete comparison data first.'
             });
         }
         // 대안 삭제
-        await (0, connection_1.query)('DELETE FROM alternatives WHERE id = ?', [id]);
+        await (0, connection_1.query)('DELETE FROM alternatives WHERE id = $1', [id]);
         res.json({
             message: 'Alternative deleted successfully',
             deleted_id: parseInt(id)
@@ -292,12 +294,12 @@ router.put('/:id/reorder', auth_1.authenticateToken, [
         // 같은 프로젝트의 다른 대안들 위치 조정
         await (0, connection_1.query)(`UPDATE alternatives 
          SET position = CASE 
-           WHEN position >= ? AND id != ? THEN position + 1
-           ELSE position 
+           WHEN order_index >= $1 AND id != $2 THEN order_index + 1
+           ELSE order_index 
          END
-         WHERE project_id = ?`, [new_position, id, alternative.project_id]);
+         WHERE project_id = $3`, [new_position, id, alternative.project_id]);
         // 대상 대안 위치 업데이트
-        await (0, connection_1.query)('UPDATE alternatives SET position = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [new_position, id]);
+        await (0, connection_1.query)('UPDATE alternatives SET order_index = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [new_position, id]);
         res.json({
             message: 'Alternative position updated successfully',
             alternative_id: parseInt(id),

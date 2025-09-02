@@ -63,6 +63,7 @@ const export_1 = __importDefault(require("./routes/export"));
 const subscription_1 = __importDefault(require("./routes/subscription"));
 const support_1 = __importDefault(require("./routes/support"));
 const news_1 = __importDefault(require("./routes/news"));
+const admin_1 = __importDefault(require("./routes/admin"));
 const app = (0, express_1.default)();
 const httpServer = (0, http_1.createServer)(app);
 const PORT = process.env.PORT || 5000;
@@ -269,6 +270,7 @@ app.use('/api/export', export_1.default);
 app.use('/api/subscription', subscription_1.default);
 app.use('/api/support', support_1.default);
 app.use('/api/news', news_1.default);
+app.use('/api/admin', admin_1.default);
 // API-only backend - no static file serving
 app.get('/', (req, res) => {
     res.json({

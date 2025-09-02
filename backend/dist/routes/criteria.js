@@ -31,16 +31,16 @@ router.get('/:projectId', auth_1.authenticateToken, [
         const userId = req.user.id;
         const userRole = req.user.role;
         // 프로젝트 접근 권한 확인
-        let accessQuery = 'SELECT id FROM projects WHERE id = ?';
+        let accessQuery = 'SELECT id FROM projects WHERE id = $1';
         let accessParams = [projectId];
         if (userRole === 'evaluator') {
-            accessQuery += ` AND (admin_id = ? OR EXISTS (
-          SELECT 1 FROM project_evaluators pe WHERE pe.project_id = ? AND pe.evaluator_id = ?
+            accessQuery += ` AND (admin_id = $2 OR EXISTS (
+          SELECT 1 FROM project_evaluators pe WHERE pe.project_id = $3 AND pe.evaluator_id = $4
         ))`;
             accessParams = [projectId, userId, projectId, userId];
         }
         else {
-            accessQuery += ' AND admin_id = ?';
+            accessQuery += ' AND admin_id = $2';
             accessParams.push(userId);
         }
         const accessResult = await (0, connection_1.query)(accessQuery, accessParams);
@@ -56,12 +56,12 @@ router.get('/:projectId', auth_1.authenticateToken, [
           parent_id,
           level,
           weight,
-          position,
+          order_index,
           created_at,
           updated_at
          FROM criteria 
-         WHERE project_id = ? 
-         ORDER BY level ASC, position ASC, name ASC`, [projectId]);
+         WHERE project_id = $1 
+         ORDER BY level ASC, order_index ASC, name ASC`, [projectId]);
         res.json({
             criteria: criteriaResult.rows,
             total: criteriaResult.rows.length
@@ -100,13 +100,13 @@ router.post('/', auth_1.authenticateToken, [
             return res.status(403).json({ error: 'Only project admins can create criteria' });
         }
         // 프로젝트 소유권 확인
-        const accessResult = await (0, connection_1.query)('SELECT id FROM projects WHERE id = ? AND admin_id = ?', [project_id, userId]);
+        const accessResult = await (0, connection_1.query)('SELECT id FROM projects WHERE id = $1 AND admin_id = $2', [project_id, userId]);
         if (accessResult.rows.length === 0) {
             return res.status(404).json({ error: 'Project not found or access denied' });
         }
         // 부모 기준 유효성 검사
         if (parent_id) {
-            const parentResult = await (0, connection_1.query)('SELECT level FROM criteria WHERE id = ? AND project_id = ?', [parent_id, project_id]);
+            const parentResult = await (0, connection_1.query)('SELECT level FROM criteria WHERE id = $1 AND project_id = $2', [parent_id, project_id]);
             if (parentResult.rows.length === 0) {
                 return res.status(404).json({ error: 'Parent criterion not found' });
             }
@@ -117,12 +117,13 @@ router.post('/', auth_1.authenticateToken, [
         // 다음 위치 계산
         let nextPosition = position || 0;
         if (!position && position !== 0) {
-            const positionResult = await (0, connection_1.query)('SELECT MAX(position) as max_position FROM criteria WHERE project_id = ? AND level = ?', [project_id, level || 1]);
+            const positionResult = await (0, connection_1.query)('SELECT MAX(order_index) as max_position FROM criteria WHERE project_id = $1 AND level = $2', [project_id, level || 1]);
             nextPosition = (positionResult.rows[0]?.max_position || 0) + 1;
         }
         // 기준 생성
-        const result = await (0, connection_1.query)(`INSERT INTO criteria (project_id, name, description, parent_id, level, weight, position)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`, [
+        const result = await (0, connection_1.query)(`INSERT INTO criteria (project_id, name, description, parent_id, level, weight, order_index)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)
+         RETURNING id`, [
             project_id,
             name,
             description || null,
@@ -132,7 +133,7 @@ router.post('/', auth_1.authenticateToken, [
             nextPosition
         ]);
         // 생성된 기준 조회
-        const createdCriterion = await (0, connection_1.query)('SELECT * FROM criteria WHERE id = ?', [result.lastID]);
+        const createdCriterion = await (0, connection_1.query)('SELECT * FROM criteria WHERE id = $1', [result.rows[0].id]);
         res.status(201).json({
             message: 'Criterion created successfully',
             criterion: createdCriterion.rows[0]
@@ -169,7 +170,7 @@ router.put('/:id', auth_1.authenticateToken, [
         const checkResult = await (0, connection_1.query)(`SELECT c.*, p.admin_id 
          FROM criteria c
          JOIN projects p ON c.project_id = p.id
-         WHERE c.id = ?`, [id]);
+         WHERE c.id = $1`, [id]);
         if (checkResult.rows.length === 0) {
             return res.status(404).json({ error: 'Criterion not found' });
         }
@@ -179,20 +180,21 @@ router.put('/:id', auth_1.authenticateToken, [
         // 업데이트 필드 구성
         const updateFields = [];
         const updateValues = [];
+        let paramIndex = 1;
         if (updates.name !== undefined) {
-            updateFields.push('name = ?');
+            updateFields.push(`name = $${paramIndex++}`);
             updateValues.push(updates.name);
         }
         if (updates.description !== undefined) {
-            updateFields.push('description = ?');
+            updateFields.push(`description = $${paramIndex++}`);
             updateValues.push(updates.description);
         }
         if (updates.weight !== undefined) {
-            updateFields.push('weight = ?');
+            updateFields.push(`weight = $${paramIndex++}`);
             updateValues.push(updates.weight);
         }
         if (updates.position !== undefined) {
-            updateFields.push('position = ?');
+            updateFields.push(`order_index = $${paramIndex++}`);
             updateValues.push(updates.position);
         }
         if (updateFields.length === 0) {
@@ -201,9 +203,9 @@ router.put('/:id', auth_1.authenticateToken, [
         updateFields.push('updated_at = CURRENT_TIMESTAMP');
         updateValues.push(id);
         // 기준 업데이트
-        await (0, connection_1.query)(`UPDATE criteria SET ${updateFields.join(', ')} WHERE id = ?`, updateValues);
+        await (0, connection_1.query)(`UPDATE criteria SET ${updateFields.join(', ')} WHERE id = $${updateValues.length}`, updateValues);
         // 업데이트된 기준 조회
-        const updatedCriterion = await (0, connection_1.query)('SELECT * FROM criteria WHERE id = ?', [id]);
+        const updatedCriterion = await (0, connection_1.query)('SELECT * FROM criteria WHERE id = $1', [id]);
         res.json({
             message: 'Criterion updated successfully',
             criterion: updatedCriterion.rows[0]
@@ -235,7 +237,7 @@ router.delete('/:id', auth_1.authenticateToken, [
         const checkResult = await (0, connection_1.query)(`SELECT c.*, p.admin_id 
          FROM criteria c
          JOIN projects p ON c.project_id = p.id
-         WHERE c.id = ?`, [id]);
+         WHERE c.id = $1`, [id]);
         if (checkResult.rows.length === 0) {
             return res.status(404).json({ error: 'Criterion not found' });
         }
@@ -243,21 +245,21 @@ router.delete('/:id', auth_1.authenticateToken, [
             return res.status(403).json({ error: 'Access denied. Only project admin can delete criteria' });
         }
         // 하위 기준 확인
-        const childrenResult = await (0, connection_1.query)('SELECT COUNT(*) as count FROM criteria WHERE parent_id = ?', [id]);
+        const childrenResult = await (0, connection_1.query)('SELECT COUNT(*) as count FROM criteria WHERE parent_id = $1', [id]);
         if (childrenResult.rows[0].count > 0) {
             return res.status(400).json({
                 error: 'Cannot delete criterion with sub-criteria. Please delete sub-criteria first.'
             });
         }
         // 기준과 관련된 비교 데이터 확인
-        const comparisonsResult = await (0, connection_1.query)('SELECT COUNT(*) as count FROM pairwise_comparisons WHERE element_a_id = ? OR element_b_id = ? OR parent_criteria_id = ?', [id, id, id]);
+        const comparisonsResult = await (0, connection_1.query)('SELECT COUNT(*) as count FROM pairwise_comparisons WHERE element1_id = $1 OR element2_id = $2 OR criterion_id = $3', [id, id, id]);
         if (comparisonsResult.rows[0].count > 0) {
             return res.status(400).json({
                 error: 'Cannot delete criterion with existing comparisons. Please delete comparison data first.'
             });
         }
         // 기준 삭제
-        await (0, connection_1.query)('DELETE FROM criteria WHERE id = ?', [id]);
+        await (0, connection_1.query)('DELETE FROM criteria WHERE id = $1', [id]);
         res.json({
             message: 'Criterion deleted successfully',
             deleted_id: parseInt(id)
@@ -291,7 +293,7 @@ router.put('/:id/reorder', auth_1.authenticateToken, [
         const checkResult = await (0, connection_1.query)(`SELECT c.*, p.admin_id 
          FROM criteria c
          JOIN projects p ON c.project_id = p.id
-         WHERE c.id = ?`, [id]);
+         WHERE c.id = $1`, [id]);
         if (checkResult.rows.length === 0) {
             return res.status(404).json({ error: 'Criterion not found' });
         }
@@ -302,14 +304,14 @@ router.put('/:id/reorder', auth_1.authenticateToken, [
         // 같은 레벨의 다른 기준들 위치 조정
         await (0, connection_1.query)(`UPDATE criteria 
          SET position = CASE 
-           WHEN position >= ? AND id != ? THEN position + 1
-           ELSE position 
+           WHEN order_index >= $1 AND id != $2 THEN order_index + 1
+           ELSE order_index 
          END
-         WHERE project_id = ? AND level = ? AND parent_id ${criterion.parent_id ? '= ?' : 'IS NULL'}`, criterion.parent_id
+         WHERE project_id = $3 AND level = $4 AND parent_id ${criterion.parent_id ? '= $5' : 'IS NULL'}`, criterion.parent_id
             ? [new_position, id, criterion.project_id, criterion.level, criterion.parent_id]
             : [new_position, id, criterion.project_id, criterion.level]);
         // 대상 기준 위치 업데이트
-        await (0, connection_1.query)('UPDATE criteria SET position = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?', [new_position, id]);
+        await (0, connection_1.query)('UPDATE criteria SET order_index = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2', [new_position, id]);
         res.json({
             message: 'Criterion position updated successfully',
             criterion_id: parseInt(id),

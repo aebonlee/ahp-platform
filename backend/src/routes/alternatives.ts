@@ -34,16 +34,16 @@ router.get('/:projectId',
       const userRole = (req as AuthenticatedRequest).user.role;
 
       // 프로젝트 접근 권한 확인
-      let accessQuery = 'SELECT id FROM projects WHERE id = ?';
+      let accessQuery = 'SELECT id FROM projects WHERE id = $1';
       let accessParams = [projectId];
 
       if (userRole === 'evaluator') {
-        accessQuery += ` AND (admin_id = ? OR EXISTS (
-          SELECT 1 FROM project_evaluators pe WHERE pe.project_id = ? AND pe.evaluator_id = ?
+        accessQuery += ` AND (admin_id = $2 OR EXISTS (
+          SELECT 1 FROM project_evaluators pe WHERE pe.project_id = $3 AND pe.evaluator_id = $4
         ))`;
         accessParams = [projectId, userId, projectId, userId];
       } else {
-        accessQuery += ' AND admin_id = ?';
+        accessQuery += ' AND admin_id = $2';
         accessParams.push(userId);
       }
 
@@ -60,12 +60,12 @@ router.get('/:projectId',
           name,
           description,
           cost,
-          position,
+          order_index,
           created_at,
           updated_at
          FROM alternatives 
-         WHERE project_id = ? 
-         ORDER BY position ASC, name ASC`,
+         WHERE project_id = $1 
+         ORDER BY order_index ASC, name ASC`,
         [projectId]
       );
 
@@ -115,7 +115,7 @@ router.post('/',
 
       // 프로젝트 소유권 확인
       const accessResult = await query(
-        'SELECT id FROM projects WHERE id = ? AND admin_id = ?',
+        'SELECT id FROM projects WHERE id = $1 AND admin_id = $2',
         [project_id, userId]
       );
 
@@ -125,7 +125,7 @@ router.post('/',
 
       // 중복 이름 확인
       const duplicateResult = await query(
-        'SELECT id FROM alternatives WHERE project_id = ? AND name = ?',
+        'SELECT id FROM alternatives WHERE project_id = $1 AND name = $2',
         [project_id, name]
       );
 
@@ -137,7 +137,7 @@ router.post('/',
       let nextPosition = position || 0;
       if (!position && position !== 0) {
         const positionResult = await query(
-          'SELECT MAX(position) as max_position FROM alternatives WHERE project_id = ?',
+          'SELECT MAX(order_index) as max_position FROM alternatives WHERE project_id = $1',
           [project_id]
         );
         nextPosition = (positionResult.rows[0]?.max_position || 0) + 1;
@@ -145,8 +145,9 @@ router.post('/',
 
       // 대안 생성
       const result = await query(
-        `INSERT INTO alternatives (project_id, name, description, cost, position)
-         VALUES (?, ?, ?, ?, ?)`,
+        `INSERT INTO alternatives (project_id, name, description, cost, order_index)
+         VALUES ($1, $2, $3, $4, $5)
+         RETURNING id`,
         [
           project_id,
           name,
@@ -158,8 +159,8 @@ router.post('/',
 
       // 생성된 대안 조회
       const createdAlternative = await query(
-        'SELECT * FROM alternatives WHERE id = ?',
-        [result.lastID]
+        'SELECT * FROM alternatives WHERE id = $1',
+        [result.rows[0].id]
       );
 
       res.status(201).json({
@@ -234,20 +235,21 @@ router.put('/:id',
       const updateFields = [];
       const updateValues = [];
 
+      let paramIndex = 1;
       if (updates.name !== undefined) {
-        updateFields.push('name = ?');
+        updateFields.push(`name = $${paramIndex++}`);
         updateValues.push(updates.name);
       }
       if (updates.description !== undefined) {
-        updateFields.push('description = ?');
+        updateFields.push(`description = $${paramIndex++}`);
         updateValues.push(updates.description);
       }
       if (updates.cost !== undefined) {
-        updateFields.push('cost = ?');
+        updateFields.push(`cost = $${paramIndex++}`);
         updateValues.push(updates.cost);
       }
       if (updates.position !== undefined) {
-        updateFields.push('position = ?');
+        updateFields.push(`order_index = $${paramIndex++}`);
         updateValues.push(updates.position);
       }
 
@@ -260,13 +262,13 @@ router.put('/:id',
 
       // 대안 업데이트
       await query(
-        `UPDATE alternatives SET ${updateFields.join(', ')} WHERE id = ?`,
+        `UPDATE alternatives SET ${updateFields.join(', ')} WHERE id = $${updateValues.length}`,
         updateValues
       );
 
       // 업데이트된 대안 조회
       const updatedAlternative = await query(
-        'SELECT * FROM alternatives WHERE id = ?',
+        'SELECT * FROM alternatives WHERE id = $1',
         [id]
       );
 
@@ -323,7 +325,7 @@ router.delete('/:id',
 
       // 대안과 관련된 비교 데이터 확인
       const comparisonsResult = await query(
-        'SELECT COUNT(*) as count FROM pairwise_comparisons WHERE element_a_id = ? OR element_b_id = ?',
+        'SELECT COUNT(*) as count FROM pairwise_comparisons WHERE element1_id = $1 OR element2_id = $2',
         [id, id]
       );
 
@@ -334,7 +336,7 @@ router.delete('/:id',
       }
 
       // 대안 삭제
-      await query('DELETE FROM alternatives WHERE id = ?', [id]);
+      await query('DELETE FROM alternatives WHERE id = $1', [id]);
 
       res.json({
         message: 'Alternative deleted successfully',
@@ -395,16 +397,16 @@ router.put('/:id/reorder',
       await query(
         `UPDATE alternatives 
          SET position = CASE 
-           WHEN position >= ? AND id != ? THEN position + 1
-           ELSE position 
+           WHEN order_index >= $1 AND id != $2 THEN order_index + 1
+           ELSE order_index 
          END
-         WHERE project_id = ?`,
+         WHERE project_id = $3`,
         [new_position, id, alternative.project_id]
       );
 
       // 대상 대안 위치 업데이트
       await query(
-        'UPDATE alternatives SET position = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+        'UPDATE alternatives SET order_index = $1, updated_at = CURRENT_TIMESTAMP WHERE id = $2',
         [new_position, id]
       );
 
