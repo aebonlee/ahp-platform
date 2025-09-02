@@ -2250,7 +2250,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <div className="space-y-6">
       <h3 className="text-lg font-semibold">보고서 내보내기</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-3 gap-8">
         <Card title="Excel 보고서">
           <div className="space-y-4">
             <div className="text-sm text-gray-600">
