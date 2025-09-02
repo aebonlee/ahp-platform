@@ -371,19 +371,99 @@ router.delete('/:evaluatorId/project/:projectId', auth_1.authenticateToken, (0, 
         if (projectCheck.rowCount === 0) {
             return res.status(403).json({ error: 'Access denied to this project' });
         }
-        // 평가자 제거 (CASCADE로 관련 데이터도 함께 삭제됨)
-        const result = await (0, connection_1.query)('DELETE FROM project_evaluators WHERE project_id = $1 AND evaluator_id = $2', [projectId, evaluatorId]);
-        if (result.rowCount === 0) {
-            return res.status(404).json({ error: 'Evaluator not found in this project' });
+        // 트랜잭션으로 평가자 관련 모든 데이터 삭제
+        await (0, connection_1.query)('BEGIN');
+        try {
+            // 1. 워크숍 참가자 삭제
+            await (0, connection_1.query)('DELETE FROM workshop_participants WHERE workshop_session_id IN (SELECT id FROM workshop_sessions WHERE project_id = $1) AND participant_id = $2', [projectId, evaluatorId]);
+            // 2. 평가자 진행 상황 삭제
+            await (0, connection_1.query)('DELETE FROM evaluator_progress WHERE project_id = $1 AND evaluator_id = $2', [projectId, evaluatorId]);
+            // 3. 평가자 가중치 삭제
+            await (0, connection_1.query)('DELETE FROM evaluator_weights WHERE project_id = $1 AND evaluator_id = $2', [projectId, evaluatorId]);
+            // 4. 평가자의 평가 데이터 삭제
+            await (0, connection_1.query)('DELETE FROM evaluator_assessments WHERE participant_id IN (SELECT id FROM workshop_participants WHERE participant_id = $1)', [evaluatorId]);
+            // 5. 프로젝트-평가자 연결 삭제
+            const result = await (0, connection_1.query)('DELETE FROM project_evaluators WHERE project_id = $1 AND evaluator_id = $2 RETURNING *', [projectId, evaluatorId]);
+            if (result.rowCount === 0) {
+                await (0, connection_1.query)('ROLLBACK');
+                return res.status(404).json({ error: 'Evaluator not found in this project' });
+            }
+            await (0, connection_1.query)('COMMIT');
+            res.json({
+                message: 'Evaluator and all related data removed successfully',
+                project_id: projectId,
+                evaluator_id: evaluatorId,
+                removed_data: {
+                    project_evaluator: true,
+                    evaluator_weights: true,
+                    evaluator_progress: true,
+                    workshop_participation: true,
+                    evaluation_assessments: true
+                }
+            });
         }
-        res.json({
-            message: 'Evaluator removed successfully',
-            project_id: projectId,
-            evaluator_id: evaluatorId
-        });
+        catch (error) {
+            await (0, connection_1.query)('ROLLBACK');
+            throw error;
+        }
     }
     catch (error) {
         console.error('Error removing evaluator:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+/**
+ * 평가자 완전 삭제 (모든 프로젝트에서 제거)
+ * DELETE /api/evaluators/:evaluatorId
+ */
+router.delete('/:evaluatorId', auth_1.authenticateToken, (0, auth_1.requireRole)(['admin']), [
+    (0, express_validator_1.param)('evaluatorId').isInt().withMessage('Evaluator ID must be an integer')
+], async (req, res) => {
+    try {
+        const errors = (0, express_validator_1.validationResult)(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({
+                error: 'Validation failed',
+                details: errors.array()
+            });
+        }
+        const evaluatorId = parseInt(req.params.evaluatorId);
+        // 트랜잭션으로 평가자 완전 삭제
+        await (0, connection_1.query)('BEGIN');
+        try {
+            // 평가자가 참여한 모든 프로젝트에서 데이터 삭제
+            const projectsResult = await (0, connection_1.query)('SELECT DISTINCT project_id FROM project_evaluators WHERE evaluator_id = $1', [evaluatorId]);
+            for (const project of projectsResult.rows) {
+                const projectId = project.project_id;
+                // 워크숍 데이터 삭제
+                await (0, connection_1.query)('DELETE FROM workshop_participants WHERE workshop_session_id IN (SELECT id FROM workshop_sessions WHERE project_id = $1) AND participant_id = $2', [projectId, evaluatorId]);
+                // 평가자 관련 데이터 삭제
+                await (0, connection_1.query)('DELETE FROM evaluator_progress WHERE project_id = $1 AND evaluator_id = $2', [projectId, evaluatorId]);
+                await (0, connection_1.query)('DELETE FROM evaluator_weights WHERE project_id = $1 AND evaluator_id = $2', [projectId, evaluatorId]);
+            }
+            // 모든 프로젝트에서 평가자 제거
+            await (0, connection_1.query)('DELETE FROM project_evaluators WHERE evaluator_id = $1', [evaluatorId]);
+            // 평가자 계정 삭제 (role이 evaluator인 경우만)
+            const userResult = await (0, connection_1.query)('DELETE FROM users WHERE id = $1 AND role = $2 RETURNING *', [evaluatorId, 'evaluator']);
+            if (userResult.rowCount === 0) {
+                await (0, connection_1.query)('ROLLBACK');
+                return res.status(404).json({ error: 'Evaluator not found or cannot be deleted' });
+            }
+            await (0, connection_1.query)('COMMIT');
+            res.json({
+                message: 'Evaluator completely removed from all projects',
+                evaluator_id: evaluatorId,
+                removed_from_projects: projectsResult.rows.length,
+                deleted_user_account: true
+            });
+        }
+        catch (error) {
+            await (0, connection_1.query)('ROLLBACK');
+            throw error;
+        }
+    }
+    catch (error) {
+        console.error('Error completely removing evaluator:', error);
         res.status(500).json({ error: 'Internal server error' });
     }
 });

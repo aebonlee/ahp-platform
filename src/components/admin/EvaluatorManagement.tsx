@@ -284,11 +284,6 @@ const EvaluatorManagement: React.FC<EvaluatorManagementProps> = ({
     setErrors({});
   };
 
-  const handleDeleteEvaluator = (evaluatorId: string) => {
-    if (window.confirm('평가자를 삭제하시겠습니까? 배정된 프로젝트에서 제외되며 평가 데이터가 삭제됩니다.')) {
-      setEvaluators(evaluators.filter(e => e.id !== evaluatorId));
-    }
-  };
 
   const handleAssignEvaluators = () => {
     const selectedEvaluatorIds = evaluators

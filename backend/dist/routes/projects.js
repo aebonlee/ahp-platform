@@ -231,11 +231,20 @@ router.delete('/:id/permanent', auth_1.authenticateToken, async (req, res) => {
                 return res.status(404).json({ error: 'Project not found in trash or access denied' });
             }
             // 관련 데이터 삭제 (CASCADE 설정이 없는 경우)
-            await (0, connection_1.query)('DELETE FROM pairwise_comparisons WHERE project_id = $1', [id]);
+            // 1. 평가자 관련 데이터 삭제
+            await (0, connection_1.query)('DELETE FROM evaluator_progress WHERE project_id = $1', [id]);
+            await (0, connection_1.query)('DELETE FROM evaluator_weights WHERE project_id = $1', [id]);
+            await (0, connection_1.query)('DELETE FROM workshop_participants WHERE workshop_session_id IN (SELECT id FROM workshop_sessions WHERE project_id = $1)', [id]);
+            await (0, connection_1.query)('DELETE FROM workshop_sessions WHERE project_id = $1', [id]);
             await (0, connection_1.query)('DELETE FROM project_evaluators WHERE project_id = $1', [id]);
+            // 2. 평가 관련 데이터 삭제
+            await (0, connection_1.query)('DELETE FROM pairwise_comparisons WHERE project_id = $1', [id]);
+            await (0, connection_1.query)('DELETE FROM evaluations WHERE project_id = $1', [id]);
+            await (0, connection_1.query)('DELETE FROM comparisons WHERE project_id = $1', [id]);
+            // 3. 프로젝트 구조 데이터 삭제
             await (0, connection_1.query)('DELETE FROM alternatives WHERE project_id = $1', [id]);
             await (0, connection_1.query)('DELETE FROM criteria WHERE project_id = $1', [id]);
-            // 프로젝트 영구 삭제
+            // 4. 프로젝트 영구 삭제
             await (0, connection_1.query)('DELETE FROM projects WHERE id = $1', [id]);
             await (0, connection_1.query)('COMMIT');
             res.json({ message: 'Project permanently deleted' });
