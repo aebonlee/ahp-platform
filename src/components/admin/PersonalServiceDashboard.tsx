@@ -652,49 +652,49 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
       {/* 프로젝트 현황 대시보드 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-info-bg), var(--status-info-bg-light))', border: '1px solid var(--status-info-border)' }}>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.length}</p>
+              <p className="text-base font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-info-text)' }}>
-              <span className="text-white text-xl">📊</span>
+              <span className="text-white text-2xl">📊</span>
             </div>
           </div>
         </div>
-        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-success-bg), var(--status-success-bg-light))', border: '1px solid var(--status-success-border)' }}>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'active').length}</p>
+              <p className="text-base font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'active').length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-success-text)' }}>
-              <span className="text-white text-xl">🚀</span>
+              <span className="text-white text-2xl">🚀</span>
             </div>
           </div>
         </div>
-        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-light-2))', border: '1px solid var(--accent-primary)' }}>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'completed').length}</p>
+              <p className="text-base font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'completed').length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--accent-primary)' }}>
-              <span className="text-white text-xl">✅</span>
+              <span className="text-white text-2xl">✅</span>
             </div>
           </div>
         </div>
-        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-warning-bg), var(--status-warning-bg-light))', border: '1px solid var(--status-warning-border)' }}>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+              <p className="text-base font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.completion_rate || 0), 0) / projects.length) : 0}%
               </p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-warning-text)' }}>
-              <span className="text-white text-xl">📈</span>
+              <span className="text-white text-2xl">📈</span>
             </div>
           </div>
         </div>
@@ -740,9 +740,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       <div 
         className="p-8 rounded-xl border-2 transition-all duration-300"
         style={{
-          background: 'linear-gradient(135deg, var(--accent-light), var(--bg-elevated))',
-          borderColor: 'var(--accent-primary)',
-          boxShadow: 'var(--shadow-xl)'
+          border: '1px solid var(--border-light)',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}
       >
         <div className="text-center mb-8">
@@ -789,10 +788,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               }}
             >
               <div className={`w-12 h-12 bg-gradient-to-r ${item.color} rounded-lg flex items-center justify-center mb-3`}>
-                <span className="text-white text-xl">{item.icon}</span>
+                <span className="text-white text-2xl">{item.icon}</span>
               </div>
               <span 
-                className="text-sm font-medium text-center leading-tight"
+                className="text-base font-medium text-center leading-tight"
                 style={{ color: 'var(--text-primary)' }}
               >
                 {item.label}
@@ -812,7 +811,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <Card title="프로젝트 설정">
             <div className="space-y-4">
               <p>프로젝트 기본 정보를 설정하는 단계입니다.</p>
-              <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('criteria')}>
+              <Button variant="primary" className="p-5 lg:p-6 text-xl lg:text-2xl" onClick={() => setCurrentStep('criteria')}>
                 다음 단계: 기준 설정
               </Button>
             </div>
@@ -827,7 +826,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               onCriteriaChange={handleCriteriaCountUpdate}
             />
             <div className="flex justify-between">
-              <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('projects')}>
+              <Button variant="secondary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('projects')}>
                 이전
               </Button>
               <Button variant="primary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('alternatives')}>
@@ -845,7 +844,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               onAlternativesChange={handleAlternativesCountUpdate}
             />
             <div className="flex justify-between">
-              <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('criteria')}>
+              <Button variant="secondary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('criteria')}>
                 이전
               </Button>
               <Button variant="primary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('evaluators')}>
@@ -859,7 +858,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="space-y-4">
             <EvaluatorAssignment projectId={selectedProjectId} onComplete={() => setCurrentStep('finalize')} />
             <div className="flex justify-between">
-              <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('alternatives')}>
+              <Button variant="secondary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('alternatives')}>
                 이전
               </Button>
               <Button variant="primary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('finalize')}>
@@ -997,7 +996,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <Button variant="error" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('trash')}>
                   🗑️ 휴지통
                 </Button>
-                <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('creation')}>
+                <Button variant="primary" className="p-5 lg:p-6 text-xl lg:text-2xl" onClick={() => handleTabChange('creation')}>
                   ➕ 새 프로젝트 생성
                 </Button>
               </div>
@@ -1037,49 +1036,49 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <div className="space-y-6">
       {/* 프로젝트 통계 대시보드 */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-info-bg), var(--status-info-bg-light))', border: '1px solid var(--status-info-border)' }}>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.length}</p>
+              <p className="text-base font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-info-text)' }}>
-              <span className="text-white text-xl">📊</span>
+              <span className="text-white text-2xl">📊</span>
             </div>
           </div>
         </div>
-        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-success-bg), var(--status-success-bg-light))', border: '1px solid var(--status-success-border)' }}>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'active').length}</p>
+              <p className="text-base font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'active').length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-success-text)' }}>
-              <span className="text-white text-xl">🚀</span>
+              <span className="text-white text-2xl">🚀</span>
             </div>
           </div>
         </div>
-        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--accent-light), var(--accent-light-2))', border: '1px solid var(--accent-primary)' }}>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'completed').length}</p>
+              <p className="text-base font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'completed').length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--accent-primary)' }}>
-              <span className="text-white text-xl">✅</span>
+              <span className="text-white text-2xl">✅</span>
             </div>
           </div>
         </div>
-        <div className="rounded-lg p-4" style={{ background: 'linear-gradient(135deg, var(--status-warning-bg), var(--status-warning-bg-light))', border: '1px solid var(--status-warning-border)' }}>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
-              <p className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+              <p className="text-base font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
                 {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.completion_rate || 0), 0) / projects.length) : 0}%
               </p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-warning-text)' }}>
-              <span className="text-white text-xl">📈</span>
+              <span className="text-white text-2xl">📈</span>
             </div>
           </div>
         </div>
@@ -2883,13 +2882,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     </div>
                   </div>
                   <div className="mt-6 flex space-x-3">
-                    <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('criteria')}>
+                    <Button variant="primary" className="p-5 lg:p-6 text-xl lg:text-2xl" onClick={() => setCurrentStep('criteria')}>
                       🎯 기준 설정 시작
                     </Button>
-                    <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('alternatives')}>
+                    <Button variant="secondary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('alternatives')}>
                       📋 대안 관리
                     </Button>
-                    <Button variant="secondary" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => setCurrentStep('evaluators')}>
+                    <Button variant="secondary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setCurrentStep('evaluators')}>
                       👥 평가자 관리
                     </Button>
                   </div>
@@ -2907,7 +2906,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div className="text-gray-400 text-6xl mb-4">🏗️</div>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">모델을 구축할 프로젝트를 선택하세요</h3>
                 <p className="text-gray-600 mb-4">프로젝트를 선택하고 단계별로 모델을 구성해보세요.</p>
-                <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('projects')}>
+                <Button variant="primary" className="p-5 lg:p-6 text-xl lg:text-2xl" onClick={() => handleTabChange('projects')}>
                   프로젝트 선택하기
                 </Button>
               </div>
@@ -3153,7 +3152,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 >
                   P
                 </div>
-                <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   프로젝트 개수
                 </h3>
               </div>
@@ -3161,7 +3160,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div className="text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {usedProjects}/{planLimits.projects}
                 </div>
-                <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                <div className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>
                   사용 중인 프로젝트
                 </div>
                 <div className="w-full max-w-40 mx-auto">
@@ -3203,7 +3202,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 >
                   E
                 </div>
-                <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   평가자 인원수
                 </h3>
               </div>
@@ -3211,7 +3210,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 <div className="text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>
                   {usedEvaluators}/{planLimits.evaluators}명
                 </div>
-                <div className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                <div className="text-base font-medium" style={{ color: 'var(--text-secondary)' }}>
                   사용 중인 평가자
                 </div>
                 <div className="w-full max-w-40 mx-auto">
@@ -3254,7 +3253,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   >
                     O
                   </div>
-                  <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <h3 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     사용 가능 옵션
                   </h3>
                 </div>
@@ -3394,10 +3393,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         <div 
           className="p-6 rounded-xl transition-all duration-300"
           style={{
-            background: 'var(--gradient-gold-light)',
-            border: '1px solid var(--border-medium)',
-            backdropFilter: 'blur(10px)',
-            boxShadow: 'var(--shadow-md)'
+            border: '1px solid var(--border-light)',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            backdropFilter: 'blur(10px)'
           }}
           >
             <div className="flex items-center justify-between mb-6">
@@ -3443,8 +3441,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   onClick={() => handleTabChange('creation')}
                   className="px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:scale-105"
                   style={{
-                    background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-                    color: 'white'
+                    border: '1px solid var(--border-light)',
+                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                    color: 'var(--text-primary)'
                   }}
                 >
                   ➕ 새 프로젝트 생성
@@ -3536,10 +3535,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         <div 
           className="p-6 rounded-xl transition-all duration-300"
           style={{
-            background: 'var(--gradient-gray-light)',
-            border: '1px solid var(--border-medium)',
-            backdropFilter: 'blur(10px)',
-            boxShadow: 'var(--shadow-md)'
+            border: '1px solid var(--border-light)',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            backdropFilter: 'blur(10px)'
           }}
         >
             <h3 
@@ -3608,7 +3606,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             className="h-2 rounded-full transition-all duration-500"
                             style={{ 
                               width: `${progressPercent}%`,
-                              background: progressPercent === 100 ? 'var(--semantic-success)' : 'var(--gradient-gold-main)'
+                              background: progressPercent === 100 ? 'var(--accent-primary)' : 'var(--accent-secondary)'
                             }}
                           ></div>
                         </div>
@@ -3685,7 +3683,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                             className="h-2 rounded-full transition-all duration-500"
                             style={{ 
                               width: `${progressPercent}%`,
-                              background: progressPercent >= 100 ? 'var(--semantic-success)' : 'var(--gradient-gray-main)'
+                              background: progressPercent >= 100 ? 'var(--accent-primary)' : 'var(--accent-secondary)'
                             }}
                           ></div>
                         </div>
@@ -3800,9 +3798,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       <div 
         className="card-enhanced p-6"
         style={{
-          background: 'var(--gradient-mixed)',
-          boxShadow: 'var(--shadow-md)',
-          border: '1px solid var(--color-gold-pastel-2)'
+          border: '1px solid var(--border-light)',
+          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
         }}
       >
         <div className="mb-4">
