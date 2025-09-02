@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import HierarchyTreeVisualization from '../common/HierarchyTreeVisualization';
-import { DEMO_CRITERIA, DEMO_SUB_CRITERIA, DEMO_ALTERNATIVES, DEMO_EVALUATORS } from '../../data/demoData';
+import { apiService } from '../../services/apiService';
 
 interface ModelFinalizationProps {
   projectId: string;
@@ -17,6 +17,42 @@ const ModelFinalization: React.FC<ModelFinalizationProps> = ({
 }) => {
   const [workshopMode, setWorkshopMode] = useState<'individual' | 'workshop'>('individual');
   const [isConfirming, setIsConfirming] = useState(false);
+  const [criteria, setCriteria] = useState<any[]>([]);
+  const [alternatives, setAlternatives] = useState<any[]>([]);
+  const [evaluators, setEvaluators] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadProjectData = async () => {
+      try {
+        setLoading(true);
+        
+        // 실제 프로젝트 데이터 로드
+        const [criteriaResponse, alternativesResponse, evaluatorsResponse] = await Promise.all([
+          apiService.get(`/projects/${projectId}/criteria`),
+          apiService.get(`/projects/${projectId}/alternatives`),
+          apiService.get(`/projects/${projectId}/evaluators`)
+        ]);
+        
+        setCriteria(criteriaResponse.criteria || []);
+        setAlternatives(alternativesResponse.alternatives || []);
+        setEvaluators(evaluatorsResponse.evaluators || []);
+        
+      } catch (error) {
+        console.error('Failed to load project data:', error);
+        // 에러 시 빈 배열로 초기화
+        setCriteria([]);
+        setAlternatives([]);
+        setEvaluators([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (projectId) {
+      loadProjectData();
+    }
+  }, [projectId]);
 
   const handleFinalize = () => {
     if (isConfirming) {
@@ -31,16 +67,40 @@ const ModelFinalization: React.FC<ModelFinalizationProps> = ({
   };
 
   const getModelSummary = () => {
+    const criteriaCount = criteria.length;
+    const alternativesCount = alternatives.length;
+    const evaluatorsCount = evaluators.length;
+    
+    // 실제 데이터 기반으로 예상 비교 횟수 계산
+    const criteriaComparisons = criteriaCount > 1 ? (criteriaCount * (criteriaCount - 1)) / 2 : 0;
+    const alternativeComparisons = alternativesCount > 1 ? (alternativesCount * (alternativesCount - 1)) / 2 : 0;
+    const estimatedComparisons = evaluatorsCount * (criteriaComparisons + (alternativeComparisons * criteriaCount));
+    
     return {
-      criteria: DEMO_CRITERIA.length, // 3개 상위 기준
-      subCriteria: DEMO_SUB_CRITERIA.length, // 9개 세부 기준
-      alternatives: DEMO_ALTERNATIVES.length, // 9개 대안
-      evaluators: DEMO_EVALUATORS.length, // 26명 평가자
-      estimatedComparisons: 126 // 26명 × (3개 상위기준 비교 + 15개 대안 비교)
+      criteria: criteriaCount,
+      subCriteria: criteria.filter(c => c.level > 1).length,
+      alternatives: alternativesCount,
+      evaluators: evaluatorsCount,
+      estimatedComparisons: estimatedComparisons
     };
   };
 
   const summary = getModelSummary();
+
+  if (loading) {
+    return (
+      <div className="space-y-6">
+        <Card title="2-4단계 — 모델 구축">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+              <p className="text-gray-600">프로젝트 데이터를 불러오는 중...</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -54,14 +114,16 @@ const ModelFinalization: React.FC<ModelFinalizationProps> = ({
           </div>
 
           {/* Hierarchy Tree Visualization */}
-          <div>
-            <HierarchyTreeVisualization
-              nodes={[...DEMO_CRITERIA, ...DEMO_SUB_CRITERIA]}
-              title="AI 개발 활용 방안 최종 계층구조"
-              showWeights={true}
-              interactive={false}
-            />
-          </div>
+          {!loading && criteria.length > 0 && (
+            <div>
+              <HierarchyTreeVisualization
+                nodes={criteria}
+                title="프로젝트 최종 계층구조"
+                showWeights={true}
+                interactive={false}
+              />
+            </div>
+          )}
 
           {/* Model Summary */}
           <div>
@@ -95,22 +157,31 @@ const ModelFinalization: React.FC<ModelFinalizationProps> = ({
           </div>
 
           {/* Alternatives Summary */}
-          <div>
-            <h4 className="font-medium text-gray-900 mb-4">🎯 평가 대안 목록</h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {DEMO_ALTERNATIVES.slice(0, 9).map((alternative, index) => (
-                <div key={alternative.id} className="bg-white border border-gray-200 rounded-lg p-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-900">{alternative.name}</span>
-                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                      #{index + 1}
-                    </span>
-                  </div>
-                  <p className="text-xs text-gray-600 mt-1">{alternative.description}</p>
+          {!loading && (
+            <div>
+              <h4 className="font-medium text-gray-900 mb-4">🎯 평가 대안 목록</h4>
+              {alternatives.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {alternatives.map((alternative, index) => (
+                    <div key={alternative.id} className="bg-white border border-gray-200 rounded-lg p-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-900">{alternative.name}</span>
+                        <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                          #{index + 1}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-600 mt-1">{alternative.description || '설명 없음'}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              ) : (
+                <div className="text-center py-8 text-gray-500">
+                  <p>등록된 대안이 없습니다.</p>
+                  <p className="text-sm">2-2단계에서 대안을 추가해주세요.</p>
+                </div>
+              )}
             </div>
-          </div>
+          )}
 
           {/* Evaluation Method Selection */}
           <div className="border-t pt-6">
