@@ -478,7 +478,7 @@ const PaperManagement: React.FC = () => {
       {/* 탭 네비게이션 */}
       <Card>
         <div className="border-b border-gray-200">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex flex-wrap gap-4">
             {[
               { id: 'references', label: '📚 참고문헌', desc: '문헌 관리 및 인용' },
               { id: 'results', label: '📊 결과 정리', desc: 'AHP 분석 결과 인용' },
@@ -488,15 +488,15 @@ const PaperManagement: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap ${
+                className={`flex-1 min-w-0 py-6 px-6 border-b-3 font-semibold text-base rounded-t-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    ? 'border-blue-500 text-blue-700 bg-blue-50 shadow-sm'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300'
                 }`}
               >
                 <div className="text-center">
-                  <div>{tab.label}</div>
-                  <div className="text-xs text-gray-400 mt-1">{tab.desc}</div>
+                  <div className="text-lg">{tab.label}</div>
+                  <div className="text-sm text-gray-500 mt-2 font-normal">{tab.desc}</div>
                 </div>
               </button>
             ))}
