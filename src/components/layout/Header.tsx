@@ -4,7 +4,6 @@ import LayerPopup from '../common/LayerPopup';
 import ColorThemeSelector from '../common/ColorThemeSelector';
 import sessionService from '../../services/sessionService';
 import { useTheme } from '../../hooks/useTheme';
-// import { useColorTheme } from '../../hooks/useColorTheme';
 
 interface HeaderProps {
   user?: {
@@ -30,31 +29,24 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
   const [remainingTime, setRemainingTime] = useState<number>(0);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [favorites, setFavorites] = useState<FavoriteMenuItem[]>([]);
-  // const [showFavoriteModal, setShowFavoriteModal] = useState(false);
   
   const { theme, toggleTheme } = useTheme();
-  // const { currentTheme } = useColorTheme();
 
   useEffect(() => {
-    // 세션 상태 확인 및 시간 업데이트
     const updateSessionStatus = async () => {
-      // 사용자가 로그인 상태면 세션 활성화로 간주
       if (user) {
         setIsLoggedIn(true);
         
-        // 세션 시간 계산 (기본 30분)
         const loginTime = localStorage.getItem('login_time');
         if (loginTime) {
-          const elapsed = Math.floor((Date.now() - parseInt(loginTime)) / 60000); // 분 단위
+          const elapsed = Math.floor((Date.now() - parseInt(loginTime)) / 60000);
           const remaining = Math.max(0, 30 - elapsed);
           setRemainingTime(remaining);
         } else {
-          // 로그인 시간 설정
           localStorage.setItem('login_time', Date.now().toString());
           setRemainingTime(30);
         }
         
-        // 마지막 활동 시간 업데이트
         localStorage.setItem('last_activity', Date.now().toString());
       } else {
         setIsLoggedIn(false);
@@ -64,7 +56,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
 
     if (user) {
       updateSessionStatus();
-      const interval = setInterval(updateSessionStatus, 60000); // 1분마다 업데이트
+      const interval = setInterval(updateSessionStatus, 60000);
       return () => clearInterval(interval);
     } else {
       setIsLoggedIn(false);
@@ -72,7 +64,6 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
     }
   }, [user]);
 
-  // 즐겨찾기 로드
   useEffect(() => {
     if (user) {
       const savedFavorites = localStorage.getItem(`favorites_${user.first_name}_${user.last_name}`);
@@ -82,7 +73,6 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
     }
   }, [user]);
 
-  // 즐겨찾기 저장
   const saveFavorites = (newFavorites: FavoriteMenuItem[]) => {
     if (user) {
       localStorage.setItem(`favorites_${user.first_name}_${user.last_name}`, JSON.stringify(newFavorites));
@@ -90,7 +80,6 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
     }
   };
 
-  // 즐겨찾기 추가
   const addToFavorites = (item: Omit<FavoriteMenuItem, 'id'>) => {
     const newFavorite: FavoriteMenuItem = {
       ...item,
@@ -101,13 +90,11 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
     saveFavorites(newFavorites);
   };
 
-  // 즐겨찾기 제거
   const removeFromFavorites = (id: string) => {
     const newFavorites = favorites.filter(fav => fav.id !== id);
     saveFavorites(newFavorites);
   };
 
-  // 현재 탭이 즐겨찾기에 있는지 확인
   const isCurrentTabFavorite = () => {
     return favorites.some(fav => fav.tab === activeTab);
   };
@@ -118,40 +105,16 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
     return 'session-danger';
   };
 
-  /*
-  const getTimeStyle = () => {
-    if (remainingTime > 10) {
-      return {
-        backgroundColor: 'var(--session-good-bg)',
-        color: 'var(--session-good-text)',
-        borderColor: 'var(--session-good-border)'
-      };
-    }
-    if (remainingTime > 5) {
-      return {
-        backgroundColor: 'var(--session-warning-bg)',
-        color: 'var(--session-warning-text)',
-        borderColor: 'var(--session-warning-border)'
-      };
-    }
-    return {
-      backgroundColor: 'var(--session-danger-bg)',
-      color: 'var(--session-danger-text)',
-      borderColor: 'var(--session-danger-border)'
-    };
-  };
-  */
-
   const getTimeIcon = () => {
     if (remainingTime > 10) return '🟢';
     if (remainingTime > 5) return '🟡';
     return '🔴';
   };
+
   const handleLogoClick = () => {
     if (onLogoClick) {
       onLogoClick();
     } else if (user) {
-      // 로그인 상태에서는 적절한 대시보드로 이동
       if (onTabChange) {
         if (user.role === 'super_admin' && user.admin_type === 'super') {
           onTabChange('super-admin');
@@ -162,21 +125,13 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
         }
       }
     } else {
-      // 비로그인 상태에서는 홈페이지로
       window.location.href = '/';
     }
   };
-  
-  const handleQuickNavigation = (tab: string) => {
-    if (onTabChange) {
-      onTabChange(tab);
-    }
-  };
-  
+
   const getQuickNavItems = () => {
     const items = [];
     
-    // 모든 사용자(비로그인 포함)에게 공통 메뉴
     items.push(
       { label: '사용자 가이드', tab: 'user-guide', icon: '📚' },
       { label: '평가자 체험', tab: 'evaluator-mode', icon: '👨‍💼' }
@@ -184,7 +139,6 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
     
     if (!user) return items;
     
-    // 로그인된 사용자 전용 메뉴
     if (user.role === 'super_admin' && user.admin_type === 'super') {
       items.push(
         { label: '관리 대시보드', tab: 'super-admin', icon: '📊' },
@@ -241,32 +195,9 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
           <div className="flex-shrink-0">
             <button
               onClick={handleLogoClick}
-              className="flex items-center space-x-4 hover:opacity-90 transition-luxury focus-luxury rounded-lg p-3 group"
-              style={{ marginLeft: '50px', marginTop: '5px' }}
+              className="flex items-center hover:opacity-90 transition-luxury focus-luxury rounded-lg p-3 group"
+              style={{ marginLeft: '20px', marginTop: '5px' }}
             >
-              {/* AHP 로고 아이콘 */}
-              <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg"
-                   style={{ 
-                     background: `linear-gradient(135deg, var(--accent-gold), var(--accent-gold-2))`,
-                     borderRadius: 'var(--radius-md)',
-                     boxShadow: 'var(--shadow-md)'
-                   }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <circle cx="12" cy="8" r="2" fill="white"/>
-                  <circle cx="8" cy="14" r="1.5" fill="white"/>
-                  <circle cx="16" cy="14" r="1.5" fill="white"/>
-                  <circle cx="6" cy="18" r="1" fill="white"/>
-                  <circle cx="10" cy="18" r="1" fill="white"/>
-                  <circle cx="14" cy="18" r="1" fill="white"/>
-                  <circle cx="18" cy="18" r="1" fill="white"/>
-                  <line x1="12" y1="10" x2="8" y2="12.5" stroke="white" strokeWidth="1" opacity="0.8"/>
-                  <line x1="12" y1="10" x2="16" y2="12.5" stroke="white" strokeWidth="1" opacity="0.8"/>
-                  <line x1="8" y1="15.5" x2="6" y2="17" stroke="white" strokeWidth="0.8" opacity="0.8"/>
-                  <line x1="8" y1="15.5" x2="10" y2="17" stroke="white" strokeWidth="0.8" opacity="0.8"/>
-                  <line x1="16" y1="15.5" x2="14" y2="17" stroke="white" strokeWidth="0.8" opacity="0.8"/>
-                  <line x1="16" y1="15.5" x2="18" y2="17" stroke="white" strokeWidth="0.8" opacity="0.8"/>
-                </svg>
-              </div>
               <div className="flex flex-col items-start">
                 <h1 className="text-2xl font-black leading-tight"
                     style={{ 
@@ -284,211 +215,184 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
             </button>
           </div>
 
-          {/* 중앙 메뉴 영역 */}
+          {/* 좌측 핵심 기능 그룹 */}
           {user && (
-            <div className="flex-1 flex items-center justify-center space-x-6">
-              {/* 즐겨찾기 메뉴 */}
-              <div className="flex items-center space-x-4">
-                <LayerPopup
-                  trigger={
-                    <UnifiedButton
-                      variant="secondary"
-                      size="md"
-                      icon="⭐"
-                      className="relative shadow-md transition-all duration-300 hover:shadow-lg"
-                      style={{
-                        background: 'linear-gradient(135deg, var(--favorite-bg), var(--accent-light))',
-                        borderColor: 'var(--favorite-border)',
-                        color: 'var(--favorite-text)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'var(--favorite-hover-bg)';
-                        e.currentTarget.style.color = 'var(--favorite-hover-text)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'linear-gradient(135deg, var(--favorite-bg), var(--accent-light))';
-                        e.currentTarget.style.color = 'var(--favorite-text)';
-                      }}
-                    >
-                      <span className="font-semibold">즐겨찾기</span>
-                      {favorites.length > 0 && (
-                        <span className="absolute -top-1 -right-1 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center shadow-lg animate-pulse"
-                              style={{ background: 'linear-gradient(135deg, var(--status-danger-bg), var(--accent-secondary))' }}>
-                          {favorites.length}
-                        </span>
-                      )}
-                    </UnifiedButton>
-                  }
-                  title="⭐ 내 즐겨찾기 메뉴"
-                  content={
-                    <div className="space-y-5 w-96">
-                      {favorites.length === 0 ? (
-                        <div className="text-center py-12 rounded-xl border-2 border-dashed"
-                             style={{
-                               background: 'linear-gradient(135deg, var(--favorite-bg), transparent)',
-                               borderColor: 'var(--favorite-border)'
-                             }}>
-                          <div className="text-6xl mb-4 animate-bounce">⭐</div>
-                          <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>즐겨찾기가 비어있습니다</h3>
-                          <p className="text-sm mb-4 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>자주 사용하는 메뉴를 즐겨찾기에 추가하여<br/>빠르게 접근해보세요</p>
-                          <div className="p-4 rounded-lg shadow-sm border inline-block"
-                               style={{ backgroundColor: 'var(--bg-secondary)', borderColor: 'var(--favorite-border)' }}>
-                            <p className="text-xs flex items-center gap-2" style={{ color: 'var(--favorite-text)' }}>
-                              <span>💡</span>
-                              현재 페이지에서 <span className="px-1 rounded" style={{ backgroundColor: 'var(--favorite-bg)' }}>⭐</span> 버튼을 클릭하여 추가
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <>
-                          <div className="p-4 rounded-xl border shadow-sm"
-                               style={{
-                                 background: 'linear-gradient(135deg, var(--status-info-light), var(--interactive-primary-light))',
-                                 borderColor: 'var(--interactive-primary)'
-                               }}>
-                            <div className="flex items-center justify-between mb-2">
-                              <h4 className="font-bold flex items-center gap-2"
-                                  style={{ color: 'var(--interactive-secondary)' }}>
-                                <span className="text-xl">⭐</span>
-                                내 즐겨찾기
-                              </h4>
-                              <span className="px-3 py-1 rounded-full text-sm font-bold"
-                                    style={{ 
-                                      backgroundColor: 'var(--interactive-primary-light)',
-                                      color: 'var(--interactive-secondary)'
-                                    }}>
-                                {favorites.length}개
-                              </span>
-                            </div>
-                            <p className="text-sm font-medium" style={{ color: 'var(--interactive-secondary)' }}>자주 사용하는 메뉴를 빠르게 접근하세요</p>
-                          </div>
-                          <div className="space-y-3 max-h-72 overflow-y-auto custom-scrollbar">
-                            {favorites.map((fav, index) => (
-                              <div 
-                                key={fav.id} 
-                                className="group flex items-center justify-between p-4 rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
-                                style={{
-                                  background: 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))',
-                                  borderColor: 'var(--border-light)',
-                                  border: '1px solid',
-                                  animationDelay: `${index * 0.1}s`
-                                }}
-                                onMouseEnter={(e) => {
-                                  e.currentTarget.style.background = 'linear-gradient(135deg, var(--interactive-primary-light), var(--accent-light))';
-                                  e.currentTarget.style.borderColor = 'var(--interactive-primary)';
-                                }}
-                                onMouseLeave={(e) => {
-                                  e.currentTarget.style.background = 'linear-gradient(135deg, var(--bg-secondary), var(--bg-elevated))';
-                                  e.currentTarget.style.borderColor = 'var(--border-light)';
-                                }}
-                              >
-                                <button
-                                  onClick={() => {
-                                    if (onTabChange) onTabChange(fav.tab);
-                                  }}
-                                  className="flex items-center space-x-3 flex-1 text-left"
-                                >
-                                  <div className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300"
-                                       style={{ background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))' }}>
-                                    <span className="text-lg">{fav.icon}</span>
-                                  </div>
-                                  <div className="flex-1">
-                                    <span className="font-semibold transition-colors duration-300"
-                                          style={{ 
-                                            color: 'var(--text-primary)'
-                                          } as React.CSSProperties}
-                                          onMouseEnter={(e) => e.currentTarget.style.color = 'var(--interactive-secondary)'}
-                                          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-primary)'}>
-                                      {fav.label}
-                                    </span>
-                                    <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                                      즐겨찾기 #{index + 1}
-                                    </p>
-                                  </div>
-                                </button>
-                                <div className="flex items-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                  <UnifiedButton
-                                    variant="danger"
-                                    size="sm"
-                                    onClick={() => removeFromFavorites(fav.id)}
-                                    icon="🗑️"
-                                    className="shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-110"
-                                  >
-                                    
-                                  </UnifiedButton>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="bg-gradient-to-r from-green-50 to-emerald-50 p-3 rounded-lg border border-green-200">
-                            <p className="text-sm text-green-700 flex items-center gap-2">
-                              <span>✨</span>
-                              즐겨찾기를 활용하여 업무 효율성을 높여보세요!
-                            </p>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  }
-                  width="lg"
-                />
+            <div className="flex-1 flex items-center space-x-4 ml-8">
+              <UnifiedButton
+                variant={activeTab === 'personal-service' ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => onTabChange && onTabChange('personal-service')}
+                icon="🏠"
+                className="font-medium"
+              >
+                대시보드
+              </UnifiedButton>
+              
+              <UnifiedButton
+                variant={activeTab === 'my-projects' ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => onTabChange && onTabChange('my-projects')}
+                icon="📂"
+                className="font-medium"
+              >
+                내 프로젝트
+              </UnifiedButton>
+              
+              <UnifiedButton
+                variant={activeTab === 'project-creation' ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => onTabChange && onTabChange('project-creation')}
+                icon="➕"
+                className="font-medium"
+              >
+                새 프로젝트
+              </UnifiedButton>
+              
+              <UnifiedButton
+                variant={activeTab === 'model-builder' ? 'primary' : 'secondary'}
+                size="sm"
+                onClick={() => onTabChange && onTabChange('model-builder')}
+                icon="🏗️"
+                className="font-medium"
+              >
+                모델 구축
+              </UnifiedButton>
 
-                {/* 현재 페이지 즐겨찾기 토글 */}
-                {activeTab && getQuickNavItems().some(item => item.tab === activeTab) && (
+              {/* 즐겨찾기 메뉴 (축소형) */}
+              <LayerPopup
+                trigger={
                   <UnifiedButton
-                    variant={isCurrentTabFavorite() ? "warning" : "secondary"}
+                    variant="secondary"
                     size="sm"
-                    onClick={() => {
-                      const currentItem = getQuickNavItems().find(item => item.tab === activeTab);
-                      if (currentItem) {
-                        if (isCurrentTabFavorite()) {
-                          const favItem = favorites.find(fav => fav.tab === activeTab);
-                          if (favItem) removeFromFavorites(favItem.id);
-                        } else {
-                          addToFavorites(currentItem);
-                        }
-                      }
-                    }}
-                    icon={isCurrentTabFavorite() ? "⭐" : "☆"}
-                    className={`transition-all duration-300 transform hover:scale-110 ${
-                      isCurrentTabFavorite() 
-                        ? 'bg-gradient-to-r from-yellow-100 to-amber-100 border-yellow-300 text-yellow-700 shadow-md hover:shadow-lg animate-pulse' 
-                        : 'bg-gray-50 border-gray-300 text-gray-600 hover:bg-yellow-50 hover:border-yellow-200 hover:text-yellow-600'
-                    }`}
-                    title={isCurrentTabFavorite() ? "즐겨찾기에서 제거" : "즐겨찾기에 추가"}
+                    icon="⭐"
+                    className="relative"
                   >
-                    
+                    즐겨찾기
+                    {favorites.length > 0 && (
+                      <span className="absolute -top-1 -right-1 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-lg"
+                            style={{ background: 'var(--status-danger-bg)' }}>
+                        {favorites.length}
+                      </span>
+                    )}
                   </UnifiedButton>
-                )}
-              </div>
+                }
+                title="⭐ 내 즐겨찾기 메뉴"
+                content={
+                  <div className="space-y-4 w-80">
+                    {favorites.length === 0 ? (
+                      <div className="text-center py-8 rounded-xl border-2 border-dashed"
+                           style={{
+                             background: 'linear-gradient(135deg, var(--favorite-bg), transparent)',
+                             borderColor: 'var(--favorite-border)'
+                           }}>
+                        <div className="text-4xl mb-3">⭐</div>
+                        <h3 className="text-lg font-bold mb-2" style={{ color: 'var(--text-primary)' }}>즐겨찾기가 비어있습니다</h3>
+                        <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>자주 사용하는 메뉴를 추가해보세요</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2 max-h-60 overflow-y-auto">
+                        {favorites.map((fav) => (
+                          <div key={fav.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50">
+                            <button
+                              onClick={() => onTabChange && onTabChange(fav.tab)}
+                              className="flex items-center space-x-2 flex-1 text-left"
+                            >
+                              <span className="text-lg">{fav.icon}</span>
+                              <span className="font-medium">{fav.label}</span>
+                            </button>
+                            <UnifiedButton
+                              variant="danger"
+                              size="sm"
+                              onClick={() => removeFromFavorites(fav.id)}
+                              icon="🗑️"
+                            >
+                              삭제
+                            </UnifiedButton>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {activeTab && (
+                      <div className="pt-3 border-t border-gray-200">
+                        <UnifiedButton
+                          variant={isCurrentTabFavorite() ? "danger" : "success"}
+                          size="sm"
+                          onClick={() => {
+                            if (isCurrentTabFavorite()) {
+                              const currentFav = favorites.find(fav => fav.tab === activeTab);
+                              if (currentFav) removeFromFavorites(currentFav.id);
+                            } else {
+                              const quickNav = getQuickNavItems().find(item => item.tab === activeTab);
+                              if (quickNav) {
+                                addToFavorites({
+                                  label: quickNav.label,
+                                  tab: quickNav.tab,
+                                  icon: quickNav.icon
+                                });
+                              }
+                            }
+                          }}
+                          icon={isCurrentTabFavorite() ? "🗑️" : "⭐"}
+                          className="w-full"
+                        >
+                          {isCurrentTabFavorite() ? '즐겨찾기에서 제거' : '즐겨찾기에 추가'}
+                        </UnifiedButton>
+                      </div>
+                    )}
+                  </div>
+                }
+                width="lg"
+              />
+            </div>
+          )}
 
-              {/* 빠른 네비게이션 */}
-              <div className="hidden lg:flex items-center space-x-2">
-                {getQuickNavItems().slice(0, 4).map((item) => (
-                  <button
-                    key={item.tab}
-                    onClick={() => handleQuickNavigation(item.tab)}
-                    className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 cursor-pointer ${
-                      activeTab === item.tab
-                        ? 'bg-blue-100 text-blue-700 shadow-sm border border-blue-200'
-                        : item.tab === 'personal-service' 
-                          ? 'text-blue-600 hover:text-blue-800 hover:bg-blue-50 underline hover:no-underline'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                    title={item.label}
-                  >
-                    <span className="text-base">{item.icon}</span>
-                    <span>{item.label}</span>
-                  </button>
-                ))}
+          {/* 오른쪽 부가 기능 및 사용자 정보 영역 */}
+          <div className="flex items-center space-x-4" style={{ marginRight: '20px' }}>
+            {/* 부가 기능 메뉴 */}
+            {user && (
+              <div className="flex items-center space-x-3">
+                <UnifiedButton
+                  variant={activeTab === 'user-guide' ? 'primary' : 'secondary'}
+                  size="sm"
+                  onClick={() => onTabChange && onTabChange('user-guide')}
+                  icon="📚"
+                  className="font-medium"
+                >
+                  가이드
+                </UnifiedButton>
+                
+                <UnifiedButton
+                  variant={activeTab === 'results-analysis' ? 'primary' : 'secondary'}
+                  size="sm"
+                  onClick={() => onTabChange && onTabChange('results-analysis')}
+                  icon="📊"
+                  className="font-medium"
+                >
+                  결과 분석
+                </UnifiedButton>
+                
+                <UnifiedButton
+                  variant={activeTab === 'personal-settings' ? 'primary' : 'secondary'}
+                  size="sm"
+                  onClick={() => onTabChange && onTabChange('personal-settings')}
+                  icon="⚙️"
+                  className="font-medium"
+                >
+                  설정
+                </UnifiedButton>
               </div>
+            )}
 
-              {/* 컬러 템플릿 선택기 */}
+            {/* 컬러 테마 선택기 */}
+            {user && (
               <div className="flex items-center">
                 <ColorThemeSelector />
               </div>
+            )}
 
-              {/* 테마 토글 버튼 */}
+            {/* 테마 토글 버튼 */}
+            {user && (
               <div className="flex items-center">
                 <UnifiedButton
                   variant="secondary"
@@ -501,114 +405,31 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                   <span className="hidden sm:inline">{getThemeLabel()}</span>
                 </UnifiedButton>
               </div>
-
-              {/* 세션 상태 */}
-              {isLoggedIn && (
-                <div className="flex items-center space-x-3">
-                  <div className={`px-4 py-2 rounded-xl text-sm font-medium border flex items-center space-x-2 ${getTimeColor()}`}>
-                    <span className="text-base">{getTimeIcon()}</span>
-                    <span className="hidden sm:inline">세션: </span>
-                    <span className="font-bold">{remainingTime}분</span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-2">
-                    <UnifiedButton
-                      variant="info"
-                      size="sm"
-                      onClick={() => {
-                        sessionService.extendSession();
-                        setRemainingTime(30);
-                      }}
-                      icon="⏰"
-                    >
-                      <span className="hidden sm:inline">연장</span>
-                    </UnifiedButton>
-                    
-                    <LayerPopup
-                      trigger={
-                        <UnifiedButton
-                          variant="secondary"
-                          size="sm"
-                          icon="ℹ️"
-                        >
-                          <span className="hidden sm:inline">세션확인</span>
-                        </UnifiedButton>
-                      }
-                      title="세션 상세 정보"
-                      content={
-                        <div className="space-y-6">
-                          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                            <div className="flex items-center justify-between mb-3">
-                              <h4 className="font-semibold text-blue-900">현재 세션 상태</h4>
-                              <div className={`px-3 py-1 rounded-full text-sm font-medium ${getTimeColor()}`}>
-                                {getTimeIcon()} {remainingTime}분 남음
-                              </div>
-                            </div>
-                            <div className="w-full bg-gray-200 rounded-full h-3">
-                              <div 
-                                className={`h-3 rounded-full transition-all duration-500 ${
-                                  remainingTime > 10 ? 'bg-green-500' :
-                                  remainingTime > 5 ? 'bg-yellow-500' :
-                                  'bg-red-500'
-                                }`}
-                                style={{ width: `${Math.max(0, (remainingTime / 30) * 100)}%` }}
-                              ></div>
-                            </div>
-                            <p className="text-sm text-blue-700 mt-2">
-                              {remainingTime > 10 ? '세션이 안정적으로 유지되고 있습니다.' :
-                               remainingTime > 5 ? '세션이 곧 만료됩니다. 연장을 고려하세요.' :
-                               '세션이 곧 만료됩니다! 즉시 연장하세요.'}
-                            </p>
-                          </div>
-
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="bg-white p-4 rounded-lg border">
-                              <div className="text-gray-600 text-sm mb-1">로그인 시간</div>
-                              <div className="font-medium text-gray-900">
-                                {localStorage.getItem('login_time') ? 
-                                  new Date(parseInt(localStorage.getItem('login_time') || '0')).toLocaleString() : 
-                                  '정보 없음'
-                                }
-                              </div>
-                            </div>
-                            <div className="bg-white p-4 rounded-lg border">
-                              <div className="text-gray-600 text-sm mb-1">마지막 활동</div>
-                              <div className="font-medium text-gray-900">
-                                {localStorage.getItem('last_activity') ? 
-                                  new Date(parseInt(localStorage.getItem('last_activity') || '0')).toLocaleString() : 
-                                  '정보 없음'
-                                }
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex justify-center">
-                            <UnifiedButton
-                              variant="info"
-                              size="md"
-                              onClick={() => {
-                                sessionService.extendSession();
-                                setRemainingTime(30);
-                              }}
-                              icon="⏰"
-                            >
-                              지금 30분 연장하기
-                            </UnifiedButton>
-                          </div>
-                        </div>
-                      }
-                      width="lg"
-                    />
-                  </div>
+            )}
+            
+            {/* 세션 상태 */}
+            {user && isLoggedIn && (
+              <div className="flex items-center space-x-2">
+                <div className={`px-3 py-1 rounded-xl text-sm font-medium border flex items-center space-x-1 ${getTimeColor()}`}>
+                  <span className="text-base">{getTimeIcon()}</span>
+                  <span className="font-bold">{remainingTime}분</span>
                 </div>
-              )}
-            </div>
-          )}
-
-          {/* 오른쪽 사용자 정보 및 로그아웃 영역 */}
-          {user && (
-            <div className="flex items-center space-x-4" style={{ marginRight: '50px' }}>
-              {/* 사용자 정보 */}
+                
+                <UnifiedButton
+                  variant="info"
+                  size="sm"
+                  onClick={() => {
+                    sessionService.extendSession();
+                    setRemainingTime(30);
+                  }}
+                  icon="⏰"
+                  title="세션 30분 연장"
+                />
+              </div>
+            )}
+            
+            {/* 사용자 정보 */}
+            {user && (
               <div className="flex items-center space-x-3">
                 <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-full flex items-center justify-center shadow-lg">
                   <span className="text-sm font-bold text-white">
@@ -645,25 +466,25 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
                   </div>
                 </div>
               </div>
+            )}
               
-              {/* 로그아웃 버튼 */}
-              {onLogout && (
-                <UnifiedButton
-                  variant="danger"
-                  size="md"
-                  onClick={() => {
-                    if (window.confirm('로그아웃 하시겠습니까?')) {
-                      sessionService.logout();
-                      onLogout();
-                    }
-                  }}
-                  icon="🚪"
-                >
-                  <span className="hidden sm:inline font-medium">로그아웃</span>
-                </UnifiedButton>
-              )}
-            </div>
-          )}
+            {/* 로그아웃 버튼 */}
+            {user && onLogout && (
+              <UnifiedButton
+                variant="danger"
+                size="md"
+                onClick={() => {
+                  if (window.confirm('로그아웃 하시겠습니까?')) {
+                    sessionService.logout();
+                    onLogout();
+                  }
+                }}
+                icon="🚪"
+              >
+                <span className="hidden sm:inline font-medium">로그아웃</span>
+              </UnifiedButton>
+            )}
+          </div>
         </div>
       </div>
     </header>
