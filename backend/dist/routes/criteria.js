@@ -81,8 +81,8 @@ router.post('/', auth_1.authenticateToken, [
     (0, express_validator_1.body)('name').trim().isLength({ min: 1, max: 255 }).withMessage('Name is required and must be less than 255 characters'),
     (0, express_validator_1.body)('description').optional().isLength({ max: 1000 }).withMessage('Description must be less than 1000 characters'),
     (0, express_validator_1.body)('parent_id').optional().isInt().withMessage('Parent ID must be an integer'),
-    (0, express_validator_1.body)('level').optional().isInt({ min: 1, max: 4 }).withMessage('Level must be between 1 and 4'),
-    (0, express_validator_1.body)('position').optional().isInt({ min: 0 }).withMessage('Position must be non-negative')
+    (0, express_validator_1.body)('level').optional().isInt({ min: 1, max: 5 }).withMessage('Level must be between 1 and 5'),
+    (0, express_validator_1.body)('order_index').optional().isInt({ min: 0 }).withMessage('Order index must be non-negative')
 ], async (req, res) => {
     try {
         const errors = (0, express_validator_1.validationResult)(req);
@@ -92,7 +92,7 @@ router.post('/', auth_1.authenticateToken, [
                 details: errors.array()
             });
         }
-        const { project_id, name, description, parent_id, level, position } = req.body;
+        const { project_id, name, description, parent_id, level, order_index } = req.body;
         const userId = req.user.id;
         const userRole = req.user.role;
         // 관리자 권한 확인
@@ -110,13 +110,13 @@ router.post('/', auth_1.authenticateToken, [
             if (parentResult.rows.length === 0) {
                 return res.status(404).json({ error: 'Parent criterion not found' });
             }
-            if (parentResult.rows[0].level >= 4) {
-                return res.status(400).json({ error: 'Cannot create more than 4 levels of criteria hierarchy' });
+            if (parentResult.rows[0].level >= 5) {
+                return res.status(400).json({ error: 'Cannot create more than 5 levels of criteria hierarchy' });
             }
         }
         // 다음 위치 계산
-        let nextPosition = position || 0;
-        if (!position && position !== 0) {
+        let nextPosition = order_index || 0;
+        if (!order_index && order_index !== 0) {
             const positionResult = await (0, connection_1.query)('SELECT MAX(order_index) as max_position FROM criteria WHERE project_id = $1 AND level = $2', [project_id, level || 1]);
             nextPosition = (positionResult.rows[0]?.max_position || 0) + 1;
         }
@@ -153,7 +153,7 @@ router.put('/:id', auth_1.authenticateToken, [
     (0, express_validator_1.body)('name').optional().trim().isLength({ min: 1, max: 255 }).withMessage('Name must be between 1 and 255 characters'),
     (0, express_validator_1.body)('description').optional().isLength({ max: 1000 }).withMessage('Description must be less than 1000 characters'),
     (0, express_validator_1.body)('weight').optional().isFloat({ min: 0, max: 1 }).withMessage('Weight must be between 0 and 1'),
-    (0, express_validator_1.body)('position').optional().isInt({ min: 0 }).withMessage('Position must be non-negative')
+    (0, express_validator_1.body)('order_index').optional().isInt({ min: 0 }).withMessage('Order index must be non-negative')
 ], async (req, res) => {
     try {
         const errors = (0, express_validator_1.validationResult)(req);
@@ -193,9 +193,9 @@ router.put('/:id', auth_1.authenticateToken, [
             updateFields.push(`weight = $${paramIndex++}`);
             updateValues.push(updates.weight);
         }
-        if (updates.position !== undefined) {
+        if (updates.order_index !== undefined) {
             updateFields.push(`order_index = $${paramIndex++}`);
-            updateValues.push(updates.position);
+            updateValues.push(updates.order_index);
         }
         if (updateFields.length === 0) {
             return res.status(400).json({ error: 'No fields to update' });

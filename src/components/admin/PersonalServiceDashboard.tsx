@@ -69,9 +69,10 @@ interface UserProject extends Omit<ProjectData, 'evaluation_method'> {
 
 // 요금제별 할당량 정의
 const PLAN_QUOTAS = {
-  'basic': { projects: 5, evaluators: 20 },
-  'pro': { projects: 20, evaluators: 100 },
-  'enterprise': { projects: 100, evaluators: 500 }
+  'basic': { projects: 3, evaluators: 30 },
+  'standard': { projects: 3, evaluators: 50 },
+  'premium': { projects: 3, evaluators: 100 },
+  'enterprise': { projects: 3, evaluators: 100 } // + 10명 단위 추가 가능
 };
 
 const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({ 
@@ -95,6 +96,17 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 }) => {
   // 사용자 정보 내부 상태 관리
   const [user, setUser] = useState(initialUser);
+  
+  // 요금제 정보 관리
+  const [userPlan, setUserPlan] = useState<{
+    planType: 'basic' | 'standard' | 'premium' | 'enterprise';
+    additionalEvaluators: number; // 10명 단위 추가 구매
+    planName: string;
+  }>({
+    planType: 'standard',
+    additionalEvaluators: 0,
+    planName: 'Standard Plan'
+  });
 
   // props에서 projects를 직접 사용하므로 useEffect 불필요
 
@@ -134,6 +146,23 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   
   // props에서 받은 projects를 직접 사용 (내부 state 제거)
   const projects = Array.isArray(externalProjects) ? externalProjects : [];
+  
+  // 현재 사용량 및 할당량 계산
+  const getCurrentQuotas = () => {
+    const basePlan = PLAN_QUOTAS[userPlan.planType];
+    const totalEvaluators = basePlan.evaluators + (userPlan.additionalEvaluators * 10);
+    
+    return {
+      maxProjects: basePlan.projects,
+      currentProjects: projects.length,
+      maxEvaluators: totalEvaluators,
+      currentEvaluators: projects.reduce((total, project) => total + (project.evaluator_count || 0), 0),
+      planName: userPlan.planName,
+      additionalEvaluators: userPlan.additionalEvaluators
+    };
+  };
+  
+  const quotas = getCurrentQuotas();
   
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [activeProject, setActiveProject] = useState<string | null>(null);
@@ -202,7 +231,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   const [sortBy, setSortBy] = useState<'name' | 'date' | 'progress' | 'status'>('date');
 
   // 현재 사용자의 플랜 정보 (실제로는 API에서 가져와야 함)
-  const currentPlan = 'pro'; // 임시로 Pro Plan으로 설정
+  const currentPlan = 'standard'; // 임시로 Standard Plan으로 설정
   const planLimits = PLAN_QUOTAS[currentPlan];
   
   // 사용량 계산 (안전 가드 추가)
@@ -217,7 +246,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       'realtime-collab': false,
       'premium-support': false
     },
-    'pro': {
+    'standard': {
+      'advanced-analysis': false,
+      'group-ahp': true,
+      'realtime-collab': false,
+      'premium-support': false
+    },
+    'premium': {
       'advanced-analysis': true,
       'group-ahp': true,
       'realtime-collab': true,
@@ -592,8 +627,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-base font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).length}</p>
+              <p className="text-base font-medium" style={{ color: 'var(--status-info-text)' }}>프로젝트</p>
+              <p className="text-3xl font-bold" style={{ 
+                color: (projects || []).length >= getCurrentQuotas().maxProjects ? 'var(--status-error-text)' : 'var(--text-primary)' 
+              }}>
+                {(projects || []).length}<span className="text-lg text-gray-500">/{getCurrentQuotas().maxProjects}</span>
+              </p>
+              <p className="text-sm text-gray-500">{userPlan.planName}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-info-text)' }}>
               <span className="text-white text-2xl">📊</span>
@@ -603,10 +643,28 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-base font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).filter(p => p.status === 'active').length}</p>
+              <p className="text-base font-medium" style={{ color: 'var(--status-success-text)' }}>평가자</p>
+              <p className="text-3xl font-bold" style={{ 
+                color: getCurrentQuotas().currentEvaluators >= getCurrentQuotas().maxEvaluators ? 'var(--status-error-text)' : 'var(--text-primary)' 
+              }}>
+                {getCurrentQuotas().currentEvaluators}<span className="text-lg text-gray-500">/{getCurrentQuotas().maxEvaluators}</span>
+              </p>
+              <p className="text-sm text-gray-500">
+                {userPlan.additionalEvaluators > 0 && `+${userPlan.additionalEvaluators * 10}명 추가`}
+              </p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-success-text)' }}>
+              <span className="text-white text-2xl">👥</span>
+            </div>
+          </div>
+        </div>
+        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-base font-medium" style={{ color: 'var(--accent-primary)' }}>진행중</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).filter(p => p.status === 'active').length}</p>
+            </div>
+            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--accent-primary)' }}>
               <span className="text-white text-2xl">🚀</span>
             </div>
           </div>
@@ -614,24 +672,13 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-base font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).filter(p => p.status === 'completed').length}</p>
-            </div>
-            <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--accent-primary)' }}>
-              <span className="text-white text-2xl">✅</span>
-            </div>
-          </div>
-        </div>
-        <div className="rounded-lg p-4" style={{ border: '1px solid var(--border-light)', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-base font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
+              <p className="text-base font-medium" style={{ color: 'var(--status-warning-text)' }}>완료됨</p>
               <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                {(projects || []).length > 0 ? Math.round((projects || []).reduce((sum, p) => sum + (p.completion_rate || 0), 0) / (projects || []).length) : 0}%
+                {(projects || []).filter(p => p.status === 'completed').length}
               </p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-warning-text)' }}>
-              <span className="text-white text-2xl">📈</span>
+              <span className="text-white text-2xl">✅</span>
             </div>
           </div>
         </div>
