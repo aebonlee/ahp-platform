@@ -11,7 +11,7 @@ router.post('/',
     body('title').trim().isLength({ min: 1, max: 255 }).withMessage('Title is required'),
     body('description').optional().isLength({ max: 1000 }),
     body('objective').optional().isLength({ max: 500 }),
-    body('evaluationMode').optional().isIn(['practical', 'theoretical', 'direct_input']).withMessage('Invalid evaluation mode')
+    body('evaluationMode').optional().isIn(['practical', 'theoretical', 'direct_input', 'pairwise']).withMessage('Invalid evaluation mode')
   ],
   async (req: Request, res: Response) => {
     try {
@@ -124,7 +124,7 @@ router.put('/:id',
     body('description').optional().isLength({ max: 1000 }),
     body('objective').optional().isLength({ max: 500 }),
     body('status').optional().isIn(['draft', 'active', 'completed']),
-    body('evaluation_mode').optional().isIn(['practical', 'theoretical', 'direct_input']),
+    body('evaluation_mode').optional().isIn(['practical', 'theoretical', 'direct_input', 'pairwise']),
     body('workflow_stage').optional().isIn(['creating', 'waiting', 'evaluating', 'completed'])
   ],
   async (req: Request, res: Response) => {

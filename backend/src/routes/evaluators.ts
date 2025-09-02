@@ -248,14 +248,12 @@ router.post('/invite',
         shortLink
       });
 
-      // 초대 상태 업데이트 (데이터베이스에 저장)
+      // 초대 상태 업데이트 (project_evaluators 테이블에 저장)
       await query(
-        `UPDATE evaluators 
-         SET invitation_status = 'sent', 
-             invitation_link = $1,
-             invitation_sent_at = NOW()
-         WHERE id = $2 AND project_id = $3`,
-        [shortLink, evaluatorId, projectId]
+        `UPDATE project_evaluators 
+         SET invitation_sent_at = NOW()
+         WHERE evaluator_id = $1 AND project_id = $2`,
+        [evaluatorId, projectId]
       );
 
       res.json({
@@ -285,29 +283,24 @@ router.get('/',
 
       let evaluatorsQuery = `
         SELECT 
-          e.id,
-          e.email,
-          e.name,
-          e.phone,
-          e.invitation_status,
-          e.invitation_link as short_link,
-          e.invitation_sent_at,
-          e.created_at,
-          e.last_active,
-          array_agg(DISTINCT ep.project_id) as assigned_projects
-        FROM evaluators e
-        LEFT JOIN evaluator_projects ep ON e.id = ep.evaluator_id
-        WHERE e.created_by = $1
+          u.id,
+          u.email,
+          u.first_name || ' ' || u.last_name as name,
+          u.created_at,
+          array_agg(DISTINCT pe.project_id) as assigned_projects
+        FROM users u
+        LEFT JOIN project_evaluators pe ON u.id = pe.evaluator_id
+        WHERE u.role = 'evaluator'
       `;
 
-      const params: any[] = [userId];
+      const params: any[] = [];
 
       if (projectId) {
-        evaluatorsQuery += ` AND ep.project_id = $2`;
+        evaluatorsQuery += ` AND pe.project_id = $1`;
         params.push(projectId);
       }
 
-      evaluatorsQuery += ` GROUP BY e.id ORDER BY e.created_at DESC`;
+      evaluatorsQuery += ` GROUP BY u.id ORDER BY u.created_at DESC`;
 
       const result = await query(evaluatorsQuery, params);
 
@@ -316,12 +309,8 @@ router.get('/',
           id: row.id,
           email: row.email,
           name: row.name,
-          phone: row.phone,
           assignedProjects: row.assigned_projects || [],
-          invitationStatus: row.invitation_status,
-          shortLink: row.short_link,
-          createdAt: row.created_at,
-          lastActive: row.last_active
+          createdAt: row.created_at
         }))
       });
 
@@ -358,32 +347,37 @@ router.post('/',
       const { email, name, phone, projectId } = req.body;
       const adminId = (req as any).user.userId;
 
-      // 이메일 중복 확인
+      // 이메일 중복 확인 (users 테이블에서 확인)
       const existingCheck = await query(
-        'SELECT * FROM evaluators WHERE email = $1 AND created_by = $2',
-        [email, adminId]
+        'SELECT * FROM users WHERE email = $1',
+        [email]
       );
 
       if (existingCheck.rowCount > 0) {
-        return res.status(400).json({ error: 'Evaluator with this email already exists' });
+        return res.status(400).json({ error: 'User with this email already exists' });
       }
 
-      // 평가자 생성
+      // 평가자 사용자 생성 (users 테이블에)
+      const hashedPassword = await hashPassword('defaultpassword'); // 임시 비밀번호
       const result = await query(
-        `INSERT INTO evaluators (email, name, phone, created_by, invitation_status)
-         VALUES ($1, $2, $3, $4, 'pending')
+        `INSERT INTO users (email, password_hash, first_name, last_name, role)
+         VALUES ($1, $2, $3, $4, 'evaluator')
          RETURNING *`,
-        [email, name, phone, adminId]
+        [email, hashedPassword, name, 'Evaluator']
       );
 
       const evaluator = result.rows[0];
 
       // 프로젝트에 배정
       if (projectId) {
+        // 평가자 코드 생성
+        const evaluatorCode = `EVAL${evaluator.id}`;
+        const accessKey = generateAccessKey(evaluatorCode, projectId);
+        
         await query(
-          `INSERT INTO evaluator_projects (evaluator_id, project_id)
-           VALUES ($1, $2)`,
-          [evaluator.id, projectId]
+          `INSERT INTO project_evaluators (project_id, evaluator_id, evaluator_code, access_key)
+           VALUES ($1, $2, $3, $4)`,
+          [projectId, evaluator.id, evaluatorCode, accessKey]
         );
       }
 

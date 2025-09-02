@@ -79,7 +79,7 @@ initDatabase = async () => {
         objective TEXT,
         admin_id INTEGER NOT NULL REFERENCES users(id),
         status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'completed', 'deleted')),
-        evaluation_mode VARCHAR(20) DEFAULT 'practical' CHECK (evaluation_mode IN ('practical', 'theoretical', 'direct_input')),
+        evaluation_mode VARCHAR(20) DEFAULT 'practical' CHECK (evaluation_mode IN ('practical', 'theoretical', 'direct_input', 'pairwise')),
         workflow_stage VARCHAR(20) DEFAULT 'creating' CHECK (workflow_stage IN ('creating', 'waiting', 'evaluating', 'completed')),
         deleted_at TIMESTAMP WITH TIME ZONE NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -123,9 +123,33 @@ initDatabase = async () => {
         id SERIAL PRIMARY KEY,
         project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
         evaluator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        evaluator_code VARCHAR(50),
+        access_key VARCHAR(100),
+        invitation_sent_at TIMESTAMP WITH TIME ZONE,
         assigned_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(project_id, evaluator_id)
       )
+    `);
+
+    // project_evaluators 테이블에 컬럼 추가 (기존 테이블이 있는 경우)
+    await query(`
+      ALTER TABLE project_evaluators 
+      ADD COLUMN IF NOT EXISTS evaluator_code VARCHAR(50),
+      ADD COLUMN IF NOT EXISTS access_key VARCHAR(100),
+      ADD COLUMN IF NOT EXISTS invitation_sent_at TIMESTAMP WITH TIME ZONE
+    `);
+
+    // projects 테이블 evaluation_mode 제약조건 업데이트
+    await query(`
+      ALTER TABLE projects
+      DROP CONSTRAINT IF EXISTS projects_evaluation_mode_check
+    `);
+    
+    await query(`
+      ALTER TABLE projects
+      ADD CONSTRAINT projects_evaluation_mode_check 
+      CHECK (evaluation_mode IN ('practical', 'theoretical', 'direct_input', 'pairwise'))
     `);
 
     // 쌍대비교 테이블

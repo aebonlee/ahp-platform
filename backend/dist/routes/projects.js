@@ -12,7 +12,7 @@ router.post('/', auth_1.authenticateToken, [
     (0, express_validator_1.body)('title').trim().isLength({ min: 1, max: 255 }).withMessage('Title is required'),
     (0, express_validator_1.body)('description').optional().isLength({ max: 1000 }),
     (0, express_validator_1.body)('objective').optional().isLength({ max: 500 }),
-    (0, express_validator_1.body)('evaluationMode').optional().isIn(['practical', 'theoretical', 'direct_input']).withMessage('Invalid evaluation mode')
+    (0, express_validator_1.body)('evaluationMode').optional().isIn(['practical', 'theoretical', 'direct_input', 'pairwise']).withMessage('Invalid evaluation mode')
 ], async (req, res) => {
     try {
         const errors = (0, express_validator_1.validationResult)(req);
@@ -105,7 +105,7 @@ router.put('/:id', auth_1.authenticateToken, [
     (0, express_validator_1.body)('description').optional().isLength({ max: 1000 }),
     (0, express_validator_1.body)('objective').optional().isLength({ max: 500 }),
     (0, express_validator_1.body)('status').optional().isIn(['draft', 'active', 'completed']),
-    (0, express_validator_1.body)('evaluation_mode').optional().isIn(['practical', 'theoretical', 'direct_input']),
+    (0, express_validator_1.body)('evaluation_mode').optional().isIn(['practical', 'theoretical', 'direct_input', 'pairwise']),
     (0, express_validator_1.body)('workflow_stage').optional().isIn(['creating', 'waiting', 'evaluating', 'completed'])
 ], async (req, res) => {
     try {

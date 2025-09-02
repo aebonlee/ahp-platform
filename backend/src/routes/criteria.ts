@@ -93,7 +93,11 @@ router.post('/',
     body('project_id').isInt().withMessage('Valid project ID is required'),
     body('name').trim().isLength({ min: 1, max: 255 }).withMessage('Name is required and must be less than 255 characters'),
     body('description').optional().isLength({ max: 1000 }).withMessage('Description must be less than 1000 characters'),
-    body('parent_id').optional().isInt().withMessage('Parent ID must be an integer'),
+    body('parent_id').optional().custom((value) => {
+      if (value === null || value === undefined || value === '') return true;
+      if (!Number.isInteger(Number(value))) throw new Error('Parent ID must be an integer or null');
+      return true;
+    }),
     body('level').optional().isInt({ min: 1, max: 5 }).withMessage('Level must be between 1 and 5'),
     body('order_index').optional().isInt({ min: 0 }).withMessage('Order index must be non-negative')
   ],
