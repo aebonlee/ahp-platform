@@ -1254,7 +1254,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <Button variant="primary" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => setIsProjectFormOpen(true)}>
             ➕ 새 프로젝트 생성
           </Button>
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          <div className="mt-8 grid grid-cols-3 gap-6 max-w-5xl mx-auto">
             <div className="bg-blue-50 p-4 rounded-lg">
               <div className="text-2xl mb-2">🎯</div>
               <h4 className="font-medium mb-1">목표 설정</h4>
