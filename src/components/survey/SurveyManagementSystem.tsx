@@ -143,6 +143,79 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
         </div>
       </div>
 
+      {/* 기본 허수 가이드 */}
+      <Card variant="outlined" className="p-6 border-blue-200 bg-blue-50">
+        <div className="flex items-start space-x-4">
+          <div className="text-4xl">📋</div>
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold mb-2 text-blue-800">
+              인구통계학적 설문조사 기본 허수 가이드
+            </h3>
+            <p className="text-blue-700 mb-4">
+              연구의 신뢰성을 위해 다음 기본 허수를 참고하여 설문을 구성하시기 바랍니다.
+            </p>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="text-sm font-medium text-blue-800 mb-1">연령대</div>
+                <div className="text-xs text-blue-600">
+                  • 20-29세: 25%<br/>
+                  • 30-39세: 30%<br/>
+                  • 40-49세: 25%<br/>
+                  • 50세 이상: 20%
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="text-sm font-medium text-blue-800 mb-1">성별</div>
+                <div className="text-xs text-blue-600">
+                  • 남성: 50%<br/>
+                  • 여성: 50%
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="text-sm font-medium text-blue-800 mb-1">학력</div>
+                <div className="text-xs text-blue-600">
+                  • 고졸: 20%<br/>
+                  • 대졸: 50%<br/>
+                  • 대학원졸: 30%
+                </div>
+              </div>
+              
+              <div className="bg-white rounded-lg p-4 border border-blue-200">
+                <div className="text-sm font-medium text-blue-800 mb-1">경력</div>
+                <div className="text-xs text-blue-600">
+                  • 5년 미만: 30%<br/>
+                  • 5-10년: 35%<br/>
+                  • 10년 이상: 35%
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-3">
+              <Button 
+                variant="primary" 
+                size="sm"
+                onClick={() => setCurrentView('create')}
+              >
+                🚀 가이드 기반 설문 만들기
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  // TODO: 가이드 PDF 다운로드
+                  alert('설문조사 가이드 PDF 다운로드 기능은 준비 중입니다.');
+                }}
+              >
+                📄 가이드 다운로드
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
       {/* 설문조사 목록 */}
       <div className="grid gap-4">
         {surveys.length === 0 ? (

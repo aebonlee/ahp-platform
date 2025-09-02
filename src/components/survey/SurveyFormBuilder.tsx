@@ -16,16 +16,159 @@ interface SurveyFormBuilderProps {
 const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel }) => {
   const [surveyTitle, setSurveyTitle] = useState('인구통계학적 설문조사');
   const [surveyDescription, setSurveyDescription] = useState('');
-  const [questions, setQuestions] = useState<Question[]>([
-    {
-      id: '1',
-      type: 'select',
-      question: '연령대를 선택해주세요',
-      options: ['20대', '30대', '40대', '50대', '60대 이상'],
-      required: true
-    }
-  ]);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [isPreview, setIsPreview] = useState(false);
+  const [showTemplateSelection, setShowTemplateSelection] = useState(true);
+
+  // 기본 허수 템플릿들
+  const demographicTemplates = {
+    standard: {
+      name: '표준 인구통계 템플릿',
+      description: '연구에서 가장 일반적으로 사용되는 기본 항목들',
+      questions: [
+        {
+          id: '1',
+          type: 'radio' as const,
+          question: '연령대를 선택해주세요',
+          options: ['20-29세', '30-39세', '40-49세', '50세 이상'],
+          required: true
+        },
+        {
+          id: '2',
+          type: 'radio' as const,
+          question: '성별을 선택해주세요',
+          options: ['남성', '여성'],
+          required: true
+        },
+        {
+          id: '3',
+          type: 'radio' as const,
+          question: '최종 학력을 선택해주세요',
+          options: ['고등학교 졸업', '전문대 졸업', '4년제 대학 졸업', '대학원 졸업 (석사)', '대학원 졸업 (박사)'],
+          required: true
+        },
+        {
+          id: '4',
+          type: 'radio' as const,
+          question: '현재 직업 분야를 선택해주세요',
+          options: ['IT/소프트웨어', '제조업', '서비스업', '교육', '공공기관', '연구기관', '의료', '기타'],
+          required: true
+        },
+        {
+          id: '5',
+          type: 'radio' as const,
+          question: '해당 분야 경력을 선택해주세요',
+          options: ['5년 미만', '5-10년', '10-15년', '15년 이상'],
+          required: true
+        }
+      ]
+    },
+    academic: {
+      name: '학술 연구용 템플릿',
+      description: '학술 논문 및 연구 목적에 특화된 항목들',
+      questions: [
+        {
+          id: '1',
+          type: 'radio' as const,
+          question: '연령대를 선택해주세요',
+          options: ['20-29세', '30-39세', '40-49세', '50세 이상'],
+          required: true
+        },
+        {
+          id: '2',
+          type: 'radio' as const,
+          question: '성별을 선택해주세요',
+          options: ['남성', '여성'],
+          required: true
+        },
+        {
+          id: '3',
+          type: 'radio' as const,
+          question: '최종 학력을 선택해주세요',
+          options: ['학사', '석사', '박사'],
+          required: true
+        },
+        {
+          id: '4',
+          type: 'radio' as const,
+          question: '전공 분야를 선택해주세요',
+          options: ['공학', '자연과학', '사회과학', '인문학', '예술', '의학', '경영학', '기타'],
+          required: true
+        },
+        {
+          id: '5',
+          type: 'radio' as const,
+          question: '현재 소속을 선택해주세요',
+          options: ['대학생', '대학원생', '교수/연구원', '기업 연구직', '일반 직장인'],
+          required: true
+        },
+        {
+          id: '6',
+          type: 'radio' as const,
+          question: 'AHP 분석 경험을 선택해주세요',
+          options: ['처음', '1-2회', '3-5회', '5회 이상'],
+          required: true
+        }
+      ]
+    },
+    business: {
+      name: '비즈니스 의사결정 템플릿',
+      description: '기업 및 조직의 의사결정 과정에 특화된 항목들',
+      questions: [
+        {
+          id: '1',
+          type: 'radio' as const,
+          question: '연령대를 선택해주세요',
+          options: ['20-29세', '30-39세', '40-49세', '50세 이상'],
+          required: true
+        },
+        {
+          id: '2',
+          type: 'radio' as const,
+          question: '성별을 선택해주세요',
+          options: ['남성', '여성'],
+          required: true
+        },
+        {
+          id: '3',
+          type: 'radio' as const,
+          question: '직급을 선택해주세요',
+          options: ['사원급', '대리급', '과장급', '차장급', '부장급', '임원급'],
+          required: true
+        },
+        {
+          id: '4',
+          type: 'radio' as const,
+          question: '부서를 선택해주세요',
+          options: ['경영기획', '마케팅', '영업', '개발', '생산', '인사', '재무', '기타'],
+          required: true
+        },
+        {
+          id: '5',
+          type: 'radio' as const,
+          question: '경력을 선택해주세요',
+          options: ['3년 미만', '3-7년', '7-15년', '15년 이상'],
+          required: true
+        },
+        {
+          id: '6',
+          type: 'radio' as const,
+          question: '의사결정 경험을 선택해주세요',
+          options: ['참여 경험 없음', '팀 단위 의사결정', '부서 단위 의사결정', '전사 단위 의사결정'],
+          required: true
+        }
+      ]
+    }
+  };
+
+  // 템플릿 적용
+  const applyTemplate = (templateKey: keyof typeof demographicTemplates) => {
+    const template = demographicTemplates[templateKey];
+    setQuestions(template.questions);
+    setSurveyTitle(template.name);
+    setSurveyDescription(template.description);
+    setShowTemplateSelection(false);
+  };
 
   const questionTypes = [
     { value: 'text', label: '단답형 텍스트', icon: '📝' },
@@ -36,6 +179,81 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
     { value: 'number', label: '숫자', icon: '🔢' },
     { value: 'date', label: '날짜', icon: '📅' }
   ];
+
+  // 템플릿 선택 화면
+  const renderTemplateSelection = () => (
+    <div className="max-w-4xl mx-auto p-6">
+      <div className="text-center mb-8">
+        <h2 className="text-3xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+          📊 설문조사 템플릿 선택
+        </h2>
+        <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
+          연구 목적에 맞는 기본 허수 템플릿을 선택하거나 새로 만드세요
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {Object.entries(demographicTemplates).map(([key, template]) => (
+          <div 
+            key={key}
+            className="border-2 border-gray-200 rounded-xl p-6 hover:border-blue-400 transition-all cursor-pointer hover:shadow-lg"
+            onClick={() => applyTemplate(key as keyof typeof demographicTemplates)}
+          >
+            <div className="text-center mb-4">
+              <div className="text-4xl mb-3">
+                {key === 'standard' ? '📋' : key === 'academic' ? '🎓' : '💼'}
+              </div>
+              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                {template.name}
+              </h3>
+              <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+                {template.description}
+              </p>
+            </div>
+            
+            <div className="text-left">
+              <div className="text-sm font-medium mb-2 text-gray-600">포함된 질문 ({template.questions.length}개):</div>
+              <ul className="text-xs text-gray-500 space-y-1">
+                {template.questions.slice(0, 3).map((q, i) => (
+                  <li key={i}>• {q.question}</li>
+                ))}
+                {template.questions.length > 3 && (
+                  <li>• 외 {template.questions.length - 3}개 질문</li>
+                )}
+              </ul>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <button className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                이 템플릿 사용하기
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="text-center">
+        <div className="inline-block p-6 border-2 border-dashed border-gray-300 rounded-xl hover:border-blue-400 transition-colors">
+          <div className="text-4xl mb-3">✨</div>
+          <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+            빈 설문조사로 시작
+          </h3>
+          <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
+            처음부터 직접 질문을 만들어 설문조사를 구성합니다
+          </p>
+          <button 
+            onClick={() => {
+              setQuestions([]);
+              setShowTemplateSelection(false);
+            }}
+            className="py-2 px-6 border border-gray-400 rounded-lg hover:bg-gray-50 transition-colors"
+          >
+            빈 설문으로 시작하기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   const addQuestion = () => {
     const newQuestion: Question = {
@@ -215,6 +433,10 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
     return renderPreview();
   }
 
+  if (showTemplateSelection) {
+    return renderTemplateSelection();
+  }
+
   return (
     <div className="max-w-6xl mx-auto p-6">
       <div className="backdrop-blur-xl rounded-2xl p-8 shadow-lg" style={{ 
@@ -232,6 +454,25 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
             </p>
           </div>
           <div className="flex space-x-3">
+            <button
+              onClick={() => setShowTemplateSelection(true)}
+              className="px-4 py-2 border rounded-lg transition-colors"
+              style={{ 
+                borderColor: 'var(--border-default)', 
+                color: 'var(--text-secondary)',
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                e.currentTarget.style.borderColor = 'var(--accent-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.borderColor = 'var(--border-default)';
+              }}
+            >
+              📋 템플릿 변경
+            </button>
             <button
               onClick={() => setIsPreview(true)}
               className="px-4 py-2 border rounded-lg transition-colors"
@@ -281,7 +522,32 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
 
         {/* 질문 목록 */}
         <div className="space-y-4 mb-6">
-          {questions.map((question, index) => (
+          {questions.length === 0 ? (
+            <div className="text-center py-12 border-2 border-dashed border-gray-300 rounded-lg">
+              <div className="text-4xl mb-4">📝</div>
+              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                질문이 없습니다
+              </h3>
+              <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
+                템플릿을 선택하거나 새 질문을 추가해서 설문조사를 시작하세요
+              </p>
+              <div className="flex justify-center space-x-4">
+                <button
+                  onClick={() => setShowTemplateSelection(true)}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  📋 템플릿 선택하기
+                </button>
+                <button
+                  onClick={addQuestion}
+                  className="px-6 py-3 border border-gray-400 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  ➕ 직접 질문 추가
+                </button>
+              </div>
+            </div>
+          ) : (
+            questions.map((question, index) => (
             <div key={question.id} className="p-6 border-2 border-gray-200 rounded-lg hover:border-blue-300 transition-colors">
               {/* 질문 헤더 */}
               <div className="flex items-start justify-between mb-4">
@@ -410,16 +676,19 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
                 </div>
               )}
             </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* 질문 추가 버튼 */}
-        <button
-          onClick={addQuestion}
-          className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors"
-        >
-          <span className="text-blue-600 font-medium">➕ 새 질문 추가</span>
-        </button>
+        {questions.length > 0 && (
+          <button
+            onClick={addQuestion}
+            className="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-colors"
+          >
+            <span className="text-blue-600 font-medium">➕ 새 질문 추가</span>
+          </button>
+        )}
 
         {/* 하단 버튼 */}
         <div className="flex justify-end space-x-4 mt-8 pt-6 border-t">
