@@ -420,17 +420,22 @@ function App() {
         
         setUser(userWithAdminType);
         
-        // 기본 탭 설정
+        // URL 파라미터가 있으면 우선, 없으면 기본 탭 설정
+        const urlParams = new URLSearchParams(window.location.search);
+        const tabParam = urlParams.get('tab');
+        
         let targetTab = '';
-        if (data.user.role === 'evaluator') {
+        if (tabParam && ['personal-service', 'my-projects', 'model-builder', 'evaluator-management', 'results-analysis'].includes(tabParam)) {
+          targetTab = tabParam;
+        } else if (data.user.role === 'evaluator') {
           targetTab = 'evaluator-dashboard';
         } else if (data.user.role === 'super_admin') {
           targetTab = 'super-admin';
-        } else if (data.user.role === 'service_tester') {
-          targetTab = 'personal-service';
         } else {
           targetTab = 'personal-service';
         }
+        
+        console.log('🎯 로그인 후 타겟 탭:', targetTab, '(URL 파라미터:', tabParam, ')');
         setActiveTab(targetTab);
         
         console.log('✅ 백엔드 로그인 성공');
@@ -1005,7 +1010,13 @@ function App() {
     }
   }, [user, activeTab, fetchProjects, fetchUsers]);
 
-
+  // 로그인 후 URL 기반 리다이렉트 처리 (무한 루프 방지)
+  useEffect(() => {
+    if (user && (activeTab === 'home' || activeTab === 'register')) {
+      console.log('🔄 로그인된 사용자 리다이렉트:', activeTab, '→ personal-service');
+      setActiveTab('personal-service');
+    }
+  }, [user, activeTab]);
 
   const renderContent = () => {
     // 로그인하지 않은 상태에서는 메인페이지와 관련 페이지만 렌더링
@@ -1045,14 +1056,16 @@ function App() {
     // 로그인한 상태에서의 라우팅
     switch (activeTab) {
       case 'home':
-        // 로그인한 상태에서 홈 접근 시 서비스 대시보드로 리다이렉트
-        setActiveTab('personal-service');
-        return null;
-        
       case 'register':
-        // 로그인한 상태에서 회원가입 페이지 접근 시 서비스로 리다이렉트
-        setActiveTab('personal-service');
-        return null;
+        // useEffect에서 리다이렉트 처리하므로 여기서는 로딩 표시
+        return (
+          <div className="flex items-center justify-center h-64">
+            <div className="text-center">
+              <div className="text-4xl mb-4">•••</div>
+              <p className="text-gray-600">페이지 로딩 중...</p>
+            </div>
+          </div>
+        );
 
       case 'welcome':
         return (
