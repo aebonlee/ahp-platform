@@ -17,6 +17,10 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [selectedSurvey, setSelectedSurvey] = useState<Survey | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [projects, setProjects] = useState<any[]>([]); // 프로젝트 개수 추적용
+
+  // 설문 개수 제한 (프로젝트 개수와 동일)
+  const MAX_SURVEYS_PER_PROJECT = 3; // 프로젝트당 최대 3개 설문
 
   // 설문조사 목록 조회
   const fetchSurveys = async () => {
@@ -115,6 +119,30 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
     }
   };
 
+  // 설문조사 삭제
+  const deleteSurvey = async (surveyId: string) => {
+    const survey = surveys.find(s => s.id === surveyId);
+    if (!survey) return;
+
+    const confirmDelete = window.confirm(
+      `"${survey.title}" 설문조사를 삭제하시겠습니까?\n\n⚠️ 모든 응답 데이터도 함께 삭제되며 복구할 수 없습니다.`
+    );
+    
+    if (!confirmDelete) return;
+
+    try {
+      setIsLoading(true);
+      // TODO: API 호출로 교체
+      setSurveys(prev => prev.filter(s => s.id !== surveyId));
+      alert('설문조사가 삭제되었습니다.');
+    } catch (error) {
+      console.error('설문조사 삭제 실패:', error);
+      alert('설문조사 삭제에 실패했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const renderSurveyList = () => (
     <div className="space-y-6">
       {/* 헤더 */}
@@ -127,6 +155,26 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
           <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>
             평가자를 위한 인구통계학적 설문조사를 생성하고 관리합니다
           </p>
+          
+          {/* 설문 개수 제한 표시 */}
+          <div className="mt-3 flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                설문조사:
+              </span>
+              <span className={`text-sm font-bold ${
+                surveys.length >= MAX_SURVEYS_PER_PROJECT ? 'text-red-600' : 'text-blue-600'
+              }`}>
+                {surveys.length}/{MAX_SURVEYS_PER_PROJECT}
+              </span>
+            </div>
+            {surveys.length >= MAX_SURVEYS_PER_PROJECT && (
+              <div className="text-xs text-red-600 flex items-center">
+                <span className="mr-1">⚠️</span>
+                최대 설문 개수에 도달했습니다
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex space-x-3">
           {onBack && (
@@ -136,7 +184,14 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
           )}
           <Button 
             variant="primary" 
-            onClick={() => setCurrentView('create')}
+            onClick={() => {
+              if (surveys.length >= MAX_SURVEYS_PER_PROJECT) {
+                alert(`프로젝트당 최대 ${MAX_SURVEYS_PER_PROJECT}개의 설문조사만 생성할 수 있습니다.\n기존 설문을 삭제한 후 새로 만들어주세요.`);
+                return;
+              }
+              setCurrentView('create');
+            }}
+            disabled={surveys.length >= MAX_SURVEYS_PER_PROJECT}
           >
             📝 새 설문 만들기
           </Button>
@@ -197,7 +252,14 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
               <Button 
                 variant="primary" 
                 size="sm"
-                onClick={() => setCurrentView('create')}
+                onClick={() => {
+                  if (surveys.length >= MAX_SURVEYS_PER_PROJECT) {
+                    alert(`프로젝트당 최대 ${MAX_SURVEYS_PER_PROJECT}개의 설문조사만 생성할 수 있습니다.\n기존 설문을 삭제한 후 새로 만들어주세요.`);
+                    return;
+                  }
+                  setCurrentView('create');
+                }}
+                disabled={surveys.length >= MAX_SURVEYS_PER_PROJECT}
               >
                 🚀 가이드 기반 설문 만들기
               </Button>
@@ -227,7 +289,17 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
             <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
               첫 번째 설문조사를 만들어 평가자들의 정보를 수집해보세요
             </p>
-            <Button variant="primary" onClick={() => setCurrentView('create')}>
+            <Button 
+              variant="primary" 
+              onClick={() => {
+                if (surveys.length >= MAX_SURVEYS_PER_PROJECT) {
+                  alert(`프로젝트당 최대 ${MAX_SURVEYS_PER_PROJECT}개의 설문조사만 생성할 수 있습니다.`);
+                  return;
+                }
+                setCurrentView('create');
+              }}
+              disabled={surveys.length >= MAX_SURVEYS_PER_PROJECT}
+            >
               첫 설문조사 만들기
             </Button>
           </Card>
@@ -340,6 +412,15 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
                     }}
                   >
                     ✏️ 편집
+                  </Button>
+                  
+                  <Button 
+                    variant="error" 
+                    size="sm"
+                    onClick={() => deleteSurvey(survey.id)}
+                    title="설문조사 삭제"
+                  >
+                    🗑️
                   </Button>
                 </div>
               </div>

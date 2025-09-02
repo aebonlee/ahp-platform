@@ -60,6 +60,13 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
           question: '해당 분야 경력을 선택해주세요',
           options: ['5년 미만', '5-10년', '10-15년', '15년 이상'],
           required: true
+        },
+        {
+          id: '6',
+          type: 'text' as const,
+          question: 'AHP 평가 참여를 위한 이메일 주소를 입력해주세요',
+          options: [],
+          required: true
         }
       ]
     },
@@ -108,6 +115,13 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
           question: 'AHP 분석 경험을 선택해주세요',
           options: ['처음', '1-2회', '3-5회', '5회 이상'],
           required: true
+        },
+        {
+          id: '7',
+          type: 'text' as const,
+          question: 'AHP 평가 참여를 위한 이메일 주소를 입력해주세요',
+          options: [],
+          required: true
         }
       ]
     },
@@ -155,6 +169,13 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
           type: 'radio' as const,
           question: '의사결정 경험을 선택해주세요',
           options: ['참여 경험 없음', '팀 단위 의사결정', '부서 단위 의사결정', '전사 단위 의사결정'],
+          required: true
+        },
+        {
+          id: '7',
+          type: 'text' as const,
+          question: 'AHP 평가 참여를 위한 이메일 주소를 입력해주세요',
+          options: [],
           required: true
         }
       ]
