@@ -78,9 +78,10 @@ initDatabase = async () => {
         description TEXT,
         objective TEXT,
         admin_id INTEGER NOT NULL REFERENCES users(id),
-        status VARCHAR(20) DEFAULT 'draft',
+        status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'completed', 'deleted')),
         evaluation_mode VARCHAR(20) DEFAULT 'practical' CHECK (evaluation_mode IN ('practical', 'theoretical', 'direct_input')),
         workflow_stage VARCHAR(20) DEFAULT 'creating' CHECK (workflow_stage IN ('creating', 'waiting', 'evaluating', 'completed')),
+        deleted_at TIMESTAMP WITH TIME ZONE NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
@@ -257,6 +258,8 @@ initDatabase = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_admin_id ON projects(admin_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_evaluation_mode ON projects(evaluation_mode)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_workflow_stage ON projects(workflow_stage)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_projects_deleted_at ON projects(deleted_at)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_projects_status_deleted ON projects(status) WHERE status = 'deleted'`);
     await query(`CREATE INDEX IF NOT EXISTS idx_criteria_project_id ON criteria(project_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_alternatives_project_id ON alternatives(project_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_project_evaluators_project_id ON project_evaluators(project_id)`);
