@@ -19,9 +19,9 @@ import PersonalSettings from '../settings/PersonalSettings';
 import UsageManagement from './UsageManagement';
 import ValidityCheck from '../validity/ValidityCheck';
 import TrashBin from './TrashBin';
-import dataService from '../../services/dataService';
-import type { ProjectData } from '../../services/dataService';
-import { DEMO_CRITERIA, DEMO_ALTERNATIVES, DEMO_EVALUATORS } from '../../data/demoData';
+import dataService from '../../services/dataService_clean';
+import type { ProjectData } from '../../services/api';
+// DEMO 데이터 제거 - 실제 DB만 사용
 
 interface PersonalServiceProps {
   user: {
@@ -284,10 +284,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       // ProjectData를 UserProject로 변환
       const convertedProjects: UserProject[] = projectsData.map((project: ProjectData) => ({
         ...project,
-        evaluator_count: DEMO_EVALUATORS.length, // 실제 평가자 수: 26명
+        evaluator_count: 0, // 실제 DB에서 조회
         completion_rate: 85, // 실제 진행률
-        criteria_count: DEMO_CRITERIA.length, // 실제 기준 수: 3개
-        alternatives_count: DEMO_ALTERNATIVES.length, // 실제 대안 수: 9개
+        criteria_count: 0, // 실제 DB에서 조회
+        alternatives_count: 0, // 실제 DB에서 조회
         last_modified: project.updated_at ? new Date(project.updated_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         evaluation_method: 'pairwise' as const // 쌍대비교 방식
       }));
@@ -307,10 +307,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         if (sampleProject) {
           const sampleUserProject: UserProject = {
             ...sampleProject,
-            evaluator_count: DEMO_EVALUATORS.length, // 실제 평가자 수: 26명
+            evaluator_count: 0, // 실제 DB에서 조회
             completion_rate: 85, // 실제 진행률
-            criteria_count: DEMO_CRITERIA.length, // 실제 기준 수: 3개
-            alternatives_count: DEMO_ALTERNATIVES.length, // 실제 대안 수: 9개
+            criteria_count: 0, // 실제 DB에서 조회
+            alternatives_count: 0, // 실제 DB에서 조회
             last_modified: new Date().toISOString().split('T')[0],
             evaluation_method: 'pairwise' as const
           };
@@ -448,10 +448,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         if (newProject) {
           const newUserProject: UserProject = {
             ...newProject,
-            evaluator_count: DEMO_EVALUATORS.length, // 실제 평가자 수: 26명
+            evaluator_count: 0, // 실제 DB에서 조회
             completion_rate: 85, // 실제 진행률
-            criteria_count: DEMO_CRITERIA.length, // 실제 기준 수: 3개
-            alternatives_count: DEMO_ALTERNATIVES.length, // 실제 대안 수: 9개
+            criteria_count: 0, // 실제 DB에서 조회
+            alternatives_count: 0, // 실제 DB에서 조회
             last_modified: new Date().toISOString().split('T')[0],
             evaluation_method: projectForm.evaluation_method
           };
@@ -542,10 +542,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         workflow_stage: createdProject.workflow_stage || 'creating',
         created_at: createdProject.created_at ? new Date(createdProject.created_at).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
         last_modified: new Date().toISOString().split('T')[0],
-        evaluator_count: DEMO_EVALUATORS.length, // 실제 평가자 수: 26명
+        evaluator_count: 0, // 실제 DB에서 조회
         completion_rate: 85, // 실제 진행률
-        criteria_count: DEMO_CRITERIA.length, // 실제 기준 수: 3개
-        alternatives_count: DEMO_ALTERNATIVES.length, // 실제 대안 수: 9개
+        criteria_count: 0, // 실제 DB에서 조회
+        alternatives_count: 0, // 실제 DB에서 조회
         evaluation_method: projectForm.evaluation_method || 'pairwise'
       };
 

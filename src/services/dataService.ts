@@ -14,13 +14,8 @@ const STORAGE_KEYS = {
 
 // 오프라인 모드 확인 함수
 const isOfflineMode = (): boolean => {
-  // 프로덕션 환경에서는 항상 오프라인 모드 (GitHub Pages)
-  if (process.env.NODE_ENV === 'production') {
-    return true;
-  }
-  
-  // 로컬 개발환경에서는 설정에 따라 결정
-  return localStorage.getItem(STORAGE_KEYS.OFFLINE_MODE) === 'true';
+  // 이제 항상 실제 데이터베이스를 사용
+  return false;
 };
 
 // 로컬 스토리지 유틸리티 함수들
@@ -66,77 +61,45 @@ class DataService {
   
   // === 프로젝트 관리 ===
   async getProjects(): Promise<ProjectData[]> {
-    if (isOfflineMode()) {
-      return storage.get(STORAGE_KEYS.PROJECTS, []);
-    }
-    
     try {
       const response = await projectApi.getProjects();
       if (response.success && response.data) {
-        // 백엔드 데이터를 로컬에도 백업
-        storage.set(STORAGE_KEYS.PROJECTS, response.data);
         return response.data;
       }
+      console.error('Failed to fetch projects from backend');
+      return [];
     } catch (error) {
-      console.warn('Backend unavailable, using local data');
+      console.error('Error fetching projects:', error);
+      return [];
     }
-    
-    return storage.get(STORAGE_KEYS.PROJECTS, []);
   }
 
   async getProject(id: string): Promise<ProjectData | null> {
-    if (isOfflineMode()) {
-      const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
-      return projects.find(p => p.id === id) || null;
-    }
-    
     try {
       const response = await projectApi.getProject(id);
       if (response.success && response.data) {
         return response.data;
       }
+      console.error('Failed to fetch project from backend:', id);
+      return null;
     } catch (error) {
-      console.warn('Backend unavailable, using local data');
-      const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
-      return projects.find(p => p.id === id) || null;
+      console.error('Error fetching project:', error);
+      return null;
     }
-    
-    return null;
   }
 
   async createProject(data: Omit<ProjectData, 'id'>): Promise<ProjectData | null> {
-    const projectData: ProjectData = {
-      ...data,
-      id: generateUUID(),
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
-    };
-
-    if (isOfflineMode()) {
-      const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
-      projects.push(projectData);
-      storage.set(STORAGE_KEYS.PROJECTS, projects);
-      return projectData;
-    }
-    
     try {
       const response = await projectApi.createProject(data);
       if (response.success && response.data) {
-        // 백엔드 성공시 로컬도 업데이트
-        const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
-        projects.push(response.data);
-        storage.set(STORAGE_KEYS.PROJECTS, projects);
         return response.data;
       }
+      console.error('Failed to create project');
+      return null;
     } catch (error) {
-      console.warn('Backend unavailable, saving locally only');
+      console.error('Error creating project:', error);
+      throw error;
     }
-    
-    // 백엔드 실패시 로컬에만 저장
-    const projects = storage.get<ProjectData[]>(STORAGE_KEYS.PROJECTS, []);
-    projects.push(projectData);
-    storage.set(STORAGE_KEYS.PROJECTS, projects);
-    return projectData;
   }
 
   async updateProject(id: string, data: Partial<ProjectData>): Promise<ProjectData | null> {

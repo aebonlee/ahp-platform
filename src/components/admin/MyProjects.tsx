@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import dataService, { ProjectData } from '../../services/dataService';
+import dataService from '../../services/dataService_clean';
+import { ProjectData } from '../../services/api';
 
 interface MyProjectsProps {
   onProjectSelect?: (project: ProjectData) => void;
