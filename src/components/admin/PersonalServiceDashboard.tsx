@@ -367,17 +367,24 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     
     if (window.confirm(`"${projectTitle}"를 휴지통으로 이동하시겠습니까?\n\n휴지통에서 복원하거나 영구 삭제할 수 있습니다.`)) {
       try {
+        console.log('🗑️ 삭제 시작:', projectId, projectTitle);
+        
         // onDeleteProject prop 사용 (백엔드 API 호출)
         if (onDeleteProject) {
           await onDeleteProject(projectId);
+          console.log('✅ 백엔드 삭제 완료');
           
-          // UI에서 즉시 제거
-          setProjects(prev => prev.filter(p => p.id !== projectId));
+          // 프로젝트 목록 새로고침
+          await loadProjects();
+          console.log('✅ 프로젝트 목록 새로고침 완료');
           
           alert(`"${projectTitle}"가 휴지통으로 이동되었습니다.`);
+        } else {
+          console.error('❌ onDeleteProject prop이 없습니다');
+          alert('삭제 기능이 연결되지 않았습니다.');
         }
       } catch (error) {
-        console.error('Project deletion error:', error);
+        console.error('❌ Project deletion error:', error);
         alert(error instanceof Error ? error.message : '프로젝트 삭제 중 오류가 발생했습니다.');
         
         // 실패 시 프로젝트 목록 다시 로드
@@ -993,9 +1000,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
               </div>
               <div className="flex space-x-2">
-                <Button variant="error" className="p-4 lg:p-5 text-lg lg:text-xl" onClick={() => handleTabChange('trash')}>
-                  🗑️ 휴지통
-                </Button>
                 <Button variant="primary" className="p-5 lg:p-6 text-xl lg:text-2xl" onClick={() => handleTabChange('creation')}>
                   ➕ 새 프로젝트 생성
                 </Button>
@@ -1157,9 +1161,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               </button>
             </div>
 
-            <Button variant="error" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => handleTabChange('trash')}>
-              🗑️ 휴지통
-            </Button>
+            <div className="flex space-x-2">
+              <Button variant="error" className="p-3 lg:p-4 text-base lg:text-lg" onClick={() => handleTabChange('trash')}>
+                🗑️휴지통
+              </Button>
+            </div>
           </div>
         </div>
       </div>
