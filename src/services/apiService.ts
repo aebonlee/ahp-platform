@@ -123,8 +123,8 @@ export const ahpCalculationAPI = {
 export const evaluatorAPI = {
   assign: (data: {
     project_id: number;
-    evaluator_code: string;
     evaluator_name: string;
+    evaluator_email?: string;
     weight?: number;
   }) => apiClient.post('/api/evaluators/assign', data),
 
