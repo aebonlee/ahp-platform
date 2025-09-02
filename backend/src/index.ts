@@ -28,6 +28,7 @@ import exportRoutes from './routes/export';
 import subscriptionRoutes from './routes/subscription';
 import supportRoutes from './routes/support';
 import newsRoutes from './routes/news';
+import adminRoutes from '../routes/admin';
 
 const app = express();
 const httpServer = createServer(app);
@@ -258,6 +259,7 @@ app.use('/api/export', exportRoutes);
 app.use('/api/subscription', subscriptionRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/news', newsRoutes);
+app.use('/api/admin', adminRoutes);
 
 // API-only backend - no static file serving
 app.get('/', (req, res) => {

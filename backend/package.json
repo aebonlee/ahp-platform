@@ -27,6 +27,7 @@
     "@types/morgan": "^1.9.10",
     "@types/node": "^24.2.1",
     "@types/pg": "^8.15.5",
+    "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -36,6 +37,7 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
+    "node-fetch": "^3.3.2",
     "pg": "^8.16.3",
     "typescript": "^5.9.2"
   },
