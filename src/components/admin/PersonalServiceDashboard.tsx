@@ -79,7 +79,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   activeTab: externalActiveTab,
   onTabChange: externalOnTabChange,
   onUserUpdate,
-  projects: externalProjects,
+  projects: externalProjects = [], // 기본값으로 빈 배열 설정
   onCreateProject,
   onDeleteProject,
   onFetchCriteria,
@@ -95,6 +95,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 }) => {
   // 사용자 정보 내부 상태 관리
   const [user, setUser] = useState(initialUser);
+  
+  // projects 안전하게 처리
+  const projects = Array.isArray(externalProjects) ? externalProjects : [];
 
   // props의 user가 변경될 때 내부 상태도 업데이트
   useEffect(() => {

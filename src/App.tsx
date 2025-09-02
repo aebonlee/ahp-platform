@@ -590,6 +590,7 @@ function App() {
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     try {
+      console.log('🔍 App.tsx fetchProjects 시작...');
       const response = await fetch(`${API_BASE_URL}/api/projects`, {
         credentials: 'include',
         headers: {
@@ -597,12 +598,26 @@ function App() {
         },
       });
 
+      console.log('📡 fetchProjects 응답:', response.status, response.statusText);
+
       if (response.ok) {
         const data = await response.json();
-        setProjects(data.projects || []);
+        console.log('📊 fetchProjects 데이터 구조:', data);
+        
+        // API 응답 구조에 따라 안전하게 프로젝트 배열 추출
+        const projects = Array.isArray(data) ? data : 
+                        Array.isArray(data.data) ? data.data : 
+                        Array.isArray(data.projects) ? data.projects : [];
+        
+        console.log('✅ 추출된 프로젝트 수:', projects.length);
+        setProjects(projects);
+      } else {
+        console.error('❌ fetchProjects 실패:', response.status);
+        setProjects([]);
       }
     } catch (error) {
-      console.error('Failed to fetch projects:', error);
+      console.error('❌ fetchProjects 오류:', error);
+      setProjects([]);
     } finally {
       setLoading(false);
     }
@@ -983,7 +998,7 @@ function App() {
   };
 
   useEffect(() => {
-    if (user && activeTab === 'personal-projects') {
+    if (user && (activeTab === 'personal-projects' || activeTab === 'personal-service' || activeTab === 'welcome' || activeTab === 'my-projects')) {
       fetchProjects();
     } else if (user && activeTab === 'personal-users' && user.role === 'admin') {
       fetchUsers();
@@ -1046,6 +1061,19 @@ function App() {
             activeTab='welcome'
             onTabChange={setActiveTab}
             onUserUpdate={setUser}
+            projects={projects}
+            onCreateProject={createProject}
+            onDeleteProject={deleteProject}
+            onFetchCriteria={fetchCriteria}
+            onCreateCriteria={createCriteria}
+            onFetchAlternatives={fetchAlternatives}
+            onCreateAlternative={createAlternative}
+            onSaveEvaluation={saveEvaluation}
+            onFetchTrashedProjects={fetchTrashedProjects}
+            onRestoreProject={restoreProject}
+            onPermanentDeleteProject={permanentDeleteProject}
+            selectedProjectId={selectedProjectId}
+            onSelectProject={setSelectedProjectId}
           />
         );
 
