@@ -1,26 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Card from '../common/Card';
 import Button from '../common/Button';
+import dataService from '../../services/dataService_clean';
+import { ProjectData, CriteriaData, AlternativeData } from '../../services/api';
 
 interface TestProject {
   id: string;
-  name: string;
+  title: string;
   description: string;
-  criteria: {
-    id: string;
-    name: string;
-    weight?: number;
-    subCriteria?: {
-      id: string;
-      name: string;
-      weight?: number;
-    }[];
-  }[];
-  alternatives: {
-    id: string;
-    name: string;
-    description?: string;
-  }[];
+  criteria: CriteriaData[];
+  alternatives: AlternativeData[];
   evaluationMethod: 'pairwise' | 'direct';
 }
 
@@ -29,64 +18,58 @@ const EvaluationTest: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<'select' | 'demographic' | 'evaluation' | 'result'>('select');
   const [evaluationProgress, setEvaluationProgress] = useState(0);
   const [testMode, setTestMode] = useState<'preview' | 'simulate'>('preview');
+  const [realProjects, setRealProjects] = useState<ProjectData[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // 샘플 프로젝트 데이터
-  const sampleProjects: TestProject[] = [
-    {
-      id: '1',
-      name: 'AI 도입 우선순위 평가',
-      description: '기업 내 AI 기술 도입을 위한 우선순위 결정',
-      criteria: [
-        {
-          id: 'c1',
-          name: '기술적 타당성',
-          subCriteria: [
-            { id: 'sc1', name: '기술 성숙도' },
-            { id: 'sc2', name: '구현 난이도' }
-          ]
-        },
-        {
-          id: 'c2',
-          name: '경제적 효과',
-          subCriteria: [
-            { id: 'sc3', name: 'ROI' },
-            { id: 'sc4', name: '비용 절감' }
-          ]
-        },
-        {
-          id: 'c3',
-          name: '전략적 중요도',
-          subCriteria: [
-            { id: 'sc5', name: '시장 경쟁력' },
-            { id: 'sc6', name: '혁신성' }
-          ]
-        }
-      ],
-      alternatives: [
-        { id: 'a1', name: 'ChatBot 시스템', description: '고객 서비스 자동화' },
-        { id: 'a2', name: '예측 분석 시스템', description: '수요 예측 및 재고 최적화' },
-        { id: 'a3', name: '프로세스 자동화', description: 'RPA 기반 업무 자동화' }
-      ],
-      evaluationMethod: 'pairwise'
-    },
-    {
-      id: '2',
-      name: '공급업체 선정',
-      description: '신규 프로젝트를 위한 최적 공급업체 선정',
-      criteria: [
-        { id: 'c1', name: '품질' },
-        { id: 'c2', name: '가격' },
-        { id: 'c3', name: '납기' },
-        { id: 'c4', name: '기술력' }
-      ],
-      alternatives: [
-        { id: 'a1', name: '업체 A' },
-        { id: 'a2', name: '업체 B' },
-        { id: 'a3', name: '업체 C' }
-      ],
-      evaluationMethod: 'direct'
+  // 실제 프로젝트 데이터 로드
+  useEffect(() => {
+    loadRealProjects();
+  }, []);
+
+  const loadRealProjects = async () => {
+    try {
+      setLoading(true);
+      console.log('🔍 평가 테스트: 실제 프로젝트 데이터 로드 시작...');
+      const projects = await dataService.getProjects();
+      
+      // 활성 프로젝트만 필터링
+      const activeProjects = projects.filter(p => p.status === 'active' || p.status === 'completed');
+      setRealProjects(activeProjects);
+      console.log('✅ 평가 테스트: 실제 프로젝트', activeProjects.length, '개 로드 완료');
+    } catch (error) {
+      console.error('❌ 평가 테스트: 프로젝트 로드 실패:', error);
+    } finally {
+      setLoading(false);
     }
-  ];
+  };
+
+  // 프로젝트와 관련 데이터 로드
+  const loadProjectDetails = async (project: ProjectData): Promise<TestProject> => {
+    try {
+      console.log('🔍 프로젝트 상세 정보 로드:', project.title);
+      
+      const [criteria, alternatives] = await Promise.all([
+        dataService.getCriteria(project.id || ''),
+        dataService.getAlternatives(project.id || '')
+      ]);
+      
+      console.log('✅ 로드 완료 - 기준:', criteria.length, '개, 대안:', alternatives.length, '개');
+      
+      return {
+        id: project.id || '',
+        title: project.title,
+        description: project.description,
+        criteria: criteria,
+        alternatives: alternatives,
+        evaluationMethod: 'pairwise' // 기본값
+      };
+    } catch (error) {
+      console.error('❌ 프로젝트 상세 정보 로드 실패:', error);
+      throw error;
+    }
+  };
+
+  // 실제 PostgreSQL DB 데이터만 사용
 
   // 평가 시뮬레이션
   const simulateEvaluation = () => {
@@ -102,38 +85,67 @@ const EvaluationTest: React.FC = () => {
     }, 300);
   };
 
+  // 실제 프로젝트 선택
+  const handleProjectSelect = async (project: ProjectData) => {
+    try {
+      const projectDetails = await loadProjectDetails(project);
+      setSelectedProject(projectDetails);
+      setCurrentStep('demographic');
+    } catch (error) {
+      alert('프로젝트 데이터 로드에 실패했습니다.');
+    }
+  };
+
   // 프로젝트 선택 화면
-  const ProjectSelection = () => (
-    <Card title="📋 프로젝트 선택">
-      <div className="space-y-4">
-        <p className="text-sm text-gray-600">
-          평가 테스트를 진행할 프로젝트를 선택하세요.
-        </p>
-        
-        <div className="grid gap-4">
-          {sampleProjects.map(project => (
-            <div 
-              key={project.id}
-              className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
-              onClick={() => {
-                setSelectedProject(project);
-                setCurrentStep('demographic');
-              }}
-            >
-              <h4 className="font-semibold text-lg mb-2">{project.name}</h4>
-              <p className="text-sm text-gray-600 mb-3">{project.description}</p>
-              
-              <div className="flex items-center gap-6 text-xs text-gray-500">
-                <span>평가방법: {project.evaluationMethod === 'pairwise' ? '쌍대비교' : '직접입력'}</span>
-                <span>기준: {project.criteria.length}개</span>
-                <span>대안: {project.alternatives.length}개</span>
-              </div>
+  const ProjectSelection = () => {
+    if (loading) {
+      return (
+        <Card title="📋 프로젝트 선택">
+          <div className="text-center py-8">
+            <div className="text-4xl mb-4">•••</div>
+            <p className="text-gray-600">실제 프로젝트 데이터 로드 중...</p>
+          </div>
+        </Card>
+      );
+    }
+
+    return (
+      <Card title="📋 프로젝트 선택">
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            평가 테스트를 진행할 실제 프로젝트를 선택하세요.
+          </p>
+          
+          {realProjects.length === 0 ? (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <div className="text-4xl mb-4">📋</div>
+              <h3 className="text-lg font-medium text-gray-700 mb-2">평가 가능한 프로젝트가 없습니다</h3>
+              <p className="text-gray-500">먼저 '내 프로젝트'에서 프로젝트를 생성하고 기준과 대안을 설정해주세요.</p>
             </div>
-          ))}
+          ) : (
+            <div className="grid gap-4">
+              {realProjects.map(project => (
+                <div 
+                  key={project.id}
+                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                  onClick={() => handleProjectSelect(project)}
+                >
+                  <h4 className="font-semibold text-lg mb-2">{project.title}</h4>
+                  <p className="text-sm text-gray-600 mb-3">{project.description}</p>
+                  
+                  <div className="flex items-center gap-6 text-xs text-gray-500">
+                    <span>상태: {project.status === 'active' ? '진행중' : project.status === 'completed' ? '완료' : project.status}</span>
+                    <span>기준: {project.criteria_count || 0}개</span>
+                    <span>대안: {project.alternatives_count || 0}개</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-      </div>
-    </Card>
-  );
+      </Card>
+    );
+  };
 
   // 인구통계학적 설문 화면
   const DemographicSurvey = () => (
@@ -231,9 +243,9 @@ const EvaluationTest: React.FC = () => {
             
             <div className="bg-gray-50 p-4 rounded-lg">
               <div className="flex items-center justify-between mb-4">
-                <span className="font-medium">기술적 타당성</span>
+                <span className="font-medium">{selectedProject?.criteria[0]?.name || '기준 1'}</span>
                 <span className="text-gray-500">vs</span>
-                <span className="font-medium">경제적 효과</span>
+                <span className="font-medium">{selectedProject?.criteria[1]?.name || '기준 2'}</span>
               </div>
               
               <div className="flex items-center gap-2">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import dataService from './services/dataService';
+// dataService 제거 - 각 컴포넌트에서 직접 사용
 import sessionService from './services/sessionService';
 import Layout from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
@@ -28,7 +28,7 @@ import EvaluationTest from './components/evaluation/EvaluationTest';
 import { API_BASE_URL } from './config/api';
 import { useColorTheme } from './hooks/useColorTheme';
 import { useTheme } from './hooks/useTheme';
-import { DEMO_USER } from './data/demoData';
+// DEMO 데이터 제거 - 실제 DB만 사용
 
 function App() {
   // Initialize theme systems
