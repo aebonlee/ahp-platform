@@ -8,6 +8,40 @@ const router = express.Router();
  * 관리자 전용 데이터 관리 API
  */
 
+// 개별 프로젝트 하드 삭제 API (관리자 전용)
+router.delete('/projects/:id/hard-delete', authenticateToken, requireAdmin, async (req: any, res) => {
+  try {
+    const { id } = req.params;
+    console.log(`🗑️ 관리자 요청: 프로젝트 ${id} 하드 삭제...`);
+    
+    // CASCADE 삭제로 관련 데이터 자동 삭제
+    const result = await query('DELETE FROM projects WHERE id = $1 RETURNING *', [id]);
+    
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: '프로젝트를 찾을 수 없습니다.'
+      });
+    }
+    
+    console.log(`✅ 프로젝트 ${id} 하드 삭제 완료`);
+    
+    res.json({
+      success: true,
+      message: '프로젝트가 완전히 삭제되었습니다.',
+      deleted_project: result.rows[0]
+    });
+    
+  } catch (error: any) {
+    console.error('❌ 프로젝트 하드 삭제 중 오류:', error);
+    res.status(500).json({
+      success: false,
+      message: '프로젝트 삭제 중 오류가 발생했습니다.',
+      error: error.message
+    });
+  }
+});
+
 // 테스트/허수 데이터 정리 API
 router.delete('/cleanup-test-data', authenticateToken, requireAdmin, async (req: any, res) => {
   try {
