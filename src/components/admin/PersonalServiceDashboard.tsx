@@ -1864,87 +1864,164 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     </div>
   );
 
-  const renderProgressMonitoring = () => (
-    <div className="space-y-6">
-      <h3 className="text-lg font-semibold">진행률 모니터링</h3>
+  const renderProgressMonitoring = () => {
+    // 평가자 페이지네이션 상태
+    const [currentPage, setCurrentPage] = useState(1);
+    const evaluatorsPerPage = 10;
+    
+    // 샘플 평가자 데이터 (실제로는 API에서 가져올 데이터)
+    const mockEvaluators = Array.from({ length: 26 }, (_, i) => {
+      const progress = Math.floor(Math.random() * 101);
+      const status = progress === 100 ? 'completed' : progress > 50 ? 'in_progress' : 'not_started';
+      const names = ['김철수', '이영희', '박민수', '정하늘', '최지은', '윤도현', '한소영', '강태준', '임나래', '오승호'];
+      const departments = ['개발팀', '마케팅팀', '영업팀', '기획팀', '인사팀', '재무팀', '연구팀', '디자인팀'];
+      
+      return {
+        id: i + 1,
+        name: names[i % names.length],
+        email: `evaluator${i + 1}@company.com`,
+        department: departments[i % departments.length],
+        progress,
+        status,
+        lastActivity: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleDateString()
+      };
+    });
+    
+    // 현재 페이지의 평가자들
+    const totalPages = Math.ceil(mockEvaluators.length / evaluatorsPerPage);
+    const startIndex = (currentPage - 1) * evaluatorsPerPage;
+    const currentEvaluators = mockEvaluators.slice(startIndex, startIndex + evaluatorsPerPage);
+    
+    return (
+      <div className="space-y-6">
+        <h3 className="text-lg font-semibold">진행률 모니터링</h3>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card title="전체 진행률">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-blue-600">85%</div>
-            <div className="text-sm text-gray-500 mt-1">26명 중 22명 완료</div>
-            <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
-              <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div>
+        <div className="space-y-6">
+          <Card title="전체 진행률">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-blue-600">85%</div>
+              <div className="text-sm text-gray-500 mt-1">26명 중 22명 완료</div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
+                <div className="bg-blue-600 h-2 rounded-full" style={{ width: '85%' }}></div>
+              </div>
+            </div>
+          </Card>
+
+          <Card title="평균 소요 시간">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-green-600">12분</div>
+              <div className="text-sm text-gray-500 mt-1">평가 완료까지</div>
+              <div className="text-xs text-green-600 mt-2">🟢 목표 시간 내</div>
+            </div>
+          </Card>
+
+          <Card title="일관성 품질">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-purple-600">0.08</div>
+              <div className="text-sm text-gray-500 mt-1">평균 CR 값</div>
+              <div className="text-xs text-green-600 mt-2">🟢 우수</div>
+            </div>
+          </Card>
+        </div>
+
+        <Card title="평가자별 진행 현황">
+          {/* 페이지 정보 헤더 */}
+          <div className="flex items-center justify-between mb-4 pb-3 border-b">
+            <div className="text-sm text-gray-600">
+              총 {mockEvaluators.length}명 중 {startIndex + 1}-{Math.min(startIndex + evaluatorsPerPage, mockEvaluators.length)}명 표시
+            </div>
+            <div className="text-sm text-gray-600">
+              페이지 {currentPage} / {totalPages}
             </div>
           </div>
-        </Card>
-
-        <Card title="평균 소요 시간">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-green-600">12분</div>
-            <div className="text-sm text-gray-500 mt-1">평가 완료까지</div>
-            <div className="text-xs text-green-600 mt-2">🟢 목표 시간 내</div>
-          </div>
-        </Card>
-
-        <Card title="일관성 품질">
-          <div className="text-center">
-            <div className="text-3xl font-bold text-purple-600">0.08</div>
-            <div className="text-sm text-gray-500 mt-1">평균 CR 값</div>
-            <div className="text-xs text-green-600 mt-2">🟢 우수</div>
-          </div>
-        </Card>
-      </div>
-
-      <Card title="평가자별 진행 현황">
-        <div className="space-y-3 max-h-80 overflow-y-auto">
-          {Array.from({ length: 26 }, (_, i) => {
-            const progress = Math.floor(Math.random() * 101);
-            const status = progress === 100 ? 'completed' : progress > 50 ? 'in_progress' : 'not_started';
-            
-            return (
-              <div key={i} className="flex justify-between items-center p-3 border rounded">
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm">
-                    P{String(i + 1).padStart(2, '0')}
+          
+          {/* 평가자 목록 */}
+          <div className="space-y-3">
+            {currentEvaluators.map((evaluator) => (
+              <div key={evaluator.id} className="flex justify-between items-center p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div className="flex items-center space-x-4">
+                  {/* 아바타 */}
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-sm font-medium">
+                    {evaluator.name.charAt(0)}
                   </div>
+                  
+                  {/* 평가자 정보 */}
                   <div>
-                    <div className="font-medium">평가자{i + 1}@company.com</div>
-                    <div className="text-xs text-gray-500">
-                      {status === 'completed' ? '평가 완료' :
-                       status === 'in_progress' ? '평가 진행중' : '시작 전'}
-                    </div>
+                    <div className="font-medium text-gray-900">{evaluator.name}</div>
+                    <div className="text-sm text-gray-600">{evaluator.email}</div>
+                    <div className="text-xs text-gray-500">{evaluator.department} • 최근 활동: {evaluator.lastActivity}</div>
                   </div>
                 </div>
-                <div className="flex items-center space-x-3">
+                
+                {/* 진행률 및 상태 */}
+                <div className="flex items-center space-x-4">
                   <div className="text-right">
-                    <div className="text-sm font-medium">{progress}%</div>
-                    <div className="w-20 bg-gray-200 rounded-full h-1.5">
+                    <div className="text-sm font-medium">{evaluator.progress}%</div>
+                    <div className="w-24 bg-gray-200 rounded-full h-2 mt-1">
                       <div 
-                        className={`h-1.5 rounded-full ${
-                          status === 'completed' ? 'bg-green-500' :
-                          status === 'in_progress' ? 'bg-blue-500' : 'bg-gray-300'
+                        className={`h-2 rounded-full ${
+                          evaluator.status === 'completed' ? 'bg-green-500' :
+                          evaluator.status === 'in_progress' ? 'bg-blue-500' : 'bg-gray-300'
                         }`}
-                        style={{ width: `${progress}%` }}
+                        style={{ width: `${evaluator.progress}%` }}
                       ></div>
                     </div>
                   </div>
-                  <span className={`px-2 py-1 rounded text-xs ${
-                    status === 'completed' ? 'bg-green-100 text-green-800' :
-                    status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                    evaluator.status === 'completed' ? 'bg-green-100 text-green-800' :
+                    evaluator.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
                     'bg-gray-100 text-gray-800'
                   }`}>
-                    {status === 'completed' ? '완료' :
-                     status === 'in_progress' ? '진행중' : '대기'}
+                    {evaluator.status === 'completed' ? '✓ 완료' :
+                     evaluator.status === 'in_progress' ? '⏳ 진행중' : '⏸️ 대기'}
                   </span>
                 </div>
               </div>
-            );
-          })}
-        </div>
-      </Card>
-    </div>
-  );
+            ))}
+          </div>
+          
+          {/* 페이지네이션 */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center space-x-2 mt-6 pt-4 border-t">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+              >
+                ← 이전
+              </Button>
+              
+              <div className="flex items-center space-x-1">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-full text-sm font-medium ${
+                      currentPage === page
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
+              
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+              >
+                다음 →
+              </Button>
+            </div>
+          )}
+        </Card>
+      </div>
+    );
+  };
 
   const renderResultsAnalysisFullPage = () => (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--bg-base)' }}>
