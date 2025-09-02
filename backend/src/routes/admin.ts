@@ -1,5 +1,6 @@
 import express from 'express';
-import { requireAuth, requireAdmin } from '../middleware/auth';
+import { authenticateToken, requireAdmin } from '../middleware/auth';
+import { query } from '../database/connection';
 
 const router = express.Router();
 
@@ -8,14 +9,12 @@ const router = express.Router();
  */
 
 // 테스트/허수 데이터 정리 API
-router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req: any, res) => {
+router.delete('/cleanup-test-data', authenticateToken, requireAdmin, async (req: any, res) => {
   try {
     console.log('🧹 관리자 요청: 테스트 데이터 정리 시작...');
     
-    const client = req.db;
-    
     // 1. 현재 프로젝트 목록 확인
-    const projectsResult = await client.query('SELECT id, title, description, status, created_at FROM projects ORDER BY created_at DESC');
+    const projectsResult = await query('SELECT id, title, description, status, created_at FROM projects ORDER BY created_at DESC');
     console.log(`📊 현재 프로젝트 총 개수: ${projectsResult.rows.length}개`);
     
     // 2. 테스트/허수 데이터 식별
@@ -50,26 +49,26 @@ router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req: any, 
       const projectId = project.id;
       
       // 쌍대비교 데이터 삭제
-      await client.query('DELETE FROM pairwise_comparisons WHERE project_id = $1', [projectId]);
+      await query('DELETE FROM pairwise_comparisons WHERE project_id = $1', [projectId]);
       
       // 평가자 삭제
-      await client.query('DELETE FROM evaluators WHERE project_id = $1', [projectId]);
+      await query('DELETE FROM evaluators WHERE project_id = $1', [projectId]);
       
       // 대안 삭제
-      await client.query('DELETE FROM alternatives WHERE project_id = $1', [projectId]);
+      await query('DELETE FROM alternatives WHERE project_id = $1', [projectId]);
       
       // 기준 삭제
-      await client.query('DELETE FROM criteria WHERE project_id = $1', [projectId]);
+      await query('DELETE FROM criteria WHERE project_id = $1', [projectId]);
       
       console.log(`✅ 프로젝트 ${projectId} 관련 데이터 삭제 완료`);
     }
     
     // 4. 테스트 프로젝트 삭제
     const testProjectIds = testProjects.map((p: any) => p.id);
-    await client.query('DELETE FROM projects WHERE id = ANY($1)', [testProjectIds]);
+    await query('DELETE FROM projects WHERE id = ANY($1)', [testProjectIds]);
     
     // 5. 정리 후 상태 확인
-    const finalResult = await client.query('SELECT COUNT(*) as count FROM projects');
+    const finalResult = await query('SELECT COUNT(*) as count FROM projects');
     const remainingCount = parseInt(finalResult.rows[0].count);
     
     console.log(`✅ ${testProjects.length}개 테스트 프로젝트 삭제 완료`);
@@ -94,11 +93,9 @@ router.delete('/cleanup-test-data', requireAuth, requireAdmin, async (req: any, 
 });
 
 // 프로젝트 목록 조회 (관리자용 - 상세 정보 포함)
-router.get('/projects', requireAuth, requireAdmin, async (req: any, res) => {
+router.get('/projects', authenticateToken, requireAdmin, async (req: any, res) => {
   try {
-    const client = req.db;
-    
-    const result = await client.query(`
+    const result = await query(`
       SELECT 
         p.*,
         (SELECT COUNT(*) FROM criteria WHERE project_id = p.id) as criteria_count,
