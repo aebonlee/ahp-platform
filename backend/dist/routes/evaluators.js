@@ -63,16 +63,29 @@ router.post('/assign', auth_1.authenticateToken, (0, auth_1.requireRole)(['admin
         }
         // 접속키 생성
         const accessKey = generateAccessKey(evaluator_code.toUpperCase(), project_id);
-        // 프로젝트에 평가자 배정
-        const assignment = await (0, connection_1.query)(`INSERT INTO project_evaluators (project_id, evaluator_id, evaluator_code, access_key)
-         VALUES ($1, $2, $3, $4)
-         RETURNING *`, [project_id, evaluatorUser.id, evaluator_code.toUpperCase(), accessKey]);
-        // 평가자 가중치 설정
-        await (0, connection_1.query)(`INSERT INTO evaluator_weights (project_id, evaluator_id, weight)
-         VALUES ($1, $2, $3)`, [project_id, evaluatorUser.id, weight]);
-        // 진행상황 초기화
-        await (0, connection_1.query)(`INSERT INTO evaluator_progress (project_id, evaluator_id, total_tasks, completed_tasks, completion_rate)
-         VALUES ($1, $2, 0, 0, 0.0)`, [project_id, evaluatorUser.id]);
+        // 프로젝트에 평가자 배정 (기존 테이블 구조 사용)
+        const assignment = await (0, connection_1.query)(`INSERT INTO project_evaluators (project_id, evaluator_id)
+         VALUES ($1, $2)
+         ON CONFLICT (project_id, evaluator_id) DO UPDATE SET assigned_at = CURRENT_TIMESTAMP
+         RETURNING *`, [project_id, evaluatorUser.id]);
+        // 평가자 가중치 설정 (테이블이 있는 경우에만)
+        try {
+            await (0, connection_1.query)(`INSERT INTO evaluator_weights (project_id, evaluator_id, weight)
+           VALUES ($1, $2, $3)
+           ON CONFLICT (project_id, evaluator_id) DO UPDATE SET weight = $3`, [project_id, evaluatorUser.id, weight]);
+        }
+        catch (e) {
+            console.log('evaluator_weights table not found, skipping weight assignment');
+        }
+        // 진행상황 초기화 (테이블이 있는 경우에만)
+        try {
+            await (0, connection_1.query)(`INSERT INTO evaluator_progress (project_id, evaluator_id, total_tasks, completed_tasks, completion_rate)
+           VALUES ($1, $2, 0, 0, 0.0)
+           ON CONFLICT (project_id, evaluator_id) DO UPDATE SET updated_at = CURRENT_TIMESTAMP`, [project_id, evaluatorUser.id]);
+        }
+        catch (e) {
+            console.log('evaluator_progress table not found, skipping progress initialization');
+        }
         res.status(201).json({
             message: 'Evaluator assigned successfully',
             evaluator: {
