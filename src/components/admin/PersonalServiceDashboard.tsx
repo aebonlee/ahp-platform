@@ -212,9 +212,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   const currentPlan = 'pro'; // 임시로 Pro Plan으로 설정
   const planLimits = PLAN_QUOTAS[currentPlan];
   
-  // 사용량 계산
-  const usedProjects = projects.length;
-  const usedEvaluators = projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0);
+  // 사용량 계산 (안전 가드 추가)
+  const usedProjects = (projects || []).length;
+  const usedEvaluators = (projects || []).reduce((sum, p) => sum + (p.evaluator_count || 0), 0);
   
   // 사용 가능한 옵션들 (플랜별로 다를 수 있음)
   const availableFeatures = {
@@ -438,7 +438,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             evaluation_method: projectForm.evaluation_method
           };
           
-          const updatedProjects = projects.map(p => 
+          const updatedProjects = (projects || []).map(p => 
             p.id === editingProject.id ? updatedUserProject : p
           );
           setProjects(updatedProjects);
@@ -693,7 +693,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-base font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.length}</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-info-text)' }}>
               <span className="text-white text-2xl">📊</span>
@@ -704,7 +704,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-base font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'active').length}</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).filter(p => p.status === 'active').length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-success-text)' }}>
               <span className="text-white text-2xl">🚀</span>
@@ -715,7 +715,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-base font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'completed').length}</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).filter(p => p.status === 'completed').length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--accent-primary)' }}>
               <span className="text-white text-2xl">✅</span>
@@ -727,7 +727,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             <div>
               <p className="text-base font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
               <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.completion_rate || 0), 0) / projects.length) : 0}%
+                {(projects || []).length > 0 ? Math.round((projects || []).reduce((sum, p) => sum + (p.completion_rate || 0), 0) / (projects || []).length) : 0}%
               </p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-warning-text)' }}>
@@ -1046,7 +1046,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
 
   const renderMyProjects = () => {
     // 필터링 및 검색 로직
-    const filteredProjects = projects.filter(project => {
+    const filteredProjects = (projects || []).filter(project => {
       const matchesSearch = project.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                            project.description.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesFilter = filterStatus === 'all' || project.status === filterStatus;
@@ -1074,7 +1074,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-base font-medium" style={{ color: 'var(--status-info-text)' }}>전체 프로젝트</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.length}</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-info-text)' }}>
               <span className="text-white text-2xl">📊</span>
@@ -1085,7 +1085,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-base font-medium" style={{ color: 'var(--status-success-text)' }}>진행중</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'active').length}</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).filter(p => p.status === 'active').length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-success-text)' }}>
               <span className="text-white text-2xl">🚀</span>
@@ -1096,7 +1096,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
           <div className="flex items-center justify-between">
             <div>
               <p className="text-base font-medium" style={{ color: 'var(--accent-primary)' }}>완료됨</p>
-              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{projects.filter(p => p.status === 'completed').length}</p>
+              <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>{(projects || []).filter(p => p.status === 'completed').length}</p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--accent-primary)' }}>
               <span className="text-white text-2xl">✅</span>
@@ -1108,7 +1108,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
             <div>
               <p className="text-base font-medium" style={{ color: 'var(--status-warning-text)' }}>평균 진행률</p>
               <p className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                {projects.length > 0 ? Math.round(projects.reduce((sum, p) => sum + (p.completion_rate || 0), 0) / projects.length) : 0}%
+                {(projects || []).length > 0 ? Math.round((projects || []).reduce((sum, p) => sum + (p.completion_rate || 0), 0) / (projects || []).length) : 0}%
               </p>
             </div>
             <div className="p-3 rounded-full" style={{ backgroundColor: 'var(--status-warning-text)' }}>
@@ -1294,7 +1294,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       )}
 
       {/* 프로젝트 목록 또는 빈 상태 */}
-      {projects.length === 0 ? (
+      {(projects || []).length === 0 ? (
         <div className="text-center py-12">
           <div className="text-6xl mb-4">📊</div>
           <h3 className="text-xl font-medium text-gray-900 mb-2">첫 번째 프로젝트를 시작해보세요</h3>
@@ -2164,7 +2164,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               <div className="text-6xl mb-4">📊</div>
               <p className="text-gray-600 mb-4">분석할 프로젝트를 선택해주세요.</p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl mx-auto">
-                {projects.filter(p => p.status === 'active' || p.status === 'completed').map(project => (
+                {(projects || []).filter(p => p.status === 'active' || p.status === 'completed').map(project => (
                   <button
                     key={project.id}
                     onClick={() => setSelectedProjectId(project.id || '')}
@@ -2677,7 +2677,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                   }}
                 >
                   <option value="">프로젝트 선택...</option>
-                  {projects.filter(p => (p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2).map((project, index) => (
+                  {(projects || []).filter(p => (p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2).map((project, index) => (
                     <option key={index} value={project.id}>
                       {project.title}
                     </option>
@@ -3441,7 +3441,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               >
                 📂 최근 프로젝트
               </h3>
-              {projects.length > 0 && (
+              {(projects || []).length > 0 && (
                 <button
                   onClick={() => handleTabChange('projects')}
                   className="text-sm font-medium transition-all duration-300"
@@ -3453,12 +3453,12 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     e.currentTarget.style.color = 'var(--accent-primary)';
                   }}
                 >
-                  모든 프로젝트 보기 ({projects.length}개) →
+                  모든 프로젝트 보기 ({(projects || []).length}개) →
                 </button>
               )}
             </div>
             
-            {projects.length === 0 ? (
+            {(projects || []).length === 0 ? (
               <div className="text-center py-8">
                 <div className="text-6xl mb-4 opacity-50">📊</div>
                 <h4 
@@ -3487,7 +3487,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               </div>
             ) : (
               <div className="space-y-4">
-                {projects.slice(0, 3).map((project) => (
+                {(projects || []).slice(0, 3).map((project) => (
                   <div 
                     key={project.id} 
                     className="p-4 rounded-lg transition-all duration-300 hover:scale-[1.02] cursor-pointer"
@@ -3613,7 +3613,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
                 
                 <div className="pl-12 space-y-3">
-                  {projects.slice(0, 3).map((project, index) => {
+                  {(projects || []).slice(0, 3).map((project, index) => {
                     const progressPercent = ((project.criteria_count || 0) >= 3 && (project.alternatives_count || 0) >= 2 && (project.evaluator_count || 0) >= 1) ? 100 : 
                       (((project.criteria_count || 0) >= 3 ? 40 : 0) + ((project.alternatives_count || 0) >= 2 ? 40 : 0) + ((project.evaluator_count || 0) >= 1 ? 20 : 0));
                     
@@ -3649,12 +3649,12 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       </div>
                     );
                   })}
-                  {projects.length > 3 && (
+                  {(projects || []).length > 3 && (
                     <div 
                       className="text-xs text-center pt-2"
                       style={{ color: 'var(--text-muted)' }}
                     >
-                      +{projects.length - 3}개 프로젝트 더 있음
+                      +{(projects || []).length - 3}개 프로젝트 더 있음
                     </div>
                   )}
                 </div>
@@ -3689,7 +3689,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 </div>
                 
                 <div className="pl-12 space-y-3">
-                  {projects.filter(p => (p.evaluator_count || 0) > 0).slice(0, 3).map((project, index) => {
+                  {(projects || []).filter(p => (p.evaluator_count || 0) > 0).slice(0, 3).map((project, index) => {
                     const totalEvaluators = project.evaluator_count || 0;
                     const completedEvaluators = Math.floor(totalEvaluators * 0.6); // 60% 완료율 시뮤레이션
                     const progressPercent = totalEvaluators > 0 ? Math.round((completedEvaluators / totalEvaluators) * 100) : 0;
@@ -3739,7 +3739,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                         className="text-xs font-medium"
                         style={{ color: 'var(--color-gray-dark-1)' }}
                       >
-                        {projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0)}명
+                        {(projects || []).reduce((sum, p) => sum + (p.evaluator_count || 0), 0)}명
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
@@ -3753,7 +3753,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                         className="text-xs font-medium"
                         style={{ color: 'var(--status-success-text)' }}
                       >
-                        {Math.floor(projects.reduce((sum, p) => sum + (p.evaluator_count || 0), 0) * 0.6)}명
+                        {Math.floor((projects || []).reduce((sum, p) => sum + (p.evaluator_count || 0), 0) * 0.6)}명
                       </span>
                     </div>
                   </div>
@@ -3797,7 +3797,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                       className="text-sm font-medium"
                       style={{ color: 'var(--status-success-text)' }}
                     >
-                      {projects.filter(p => (p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2 && (p.evaluator_count || 0) >= 1).length}/{projects.length}
+                      {(projects || []).filter(p => (p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2 && (p.evaluator_count || 0) >= 1).length}/{(projects || []).length}
                     </span>
                   </div>
                   <div 
@@ -3807,7 +3807,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     <div 
                       className="h-2 rounded-full transition-all duration-500"
                       style={{ 
-                        width: `${projects.length > 0 ? Math.round((projects.filter(p => (p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2 && (p.evaluator_count || 0) >= 1).length / projects.length) * 100) : 0}%`,
+                        width: `${(projects || []).length > 0 ? Math.round(((projects || []).filter(p => (p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2 && (p.evaluator_count || 0) >= 1).length / (projects || []).length) * 100) : 0}%`,
                         backgroundColor: 'var(--status-success-bg)'
                       }}
                     ></div>
@@ -3816,11 +3816,11 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                     className="text-xs"
                     style={{ color: 'var(--text-muted)' }}
                   >
-                    평균 진행률: {projects.length > 0 ? Math.round(projects.reduce((sum, p) => {
+                    평균 진행률: {(projects || []).length > 0 ? Math.round((projects || []).reduce((sum, p) => {
                       const progress = ((p.criteria_count || 0) >= 3 && (p.alternatives_count || 0) >= 2 && (p.evaluator_count || 0) >= 1) ? 100 : 
                         (((p.criteria_count || 0) >= 3 ? 40 : 0) + ((p.alternatives_count || 0) >= 2 ? 40 : 0) + ((p.evaluator_count || 0) >= 1 ? 20 : 0));
                       return sum + progress;
-                    }, 0) / projects.length) : 0}%
+                    }, 0) / (projects || []).length) : 0}%
                   </div>
               </div>
             </div>
