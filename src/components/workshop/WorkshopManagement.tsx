@@ -68,110 +68,24 @@ const WorkshopManagement: React.FC<WorkshopManagementProps> = ({ className = '' 
   });
 
   useEffect(() => {
-    // 샘플 워크숍 데이터 로드
-    const sampleWorkshops: Workshop[] = [
-      {
-        id: 'ws1',
-        title: '신기술 도입 우선순위 결정 워크숍',
-        description: '회사의 디지털 전환을 위한 신기술 도입 우선순위를 결정하는 협업 의사결정 워크숍',
-        status: 'active',
-        projectId: 'proj1',
-        facilitator: '김진수',
-        participants: [
-          {
-            id: 'p1',
-            name: '김진수',
-            email: 'kim@company.com',
-            role: 'facilitator',
-            status: 'confirmed',
-            expertise: ['프로젝트 관리', 'AHP 방법론']
-          },
-          {
-            id: 'p2',
-            name: '이영희',
-            email: 'lee@company.com',
-            role: 'expert',
-            status: 'confirmed',
-            expertise: ['IT 기술', '시스템 아키텍처']
-          },
-          {
-            id: 'p3',
-            name: '박문수',
-            email: 'park@company.com',
-            role: 'stakeholder',
-            status: 'confirmed',
-            expertise: ['경영전략', '재무관리']
-          }
-        ],
-        scheduledDate: '2025-01-20T14:00:00Z',
-        duration: 180,
-        agenda: [
-          {
-            id: 'a1',
-            title: '워크숍 소개 및 목표 설정',
-            description: '워크숍의 목적과 진행 방식 설명',
-            duration: 30,
-            type: 'presentation',
-            responsible: '김진수'
-          },
-          {
-            id: 'a2',
-            title: '문제 정의 및 기준 설정',
-            description: '의사결정 문제와 평가 기준 토론',
-            duration: 60,
-            type: 'discussion',
-            responsible: '전체 참가자'
-          },
-          {
-            id: 'a3',
-            title: 'AHP 평가 수행',
-            description: '쌍대비교를 통한 가중치 결정',
-            duration: 90,
-            type: 'evaluation',
-            responsible: '전체 참가자'
-          }
-        ],
-        decisions: [
-          {
-            id: 'd1',
-            title: '평가 기준 최종 확정',
-            description: '비용 효율성, 기술 성숙도, 구현 복잡도, 전략적 중요성을 평가 기준으로 확정',
-            alternatives: ['비용 효율성', '기술 성숙도', '구현 복잡도', '전략적 중요성'],
-            selectedAlternative: '모든 기준 채택',
-            rationale: '포괄적 평가를 위해 모든 기준을 채택',
-            timestamp: '2025-01-15T10:30:00Z',
-            participants: ['p1', 'p2', 'p3']
-          }
-        ],
-        createdAt: '2025-01-10T09:00:00Z'
-      },
-      {
-        id: 'ws2',
-        title: '마케팅 전략 수립 워크숍',
-        description: '신제품 출시를 위한 마케팅 전략 수립 워크숍',
-        status: 'planned',
-        projectId: 'proj2',
-        facilitator: '최민정',
-        participants: [
-          {
-            id: 'p4',
-            name: '최민정',
-            email: 'choi@company.com',
-            role: 'facilitator',
-            status: 'confirmed',
-            expertise: ['마케팅', '브랜딩']
-          }
-        ],
-        scheduledDate: '2025-01-25T10:00:00Z',
-        duration: 240,
-        agenda: [],
-        decisions: [],
-        createdAt: '2025-01-12T11:00:00Z'
-      }
-    ];
-
-    setWorkshops(sampleWorkshops);
+    // 실제 API에서 워크숍 데이터를 로드
+    loadWorkshops();
   }, []);
+
+  const loadWorkshops = async () => {
+    try {
+      // TODO: 실제 API 호출로 대체
+      // const response = await fetch('https://ahp-platform.onrender.com/api/workshops');
+      // const data = await response.json();
+      // setWorkshops(data.workshops || []);
+      
+      // 현재는 빈 배열로 초기화 (실제 데이터 연동 전까지)
+      setWorkshops([]);
+    } catch (error) {
+      console.error('워크숍 목록 로딩 실패:', error);
+      setWorkshops([]);
+    }
+  };
 
   const getStatusColor = (status: Workshop['status']) => {
     switch (status) {
@@ -225,43 +139,54 @@ const WorkshopManagement: React.FC<WorkshopManagementProps> = ({ className = '' 
 
       {/* 최근 워크숍 목록 */}
       <Card title="최근 워크숍" className="overflow-hidden">
-        <div className="space-y-4">
-          {workshops.slice(0, 5).map((workshop) => (
-            <div key={workshop.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-              <div className="flex-1">
-                <div className="flex items-center gap-3">
-                  <h4 className="font-medium text-gray-900">{workshop.title}</h4>
-                  <span className={`px-2 py-1 rounded text-xs ${getStatusColor(workshop.status)}`}>
-                    {getStatusLabel(workshop.status)}
-                  </span>
+        {workshops.length === 0 ? (
+          <div className="text-center py-12">
+            <div className="text-4xl mb-4">🏛️</div>
+            <h4 className="text-lg font-medium text-gray-900 mb-2">등록된 워크숍이 없습니다</h4>
+            <p className="text-gray-500 mb-6">AHP 기반 의사결정을 위한 워크숍을 생성해보세요</p>
+            <Button variant="primary" onClick={() => setActiveTab('planning')}>
+              첫 번째 워크숍 만들기
+            </Button>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {workshops.slice(0, 5).map((workshop) => (
+              <div key={workshop.id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <h4 className="font-medium text-gray-900">{workshop.title}</h4>
+                    <span className={`px-2 py-1 rounded text-xs ${getStatusColor(workshop.status)}`}>
+                      {getStatusLabel(workshop.status)}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mt-1">{workshop.description}</p>
+                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                    <span>👤 {workshop.facilitator}</span>
+                    <span>👥 {workshop.participants.length}명</span>
+                    <span>⏰ {new Date(workshop.scheduledDate).toLocaleDateString('ko-KR')}</span>
+                  </div>
                 </div>
-                <p className="text-sm text-gray-600 mt-1">{workshop.description}</p>
-                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                  <span>👤 {workshop.facilitator}</span>
-                  <span>👥 {workshop.participants.length}명</span>
-                  <span>⏰ {new Date(workshop.scheduledDate).toLocaleDateString('ko-KR')}</span>
-                </div>
-              </div>
-              <div className="flex gap-2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setSelectedWorkshop(workshop)}
-                >
-                  상세보기
-                </Button>
-                {workshop.status === 'active' && (
+                <div className="flex gap-2">
                   <Button
-                    variant="primary"
+                    variant="secondary"
                     size="sm"
+                    onClick={() => setSelectedWorkshop(workshop)}
                   >
-                    참가하기
+                    상세보기
                   </Button>
-                )}
+                  {workshop.status === 'active' && (
+                    <Button
+                      variant="primary"
+                      size="sm"
+                    >
+                      참가하기
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </Card>
     </div>
   );
@@ -366,51 +291,14 @@ const WorkshopManagement: React.FC<WorkshopManagementProps> = ({ className = '' 
   const renderFacilitation = () => (
     <div className="space-y-6">
       <Card title="진행중인 워크숍">
-        {workshops.filter(w => w.status === 'active').length > 0 ? (
-          <div className="space-y-4">
-            {workshops.filter(w => w.status === 'active').map((workshop) => (
-              <div key={workshop.id} className="border rounded-lg p-4">
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <h4 className="font-medium">{workshop.title}</h4>
-                    <p className="text-sm text-gray-600">{workshop.description}</p>
-                  </div>
-                  <Button variant="primary">워크숍 입장</Button>
-                </div>
-                
-                {/* 진행 상황 */}
-                <div className="mb-4">
-                  <div className="flex justify-between text-sm mb-2">
-                    <span>진행률</span>
-                    <span>2/3 완료</span>
-                  </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
-                    <div className="bg-blue-600 h-2 rounded-full" style={{ width: '67%' }}></div>
-                  </div>
-                </div>
-
-                {/* 참가자 상태 */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                  {workshop.participants.map((participant) => (
-                    <div key={participant.id} className="text-center">
-                      <div className={`w-8 h-8 rounded-full mx-auto mb-1 flex items-center justify-center text-white text-sm ${
-                        participant.status === 'attended' ? 'bg-green-500' : 'bg-gray-400'
-                      }`}>
-                        {participant.name.charAt(0)}
-                      </div>
-                      <div className="text-xs">{participant.name}</div>
-                      <div className="text-xs text-gray-500">{participant.role}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-8 text-gray-500">
-            현재 진행중인 워크숍이 없습니다.
-          </div>
-        )}
+        <div className="text-center py-12">
+          <div className="text-4xl mb-4">🎯</div>
+          <h4 className="text-lg font-medium text-gray-900 mb-2">진행중인 워크숍이 없습니다</h4>
+          <p className="text-gray-500 mb-6">새로운 워크숍을 계획하고 참가자들을 초대하세요</p>
+          <Button variant="primary" onClick={() => setActiveTab('planning')}>
+            워크숍 계획하기
+          </Button>
+        </div>
       </Card>
 
       {/* 워크숍 도구 */}
@@ -435,30 +323,13 @@ const WorkshopManagement: React.FC<WorkshopManagementProps> = ({ className = '' 
 
   const renderHistory = () => (
     <Card title="워크숍 이력">
-      <div className="space-y-4">
-        {workshops.filter(w => w.status === 'completed').map((workshop) => (
-          <div key={workshop.id} className="border rounded-lg p-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <h4 className="font-medium">{workshop.title}</h4>
-                <p className="text-sm text-gray-600 mt-1">{workshop.description}</p>
-                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                  <span>📅 {new Date(workshop.scheduledDate).toLocaleDateString('ko-KR')}</span>
-                  <span>⏰ {workshop.duration}분</span>
-                  <span>👥 {workshop.participants.length}명 참가</span>
-                  <span>✅ {workshop.decisions.length}개 결정사항</span>
-                </div>
-              </div>
-              <Button variant="secondary" size="sm">결과 보기</Button>
-            </div>
-          </div>
-        ))}
-        
-        {workshops.filter(w => w.status === 'completed').length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            완료된 워크숍이 없습니다.
-          </div>
-        )}
+      <div className="text-center py-12">
+        <div className="text-4xl mb-4">📜</div>
+        <h4 className="text-lg font-medium text-gray-900 mb-2">완료된 워크숍이 없습니다</h4>
+        <p className="text-gray-500 mb-6">워크숍을 완료하면 이곳에서 결과와 의사결정 내용을 확인할 수 있습니다</p>
+        <Button variant="outline" onClick={() => setActiveTab('overview')}>
+          현재 워크숍 보기
+        </Button>
       </div>
     </Card>
   );
@@ -467,24 +338,29 @@ const WorkshopManagement: React.FC<WorkshopManagementProps> = ({ className = '' 
     <div className={`space-y-6 ${className}`}>
       {/* 탭 네비게이션 */}
       <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
+        <nav className="-mb-px flex flex-wrap gap-4">
           {[
-            { id: 'overview', name: '개요', icon: '📊' },
-            { id: 'planning', name: '계획', icon: '📋' },
-            { id: 'facilitation', name: '진행', icon: '🎯' },
-            { id: 'history', name: '이력', icon: '📜' }
+            { id: 'overview', name: '개요', icon: '📊', desc: '워크숍 현황 및 통계' },
+            { id: 'planning', name: '계획', icon: '📋', desc: '새 워크숍 생성' },
+            { id: 'facilitation', name: '진행', icon: '🎯', desc: '실시간 워크숍 관리' },
+            { id: 'history', name: '이력', icon: '📜', desc: '완료된 워크숍 기록' }
           ].map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              className={`flex-1 min-w-0 py-6 px-6 border-b-3 font-semibold text-base rounded-t-lg transition-all duration-200 ${
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-blue-500 text-blue-700 bg-blue-50 shadow-sm'
+                  : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300'
               }`}
             >
-              <span className="mr-2">{tab.icon}</span>
-              {tab.name}
+              <div className="text-center">
+                <div className="text-lg">
+                  <span className="mr-2">{tab.icon}</span>
+                  {tab.name}
+                </div>
+                <div className="text-sm text-gray-500 mt-2 font-normal">{tab.desc}</div>
+              </div>
             </button>
           ))}
         </nav>

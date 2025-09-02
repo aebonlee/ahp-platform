@@ -74,31 +74,10 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
   const { currentTheme, changeColorTheme } = useColorTheme();
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'workflow' | 'notifications' | 'display' | 'privacy' | 'data'>('profile');
   
-  // 오프라인 저장된 설정 복원
+  // DB 기반 사용자 설정 초기화
   const getInitialSettings = (): UserSettings => {
-    // 1. 먼저 오프라인 저장 설정 확인
-    const offlineSettings = localStorage.getItem('user_settings_offline');
-    if (offlineSettings) {
-      try {
-        const parsed = JSON.parse(offlineSettings);
-        console.log('📥 오프라인 설정 복원:', parsed);
-        return parsed;
-      } catch (e) {
-        console.warn('오프라인 설정 파싱 실패:', e);
-      }
-    }
-    
-    // 2. userSettings 확인 (기존 방식)
-    const savedSettings = localStorage.getItem('userSettings');
-    if (savedSettings) {
-      try {
-        const parsed = JSON.parse(savedSettings);
-        console.log('📥 기존 설정 복원:', parsed);
-        return parsed;
-      } catch (e) {
-        console.warn('기존 설정 파싱 실패:', e);
-      }
-    }
+    // localStorage 사용 금지 - 모든 데이터를 API로부터 가져오기
+    // 임시로 기본값 반환, API 로딩에서 실제 데이터로 대체됨
     
     // 3. 기본값 반환
     return {
@@ -157,6 +136,38 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
   });
 
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  // 데이터 가져오기 함수 (미구현 기능 추가)
+  const handleDataImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const text = await file.text();
+      const importData = JSON.parse(text);
+      
+      if (window.confirm('가져온 데이터로 현재 설정을 덮어쓰시겠습니까?')) {
+        setSettings(importData.settings || importData);
+        alert('데이터가 성공적으로 가져와졌습니다.');
+        
+        // API로 서버에 저장
+        await fetch(`${API_BASE_URL}/api/users/import-data`, {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(importData)
+        });
+      }
+    } catch (error) {
+      console.error('데이터 가져오기 오류:', error);
+      alert('파일을 읽는 중 오류가 발생했습니다. 올바른 JSON 파일인지 확인해주세요.');
+    }
+    
+    // 파일 입력 초기화
+    event.target.value = '';
+  };
 
   // DB에서 사용자 정보 불러오기 및 동기화
   useEffect(() => {
@@ -360,8 +371,8 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
     }
   };
 
-  // 비밀번호 변경 함수
-  const handlePasswordChange = () => {
+  // 비밀번호 변경 함수 (실제 API 구현)
+  const handlePasswordChange = async () => {
     if (!passwordForm.currentPassword || !passwordForm.newPassword || !passwordForm.confirmPassword) {
       alert('모든 필드를 입력해주세요.');
       return;
@@ -377,37 +388,128 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
       return;
     }
 
-    // 실제 구현에서는 API 호출
-    alert('비밀번호가 성공적으로 변경되었습니다.');
-    setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+    // 비밀번호 강도 검사
+    const hasUppercase = /[A-Z]/.test(passwordForm.newPassword);
+    const hasLowercase = /[a-z]/.test(passwordForm.newPassword);
+    const hasNumbers = /\d/.test(passwordForm.newPassword);
+    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(passwordForm.newPassword);
+    
+    const strengthScore = [hasUppercase, hasLowercase, hasNumbers, hasSpecialChar].filter(Boolean).length;
+    
+    if (strengthScore < 3) {
+      alert('비밀번호는 대소문자, 숫자, 특수문자를 포함해야 합니다.');
+      return;
+    }
+
+    try {
+      // API 호출로 비밀번호 변경
+      const response = await fetch(`${API_BASE_URL}/api/users/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          currentPassword: passwordForm.currentPassword,
+          newPassword: passwordForm.newPassword
+        })
+      });
+
+      if (response.ok) {
+        alert('비밀번호가 성공적으로 변경되었습니다.');
+        setPasswordForm({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        const error = await response.json();
+        alert(error.message || '비밀번호 변경에 실패했습니다.');
+      }
+    } catch (error) {
+      console.error('비밀번호 변경 오류:', error);
+      alert('네트워크 오류가 발생했습니다.');
+    }
   };
 
-  // 데이터 내보내기 함수
-  const exportUserData = () => {
-    const exportData = {
-      profile: settings.profile,
-      settings: settings,
-      exportDate: new Date().toISOString(),
-      projects: [] // 실제 구현에서는 프로젝트 데이터 포함
-    };
+  // 데이터 내보내기 함수 (실제 API 구현)
+  const exportUserData = async () => {
+    try {
+      // API로부터 사용자 데이터 가져오기
+      const response = await fetch(`${API_BASE_URL}/api/users/export-data`, {
+        method: 'GET',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
 
-    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ahp-userdata-${user.id}-${new Date().toISOString().split('T')[0]}.json`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+      if (response.ok) {
+        const exportData = await response.json();
+        
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `ahp-userdata-${user.id}-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        alert('데이터가 성공적으로 내보내기 되었습니다.');
+      } else {
+        throw new Error('데이터 내보내기 실패');
+      }
+    } catch (error) {
+      console.error('데이터 내보내기 오류:', error);
+      // 폴백: 기본적인 데이터만 내보내기
+      const fallbackData = {
+        profile: settings.profile,
+        settings: settings,
+        exportDate: new Date().toISOString(),
+        note: 'API 연결 실패로 인한 부분 데이터'
+      };
+      
+      const blob = new Blob([JSON.stringify(fallbackData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `ahp-userdata-partial-${user.id}-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      alert('네트워크 오류로 인해 부분 데이터만 내보내기 되었습니다.');
+    }
   };
 
-  // 계정 삭제 함수
-  const handleDeleteAccount = () => {
+  // 계정 삭제 함수 (실제 API 구현)
+  const handleDeleteAccount = async () => {
     if (window.confirm('정말로 계정을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) {
       if (window.confirm('모든 데이터가 영구적으로 삭제됩니다. 계속하시겠습니까?')) {
-        // 실제 구현에서는 API 호출
-        alert('계정 삭제 요청이 접수되었습니다. 24시간 내에 처리됩니다.');
+        const reason = window.prompt('계정 삭제 사유를 입력해주세요 (선택사항):');
+        
+        try {
+          const response = await fetch(`${API_BASE_URL}/api/users/delete-account`, {
+            method: 'DELETE',
+            credentials: 'include',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ reason: reason || 'No reason provided' })
+          });
+
+          if (response.ok) {
+            alert('계정 삭제 요청이 접수되었습니다. 24시간 내에 처리됩니다.');
+            // 로그아웃 및 리다이렉트
+            localStorage.clear();
+            window.location.href = '/login';
+          } else {
+            const error = await response.json();
+            alert(error.message || '계정 삭제 요청에 실패했습니다.');
+          }
+        } catch (error) {
+          console.error('계정 삭제 오류:', error);
+          alert('네트워크 오류가 발생했습니다.');
+        }
       }
     }
   };
@@ -1081,6 +1183,7 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
                   <input
                     type="file"
                     accept=".json"
+                    onChange={handleDataImport}
                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                   />
                 </div>
@@ -1166,38 +1269,32 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 탭 네비게이션 - 개선된 구분도 */}
         <div className="border-b mb-8" style={{ borderColor: 'var(--border-subtle)' }}>
-          <nav className="flex space-x-2 overflow-x-auto">
+          <nav className="-mb-px flex flex-wrap gap-2">
             {[
-              { id: 'profile', label: '프로필', icon: '👤' },
-              { id: 'security', label: '보안', icon: '🔒' },
-              { id: 'workflow', label: '워크플로우', icon: '⚡' },
-              { id: 'notifications', label: '알림', icon: '🔔' },
-              { id: 'display', label: '화면', icon: '🎨' },
-              { id: 'privacy', label: '개인정보', icon: '🛡️' },
-              { id: 'data', label: '데이터', icon: '💾' }
+              { id: 'profile', label: '프로필', icon: '👤', desc: '계정 정보 및 프로필 관리' },
+              { id: 'security', label: '보안', icon: '🔒', desc: '비밀번호 및 보안 설정' },
+              { id: 'workflow', label: '워크플로우', icon: '⚡', desc: '작업 환경 및 템플릿 설정' },
+              { id: 'notifications', label: '알림', icon: '🔔', desc: '이메일 및 시스템 알림 설정' },
+              { id: 'display', label: '화면', icon: '🎨', desc: '테마, 언어, 디스플레이 설정' },
+              { id: 'privacy', label: '개인정보', icon: '🛡️', desc: '정보 공개 범위 및 프라이버시' },
+              { id: 'data', label: '데이터', icon: '💾', desc: '데이터 내보내기 및 계정 관리' }
             ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`px-4 py-3 mx-1 border-b-2 font-medium text-sm transition-all duration-200 whitespace-nowrap rounded-t-lg ${
+                className={`flex-1 min-w-0 py-6 px-6 border-b-3 font-semibold text-base rounded-t-lg transition-all duration-200 ${
                   activeTab === tab.id
-                    ? 'text-blue-700 bg-blue-50 shadow-sm border-b-blue-500'
-                    : 'text-gray-600 hover:text-gray-800 hover:bg-gray-50 border-b-transparent hover:border-b-gray-200'
+                    ? 'border-blue-500 text-blue-700 bg-blue-50 shadow-sm'
+                    : 'border-transparent text-gray-600 hover:text-gray-800 hover:bg-gray-50 hover:border-gray-300'
                 }`}
-                style={activeTab === tab.id ? {
-                  borderBottomColor: 'var(--accent-primary)',
-                  borderBottomWidth: '3px',
-                  color: 'var(--accent-primary)',
-                  backgroundColor: 'var(--accent-light)',
-                  fontWeight: '600',
-                  transform: 'translateY(-1px)'
-                } : {
-                  color: 'var(--text-muted)',
-                  borderBottomWidth: '1px'
-                }}
               >
-                <span className="mr-2 text-base">{tab.icon}</span>
-                <span>{tab.label}</span>
+                <div className="text-center">
+                  <div className="text-lg mb-1">
+                    <span className="mr-2">{tab.icon}</span>
+                    {tab.label}
+                  </div>
+                  <div className="text-sm text-gray-500 font-normal leading-tight">{tab.desc}</div>
+                </div>
               </button>
             ))}
           </nav>

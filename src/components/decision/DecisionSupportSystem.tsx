@@ -484,28 +484,29 @@ const DecisionSupportSystem: React.FC<DecisionSupportSystemProps> = ({ className
     <div className={`space-y-6 ${className}`}>
       {/* 프로세스 단계 */}
       <div className="bg-white border rounded-lg p-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           {[
-            { id: 'definition', name: '문제정의', icon: '🎯' },
-            { id: 'structuring', name: '구조화', icon: '🏗️' },
-            { id: 'evaluation', name: '평가', icon: '⚖️' },
-            { id: 'analysis', name: '분석', icon: '📊' },
-            { id: 'validation', name: '검증', icon: '✅' }
+            { id: 'definition', name: '문제정의', icon: '🎯', desc: '의사결정 문제 정의 및 목표 설정' },
+            { id: 'structuring', name: '구조화', icon: '🏗️', desc: '계층구조 및 이해관계자 분석' },
+            { id: 'evaluation', name: '평가', icon: '⚖️', desc: 'AHP 쌍대비교 평가 수행' },
+            { id: 'analysis', name: '분석', icon: '📊', desc: '결과 분석 및 민감도 검토' },
+            { id: 'validation', name: '검증', icon: '✅', desc: '의사결정 결과 타당성 검증' }
           ].map((step, index) => (
             <React.Fragment key={step.id}>
               <button
                 onClick={() => setActiveStep(step.id as any)}
-                className={`flex flex-col items-center p-3 rounded-lg transition-colors ${
+                className={`flex-1 min-w-0 flex flex-col items-center py-6 px-4 rounded-lg transition-all duration-200 ${
                   activeStep === step.id 
-                    ? 'bg-blue-100 text-blue-800' 
-                    : 'text-gray-600 hover:bg-gray-100'
+                    ? 'bg-blue-50 text-blue-700 shadow-md border-2 border-blue-300' 
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800 border-2 border-transparent'
                 }`}
               >
-                <div className="text-2xl mb-1">{step.icon}</div>
-                <div className="text-sm font-medium">{step.name}</div>
+                <div className="text-3xl mb-2">{step.icon}</div>
+                <div className="text-base font-semibold mb-1">{step.name}</div>
+                <div className="text-xs text-center leading-tight px-1">{step.desc}</div>
               </button>
               {index < 4 && (
-                <div className="flex-1 h-px bg-gray-300 mx-2"></div>
+                <div className="hidden lg:block flex-shrink-0 w-8 h-px bg-gray-300"></div>
               )}
             </React.Fragment>
           ))}
