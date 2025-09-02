@@ -9,16 +9,17 @@ interface Question {
 }
 
 interface SurveyFormBuilderProps {
-  onSave?: (questions: Question[]) => void;
+  onSave?: (questions: Question[], metadata?: { title: string; description: string }) => void;
   onCancel?: () => void;
+  initialSurvey?: any; // 편집할 기존 설문조사 데이터
 }
 
-const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel }) => {
-  const [surveyTitle, setSurveyTitle] = useState('인구통계학적 설문조사');
-  const [surveyDescription, setSurveyDescription] = useState('');
-  const [questions, setQuestions] = useState<Question[]>([]);
+const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel, initialSurvey }) => {
+  const [surveyTitle, setSurveyTitle] = useState(initialSurvey?.title || '인구통계학적 설문조사');
+  const [surveyDescription, setSurveyDescription] = useState(initialSurvey?.description || '');
+  const [questions, setQuestions] = useState<Question[]>(initialSurvey?.questions || []);
   const [isPreview, setIsPreview] = useState(false);
-  const [showTemplateSelection, setShowTemplateSelection] = useState(true);
+  const [showTemplateSelection, setShowTemplateSelection] = useState(!initialSurvey); // 편집 모드면 템플릿 선택 스킵
 
   // 기본 허수 템플릿들
   const demographicTemplates = {
@@ -354,7 +355,7 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
 
   const handleSave = () => {
     if (onSave) {
-      onSave(questions);
+      onSave(questions, { title: surveyTitle, description: surveyDescription });
     }
     alert('설문이 저장되었습니다!');
   };
@@ -468,32 +469,34 @@ const SurveyFormBuilder: React.FC<SurveyFormBuilderProps> = ({ onSave, onCancel 
         <div className="flex items-center justify-between mb-8">
           <div>
             <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
-              📊 설문조사 폼 빌더
+              {initialSurvey ? '✏️ 설문조사 편집' : '📊 설문조사 폼 빌더'}
             </h2>
             <p style={{ color: 'var(--text-secondary)' }}>
-              구글 폼처럼 자유롭게 설문 항목을 추가하고 편집할 수 있습니다
+              {initialSurvey ? '기존 설문조사 내용을 수정하고 편집할 수 있습니다' : '구글 폼처럼 자유롭게 설문 항목을 추가하고 편집할 수 있습니다'}
             </p>
           </div>
           <div className="flex space-x-3">
-            <button
-              onClick={() => setShowTemplateSelection(true)}
-              className="px-4 py-2 border rounded-lg transition-colors"
-              style={{ 
-                borderColor: 'var(--border-default)', 
-                color: 'var(--text-secondary)',
-                backgroundColor: 'transparent'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
-                e.currentTarget.style.borderColor = 'var(--accent-primary)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.borderColor = 'var(--border-default)';
-              }}
-            >
-              📋 템플릿 변경
-            </button>
+            {!initialSurvey && (
+              <button
+                onClick={() => setShowTemplateSelection(true)}
+                className="px-4 py-2 border rounded-lg transition-colors"
+                style={{ 
+                  borderColor: 'var(--border-default)', 
+                  color: 'var(--text-secondary)',
+                  backgroundColor: 'transparent'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
+                  e.currentTarget.style.borderColor = 'var(--accent-primary)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'transparent';
+                  e.currentTarget.style.borderColor = 'var(--border-default)';
+                }}
+              >
+                📋 템플릿 변경
+              </button>
+            )}
             <button
               onClick={() => setIsPreview(true)}
               className="px-4 py-2 border rounded-lg transition-colors"

@@ -194,6 +194,42 @@ initDatabase = async () => {
       )
     `);
 
+    // 설문조사 테이블
+    await query(`
+      CREATE TABLE IF NOT EXISTS surveys (
+        id SERIAL PRIMARY KEY,
+        project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        questions JSONB NOT NULL DEFAULT '[]',
+        created_by INTEGER NOT NULL REFERENCES users(id),
+        status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'completed', 'archived')),
+        evaluator_link TEXT,
+        total_responses INTEGER DEFAULT 0,
+        completed_responses INTEGER DEFAULT 0,
+        average_completion_time DECIMAL(10,2),
+        deleted_at TIMESTAMP WITH TIME ZONE NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // 설문조사 응답 테이블
+    await query(`
+      CREATE TABLE IF NOT EXISTS survey_responses (
+        id SERIAL PRIMARY KEY,
+        survey_id INTEGER NOT NULL REFERENCES surveys(id) ON DELETE CASCADE,
+        respondent_email VARCHAR(255),
+        respondent_name VARCHAR(100),
+        responses JSONB NOT NULL DEFAULT '{}',
+        completion_time INTEGER, -- in seconds
+        ip_address VARCHAR(45),
+        user_agent TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        completed_at TIMESTAMP WITH TIME ZONE
+      )
+    `);
+
     // 고객지원 게시판 테이블
     await query(`
       CREATE TABLE IF NOT EXISTS support_posts (
@@ -260,6 +296,11 @@ initDatabase = async () => {
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_workflow_stage ON projects(workflow_stage)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_deleted_at ON projects(deleted_at)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_status_deleted ON projects(status) WHERE status = 'deleted'`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_surveys_project_id ON surveys(project_id)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_surveys_created_by ON surveys(created_by)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_surveys_status ON surveys(status)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_surveys_deleted_at ON surveys(deleted_at)`);
+    await query(`CREATE INDEX IF NOT EXISTS idx_survey_responses_survey_id ON survey_responses(survey_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_criteria_project_id ON criteria(project_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_alternatives_project_id ON alternatives(project_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_project_evaluators_project_id ON project_evaluators(project_id)`);
@@ -465,7 +506,7 @@ initDatabase = async () => {
     `, ['demo@ahp-service.com', demoPassword, 'Demo', 'Evaluator', 'evaluator', true]);
     console.log('✅ Demo Evaluator created: demo@ahp-service.com / demo123');
 
-    // 샘플 데이터 생성
+    // 샘플 데이터 생성 (설문조사 예시 데이터는 제외)
     await createSampleData();
     await createSampleNewsData();
     await createSampleSupportData();

@@ -26,27 +26,37 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
   const fetchSurveys = async () => {
     setIsLoading(true);
     try {
-      // TODO: API 호출로 교체
-      const mockSurveys: Survey[] = [
-        {
-          id: 'survey-001',
-          title: 'AHP 모델 평가를 위한 인구통계학적 설문조사',
-          description: '본 연구의 AHP 모델 평가에 참여해주신 평가자분들의 배경 정보를 수집하기 위한 설문조사입니다.',
-          questions: [],
-          createdBy: 'researcher-001',
-          projectId: projectId,
-          createdAt: new Date('2025-08-28'),
-          updatedAt: new Date('2025-08-28'),
-          status: 'active',
-          evaluatorLink: `${window.location.origin}/survey/eval/survey-001-token-abc123`,
-          totalResponses: 45,
-          completedResponses: 42,
-          averageCompletionTime: 8.5
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/projects/${projectId}/surveys`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
-      ];
-      setSurveys(mockSurveys);
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch surveys');
+      }
+      
+      const surveysData = await response.json();
+      setSurveys(surveysData.map((survey: any) => ({
+        id: survey.id,
+        title: survey.title,
+        description: survey.description,
+        questions: survey.questions || [],
+        createdBy: survey.created_by,
+        projectId: survey.project_id,
+        createdAt: new Date(survey.created_at),
+        updatedAt: new Date(survey.updated_at),
+        status: survey.status,
+        evaluatorLink: survey.evaluator_link,
+        totalResponses: survey.total_responses || 0,
+        completedResponses: survey.completed_responses || 0,
+        averageCompletionTime: survey.average_completion_time
+      })));
     } catch (error) {
       console.error('설문조사 목록 조회 실패:', error);
+      setSurveys([]);
     } finally {
       setIsLoading(false);
     }
@@ -60,30 +70,30 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
   const handleCreateSurvey = async (surveyData: CreateSurveyRequest) => {
     setIsLoading(true);
     try {
-      // TODO: API 호출로 교체
-      const newSurvey: Survey = {
-        id: `survey-${Date.now()}`,
-        title: surveyData.title,
-        description: surveyData.description,
-        questions: surveyData.questions.map((q, index) => ({ ...q, id: `q-${index + 1}`, order: index + 1 })),
-        createdBy: 'current-user-id',
-        projectId: surveyData.projectId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        status: 'draft',
-        evaluatorLink: `${window.location.origin}/survey/eval/${`survey-${Date.now()}`}-token-${Math.random().toString(36).substr(2, 9)}`,
-        totalResponses: 0,
-        completedResponses: 0
-      };
-
-      setSurveys(prev => [newSurvey, ...prev]);
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/projects/${projectId}/surveys`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(surveyData)
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create survey');
+      }
+      
+      const newSurvey = await response.json();
+      await fetchSurveys(); // 목록 새로고침
       setCurrentView('list');
       
       // 성공 알림
-      alert(`설문조사가 생성되었습니다!\n평가자 링크: ${newSurvey.evaluatorLink}`);
-    } catch (error) {
+      alert(`설문조사가 생성되었습니다!\n평가자 링크: ${newSurvey.evaluator_link}`);
+    } catch (error: any) {
       console.error('설문조사 생성 실패:', error);
-      alert('설문조사 생성에 실패했습니다.');
+      alert(error.message || '설문조사 생성에 실패했습니다.');
     } finally {
       setIsLoading(false);
     }
@@ -92,15 +102,24 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
   // 설문조사 활성화/비활성화
   const toggleSurveyStatus = async (surveyId: string, newStatus: Survey['status']) => {
     try {
-      setSurveys(prev => 
-        prev.map(survey => 
-          survey.id === surveyId 
-            ? { ...survey, status: newStatus, updatedAt: new Date() }
-            : survey
-        )
-      );
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/surveys/${surveyId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ status: newStatus })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to update survey status');
+      }
+      
+      await fetchSurveys(); // 목록 새로고침
     } catch (error) {
       console.error('설문조사 상태 변경 실패:', error);
+      alert('설문조사 상태 변경에 실패했습니다.');
     }
   };
 
@@ -132,8 +151,20 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
 
     try {
       setIsLoading(true);
-      // TODO: API 호출로 교체
-      setSurveys(prev => prev.filter(s => s.id !== surveyId));
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/surveys/${surveyId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to delete survey');
+      }
+      
+      await fetchSurveys(); // 목록 새로고침
       alert('설문조사가 삭제되었습니다.');
     } catch (error) {
       console.error('설문조사 삭제 실패:', error);
@@ -476,10 +507,10 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
       </div>
       
       <SurveyFormBuilder 
-        onSave={(questions) => {
+        onSave={(questions, metadata) => {
           const surveyData: CreateSurveyRequest = {
-            title: '인구통계학적 설문조사', // 기본값
-            description: '연구 참여자들의 배경 정보를 수집하기 위한 설문조사입니다.',
+            title: metadata?.title || '인구통계학적 설문조사',
+            description: metadata?.description || '연구 참여자들의 배경 정보를 수집하기 위한 설문조사입니다.',
             questions: questions.map(({ id, ...q }, index) => ({ ...q, order: index + 1 })),
             projectId: projectId
           };
@@ -563,10 +594,64 @@ const SurveyManagementSystem: React.FC<SurveyManagementSystemProps> = ({
     </div>
   );
 
+  const renderEditSurvey = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold flex items-center" style={{ color: 'var(--text-primary)' }}>
+          <span className="text-3xl mr-3">✏️</span>
+          설문조사 편집: {selectedSurvey?.title}
+        </h2>
+        <Button variant="outline" onClick={() => setCurrentView('list')}>
+          ← 목록으로
+        </Button>
+      </div>
+      
+      {selectedSurvey && (
+        <SurveyFormBuilder 
+          initialSurvey={selectedSurvey}
+          onSave={async (questions, metadata) => {
+            try {
+              setIsLoading(true);
+              const token = localStorage.getItem('authToken');
+              const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/surveys/${selectedSurvey.id}`, {
+                method: 'PUT',
+                headers: {
+                  'Authorization': `Bearer ${token}`,
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                  title: metadata?.title || selectedSurvey.title,
+                  description: metadata?.description || selectedSurvey.description,
+                  questions: questions
+                })
+              });
+              
+              if (!response.ok) {
+                throw new Error('Failed to update survey');
+              }
+              
+              await fetchSurveys(); // 목록 새로고침
+              setCurrentView('list');
+              alert('설문조사가 수정되었습니다!');
+            } catch (error) {
+              console.error('설문조사 수정 실패:', error);
+              alert('설문조사 수정에 실패했습니다.');
+            } finally {
+              setIsLoading(false);
+            }
+          }}
+          onCancel={() => setCurrentView('list')}
+        />
+      )}
+    </div>
+  );
+
   // 메인 렌더링
   switch (currentView) {
     case 'create':
       return renderCreateSurvey();
+    case 'edit':
+      return renderEditSurvey();
     case 'responses':
       return renderResponses();
     default:
