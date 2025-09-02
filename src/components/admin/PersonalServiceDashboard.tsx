@@ -436,14 +436,32 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
         }
       } else {
         // 생성 모드 - 새 프로젝트 생성
-        const newProject = await dataService.createProject({
-          title: projectForm.title,
-          description: projectForm.description,
-          objective: projectForm.objective,
-          status: 'draft', // 초기 상태는 draft
-          evaluation_mode: projectForm.evaluation_mode,
-          workflow_stage: projectForm.workflow_stage
-        });
+        console.log('🔍 프로젝트 생성 시작:', projectForm.title);
+        
+        let newProject;
+        if (onCreateProject) {
+          console.log('✅ App.tsx onCreateProject prop 사용');
+          newProject = await onCreateProject({
+            title: projectForm.title,
+            description: projectForm.description,
+            objective: projectForm.objective,
+            status: 'draft',
+            evaluation_mode: projectForm.evaluation_mode,
+            workflow_stage: projectForm.workflow_stage
+          });
+        } else {
+          console.log('⚠️ dataService 직접 호출 (fallback)');
+          newProject = await dataService.createProject({
+            title: projectForm.title,
+            description: projectForm.description,
+            objective: projectForm.objective,
+            status: 'draft',
+            evaluation_mode: projectForm.evaluation_mode,
+            workflow_stage: projectForm.workflow_stage
+          });
+        }
+        
+        console.log('✅ 프로젝트 생성 결과:', newProject);
         
         if (newProject) {
           const newUserProject: UserProject = {

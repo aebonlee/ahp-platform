@@ -13,14 +13,16 @@ class CleanDataService {
       console.log('🔍 실제 DB에서 프로젝트 조회 시작...');
       const response = await projectApi.getProjects();
       if (response.success && response.data) {
-        console.log('✅ 프로젝트 조회 성공:', response.data.length, '개');
-        return response.data;
+        // 배열인지 확인
+        const projects = Array.isArray(response.data) ? response.data : [];
+        console.log('✅ 프로젝트 조회 성공:', projects.length, '개');
+        return projects;
       }
-      console.error('❌ 프로젝트 조회 실패: response.success =', response.success);
+      console.error('❌ 프로젝트 조회 실패: response.success =', response.success, 'data =', response.data);
       return [];
     } catch (error) {
       console.error('❌ 프로젝트 조회 중 오류:', error);
-      throw error;
+      return []; // throw 대신 빈 배열 반환
     }
   }
 
@@ -94,14 +96,15 @@ class CleanDataService {
       console.log('🔍 실제 DB에서 기준 조회 시작:', projectId);
       const response = await criteriaApi.getCriteria(projectId);
       if (response.success && response.data) {
-        console.log('✅ 기준 조회 성공:', response.data.length, '개');
-        return response.data;
+        const criteria = Array.isArray(response.data) ? response.data : [];
+        console.log('✅ 기준 조회 성공:', criteria.length, '개');
+        return criteria;
       }
       console.error('❌ 기준 조회 실패');
       return [];
     } catch (error) {
       console.error('❌ 기준 조회 중 오류:', error);
-      throw error;
+      return [];
     }
   }
 
@@ -127,14 +130,15 @@ class CleanDataService {
       console.log('🔍 실제 DB에서 대안 조회 시작:', projectId);
       const response = await alternativeApi.getAlternatives(projectId);
       if (response.success && response.data) {
-        console.log('✅ 대안 조회 성공:', response.data.length, '개');
-        return response.data;
+        const alternatives = Array.isArray(response.data) ? response.data : [];
+        console.log('✅ 대안 조회 성공:', alternatives.length, '개');
+        return alternatives;
       }
       console.error('❌ 대안 조회 실패');
       return [];
     } catch (error) {
       console.error('❌ 대안 조회 중 오류:', error);
-      throw error;
+      return [];
     }
   }
 
@@ -160,14 +164,15 @@ class CleanDataService {
       console.log('🔍 실제 DB에서 평가자 조회 시작:', projectId);
       const response = await evaluatorApi.getEvaluators(projectId);
       if (response.success && response.data) {
-        console.log('✅ 평가자 조회 성공:', response.data.length, '개');
-        return response.data;
+        const evaluators = Array.isArray(response.data) ? response.data : [];
+        console.log('✅ 평가자 조회 성공:', evaluators.length, '개');
+        return evaluators;
       }
       console.error('❌ 평가자 조회 실패');
       return [];
     } catch (error) {
       console.error('❌ 평가자 조회 중 오류:', error);
-      throw error;
+      return [];
     }
   }
 

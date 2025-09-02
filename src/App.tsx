@@ -610,23 +610,36 @@ function App() {
 
   // 프로젝트 생성 함수 (DB 저장)
   const createProject = async (projectData: any) => {
-    const response = await fetch(`${API_BASE_URL}/api/projects`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(projectData),
-    });
+    console.log('🚀 App.tsx createProject 호출됨:', projectData);
+    console.log('🔗 API URL:', `${API_BASE_URL}/api/projects`);
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/projects`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(projectData),
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || '프로젝트 생성에 실패했습니다.');
+      console.log('📡 API 응답 상태:', response.status, response.statusText);
+
+      if (!response.ok) {
+        const error = await response.json();
+        console.error('❌ API 에러 응답:', error);
+        throw new Error(error.message || '프로젝트 생성에 실패했습니다.');
+      }
+
+      const data = await response.json();
+      console.log('✅ API 성공 응답:', data);
+      
+      await fetchProjects(); // 목록 새로고침
+      return data.project || data.data || data;
+    } catch (error) {
+      console.error('❌ createProject 실패:', error);
+      throw error;
     }
-
-    const data = await response.json();
-    await fetchProjects(); // 목록 새로고침
-    return data.project;
   };
 
   // 기준(Criteria) CRUD 함수들
