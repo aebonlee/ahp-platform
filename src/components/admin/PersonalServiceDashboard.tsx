@@ -187,6 +187,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     description: string;
     nextAction: string;
   } | null>(null);
+  // 진행률 모니터링 페이지네이션 상태
+  const [currentMonitoringPage, setCurrentMonitoringPage] = useState(1);
+  
   const [activeMenu, setActiveMenu] = useState<'dashboard' | 'projects' | 'creation' | 'model-builder' | 'validity-check' | 'evaluators' | 'survey-links' | 'monitoring' | 'analysis' | 'paper' | 'export' | 'workshop' | 'decision-support' | 'evaluation-test' | 'settings' | 'usage-management' | 'payment' | 'demographic-survey' | 'trash'>(() => {
     // URL 파라미터에서 직접 demographic-survey 확인
     const urlParams = new URLSearchParams(window.location.search);
@@ -1865,8 +1868,6 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
   );
 
   const renderProgressMonitoring = () => {
-    // 평가자 페이지네이션 상태
-    const [currentPage, setCurrentPage] = useState(1);
     const evaluatorsPerPage = 10;
     
     // 샘플 평가자 데이터 (실제로는 API에서 가져올 데이터)
@@ -1889,7 +1890,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     
     // 현재 페이지의 평가자들
     const totalPages = Math.ceil(mockEvaluators.length / evaluatorsPerPage);
-    const startIndex = (currentPage - 1) * evaluatorsPerPage;
+    const startIndex = (currentMonitoringPage - 1) * evaluatorsPerPage;
     const currentEvaluators = mockEvaluators.slice(startIndex, startIndex + evaluatorsPerPage);
     
     return (
@@ -1931,7 +1932,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               총 {mockEvaluators.length}명 중 {startIndex + 1}-{Math.min(startIndex + evaluatorsPerPage, mockEvaluators.length)}명 표시
             </div>
             <div className="text-sm text-gray-600">
-              페이지 {currentPage} / {totalPages}
+              페이지 {currentMonitoringPage} / {totalPages}
             </div>
           </div>
           
@@ -1986,8 +1987,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
+                onClick={() => setCurrentMonitoringPage(prev => Math.max(1, prev - 1))}
+                disabled={currentMonitoringPage === 1}
               >
                 ← 이전
               </Button>
@@ -1996,9 +1997,9 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                   <button
                     key={page}
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => setCurrentMonitoringPage(page)}
                     className={`w-8 h-8 rounded-full text-sm font-medium ${
-                      currentPage === page
+                      currentMonitoringPage === page
                         ? 'bg-blue-600 text-white'
                         : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                     }`}
@@ -2011,8 +2012,8 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
+                onClick={() => setCurrentMonitoringPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentMonitoringPage === totalPages}
               >
                 다음 →
               </Button>
