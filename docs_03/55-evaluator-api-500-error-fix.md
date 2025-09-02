@@ -14,15 +14,21 @@
 
 ### 에러 상황
 ```
-POST https://ahp-platform.onrender.com/api/evaluators/assign 500 (Internal Server Error)
+ahp-platform.onrender.com/api/projects/107/evaluators:1  Failed to load resource: the server responded with a status of 500 ()
+ahp-platform.onrender.com/api/evaluators/project/107:1  Failed to load resource: the server responded with a status of 500 ()
+ahp-platform.onrender.com/api/evaluators/assign:1  Failed to load resource: the server responded with a status of 500 ()
 ```
 
 ### 근본 원인
-1. **테이블 구조 불일치**: 
-   - API 코드는 `evaluator_code`, `access_key` 컬럼을 사용
-   - 실제 테이블에는 해당 컬럼이 없음
+1. **데이터베이스 연결 미설정**: 
+   - DATABASE_URL 환경변수가 설정되지 않음
+   - 모든 데이터베이스 쿼리가 "Database not configured" 에러로 실패
 
-2. **기존 테이블 구조**:
+2. **에러 처리 부족**:
+   - 모든 catch 블록에서 구체적이지 않은 "Internal server error" 반환
+   - 실제 문제 파악 어려움
+
+3. **기존 테이블 구조**:
 ```sql
 CREATE TABLE project_evaluators (
     id SERIAL PRIMARY KEY,
@@ -45,75 +51,87 @@ backend/src/database/migrations/012_add_evaluator_code_columns.sql - 마이그�
 
 ## 🔧 주요 개발사항
 
-### 1. API 엔드포인트 수정
-#### 기존 코드 (에러 발생)
+### 1. 에러 처리 헬퍼 함수 추가
+
+#### 새로 추가된 헬퍼 함수
 ```typescript
-// 프로젝트에 평가자 배정
-const assignment = await query(
-  `INSERT INTO project_evaluators (project_id, evaluator_id, evaluator_code, access_key)
-   VALUES ($1, $2, $3, $4)
-   RETURNING *`,
-  [project_id, evaluatorUser.id, evaluator_code.toUpperCase(), accessKey]
-);
+/**
+ * 데이터베이스 에러를 적절히 처리하는 헬퍼 함수
+ */
+const handleDatabaseError = (error: unknown, res: express.Response, context: string) => {
+  console.error(`Error ${context}:`, error);
+  
+  // 데이터베이스 구성 에러인 경우 구체적인 메시지 반환
+  if (error instanceof Error && error.message === 'Database not configured') {
+    return res.status(500).json({ 
+      error: 'Database not configured',
+      message: 'PostgreSQL database connection is not set up. Please configure DATABASE_URL environment variable.',
+      code: 'DATABASE_NOT_CONFIGURED'
+    });
+  }
+  
+  return res.status(500).json({ 
+    error: 'Internal server error',
+    message: error instanceof Error ? error.message : 'Unknown error',
+    context
+  });
+};
 ```
 
-#### 수정된 코드 (호환성 개선)
+#### 기존 코드 (구체적이지 않은 에러)
 ```typescript
-// 프로젝트에 평가자 배정 (기존 테이블 구조 사용)
-const assignment = await query(
-  `INSERT INTO project_evaluators (project_id, evaluator_id)
-   VALUES ($1, $2)
-   ON CONFLICT (project_id, evaluator_id) DO UPDATE SET assigned_at = CURRENT_TIMESTAMP
-   RETURNING *`,
-  [project_id, evaluatorUser.id]
-);
-
-// 평가자 가중치 설정 (테이블이 있는 경우에만)
-try {
-  await query(
-    `INSERT INTO evaluator_weights (project_id, evaluator_id, weight)
-     VALUES ($1, $2, $3)
-     ON CONFLICT (project_id, evaluator_id) DO UPDATE SET weight = $3`,
-    [project_id, evaluatorUser.id, weight]
-  );
-} catch (e) {
-  console.log('evaluator_weights table not found, skipping weight assignment');
+} catch (error) {
+  console.error('Error assigning evaluator:', error);
+  res.status(500).json({ error: 'Internal server error' });
 }
 ```
 
-### 2. 에러 처리 개선
-- **ON CONFLICT** 절 추가: 중복 평가자 처리
-- **try-catch** 블록: 옵션 테이블 처리
-- **graceful degradation**: 필수 기능만 유지
+#### 수정된 코드 (구체적인 에러 처리)
+```typescript
+} catch (error) {
+  return handleDatabaseError(error, res, 'assigning evaluator');
+}
+```
 
-### 3. 마이그레이션 스크립트 생성
-```sql
--- Add missing columns to project_evaluators table
-ALTER TABLE project_evaluators 
-ADD COLUMN IF NOT EXISTS evaluator_code VARCHAR(50);
+### 2. 수정된 API 엔드포인트들
 
-ALTER TABLE project_evaluators 
-ADD COLUMN IF NOT EXISTS access_key VARCHAR(100);
+다음 라우터들의 에러 처리를 개선:
 
--- Create evaluator_weights table if not exists
-CREATE TABLE IF NOT EXISTS evaluator_weights (
-    id SERIAL PRIMARY KEY,
-    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    evaluator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    weight DECIMAL(5,3) DEFAULT 1.000,
-    CONSTRAINT unique_project_evaluator_weight UNIQUE (project_id, evaluator_id)
-);
+- `POST /api/evaluators/assign` - 평가자 배정
+- `GET /api/evaluators/project/:id` - 프로젝트 평가자 목록
+- `POST /api/evaluators/invite/:id` - 평가자 초대
+- `POST /api/evaluators` - 평가자 생성
+- `PUT /api/evaluators/:id/weight` - 평가자 가중치 업데이트
+- `DELETE /api/evaluators/:assignmentId` - 평가자 제거
+- `DELETE /api/evaluators/:assignmentId/complete` - 평가자 완전 제거
+- `GET /api/evaluators/progress/:projectId` - 평가자 진행상황
+- `POST /api/evaluators/validate-key` - 액세스 키 검증
 
--- Create evaluator_progress table if not exists
-CREATE TABLE IF NOT EXISTS evaluator_progress (
-    id SERIAL PRIMARY KEY,
-    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-    evaluator_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    total_tasks INTEGER DEFAULT 0,
-    completed_tasks INTEGER DEFAULT 0,
-    completion_rate DECIMAL(5,2) DEFAULT 0.00,
-    CONSTRAINT unique_project_evaluator_progress UNIQUE (project_id, evaluator_id)
-);
+### 3. 에러 메시지 구체화
+
+#### 새로운 에러 응답 형식
+```json
+{
+  "error": "Database not configured",
+  "message": "PostgreSQL database connection is not set up. Please configure DATABASE_URL environment variable.",
+  "code": "DATABASE_NOT_CONFIGURED"
+}
+```
+
+#### 기존 에러 응답 (비구체적)
+```json
+{
+  "error": "Internal server error"
+}
+```
+
+#### 개선된 에러 응답 (구체적)
+```json
+{
+  "error": "Internal server error",
+  "message": "Database not configured",
+  "context": "assigning evaluator"
+}
 ```
 
 ## ✅ 구현된 기능

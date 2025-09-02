@@ -12,6 +12,28 @@ import crypto from 'crypto';
 const router = express.Router();
 
 /**
+ * 데이터베이스 에러를 적절히 처리하는 헬퍼 함수
+ */
+const handleDatabaseError = (error: unknown, res: express.Response, context: string) => {
+  console.error(`Error ${context}:`, error);
+  
+  // 데이터베이스 구성 에러인 경우 구체적인 메시지 반환
+  if (error instanceof Error && error.message === 'Database not configured') {
+    return res.status(500).json({ 
+      error: 'Database not configured',
+      message: 'PostgreSQL database connection is not set up. Please configure DATABASE_URL environment variable.',
+      code: 'DATABASE_NOT_CONFIGURED'
+    });
+  }
+  
+  return res.status(500).json({ 
+    error: 'Internal server error',
+    message: error instanceof Error ? error.message : 'Unknown error',
+    context
+  });
+};
+
+/**
  * 프로젝트에 평가자 추가
  * POST /api/evaluators/assign
  */
@@ -134,8 +156,7 @@ router.post('/assign',
       });
 
     } catch (error) {
-      console.error('Error assigning evaluator:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'assigning evaluator');
     }
   }
 );
@@ -221,8 +242,7 @@ router.get('/project/:projectId',
       });
 
     } catch (error) {
-      console.error('Error fetching evaluators:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'fetching evaluators');
     }
   }
 );
@@ -277,8 +297,7 @@ router.post('/invite',
       });
 
     } catch (error) {
-      console.error('Error sending invitation:', error);
-      res.status(500).json({ error: 'Failed to send invitation' });
+      return handleDatabaseError(error, res, 'sending invitation');
     }
   }
 );
@@ -328,8 +347,7 @@ router.get('/',
       });
 
     } catch (error) {
-      console.error('Error fetching evaluators:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'fetching evaluators');
     }
   }
 );
@@ -408,8 +426,7 @@ router.post('/',
       });
 
     } catch (error) {
-      console.error('Error creating evaluator:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'creating evaluator');
     }
   }
 );
@@ -477,8 +494,7 @@ router.put('/:evaluatorId/weight',
       });
 
     } catch (error) {
-      console.error('Error updating evaluator weight:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'updating evaluator weight');
     }
   }
 );
@@ -569,8 +585,7 @@ router.delete('/:evaluatorId/project/:projectId',
       }
 
     } catch (error) {
-      console.error('Error removing evaluator:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'removing evaluator');
     }
   }
 );
@@ -650,8 +665,7 @@ router.delete('/:evaluatorId',
       }
 
     } catch (error) {
-      console.error('Error completely removing evaluator:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'completely removing evaluator');
     }
   }
 );
@@ -732,8 +746,7 @@ router.get('/progress/:projectId',
       });
 
     } catch (error) {
-      console.error('Error fetching evaluator progress:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'fetching evaluator progress');
     }
   }
 );
@@ -804,8 +817,7 @@ router.post('/auth/access-key',
       });
 
     } catch (error) {
-      console.error('Error validating access key:', error);
-      res.status(500).json({ error: 'Internal server error' });
+      return handleDatabaseError(error, res, 'validating access key');
     }
   }
 );
