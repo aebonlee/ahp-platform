@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import Card from '../common/Card';
+import { useColorTheme } from '../../hooks/useColorTheme';
 
 interface RegisterFormProps {
   onRegister: (data: {
@@ -24,6 +25,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   error,
   mode 
 }) => {
+  const { getPalette } = useColorTheme();
+  const palette = getPalette();
+  
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -109,7 +113,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         <div className="text-center">
           <button
             onClick={onBackToLogin}
-            className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4 transition-colors"
+            className="inline-flex items-center mb-4 transition-colors"
+            style={{ 
+              color: palette.primary, 
+              ':hover': { color: palette.hover } 
+            }}
           >
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -118,15 +126,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           </button>
           
           <h2 className="text-3xl font-bold text-gray-900">
-            {mode === 'service' ? (
-              <>
-                <span className="text-blue-600">서비스</span> 회원가입
-              </>
-            ) : (
-              <>
-                <span className="text-purple-600">관리자</span> 회원가입
-              </>
-            )}
+            <span style={{ color: palette.primary }}>
+              {mode === 'service' ? '서비스' : '관리자'}
+            </span>{' '}
+            회원가입
           </h2>
           
           <p className="mt-2 text-sm text-gray-600">
@@ -209,11 +212,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               size="lg"
               loading={loading}
               disabled={loading}
-              className={`w-full ${
-                mode === 'service' 
-                  ? 'bg-blue-600 hover:bg-blue-700' 
-                  : 'bg-purple-600 hover:bg-purple-700'
-              }`}
+              className="w-full"
             >
               {loading ? '계정 생성 중...' : '회원가입'}
             </Button>
@@ -228,22 +227,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               {mode === 'service' ? (
                 <div className="text-sm text-gray-700 leading-relaxed">
                   <div className="flex items-center mb-2">
-                    <span className="text-green-500 mr-2">✓</span>
+                    <span style={{ color: palette.primary }} className="mr-2">✓</span>
                     <span className="font-medium">회원 가입 후 무료 체험은 1일간 1개 프로젝트에 3명의 평가자를 초대하여 이용해 보고 전문 분석 리포트까지 확인할 수 있습니다.</span>
                   </div>
                 </div>
               ) : (
                 <>
                   <div className="flex items-center">
-                    <span className="text-purple-500 mr-2">✓</span>
+                    <span style={{ color: palette.primary }} className="mr-2">✓</span>
                     사용자 및 권한 관리
                   </div>
                   <div className="flex items-center">
-                    <span className="text-purple-500 mr-2">✓</span>
+                    <span style={{ color: palette.primary }} className="mr-2">✓</span>
                     구독 서비스 운영
                   </div>
                   <div className="flex items-center">
-                    <span className="text-purple-500 mr-2">✓</span>
+                    <span style={{ color: palette.primary }} className="mr-2">✓</span>
                     시스템 모니터링
                   </div>
                 </>

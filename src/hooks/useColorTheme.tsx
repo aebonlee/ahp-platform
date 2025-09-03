@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export type ColorTheme = 'gold' | 'blue' | 'green' | 'purple' | 'rose' | 'orange' | 'teal' | 'indigo' | 'red';
+export type ColorTheme = 'oceanBlue' | 'gold' | 'blue' | 'green' | 'purple' | 'rose' | 'orange' | 'teal' | 'indigo' | 'red';
 
 interface ColorPalette {
   primary: string;
@@ -13,6 +13,14 @@ interface ColorPalette {
 
 // Define color palettes inspired by modern design systems
 const colorPalettes: Record<ColorTheme, ColorPalette> = {
+  oceanBlue: {
+    primary: '#006B96',
+    secondary: '#004F73',
+    light: '#7FB8D3',
+    hover: '#003F5C',
+    focus: 'rgba(0, 107, 150, 0.35)',
+    rgb: '0, 107, 150'
+  },
   gold: {
     primary: '#C8A968',
     secondary: '#A98C4B',
@@ -90,7 +98,7 @@ const colorPalettes: Record<ColorTheme, ColorPalette> = {
 export const useColorTheme = () => {
   const [currentTheme, setCurrentTheme] = useState<ColorTheme>(() => {
     const saved = localStorage.getItem('colorTheme') as ColorTheme;
-    return saved || 'blue';
+    return saved || 'oceanBlue';
   });
 
   // Apply color theme to CSS variables

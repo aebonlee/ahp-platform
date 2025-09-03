@@ -345,10 +345,11 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             </div>
 
             {/* 메인 타이틀 - 적당한 크기와 세련된 타이포그래피 */}
-            <h1 className="text-4xl md:text-6xl font-bold leading-tight" style={{ 
+            <h1 className="text-4xl md:text-6xl font-bold" style={{ 
               color: 'var(--text-primary)',
               fontWeight: '700',
-              letterSpacing: '-0.02em'
+              letterSpacing: '-0.02em',
+              lineHeight: '1.4'
             }}>
               논문 연구를 위한
               <br />
@@ -1119,13 +1120,6 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
             {/* 회사 정보 */}
             <div>
               <div className="flex items-center mb-4">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center mr-3" style={{
-                  backgroundColor: '#0066cc'
-                }}>
-                  <svg className="w-5 h-5" fill="white" viewBox="0 0 24 24">
-                    <path d="M12 2L2 7v10c0 5.55 3.84 9.739 9 11 5.16-1.261 9-5.45 9-11V7l-10-5z"/>
-                  </svg>
-                </div>
                 <span className="text-lg font-bold" style={{ color: '#222' }}>
                   AHP for Paper
                 </span>
@@ -1158,7 +1152,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 </p>
               </div>
               <div className="text-sm" style={{ color: '#888' }}>
-                <p>© 2024 AHP for Paper. All rights reserved.</p>
+                <p>© 2025 AHP for Paper. All rights reserved.</p>
                 <p className="mt-1">
                   이 웹사이트의 모든 콘텐츠는 저작권법의 보호를 받습니다.
                 </p>
@@ -1199,7 +1193,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                 </button>
               </div>
               <div className="text-xs" style={{ color: '#999' }}>
-                Last updated: 2024.08.31
+                Last updated: 2025.09.03
               </div>
             </div>
           </div>
