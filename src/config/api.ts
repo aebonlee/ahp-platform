@@ -12,7 +12,7 @@ export const SYNC_INTERVAL = 5 * 60 * 1000; // 5분
 export const API_TIMEOUT = 30000; // 30초
 
 // 재시도 설정
-export const RETRY_CONFIG = {
+export const RETRY_config = {
   maxRetries: 3,
   retryDelay: 1000, // 1초
   backoffMultiplier: 2

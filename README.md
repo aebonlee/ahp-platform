@@ -1,32 +1,180 @@
-# AHP Decision System - 논문용 의사결정 분석 플랫폼
+# AHP Decision System (계층분석법 의사결정 시스템)
 
-[![React](https://img.shields.io/badge/React-19.1.1-blue.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-4.9.5-blue.svg)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-18.0.0+-green.svg)](https://nodejs.org/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+## 📋 프로젝트 개요
 
-## 🌐 서비스 접속 정보
+**AHP for Paper**는 학술 연구를 위한 웹 기반 계층분석법(AHP, Analytic Hierarchy Process) 의사결정 시스템입니다. 체계적인 의사결정 분석과 설문 조사를 통해 복잡한 의사결정 문제를 구조화하고 분석할 수 있습니다.
 
-### ✅ **현재 운영 중인 서비스**
-- **메인 URL**: https://ahp-platform.onrender.com
-- **로그인 정보**: 
-  - 이메일: `admin@ahp-system.com`
-  - 비밀번호: `password123`
-- **상태**: 정상 운영 중 (Render.com 통합 배포)
+## 🚀 주요 기능
 
-> ⚠️ **주의**: 첫 접속 시 30-60초 로딩 시간이 필요할 수 있습니다 (무료 플랜 특성)
+### 📊 대시보드 및 프로젝트 관리
+- **실시간 사용자 현황**: 접속자 수, 활성 프로젝트, 완료된 설문 통계
+- **프로젝트 생성 및 관리**: 직관적인 프로젝트 생성 및 상태 추적
+- **프로젝트 삭제 및 휴지통**: 안전한 삭제 기능과 복구 시스템
 
-## 📊 프로젝트 소개
+### 🔍 설문 조사 시스템
+- **평가자 링크 생성**: 고유한 설문 링크 자동 생성
+- **인구통계학적 정보 수집**: 연령, 성별, 직업 등 기본 정보
+- **실시간 응답 추적**: 설문 진행률 및 완료 현황 모니터링
 
-AHP(Analytic Hierarchy Process) 의사결정 분석 시스템은 복잡한 의사결정 문제를 체계적으로 분석하기 위한 웹 기반 플랫폼입니다. 학술 연구 및 실무에서 활용 가능한 전문적인 AHP 분석 도구를 제공합니다.
+### 📈 고급 분석 도구
+- **AHP 계층 구조**: 목표-기준-대안의 3단계 계층 분석
+- **일관성 비율(CR) 검증**: 응답의 논리적 일관성 자동 검증
+- **가중치 계산**: 고유벡터 방법을 통한 정확한 가중치 산출
+- **결과 시각화**: 차트와 표를 통한 직관적인 결과 표현
 
-> 🎯 **최신 업데이트 (2025-08-29 v1.0)**: 평가 테스트 시스템 완전 구현!  
-> 📋 [복구 기점 및 백업 정보](./RESTORE_POINTS.md) | [백업 시스템](./BACKUP_SYSTEM.md)
-> 
-> ✅ **신규 기능**: 평가 테스트 시스템 - 평가자 인터페이스 미리보기 및 시뮬레이션
-> 🎨 **템플릿 통합**: 헤더/사이드바와 완전 통합된 레이아웃
-> 🔧 **라우팅 최적화**: App.tsx 독립적 처리로 성능 향상
-> 🚀 **안정성**: 프로덕션 빌드 331.93kB, TypeScript 오류 없음
+## 💻 기술 스택
+
+### Frontend
+- **React 18.2.0**: 현대적인 사용자 인터페이스
+- **TypeScript 4.9.5**: 타입 안전성 확보
+- **Recharts**: 데이터 시각화 라이브러리
+- **Zustand**: 가벼운 상태 관리
+- **React Particles**: 동적 배경 애니메이션
+
+### Styling & Design
+- **CSS3**: 반응형 디자인 및 애니메이션
+- **Luxury Gray-Gold 테마**: 전문적인 디자인 시스템
+- **컴포넌트 기반 설계**: 재사용 가능한 UI 컴포넌트
+
+## 🛠️ 설치 및 실행
+
+### 전제 조건
+- Node.js ≥ 18.0.0
+- npm ≥ 8.0.0
+
+### 로컬 개발 환경
+```bash
+# 저장소 복제
+git clone https://github.com/aebonlee/ahp-platform.git
+cd ahp-platform
+
+# 의존성 설치
+npm install
+
+# 개발 서버 실행
+npm start
+```
+
+### 프로덕션 빌드
+```bash
+# 빌드
+npm run build
+
+# 배포 (GitHub Pages)
+npm run deploy
+```
+
+## 🌐 배포 정보
+
+- **GitHub Pages**: https://aebonlee.github.io/ahp-platform/
+- **메인 저장소**: https://github.com/aebonlee/ahp-platform
+- **배포 브랜치**: gh-pages
+
+## 📚 사용 가이드
+
+### 1. 프로젝트 생성
+1. 대시보드에서 "새 프로젝트 만들기" 클릭
+2. 프로젝트명, 목표, 기준, 대안 입력
+3. 평가자 수 설정 및 링크 생성
+
+### 2. 설문 진행
+1. 생성된 링크를 평가자에게 공유
+2. 평가자는 인구통계학적 정보 입력
+3. 쌍대비교를 통한 평가 수행
+
+### 3. 결과 분석
+1. 모든 평가 완료 후 결과 페이지 이동
+2. 가중치 및 순위 확인
+3. 일관성 비율(CR) 검증
+4. 결과 다운로드 (Excel 형식)
+
+## 🔧 개발 가이드
+
+### 프로젝트 구조
+```
+ahp-platform/
+├── public/          # 정적 파일
+├── src/             # 소스 코드
+│   ├── components/  # React 컴포넌트
+│   ├── hooks/       # 커스텀 훅
+│   ├── store/       # 상태 관리
+│   ├── types/       # TypeScript 타입 정의
+│   └── utils/       # 유틸리티 함수
+├── package.json     # 프로젝트 설정
+└── tsconfig.json    # TypeScript 설정
+```
+
+### 코드 스타일
+- **TypeScript**: 모든 컴포넌트에 타입 정의
+- **함수형 컴포넌트**: React Hook 사용
+- **CSS Modules**: 스타일 캡슐화
+- **ESLint**: 코드 품질 관리
+
+## 🧪 테스트
+
+```bash
+# 테스트 실행
+npm test
+
+# 커버리지 확인
+npm test -- --coverage
+```
+
+## 📊 AHP 알고리즘
+
+### 계층분석법 핵심 개념
+1. **계층 구조 설계**: 목표 → 기준 → 대안
+2. **쌍대비교**: 9점 척도를 이용한 상대적 중요도 평가
+3. **가중치 계산**: 고유벡터 방법 사용
+4. **일관성 검증**: CR(Consistency Ratio) ≤ 0.1
+
+### 일관성 비율 기준
+- CR ≤ 0.05: 매우 일관성 있음
+- 0.05 < CR ≤ 0.1: 일관성 있음
+- CR > 0.1: 재평가 필요
+
+## 🔄 버전 히스토리
+
+### v2.3.1 (2025-09-03)
+- 백업 시스템 구현
+- 전체적인 안정성 향상
+
+### v2.3.0 (2025-09-02)
+- UI/UX 대폭 개선
+- 테마 시스템 통합
+- 반응형 디자인 최적화
+
+### v2.2.0 (2025-09-01)
+- 개인 서비스 대시보드 완성
+- 프로젝트 관리 기능 강화
+- 사용자 경험 개선
+
+### v2.1.0 (2025-08-31)
+- 실시간 데이터베이스 연동
+- 평가자 격리 시스템 구현
+- 성능 최적화
+
+## 📝 라이선스
+
+이 프로젝트는 학술 연구 목적으로 개발되었습니다.
+
+## 👨‍💻 개발자
+
+**이애본 (Aebon Lee)**
+- Email: [이메일 주소]
+- GitHub: [@aebonlee](https://github.com/aebonlee)
+
+## 🤝 기여하기
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+---
+
+**AHP for Paper** - 체계적이고 과학적인 의사결정을 위한 플랫폼
 
 ### 🎯 주요 특징
 

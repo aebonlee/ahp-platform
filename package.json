@@ -36,16 +36,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "cross-env PUBLIC_URL=/ahp-platform/ npm run build:frontend",
-    "deploy": "gh-pages -d build",
-    "backend:install": "cd backend && npm install",
-    "backend:build": "cd backend && npm run build",
-    "backend:start": "cd backend && npm start",
-    "backend:dev": "cd backend && npm run dev",
-    "dev:all": "concurrently \"npm run backend:dev\" \"npm run start:frontend\"",
-    "install:all": "npm install && npm run backend:install",
-    "build:all": "npm run build:frontend && npm run backend:build",
-    "build:render": "npm install && cd backend && npm install && cd .. && npm run build:frontend && cd backend && npm run build",
-    "start:render": "cd backend && npm start"
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
@@ -66,12 +57,9 @@
     ]
   },
   "devDependencies": {
-    "autoprefixer": "^10.4.21",
-    "concurrently": "^8.2.2",
-    "cross-env": "^10.0.0",
-    "gh-pages": "^6.3.0",
-    "postcss": "^8.5.6",
-    "static-eval": "^2.1.1",
-    "tailwindcss": "^3.4.17"
+    "@types/react-test-renderer": "^18.0.0",
+    "cross-env": "^7.0.3",
+    "gh-pages": "^6.1.1",
+    "react-test-renderer": "^18.2.0"
   }
 }
