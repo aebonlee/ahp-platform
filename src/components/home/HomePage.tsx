@@ -778,7 +778,7 @@ const HomePage: React.FC<HomePageProps> = ({ onLoginClick }) => {
                       }}>
                         플랫폼 업데이트
                       </span>
-                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>2024.08.31</span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>2025.09.03</span>
                     </div>
                     <h3 className="text-lg font-semibold mb-2 group-hover:text-blue-600 transition-colors" style={{ color: 'var(--text-primary)' }}>
                       AURI 스타일 UI/UX 개편 완료 - 더욱 직관적인 사용자 경험 제공
