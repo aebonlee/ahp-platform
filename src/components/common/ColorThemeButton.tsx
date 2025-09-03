@@ -50,7 +50,7 @@ const ColorThemeButton: React.FC = () => {
     icewhite: { 
       name: 'Ice White', 
       emoji: '❄️', 
-      description: '깔끔한 화이트 테마' 
+      description: '다크모드 최적화 아이스 화이트 테마' 
     }
   };
 
