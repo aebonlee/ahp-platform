@@ -114,10 +114,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <button
             onClick={onBackToLogin}
             className="inline-flex items-center mb-4 transition-colors"
-            style={{ 
-              color: palette.primary, 
-              ':hover': { color: palette.hover } 
-            }}
+            style={{ color: palette.primary }}
+            onMouseEnter={(e) => e.currentTarget.style.color = palette.hover}
+            onMouseLeave={(e) => e.currentTarget.style.color = palette.primary}
           >
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
