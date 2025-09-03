@@ -196,7 +196,7 @@ const ColorThemeButton: React.FC = () => {
                           {info.name}
                         </h5>
                         <p className="text-xs"
-                           style={{ color: 'var(--text-muted)' }}>
+                           style={{ color: '#6b7280' }}>
                           {info.description}
                         </p>
                       </div>
@@ -220,7 +220,7 @@ const ColorThemeButton: React.FC = () => {
                      border: '1px solid var(--border-light)'
                    }}>
                 <p className="text-sm flex items-center gap-2"
-                   style={{ color: 'var(--text-muted)' }}>
+                   style={{ color: '#6b7280' }}>
                   <span>🎨</span>
                   선택한 컬러 테마는 전체 인터페이스에 적용되며, 브라우저에 자동 저장됩니다.
                 </p>

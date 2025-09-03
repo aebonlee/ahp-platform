@@ -25,8 +25,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   error,
   mode 
 }) => {
-  const { getPalette } = useColorTheme();
-  const palette = getPalette();
+  useColorTheme();
   
   const [formData, setFormData] = useState({
     email: '',
@@ -114,9 +113,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           <button
             onClick={onBackToLogin}
             className="inline-flex items-center mb-4 transition-colors"
-            style={{ color: palette.primary }}
-            onMouseEnter={(e) => e.currentTarget.style.color = palette.hover}
-            onMouseLeave={(e) => e.currentTarget.style.color = palette.primary}
+            style={{ color: 'var(--color-theme-primary)' }}
+            onMouseEnter={(e) => e.currentTarget.style.color = 'var(--color-theme-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'var(--color-theme-primary)'}
           >
             <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -125,7 +124,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
           </button>
           
           <h2 className="text-3xl font-bold text-gray-900">
-            <span style={{ color: palette.primary }}>
+            <span style={{ color: 'var(--color-theme-primary)' }}>
               {mode === 'service' ? '서비스' : '관리자'}
             </span>{' '}
             회원가입
@@ -226,22 +225,22 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
               {mode === 'service' ? (
                 <div className="text-sm text-gray-700 leading-relaxed">
                   <div className="flex items-center mb-2">
-                    <span style={{ color: palette.primary }} className="mr-2">✓</span>
+                    <span style={{ color: 'var(--color-theme-primary)' }} className="mr-2">✓</span>
                     <span className="font-medium">회원 가입 후 무료 체험은 1일간 1개 프로젝트에 3명의 평가자를 초대하여 이용해 보고 전문 분석 리포트까지 확인할 수 있습니다.</span>
                   </div>
                 </div>
               ) : (
                 <>
                   <div className="flex items-center">
-                    <span style={{ color: palette.primary }} className="mr-2">✓</span>
+                    <span style={{ color: 'var(--color-theme-primary)' }} className="mr-2">✓</span>
                     사용자 및 권한 관리
                   </div>
                   <div className="flex items-center">
-                    <span style={{ color: palette.primary }} className="mr-2">✓</span>
+                    <span style={{ color: 'var(--color-theme-primary)' }} className="mr-2">✓</span>
                     구독 서비스 운영
                   </div>
                   <div className="flex items-center">
-                    <span style={{ color: palette.primary }} className="mr-2">✓</span>
+                    <span style={{ color: 'var(--color-theme-primary)' }} className="mr-2">✓</span>
                     시스템 모니터링
                   </div>
                 </>

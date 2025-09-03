@@ -93,69 +93,18 @@ export const useColorTheme = () => {
     return saved || 'blue';
   });
 
-  // Apply color theme to CSS variables
+  // Apply color theme to CSS variables (minimal, safe approach)
   const applyColorTheme = (theme: ColorTheme) => {
     const palette = colorPalettes[theme];
     const root = document.documentElement;
 
-    // Update CSS variables with new color palette
-    root.style.setProperty('--accent-primary', palette.primary);
-    root.style.setProperty('--accent-secondary', palette.secondary);
-    root.style.setProperty('--accent-light', palette.light);
-    root.style.setProperty('--accent-hover', palette.hover);
-    root.style.setProperty('--accent-focus', palette.focus);
-    root.style.setProperty('--accent-rgb', palette.rgb);
-
-    // Legacy variable support
-    root.style.setProperty('--gold-primary', palette.primary);
-    root.style.setProperty('--gold-secondary', palette.secondary);
-    root.style.setProperty('--gold-light', palette.light);
-    root.style.setProperty('--accent-gold', palette.primary);
-    root.style.setProperty('--accent-gold-2', palette.secondary);
-
-    // Update shadows with theme color
-    root.style.setProperty('--shadow-gold', `0 4px 20px rgba(${palette.rgb}, 0.25)`);
-    root.style.setProperty('--shadow-accent', `0 4px 20px rgba(${palette.rgb}, 0.25)`);
-    
-    // Update focus shadow
-    root.style.setProperty('--shadow-focus', palette.focus);
-    root.style.setProperty('--focus', palette.focus);
-    
-    // Update border focus color
-    root.style.setProperty('--border-focus', palette.primary);
-    root.style.setProperty('--ring', palette.primary);
-
-    // Update AHP specific colors
-    root.style.setProperty('--ahp-primary', palette.primary);
-    
-    // Update semantic theme colors
-    root.style.setProperty('--interactive-primary', palette.primary);
-    root.style.setProperty('--interactive-primary-hover', palette.hover);
-    root.style.setProperty('--interactive-primary-light', palette.light);
-    root.style.setProperty('--interactive-secondary', palette.secondary);
-    
-    root.style.setProperty('--favorite-bg', palette.light);
-    root.style.setProperty('--favorite-border', palette.primary);
-    root.style.setProperty('--favorite-text', palette.secondary);
-    root.style.setProperty('--favorite-hover-bg', palette.primary);
-    
-    root.style.setProperty('--user-avatar-bg', `linear-gradient(135deg, ${palette.primary}, ${palette.secondary})`);
-    
-    // For dark mode adjustments
-    if (root.getAttribute('data-theme') === 'dark') {
-      // Brighten colors slightly for dark mode
-      const brightenColor = (hex: string) => {
-        const num = parseInt(hex.slice(1), 16);
-        const amt = 40;
-        const r = Math.min(255, (num >> 16) + amt);
-        const g = Math.min(255, ((num >> 8) & 0x00FF) + amt);
-        const b = Math.min(255, (num & 0x0000FF) + amt);
-        return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
-      };
-      
-      root.style.setProperty('--accent-primary', brightenColor(palette.primary));
-      root.style.setProperty('--gold-primary', brightenColor(palette.primary));
-    }
+    // Only update theme-specific CSS variables to avoid breaking layout
+    root.style.setProperty('--color-theme-primary', palette.primary);
+    root.style.setProperty('--color-theme-secondary', palette.secondary);
+    root.style.setProperty('--color-theme-light', palette.light);
+    root.style.setProperty('--color-theme-hover', palette.hover);
+    root.style.setProperty('--color-theme-focus', palette.focus);
+    root.style.setProperty('--color-theme-rgb', palette.rgb);
   };
 
   // Apply theme on mount and changes

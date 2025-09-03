@@ -70,22 +70,22 @@ const ColorThemeSelector: React.FC = () => {
         className="inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium transition-luxury rounded-lg group hover:scale-105"
         style={{
           fontFamily: 'Inter, system-ui, sans-serif',
-          backgroundColor: 'var(--bg-elevated)',
-          color: 'var(--text-primary)',
+          backgroundColor: '#f9fafb',
+          color: '#1f2937',
           border: '1px solid var(--border-medium)',
           borderRadius: 'var(--radius-md)',
           boxShadow: 'var(--shadow-sm)'
         }}
         title="컬러 테마 선택"
         onMouseEnter={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--accent-primary)';
+          e.currentTarget.style.backgroundColor = 'var(--color-theme-primary)';
           e.currentTarget.style.color = 'white';
-          e.currentTarget.style.borderColor = 'var(--accent-primary)';
+          e.currentTarget.style.borderColor = 'var(--color-theme-primary)';
           e.currentTarget.style.boxShadow = 'var(--shadow-accent)';
         }}
         onMouseLeave={(e) => {
-          e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
-          e.currentTarget.style.color = 'var(--text-primary)';
+          e.currentTarget.style.backgroundColor = '#f9fafb';
+          e.currentTarget.style.color = '#1f2937';
           e.currentTarget.style.borderColor = 'var(--border-medium)';
           e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
         }}
@@ -105,16 +105,16 @@ const ColorThemeSelector: React.FC = () => {
           {/* Popup Content */}
           <div className="relative rounded-xl shadow-2xl max-w-lg w-full mx-4"
                style={{
-                 backgroundColor: 'var(--bg-secondary)',
+                 backgroundColor: '#ffffff',
                  borderRadius: 'var(--radius-lg)',
                  boxShadow: 'var(--shadow-xl)'
                }}>
             
             {/* Header */}
             <div className="px-6 py-4 border-b"
-                 style={{ borderColor: 'var(--border-light)' }}>
+                 style={{ borderColor: '#e5e7eb' }}>
               <h3 className="text-xl font-bold flex items-center gap-2"
-                  style={{ color: 'var(--text-primary)' }}>
+                  style={{ color: '#1f2937' }}>
                 🎨 컬러 테마 선택
               </h3>
             </div>
@@ -125,13 +125,13 @@ const ColorThemeSelector: React.FC = () => {
               {/* Current Theme Display */}
               <div className="p-4 rounded-xl border-2"
                    style={{
-                     backgroundColor: 'var(--accent-light)',
-                     borderColor: 'var(--accent-primary)',
-                     background: `linear-gradient(135deg, var(--accent-light), transparent)`
+                     backgroundColor: 'var(--color-theme-light)',
+                     borderColor: 'var(--color-theme-primary)',
+                     background: `linear-gradient(135deg, var(--color-theme-light), transparent)`
                    }}>
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-bold flex items-center gap-2"
-                      style={{ color: 'var(--text-primary)', fontSize: 'var(--font-size-base)' }}>
+                      style={{ color: '#1f2937', fontSize: 'var(--font-size-base)' }}>
                     <span className="text-xl">{themeInfo[currentTheme].emoji}</span>
                     현재 테마: {themeInfo[currentTheme].name}
                   </h4>
@@ -156,8 +156,8 @@ const ColorThemeSelector: React.FC = () => {
                         isActive ? 'ring-2 ring-offset-2' : ''
                       }`}
                       style={{
-                        backgroundColor: isActive ? palette.light : 'var(--bg-elevated)',
-                        borderColor: isActive ? palette.primary : 'var(--border-light)',
+                        backgroundColor: isActive ? palette.light : '#f9fafb',
+                        borderColor: isActive ? palette.primary : '#e5e7eb',
                         boxShadow: isActive ? `0 4px 20px rgba(${palette.rgb}, 0.3)` : 'var(--shadow-sm)'
                       }}
                       onMouseEnter={(e) => {
@@ -169,8 +169,8 @@ const ColorThemeSelector: React.FC = () => {
                       }}
                       onMouseLeave={(e) => {
                         if (!isActive) {
-                          e.currentTarget.style.backgroundColor = 'var(--bg-elevated)';
-                          e.currentTarget.style.borderColor = 'var(--border-light)';
+                          e.currentTarget.style.backgroundColor = '#f9fafb';
+                          e.currentTarget.style.borderColor = '#e5e7eb';
                           e.currentTarget.style.boxShadow = 'var(--shadow-sm)';
                         }
                       }}
@@ -189,11 +189,11 @@ const ColorThemeSelector: React.FC = () => {
                       <div className="text-center">
                         <div className="text-2xl mb-1">{info.emoji}</div>
                         <h5 className="font-bold text-sm mb-1"
-                            style={{ color: isActive ? palette.primary : 'var(--text-primary)' }}>
+                            style={{ color: isActive ? palette.primary : '#1f2937' }}>
                           {info.name}
                         </h5>
                         <p className="text-xs"
-                           style={{ color: 'var(--text-muted)' }}>
+                           style={{ color: '#6b7280' }}>
                           {info.description}
                         </p>
                       </div>
@@ -213,11 +213,11 @@ const ColorThemeSelector: React.FC = () => {
               {/* Help Text */}
               <div className="p-3 rounded-lg"
                    style={{ 
-                     backgroundColor: 'var(--bg-elevated)',
-                     border: '1px solid var(--border-light)'
+                     backgroundColor: '#f9fafb',
+                     border: '1px solid #e5e7eb'
                    }}>
                 <p className="text-sm flex items-center gap-2"
-                   style={{ color: 'var(--text-muted)' }}>
+                   style={{ color: '#6b7280' }}>
                   <span>💡</span>
                   선택한 컬러 테마는 전체 인터페이스에 적용되며, 브라우저에 자동 저장됩니다.
                 </p>
@@ -229,9 +229,9 @@ const ColorThemeSelector: React.FC = () => {
                   onClick={() => setIsOpen(false)}
                   className="px-4 py-2 text-sm font-medium rounded-lg transition-all duration-200 hover:scale-105"
                   style={{
-                    backgroundColor: 'var(--accent-primary)',
+                    backgroundColor: 'var(--color-theme-primary)',
                     color: 'white',
-                    border: '1px solid var(--accent-primary)',
+                    border: '1px solid var(--color-theme-primary)',
                     borderRadius: 'var(--radius-md)'
                   }}
                 >
