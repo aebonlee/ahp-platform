@@ -1,12 +1,12 @@
 {
   "files": {
-    "main.css": "/ahp-platform/static/css/main.80a01a69.css",
-    "main.js": "/ahp-platform/static/js/main.18d1eae0.js",
+    "main.css": "/ahp-platform/static/css/main.efaaf5bd.css",
+    "main.js": "/ahp-platform/static/js/main.ad7f9588.js",
     "static/js/206.c8c95004.chunk.js": "/ahp-platform/static/js/206.c8c95004.chunk.js",
     "index.html": "/ahp-platform/index.html"
   },
   "entrypoints": [
-    "static/css/main.80a01a69.css",
-    "static/js/main.18d1eae0.js"
+    "static/css/main.efaaf5bd.css",
+    "static/js/main.ad7f9588.js"
   ]
 }
