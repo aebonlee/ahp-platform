@@ -139,13 +139,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             <Card 
               variant="glass" 
               hoverable={true} 
-              className="bg-gray-50/95 backdrop-blur-xl border-2 border-purple-200/60 hover:border-purple-300/80 transform hover:scale-102 cursor-pointer hover:bg-gray-100/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="bg-gray-50/95 backdrop-blur-xl border-2 transform hover:scale-102 cursor-pointer hover:bg-gray-100/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              style={{
+                borderColor: 'var(--color-theme-light)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-theme-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-theme-light)';
+              }}
             >
               <div 
                 className="text-center p-6 sm:p-8 lg:p-10"
                 onClick={() => handleModeSelect('register')}
               >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 lg:mb-8 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 lg:mb-8 rounded-2xl flex items-center justify-center shadow-lg" style={{
+                  background: 'linear-gradient(to bottom right, var(--color-theme-primary), var(--color-theme-secondary))'
+                }}>
                   <svg className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
@@ -170,27 +181,38 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                   color: '#374151'
                 }}>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: '#8b5cf6' }}>✓</span>
+                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: 'var(--color-theme-primary)' }}>✓</span>
                     <span className="font-medium">연구 프로젝트 전용 계정</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: '#8b5cf6' }}>✓</span>
+                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: 'var(--color-theme-primary)' }}>✓</span>
                     <span className="font-medium">학술 연구 완벽 지원</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: '#8b5cf6' }}>✓</span>
+                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: 'var(--color-theme-primary)' }}>✓</span>
                     <span className="font-medium">가이드 학습 프로그램</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: '#8b5cf6' }}>✓</span>
+                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: 'var(--color-theme-primary)' }}>✓</span>
                     <span className="font-medium">실제 연구 즉시 적용</span>
                   </div>
                 </div>
 
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <div className="absolute -inset-1 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity" style={{
+                    background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                  }}></div>
                   <button 
-                    className="relative w-full py-4 lg:py-5 px-8 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    className="relative w-full py-4 lg:py-5 px-8 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    style={{
+                      background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-secondary), var(--color-theme-hover))`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`;
+                    }}
                     onClick={() => handleModeSelect('register')}
                   >
                     <span className="flex items-center justify-center">
@@ -208,13 +230,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             <Card 
               variant="glass" 
               hoverable={true} 
-              className="bg-gray-50/95 backdrop-blur-xl border-2 border-blue-200/60 hover:border-blue-300/80 transform hover:scale-102 cursor-pointer hover:bg-gray-100/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="bg-gray-50/95 backdrop-blur-xl border-2 transform hover:scale-102 cursor-pointer hover:bg-gray-100/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              style={{
+                borderColor: 'var(--color-theme-light)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-theme-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-theme-light)';
+              }}
             >
               <div 
                 className="text-center p-6 sm:p-8 lg:p-10"
                 onClick={() => handleModeSelect('service')}
               >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 lg:mb-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 lg:mb-8 rounded-2xl flex items-center justify-center shadow-lg" style={{
+                  background: 'linear-gradient(to bottom right, var(--color-theme-primary), var(--color-theme-secondary))'
+                }}>
                   <svg className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                   </svg>
@@ -239,27 +272,38 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                   color: '#374151'
                 }}>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: '#3b82f6' }}>✓</span>
+                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: 'var(--color-theme-primary)' }}>✓</span>
                     <span className="font-medium">프로젝트 생성 및 관리</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: '#3b82f6' }}>✓</span>
+                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: 'var(--color-theme-primary)' }}>✓</span>
                     <span className="font-medium">평가자 초대 및 설문 진행</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: '#3b82f6' }}>✓</span>
+                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: 'var(--color-theme-primary)' }}>✓</span>
                     <span className="font-medium">실시간 결과 분석</span>
                   </div>
                   <div className="flex items-center justify-center">
-                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: '#3b82f6' }}>✓</span>
+                    <span className="mr-3 text-lg lg:text-xl font-bold" style={{ color: 'var(--color-theme-primary)' }}>✓</span>
                     <span className="font-medium">관리자 권한 자동 인식</span>
                   </div>
                 </div>
 
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <div className="absolute -inset-1 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity" style={{
+                    background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                  }}></div>
                   <button 
-                    className="relative w-full py-4 lg:py-5 px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    className="relative w-full py-4 lg:py-5 px-8 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    style={{
+                      background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-secondary), var(--color-theme-hover))`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`;
+                    }}
                     onClick={() => handleModeSelect('service')}
                   >
                     <span className="flex items-center justify-center">
@@ -340,7 +384,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
           </div>
           
           {/* 회원가입 폼 */}
-          <Card variant="glass" className="bg-white/95 backdrop-blur-xl border-2 border-gray-200 shadow-lg">
+          <Card variant="glass" className="bg-white/95 backdrop-blur-xl border-2 shadow-lg" style={{
+            borderColor: 'var(--color-theme-light)'
+          }}>
             <form className="space-y-6" onSubmit={handleSubmit}>
               {error && (
                 <div className="bg-red-500/10 border-2 border-red-400/30 rounded-xl p-4 backdrop-blur-sm">
@@ -389,11 +435,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
 
               <div className="mt-6 space-y-4">
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-purple-600 to-purple-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <div className="absolute -inset-1 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity" style={{
+                    background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                  }}></div>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="relative w-full py-4 px-8 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                    className="relative w-full py-4 px-8 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                    style={{
+                      background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!loading) {
+                        e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-secondary), var(--color-theme-hover))`;
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`;
+                    }}
                   >
                     {loading ? (
                       <span className="flex items-center justify-center">
@@ -495,13 +554,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             <Card 
               variant="glass" 
               hoverable={true} 
-              className="bg-gray-50/95 backdrop-blur-xl border-2 border-green-200/60 hover:border-green-300/80 transform hover:scale-102 cursor-pointer hover:bg-gray-100/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="bg-gray-50/95 backdrop-blur-xl border-2 transform hover:scale-102 cursor-pointer hover:bg-gray-100/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              style={{
+                borderColor: 'var(--color-theme-light)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-theme-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-theme-light)';
+              }}
             >
               <div 
                 className="text-center p-6 sm:p-8 lg:p-10"
                 onClick={() => handleAdminServiceSelect('admin')}
               >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 lg:mb-8 bg-gradient-to-br from-green-500 to-green-700 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 lg:mb-8 rounded-2xl flex items-center justify-center shadow-lg" style={{
+                  background: 'linear-gradient(to bottom right, var(--color-theme-primary), var(--color-theme-secondary))'
+                }}>
                   <svg className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -545,9 +615,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                 </div>
 
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-green-600 to-green-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <div className="absolute -inset-1 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity" style={{
+                    background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                  }}></div>
                   <button 
-                    className="relative w-full py-4 lg:py-5 px-8 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    className="relative w-full py-4 lg:py-5 px-8 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    style={{
+                      background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-secondary), var(--color-theme-hover))`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`;
+                    }}
                     onClick={() => handleAdminServiceSelect('admin')}
                   >
                     <span className="flex items-center justify-center">
@@ -566,13 +647,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             <Card 
               variant="glass" 
               hoverable={true} 
-              className="bg-gray-50/95 backdrop-blur-xl border-2 border-blue-200/60 hover:border-blue-300/80 transform hover:scale-102 cursor-pointer hover:bg-gray-100/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              className="bg-gray-50/95 backdrop-blur-xl border-2 transform hover:scale-102 cursor-pointer hover:bg-gray-100/95 transition-all duration-300 shadow-lg hover:shadow-xl"
+              style={{
+                borderColor: 'var(--color-theme-light)',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-theme-primary)';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = 'var(--color-theme-light)';
+              }}
             >
               <div 
                 className="text-center p-6 sm:p-8 lg:p-10"
                 onClick={() => handleAdminServiceSelect('personal')}
               >
-                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 lg:mb-8 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 mx-auto mb-6 lg:mb-8 rounded-2xl flex items-center justify-center shadow-lg" style={{
+                  background: 'linear-gradient(to bottom right, var(--color-theme-primary), var(--color-theme-secondary))'
+                }}>
                   <svg className="w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   </svg>
@@ -615,9 +707,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
                 </div>
 
                 <div className="relative group">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+                  <div className="absolute -inset-1 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity" style={{
+                    background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                  }}></div>
                   <button 
-                    className="relative w-full py-4 lg:py-5 px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    className="relative w-full py-4 lg:py-5 px-8 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl"
+                    style={{
+                      background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-secondary), var(--color-theme-hover))`;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`;
+                    }}
                     onClick={() => handleAdminServiceSelect('personal')}
                   >
                     <span className="flex items-center justify-center">
@@ -710,7 +813,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
         </div>
         
         {/* 개선된 로그인 폼 */}
-        <Card variant="glass" className="bg-white/95 backdrop-blur-xl border-2 border-gray-200 shadow-lg">
+        <Card variant="glass" className="bg-white/95 backdrop-blur-xl border-2 shadow-lg" style={{
+          borderColor: 'var(--color-theme-light)'
+        }}>
           <form className="space-y-6" onSubmit={handleSubmit}>
             {error && (
               <div className="bg-red-500/10 border-2 border-red-400/30 rounded-xl p-4 backdrop-blur-sm">
@@ -758,11 +863,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin, onRegister, loading = fa
             />
 
             <div className="relative group">
-              <div className="absolute -inset-1 bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity"></div>
+              <div className="absolute -inset-1 rounded-2xl blur opacity-25 group-hover:opacity-40 transition-opacity" style={{
+                background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+              }}></div>
               <button
                 type="submit"
                 disabled={loading}
-                className="relative w-full py-4 px-8 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                className="relative w-full py-4 px-8 text-white font-bold text-lg rounded-xl transition-all duration-300 transform hover:scale-105 hover:shadow-xl disabled:opacity-60 disabled:cursor-not-allowed disabled:transform-none"
+                style={{
+                  background: `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`
+                }}
+                onMouseEnter={(e) => {
+                  if (!loading) {
+                    e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-secondary), var(--color-theme-hover))`;
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = `linear-gradient(to right, var(--color-theme-primary), var(--color-theme-secondary))`;
+                }}
               >
                 {loading ? (
                   <span className="flex items-center justify-center">
