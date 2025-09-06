@@ -81,7 +81,6 @@ initDatabase = async () => {
         status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'completed', 'deleted')),
         evaluation_mode VARCHAR(20) DEFAULT 'practical' CHECK (evaluation_mode IN ('practical', 'theoretical', 'direct_input', 'pairwise')),
         workflow_stage VARCHAR(20) DEFAULT 'creating' CHECK (workflow_stage IN ('creating', 'waiting', 'evaluating', 'completed')),
-        deleted_at TIMESTAMP WITH TIME ZONE NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
@@ -232,7 +231,6 @@ initDatabase = async () => {
         total_responses INTEGER DEFAULT 0,
         completed_responses INTEGER DEFAULT 0,
         average_completion_time DECIMAL(10,2),
-        deleted_at TIMESTAMP WITH TIME ZONE NULL,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       )
@@ -314,16 +312,40 @@ initDatabase = async () => {
       )
     `);
 
+    // deleted_at 컬럼이 없는 경우를 위한 마이그레이션
+    try {
+      await query(`ALTER TABLE projects ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE NULL`);
+    } catch (error) {
+      console.log('Projects deleted_at column already exists or failed to add:', error);
+    }
+
+    try {
+      await query(`ALTER TABLE surveys ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE NULL`);
+    } catch (error) {
+      console.log('Surveys deleted_at column already exists or failed to add:', error);
+    }
+
     // 인덱스 생성
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_admin_id ON projects(admin_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_evaluation_mode ON projects(evaluation_mode)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_workflow_stage ON projects(workflow_stage)`);
-    await query(`CREATE INDEX IF NOT EXISTS idx_projects_deleted_at ON projects(deleted_at)`);
+    
+    try {
+      await query(`CREATE INDEX IF NOT EXISTS idx_projects_deleted_at ON projects(deleted_at)`);
+    } catch (error) {
+      console.log('Failed to create projects deleted_at index:', error);
+    }
+    
     await query(`CREATE INDEX IF NOT EXISTS idx_projects_status_deleted ON projects(status) WHERE status = 'deleted'`);
     await query(`CREATE INDEX IF NOT EXISTS idx_surveys_project_id ON surveys(project_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_surveys_created_by ON surveys(created_by)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_surveys_status ON surveys(status)`);
-    await query(`CREATE INDEX IF NOT EXISTS idx_surveys_deleted_at ON surveys(deleted_at)`);
+    
+    try {
+      await query(`CREATE INDEX IF NOT EXISTS idx_surveys_deleted_at ON surveys(deleted_at)`);
+    } catch (error) {
+      console.log('Failed to create surveys deleted_at index:', error);
+    }
     await query(`CREATE INDEX IF NOT EXISTS idx_survey_responses_survey_id ON survey_responses(survey_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_criteria_project_id ON criteria(project_id)`);
     await query(`CREATE INDEX IF NOT EXISTS idx_alternatives_project_id ON alternatives(project_id)`);
