@@ -3,6 +3,10 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import sessionService from './services/sessionService';
 import Layout from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
+import LoginSelectionPage from './components/auth/LoginSelectionPage';
+import RegisterPage from './components/auth/RegisterPage';
+import ServiceLoginPage from './components/auth/ServiceLoginPage';
+import AdminSelectPage from './components/auth/AdminSelectPage';
 import RegisterForm from './components/auth/RegisterForm';
 import HomePage from './components/home/HomePage';
 // import WelcomeDashboard from './components/admin/WelcomeDashboard'; // 더 이상 사용하지 않음
