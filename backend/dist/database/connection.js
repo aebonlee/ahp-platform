@@ -298,6 +298,7 @@ exports.initDatabase = initDatabase = async () => {
         }
         catch (error) {
             console.log('Projects deleted_at column already exists or failed to add:', error);
+            console.log('Triggering Render.com deployment...');
         }
         try {
             await query(`ALTER TABLE surveys ADD COLUMN IF NOT EXISTS deleted_at TIMESTAMP WITH TIME ZONE NULL`);
