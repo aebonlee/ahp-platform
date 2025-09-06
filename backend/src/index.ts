@@ -49,6 +49,7 @@ app.use(helmet({
 // Enhanced CORS configuration for production
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:3005',
   'https://aebonlee.github.io',
   'https://ahp-platform.onrender.com'
 ];
@@ -58,15 +59,18 @@ app.use(cors({
     // Allow requests with no origin (mobile apps, etc.)
     if (!origin) return callback(null, true);
     
+    // In development, allow any localhost origin
+    if (process.env.NODE_ENV !== 'production' || !process.env.DATABASE_URL) {
+      console.log('CORS: Development mode - allowing origin:', origin);
+      return callback(null, true);
+    }
+    
     if (allowedOrigins.indexOf(origin) !== -1 || process.env.CORS_ORIGIN === origin) {
+      console.log('CORS: Allowed origin:', origin);
       return callback(null, true);
     }
     
-    // In development, allow any origin
-    if (process.env.NODE_ENV !== 'production') {
-      return callback(null, true);
-    }
-    
+    console.log('CORS: Blocked origin:', origin);
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
