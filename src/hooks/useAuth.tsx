@@ -32,7 +32,7 @@ const ADMIN_USERS = ['aebon', 'admin', 'manager'];
 const checkIsSuperAdmin = (user: User | null): boolean => {
   if (!user) return false;
   return user.role === 'super_admin' || 
-         user.is_superuser === true || 
+         Boolean(user.is_superuser) === true || 
          (user.username && SUPER_ADMIN_USERS.includes(user.username.toLowerCase()));
 };
 
@@ -40,7 +40,7 @@ const checkIsAdmin = (user: User | null): boolean => {
   if (!user) return false;
   return checkIsSuperAdmin(user) ||
          user.role === 'admin' || 
-         user.is_staff === true || 
+         Boolean(user.is_staff) === true || 
          (user.username && ADMIN_USERS.includes(user.username.toLowerCase()));
 };
 
