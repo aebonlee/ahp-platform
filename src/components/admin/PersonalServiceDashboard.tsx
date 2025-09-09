@@ -2576,7 +2576,12 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     <PersonalSettings 
       user={user}
       onBack={() => handleTabChange('dashboard')}
-      onUserUpdate={setUser}
+      onUserUpdate={(updatedUser) => {
+        setUser({
+          ...updatedUser,
+          admin_type: updatedUser.admin_type || 'personal'
+        });
+      }}
     />
   );
 
