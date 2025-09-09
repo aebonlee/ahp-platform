@@ -105,7 +105,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       role: (initialUser.first_name === 'AHP' && initialUser.last_name === 'Super Admin') || 
             authUser?.username === 'aebon' || 
             isSuperAdmin ? 'super_admin' : initialUser.role,
-      admin_type: isSuperAdmin ? 'super' : initialUser.admin_type
+      admin_type: isSuperAdmin ? 'super' : (initialUser.admin_type || 'personal')
     };
     return enhancedUser;
   });
@@ -149,6 +149,7 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
     // 새로운 객체 참조를 만들어 React 리렌더링 보장
     const newUserObject = {
       ...updatedUser,
+      admin_type: updatedUser.admin_type || 'personal',
       // 타임스탬프 추가로 강제 리렌더링
       _updated: Date.now()
     };
