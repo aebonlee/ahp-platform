@@ -131,7 +131,10 @@ const PersonalServiceDashboard: React.FC<PersonalServiceProps> = ({
       변경됨: user.first_name !== initialUser.first_name || user.last_name !== initialUser.last_name
     });
     if (user.first_name !== initialUser.first_name || user.last_name !== initialUser.last_name) {
-      setUser(initialUser);
+      setUser({
+        ...initialUser,
+        admin_type: initialUser.admin_type || 'personal'
+      });
     }
   }, [initialUser.first_name, initialUser.last_name]);
 
