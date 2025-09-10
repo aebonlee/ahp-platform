@@ -216,8 +216,8 @@ function App() {
       }
       
       try {
-        // 백엔드에서 현재 로그인 상태 확인
-        const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+        // Django 백엔드에서 현재 로그인 상태 확인
+        const response = await fetch(`${API_BASE_URL}/api/user/`, {
           credentials: 'include',
           headers: {
             'Content-Type': 'application/json'
@@ -226,21 +226,31 @@ function App() {
         
         if (response.ok) {
           const data = await response.json();
-          console.log('🔄 페이지 새로고침 - 세션 복구 성공');
-          // admin 역할일 때 admin_type을 'personal'로 설정
-          const userWithAdminType = {
-            ...data.user,
-            admin_type: data.user.role === 'admin' ? 'personal' : data.user.admin_type
-          };
-          setUser(userWithAdminType);
+          if (data.authenticated && data.user) {
+            console.log('🔄 페이지 새로고침 - Django 세션 복구 성공');
+            // Django 사용자 정보를 React 형식으로 변환
+            const userInfo = {
+              id: data.user.id,
+              first_name: data.user.first_name || '',
+              last_name: data.user.last_name || '',
+              email: data.user.email,
+              role: data.user.is_superuser ? 'super_admin' : 'personal_service',
+              admin_type: data.user.is_superuser ? 'super' : 'personal',
+              canSwitchModes: data.user.is_superuser || false
+            };
+            setUser(userInfo);
           
-          // 세션 타이머 시작 (페이지 새로고침 후에도 세션 관리 유지)
-          if (!localStorage.getItem('login_time')) {
-            localStorage.setItem('login_time', Date.now().toString());
+            // 세션 타이머 시작 (페이지 새로고침 후에도 세션 관리 유지)
+            if (!localStorage.getItem('login_time')) {
+              localStorage.setItem('login_time', Date.now().toString());
+            }
+            sessionService.startSession();
+          } else {
+            console.log('❌ Django 세션 인증되지 않음');
+            setUser(null);
           }
-          sessionService.startSession();
         } else {
-          console.log('❌ 세션 만료 또는 로그인 필요');
+          console.log('❌ Django 세션 만료 또는 로그인 필요');
           setUser(null);
         }
       } catch (error) {
@@ -282,7 +292,7 @@ function App() {
       console.log('🔍 백엔드 연결 확인 중...');
       setBackendStatus('checking');
       
-      const response = await fetch(`${API_BASE_URL}/api/health`, {
+      const response = await fetch(`${API_BASE_URL}/health/`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -320,7 +330,7 @@ function App() {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 1500); // 1.5초 타임아웃
       
-      const response = await fetch(`${API_BASE_URL}/api/health`, {
+      const response = await fetch(`${API_BASE_URL}/health/`, {
         method: 'GET',
         credentials: 'include',
         headers: {
@@ -344,7 +354,7 @@ function App() {
 
   const validateSession = async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+      const response = await fetch(`${API_BASE_URL}/api/user/`, {
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
@@ -353,22 +363,29 @@ function App() {
       
       if (response.ok) {
         const data = await response.json();
-        // admin 역할일 때 admin_type을 'personal'로 설정
-        const userWithAdminType = {
-          ...data.user,
-          admin_type: data.user.role === 'admin' ? 'personal' : data.user.admin_type
-        };
-        setUser(userWithAdminType);
-        console.log('✅ 세션 복구 성공:', data.user.email);
+        if (data.authenticated && data.user) {
+          // Django 사용자 정보를 React 형식으로 변환
+          const userInfo = {
+            id: data.user.id,
+            first_name: data.user.first_name || '',
+            last_name: data.user.last_name || '',
+            email: data.user.email,
+            role: data.user.is_superuser ? 'super_admin' : 'personal_service',
+            admin_type: data.user.is_superuser ? 'super' : 'personal',
+            canSwitchModes: data.user.is_superuser || false
+          };
+          setUser(userInfo);
+          console.log('✅ Django 세션 검증 성공:', data.user.email);
         
-        // 세션 타이머 시작 (세션 검증 후에도 세션 관리 유지)
-        if (!localStorage.getItem('login_time')) {
-          localStorage.setItem('login_time', Date.now().toString());
+          // 세션 타이머 시작 (세션 검증 후에도 세션 관리 유지)
+          if (!localStorage.getItem('login_time')) {
+            localStorage.setItem('login_time', Date.now().toString());
+          }
+          sessionService.startSession();
         }
-        sessionService.startSession();
       }
     } catch (error) {
-      console.error('Session validation failed:', error);
+      console.error('Django 세션 검증 실패:', error);
     }
   };
 
@@ -414,25 +431,35 @@ function App() {
     setLoginError('');
 
     try {
-      console.log('🔍 백엔드 로그인 시도:', { email });
+      console.log('🔍 Django 백엔드 로그인 시도:', { email });
       
-      // 백엔드 로그인
-      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      // Django 통합 로그인 API 사용
+      const response = await fetch(`${API_BASE_URL}/api/login/`, {
         method: 'POST',
         credentials: 'include',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          username: email,  // Django는 username 필드 사용
+          password: password 
+        }),
       });
 
       const data = await response.json();
       
-      if (response.ok) {
-        // admin 역할일 때 admin_type을 'personal'로 설정
-        const userWithAdminType = {
-          ...data.user,
-          admin_type: data.user.role === 'admin' ? 'personal' : data.user.admin_type
+      if (response.ok && data.success) {
+        console.log('✅ Django 로그인 응답:', data);
+        
+        // Django 응답에서 사용자 정보 매핑
+        const userInfo = {
+          id: data.user.id,
+          first_name: data.user.first_name || '',
+          last_name: data.user.last_name || '',
+          email: data.user.email,
+          role: data.user.user_type || 'personal_service', // Django user_type을 role로 매핑
+          admin_type: data.user.is_superuser ? 'super' : 'personal',
+          canSwitchModes: data.user.is_superuser || false
         };
         
         // 로그인 시간 저장 (세션 관리를 위해)
@@ -442,33 +469,41 @@ function App() {
         // 세션 타이머 시작
         sessionService.startSession();
         
-        setUser(userWithAdminType);
+        setUser(userInfo);
         
-        // URL 파라미터가 있으면 우선, 없으면 기본 탭 설정
-        const urlParams = new URLSearchParams(window.location.search);
-        const tabParam = urlParams.get('tab');
-        
-        let targetTab = '';
-        if (tabParam && ['personal-service', 'my-projects', 'model-builder', 'evaluator-management', 'results-analysis'].includes(tabParam)) {
-          targetTab = tabParam;
-        } else if (data.user.role === 'evaluator') {
-          targetTab = 'evaluator-dashboard';
-        } else if (data.user.role === 'super_admin') {
-          targetTab = 'super-admin';
+        // Django에서 제공하는 redirect URL이 있으면 사용, 없으면 기본 탭 설정
+        if (data.redirect) {
+          // Django 리다이렉트 URL을 React 탭으로 변환
+          if (data.redirect.includes('/super-admin/')) {
+            setActiveTab('super-admin');
+          } else if (data.redirect.includes('/admin/')) {
+            setActiveTab('super-admin');
+          } else if (data.redirect.includes('/evaluator-dashboard/')) {
+            setActiveTab('evaluator-mode');
+          } else if (data.redirect.includes('/enterprise-dashboard/')) {
+            setActiveTab('personal-service');
+          } else {
+            setActiveTab('personal-service');
+          }
         } else {
-          targetTab = 'personal-service';
+          // 기본 탭 설정
+          if (data.user.is_superuser || data.user.user_type === 'super_admin') {
+            setActiveTab('super-admin');
+          } else if (data.user.user_type === 'evaluator') {
+            setActiveTab('evaluator-mode');
+          } else {
+            setActiveTab('personal-service');
+          }
         }
         
-        console.log('🎯 로그인 후 타겟 탭:', targetTab, '(URL 파라미터:', tabParam, ')');
-        setActiveTab(targetTab);
-        
-        console.log('✅ 백엔드 로그인 성공');
+        console.log('✅ Django 로그인 성공 - 사용자 타입:', data.user.user_type);
         // 프로젝트 목록 로드
         await fetchProjects();
       } else {
         throw new Error(data.message || '로그인에 실패했습니다.');
       }
     } catch (error) {
+      console.error('❌ Django 로그인 실패:', error);
       setLoginError(error instanceof Error ? error.message : 'Login failed');
     } finally {
       setLoginLoading(false);
@@ -484,8 +519,8 @@ function App() {
     localStorage.removeItem('last_activity');
     
     try {
-      // 백엔드 로그아웃 API 호출
-      await fetch(`${API_BASE_URL}/api/auth/logout`, {
+      // Django 로그아웃 API 호출
+      await fetch(`${API_BASE_URL}/api/logout/`, {
         method: 'POST',
         credentials: 'include',
         headers: {
@@ -493,7 +528,7 @@ function App() {
         },
       });
     } catch (error) {
-      console.error('Logout API call failed:', error);
+      console.error('Django 로그아웃 API 호출 실패:', error);
     }
     
     // 상태 초기화

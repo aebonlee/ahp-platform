@@ -1,5 +1,5 @@
-// API 설정 - 백엔드 서버 URL (Render.com 백엔드)
-export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://ahp-platform.onrender.com';
+// API 설정 - 백엔드 서버 URL (Django 통합 백엔드)
+export const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://ahp-django-backend.onrender.com';
 
 // 데이터 저장 모드 설정
 export const DATA_STORAGE_MODE = process.env.REACT_APP_DATA_MODE || 
@@ -20,12 +20,13 @@ export const RETRY_config = {
 
 // API 엔드포인트
 export const API_ENDPOINTS = {
-  // Auth
+  // Auth - Django 통합 인증 시스템
   AUTH: {
-    LOGIN: '/api/auth/login',
-    REGISTER: '/api/auth/register',
-    LOGOUT: '/api/auth/logout',
-    VERIFY: '/api/auth/verify'
+    LOGIN: '/api/login/',
+    REGISTER: '/api/register/',
+    LOGOUT: '/api/logout/',
+    PROFILE: '/api/user/',
+    HEALTH: '/api/health/'
   },
   // Projects
   PROJECTS: {
