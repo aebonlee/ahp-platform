@@ -16,6 +16,11 @@ interface SubscriptionPlan {
   maxEvaluators: number;
   features: string[];
   isPopular?: boolean;
+  limits?: {
+    maxPersonalAdmins?: number;
+    maxProjectsPerAdmin?: number;
+    maxEvaluatorsPerProject?: number;
+  };
 }
 
 interface UserSubscription {
@@ -24,9 +29,15 @@ interface UserSubscription {
   status: 'active' | 'expired' | 'cancelled' | 'trial';
   startDate: string;
   endDate: string;
-  currentProjects: number;
-  currentEvaluators: number;
+  currentProjects?: number;
+  currentEvaluators?: number;
   autoRenew: boolean;
+  currentUsage?: {
+    personalAdminsCount?: number;
+    totalProjectsCount?: number;
+    totalSurveysCount?: number;
+    storageUsed?: number;
+  };
 }
 
 interface AdminUser {
@@ -97,7 +108,12 @@ const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       currency: 'KRW',
       maxProjects: 5,
       maxEvaluators: 10,
-      features: ['기본 AHP 분석', '표준 리포트', '이메일 지원']
+      features: ['기본 AHP 분석', '표준 리포트', '이메일 지원'],
+      limits: {
+        maxPersonalAdmins: 3,
+        maxProjectsPerAdmin: 5,
+        maxEvaluatorsPerProject: 10
+      }
     },
     {
       id: 'professional',
@@ -107,7 +123,12 @@ const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       maxProjects: 20,
       maxEvaluators: 50,
       features: ['고급 AHP 분석', '민감도 분석', '커스텀 리포트', '우선 지원'],
-      isPopular: true
+      isPopular: true,
+      limits: {
+        maxPersonalAdmins: 10,
+        maxProjectsPerAdmin: 20,
+        maxEvaluatorsPerProject: 50
+      }
     },
     {
       id: 'enterprise',
@@ -116,7 +137,12 @@ const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
       currency: 'KRW',
       maxProjects: -1,
       maxEvaluators: -1,
-      features: ['모든 프로 기능', '무제한 프로젝트', '전담 지원', 'API 접근', '온프레미스 옵션']
+      features: ['모든 프로 기능', '무제한 프로젝트', '전담 지원', 'API 접근', '온프레미스 옵션'],
+      limits: {
+        maxPersonalAdmins: -1,
+        maxProjectsPerAdmin: -1,
+        maxEvaluatorsPerProject: -1
+      }
     }
   ];
 
@@ -473,8 +499,8 @@ const SuperAdminDashboard: React.FC<SuperAdminDashboardProps> = ({
                     <td className="p-3">
                       {subscription ? (
                         <div className="text-sm">
-                          <div>프로젝트: {subscription.currentProjects}/{plan?.maxProjects === -1 ? '∞' : plan?.maxProjects || 0}</div>
-                          <div>평가자: {subscription.currentEvaluators}/{plan?.maxEvaluators === -1 ? '∞' : plan?.maxEvaluators || 0}</div>
+                          <div>프로젝트: {subscription.currentUsage?.totalProjectsCount || 0}/{plan?.limits?.maxProjectsPerAdmin === -1 ? '∞' : plan?.limits?.maxProjectsPerAdmin || 0}</div>
+                          <div>관리자: {subscription.currentUsage?.personalAdminsCount || 0}/{plan?.limits?.maxPersonalAdmins === -1 ? '∞' : plan?.limits?.maxPersonalAdmins || 0}</div>
                         </div>
                       ) : (
                         <span className="text-gray-400">-</span>
