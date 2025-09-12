@@ -229,12 +229,20 @@ function App() {
           if (data.authenticated && data.user) {
             console.log('🔄 페이지 새로고침 - Django 세션 복구 성공');
             // Django 사용자 정보를 React 형식으로 변환
-            const userInfo = {
+            const userInfo: {
+              id: string | number;
+              first_name: string;
+              last_name: string;
+              email: string;
+              role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
+              admin_type?: 'super' | 'personal';
+              canSwitchModes?: boolean;
+            } = {
               id: data.user.id,
               first_name: data.user.first_name || '',
               last_name: data.user.last_name || '',
               email: data.user.email,
-              role: data.user.is_superuser ? 'super_admin' : 'personal_service',
+              role: data.user.is_superuser ? 'super_admin' : 'admin',
               admin_type: data.user.is_superuser ? 'super' : 'personal',
               canSwitchModes: data.user.is_superuser || false
             };
@@ -365,12 +373,20 @@ function App() {
         const data = await response.json();
         if (data.authenticated && data.user) {
           // Django 사용자 정보를 React 형식으로 변환
-          const userInfo = {
+          const userInfo: {
+            id: string | number;
+            first_name: string;
+            last_name: string;
+            email: string;
+            role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
+            admin_type?: 'super' | 'personal';
+            canSwitchModes?: boolean;
+          } = {
             id: data.user.id,
             first_name: data.user.first_name || '',
             last_name: data.user.last_name || '',
             email: data.user.email,
-            role: data.user.is_superuser ? 'super_admin' : 'personal_service',
+            role: data.user.is_superuser ? 'super_admin' : 'admin',
             admin_type: data.user.is_superuser ? 'super' : 'personal',
             canSwitchModes: data.user.is_superuser || false
           };
@@ -452,12 +468,20 @@ function App() {
         console.log('✅ Django 로그인 응답:', data);
         
         // Django 응답에서 사용자 정보 매핑
-        const userInfo = {
+        const userInfo: {
+          id: string | number;
+          first_name: string;
+          last_name: string;
+          email: string;
+          role: 'super_admin' | 'admin' | 'service_tester' | 'evaluator';
+          admin_type?: 'super' | 'personal';
+          canSwitchModes?: boolean;
+        } = {
           id: data.user.id,
           first_name: data.user.first_name || '',
           last_name: data.user.last_name || '',
           email: data.user.email,
-          role: data.user.user_type || 'personal_service', // Django user_type을 role로 매핑
+          role: data.user.user_type || 'admin', // Django user_type을 role로 매핑
           admin_type: data.user.is_superuser ? 'super' : 'personal',
           canSwitchModes: data.user.is_superuser || false
         };
