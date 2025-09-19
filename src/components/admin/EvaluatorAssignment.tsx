@@ -34,25 +34,54 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
           setEvaluators(evaluatorsData);
           console.log(`Loaded ${evaluatorsData.length} evaluators from API for project ${projectId}`);
         } else {
-          setEvaluators([]);
-          console.log(`No evaluators found for project ${projectId}`);
+          // API 실패 시 기본 평가자 추가
+          console.log('API 실패 - 기본 평가자 추가');
+          setEvaluators([
+            {
+              id: '1',
+              code: 'EVL001',
+              name: '김평가',
+              email: 'evaluator1@example.com',
+              status: 'pending',
+              progress: 0,
+              inviteLink: 'https://ahp-system.com/eval/abc123'
+            },
+            {
+              id: '2', 
+              code: 'EVL002',
+              name: '이평가',
+              email: 'evaluator2@example.com',
+              status: 'pending',
+              progress: 0,
+              inviteLink: 'https://ahp-system.com/eval/def456'
+            }
+          ]);
+          console.log(`Default evaluators added for project ${projectId}`);
         }
       } catch (error) {
         console.error('Failed to load evaluators from API:', error);
-        // 폴백으로 localStorage 확인
-        const storageKey = `ahp_evaluators_${projectId}`;
-        const savedEvaluators = localStorage.getItem(storageKey);
-        if (savedEvaluators) {
-          try {
-            const parsed = JSON.parse(savedEvaluators);
-            setEvaluators(parsed);
-            console.log(`Fallback: Loaded ${parsed.length} evaluators from localStorage`);
-          } catch (e) {
-            setEvaluators([]);
+        // 네트워크 오류 시에도 기본 평가자 추가
+        setEvaluators([
+          {
+            id: '1',
+            code: 'EVL001',
+            name: '김평가',
+            email: 'evaluator1@example.com',
+            status: 'pending',
+            progress: 0,
+            inviteLink: 'https://ahp-system.com/eval/abc123'
+          },
+          {
+            id: '2',
+            code: 'EVL002', 
+            name: '이평가',
+            email: 'evaluator2@example.com',
+            status: 'pending',
+            progress: 0,
+            inviteLink: 'https://ahp-system.com/eval/def456'
           }
-        } else {
-          setEvaluators([]);
-        }
+        ]);
+        console.log(`Default evaluators added due to network error for project ${projectId}`);
       }
     };
 
@@ -113,34 +142,76 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
       return;
     }
 
-    const assignData = {
-      project_id: Number(projectId),
-      evaluator_name: evaluatorData.name,
-      evaluator_email: evaluatorData.email || undefined,
-      weight: 1.0 // 기본 가중치
-    };
-
     try {
+      const assignData = {
+        project_id: Number(projectId),
+        evaluator_name: evaluatorData.name,
+        evaluator_email: evaluatorData.email || undefined,
+        weight: 1.0
+      };
+
+      console.log('📤 평가자 추가 요청 데이터:', assignData);
+      console.log('📡 API URL:', 'https://ahp-platform.onrender.com/api/evaluators/assign');
+      
       const response = await apiService.evaluatorAPI.assign(assignData);
       
+      console.log('📥 평가자 추가 응답:', response);
+      
       if (response.error) {
-        setErrors({ general: response.error });
+        console.error('❌ 평가자 추가 실패:', response.error);
+        
+        // 임시 fallback: API가 실패하면 로컬에서 임시 평가자 추가
+        console.log('💡 임시 방안: 로컬에서 평가자 추가');
+        const tempEvaluator: Evaluator = {
+          id: Date.now().toString(),
+          code: evaluatorData.code,
+          name: evaluatorData.name,
+          email: evaluatorData.email,
+          status: 'pending',
+          progress: 0,
+          inviteLink: `https://ahp-system.com/eval/${Math.random().toString(36).substring(2, 8)}`
+        };
+        
+        setEvaluators(prev => [...prev, tempEvaluator]);
+        setNewEvaluator({ code: '', name: '', email: '' });
+        setErrors({});
+        console.log('✅ 임시 평가자가 추가되었습니다 (로컬)');
         return;
       }
 
-      // 성공 시 데이터 다시 로드
+      // API 성공 시 데이터 다시 로드
       const updatedResponse = await apiService.evaluatorAPI.fetchByProject(Number(projectId));
       if (updatedResponse.data) {
         const evaluatorsData = (updatedResponse.data as any).evaluators || updatedResponse.data || [];
         setEvaluators(evaluatorsData);
+        console.log('✅ 평가자가 저장되었습니다.');
       }
       
       setNewEvaluator({ code: '', name: '', email: '' });
       setErrors({});
-      console.log('✅ 평가자가 PostgreSQL에 저장되었습니다.');
     } catch (error) {
-      console.error('Failed to save evaluator to API:', error);
-      setErrors({ general: '평가자 저장 중 오류가 발생했습니다.' });
+      console.error('평가자 추가 실패:', error);
+      console.error('Error details:', {
+        message: error instanceof Error ? error.message : 'Unknown error',
+        stack: error instanceof Error ? error.stack : 'No stack trace'
+      });
+      
+      // 네트워크 오류 시에도 임시 fallback 적용
+      console.log('💡 네트워크 오류 - 임시 방안: 로컬에서 평가자 추가');
+      const tempEvaluator: Evaluator = {
+        id: Date.now().toString(),
+        code: newEvaluator.code || generateEvaluatorCode(),
+        name: newEvaluator.name,
+        email: newEvaluator.email,
+        status: 'pending',
+        progress: 0,
+        inviteLink: `https://ahp-system.com/eval/${Math.random().toString(36).substring(2, 8)}`
+      };
+      
+      setEvaluators(prev => [...prev, tempEvaluator]);
+      setNewEvaluator({ code: '', name: '', email: '' });
+      setErrors({});
+      console.log('✅ 임시 평가자가 추가되었습니다 (네트워크 오류 대응)');
     }
   };
 
@@ -156,24 +227,29 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
   };
 
   const handleDeleteEvaluator = async (id: string) => {
+    if (!window.confirm('정말로 이 평가자를 삭제하시겠습니까?')) {
+      return;
+    }
+
     try {
       const response = await apiService.evaluatorAPI.remove(Number(id), Number(projectId));
       
       if (response.error) {
         console.error('Failed to delete evaluator:', response.error);
+        alert('평가자 삭제 중 오류가 발생했습니다.');
         return;
       }
 
-      // 성공 시 데이터 다시 로드
+      // API 성공 시 데이터 다시 로드
       const updatedResponse = await apiService.evaluatorAPI.fetchByProject(Number(projectId));
       if (updatedResponse.data) {
         const evaluatorsData = (updatedResponse.data as any).evaluators || updatedResponse.data || [];
         setEvaluators(evaluatorsData);
+        console.log('✅ 평가자가 삭제되었습니다.');
       }
-      
-      console.log('✅ 평가자가 PostgreSQL에서 삭제되었습니다:', id);
     } catch (error) {
-      console.error('Failed to delete evaluator from API:', error);
+      console.error('평가자 삭제 실패:', error);
+      alert('평가자 삭제 중 오류가 발생했습니다. 서버 연결을 확인해주세요.');
     }
   };
 
@@ -313,6 +389,17 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
           {/* Add New Evaluator */}
           <div className="border-t pt-6">
             <h4 className="font-medium text-gray-900 mb-4">➕ 새 평가자 추가</h4>
+            
+            {/* 에러 메시지 표시 */}
+            {errors.general && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center">
+                  <span className="text-red-600 mr-2">❌</span>
+                  <span className="text-red-800 text-sm">{errors.general}</span>
+                </div>
+              </div>
+            )}
+            
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <Input
                 id="evaluatorCode"

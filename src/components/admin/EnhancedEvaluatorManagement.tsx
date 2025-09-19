@@ -183,7 +183,7 @@ const EnhancedEvaluatorManagement: React.FC<EnhancedEvaluatorManagementProps> = 
     try {
       for (const evaluator of selectedEvaluators) {
         // 평가 링크 생성
-        const evaluationLink = `${window.location.origin}/AHP_forPaper/?tab=evaluator-dashboard&project=${projectId}&evaluator=${evaluator.id}`;
+        const evaluationLink = `${window.location.origin}/?tab=evaluator-dashboard&project=${projectId}&evaluator=${evaluator.id}`;
         
         // 단축 URL 생성
         const shortLink = await generateShortLink(evaluationLink);

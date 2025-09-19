@@ -127,7 +127,7 @@ const Header: React.FC<HeaderProps> = ({ user, onLogout, onLogoClick, activeTab,
         }
       }
     } else {
-      window.location.href = '/';
+      window.location.href = '/?tab=home';
     }
   };
 

@@ -45,20 +45,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
         }
       } catch (error) {
         console.error('Failed to load criteria from API:', error);
-        // 폴백으로 localStorage 확인
-        const storageKey = `ahp_criteria_${projectId}`;
-        const savedCriteria = localStorage.getItem(storageKey);
-        if (savedCriteria) {
-          try {
-            const parsed = JSON.parse(savedCriteria);
-            setCriteria(parsed);
-            console.log(`Fallback: Loaded ${parsed.length} criteria from localStorage`);
-          } catch (e) {
-            setCriteria([]);
-          }
-        } else {
-          setCriteria([]);
-        }
+        setCriteria([]);
       }
     };
 
@@ -164,17 +151,17 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
       setErrors({ name: '최대 5단계까지만 기준을 생성할 수 있습니다.' });
       return;
     }
-    
-    const criterionData = {
-      project_id: Number(projectId),
-      name: newCriterion.name,
-      description: newCriterion.description || null,
-      parent_id: newCriterion.parentId || null,
-      level,
-      order_index: getAllCriteria(criteria).filter(c => c.level === level).length + 1
-    };
 
     try {
+      const criterionData = {
+        project_id: Number(projectId),
+        name: newCriterion.name,
+        description: newCriterion.description || null,
+        parent_id: newCriterion.parentId || null,
+        level,
+        order_index: getAllCriteria(criteria).filter(c => c.level === level).length + 1
+      };
+
       const response = await apiService.criteriaAPI.create(criterionData);
       
       if (response.error) {
@@ -182,19 +169,24 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
         return;
       }
 
-      // 성공 시 데이터 다시 로드
+      // API 성공 시 데이터 다시 로드
       const updatedResponse = await apiService.criteriaAPI.fetch(Number(projectId));
       if (updatedResponse.data) {
         const criteriaData = (updatedResponse.data as any).criteria || updatedResponse.data || [];
         setCriteria(criteriaData);
+        console.log('✅ 기준이 저장되었습니다.');
       }
       
       setNewCriterion({ name: '', description: '', parentId: '' });
       setErrors({});
-      console.log('✅ 기준이 PostgreSQL에 저장되었습니다.');
+      
+      // 기준 개수 변경 콜백 호출
+      if (onCriteriaChange) {
+        onCriteriaChange(getAllCriteria(criteria).length + 1);
+      }
     } catch (error) {
-      console.error('Failed to save criterion to API:', error);
-      setErrors({ name: '기준 저장 중 오류가 발생했습니다.' });
+      console.error('기준 추가 실패:', error);
+      setErrors({ name: '기준 추가 중 오류가 발생했습니다. 서버 연결을 확인해주세요.' });
     }
   };
 

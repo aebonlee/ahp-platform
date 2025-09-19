@@ -2,7 +2,7 @@
   "name": "ahp-decision-system",
   "version": "2.3.1",
   "private": true,
-  "homepage": "https://aebonlee.github.io/ahp-platform/",
+  "homepage": ".",
   "proxy": "https://ahp-platform.onrender.com",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
@@ -36,7 +36,7 @@
     "build:frontend": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "predeploy": "cross-env PUBLIC_URL=/ahp-platform/ npm run build:frontend",
+    "predeploy": "cross-env PUBLIC_URL=. npm run build:frontend",
     "deploy": "gh-pages -d build"
   },
   "eslintConfig": {

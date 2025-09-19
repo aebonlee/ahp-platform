@@ -37,20 +37,7 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
         }
       } catch (error) {
         console.error('Failed to load alternatives from API:', error);
-        // 폴백으로 localStorage 확인
-        const storageKey = `ahp_alternatives_${projectId}`;
-        const savedAlternatives = localStorage.getItem(storageKey);
-        if (savedAlternatives) {
-          try {
-            const parsed = JSON.parse(savedAlternatives);
-            setAlternatives(parsed);
-            console.log(`Fallback: Loaded ${parsed.length} alternatives from localStorage`);
-          } catch (e) {
-            setAlternatives([]);
-          }
-        } else {
-          setAlternatives([]);
-        }
+        setAlternatives([]);
       }
     };
 
@@ -104,15 +91,15 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
     }
 
     const maxOrder = Math.max(...alternatives.map(alt => alt.order), 0);
-    
-    const alternativeData = {
-      project_id: Number(projectId),
-      name: newAlternative.name,
-      description: newAlternative.description || null,
-      order_index: maxOrder + 1
-    };
 
     try {
+      const alternativeData = {
+        project_id: Number(projectId),
+        name: newAlternative.name,
+        description: newAlternative.description || null,
+        order_index: maxOrder + 1
+      };
+
       const response = await apiService.alternativesAPI.create(alternativeData);
       
       if (response.error) {
@@ -120,19 +107,24 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
         return;
       }
 
-      // 성공 시 데이터 다시 로드
+      // API 성공 시 데이터 다시 로드
       const updatedResponse = await apiService.alternativesAPI.fetch(Number(projectId));
       if (updatedResponse.data) {
         const alternativesData = (updatedResponse.data as any).alternatives || updatedResponse.data || [];
         setAlternatives(alternativesData);
+        console.log('✅ 대안이 저장되었습니다.');
       }
       
       setNewAlternative({ name: '', description: '' });
       setErrors({});
-      console.log('✅ 대안이 PostgreSQL에 저장되었습니다.');
+      
+      // 대안 개수 변경 콜백 호출
+      if (onAlternativesChange) {
+        onAlternativesChange(alternatives.length + 1);
+      }
     } catch (error) {
-      console.error('Failed to save alternative to API:', error);
-      setErrors({ name: '대안 저장 중 오류가 발생했습니다.' });
+      console.error('대안 추가 실패:', error);
+      setErrors({ name: '대안 추가 중 오류가 발생했습니다. 서버 연결을 확인해주세요.' });
     }
   };
 

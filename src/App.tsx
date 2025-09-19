@@ -15,6 +15,7 @@ import ApiErrorModal from './components/common/ApiErrorModal';
 import TrashOverflowModal from './components/common/TrashOverflowModal';
 import PairwiseComparison from './components/comparison/PairwiseComparison';
 import ResultsDashboard from './components/results/ResultsDashboard';
+import AHPProjectManager from './components/ahp/AHPProjectManager';
 import LandingPage from './components/admin/LandingPage';
 import EnhancedSuperAdminDashboard from './components/admin/EnhancedSuperAdminDashboard';
 import PersonalServiceDashboard from './components/admin/PersonalServiceDashboard';
@@ -40,8 +41,8 @@ function App() {
   useColorTheme();
   useTheme();
 
-  // GitHub Pages 하위 경로 처리
-  const basePath = process.env.NODE_ENV === 'production' ? '/ahp-platform' : '';
+  // GitHub Pages 하위 경로 처리 - 현재는 루트에 배포되므로 빈 문자열
+  const basePath = '';
   const getFullPath = (path: string) => basePath + path;
   const [user, setUser] = useState<{
     id: string | number;  // 백엔드는 number로 보냄
@@ -64,7 +65,8 @@ function App() {
       'my-projects', 'project-creation', 'model-builder',
       'evaluator-management', 'progress-monitoring', 'results-analysis',
       'paper-management', 'export-reports', 'workshop-management',
-      'decision-support-system', 'personal-settings', 'landing'
+      'decision-support-system', 'personal-settings', 'landing',
+      'ahp-analysis'
     ];
     
     if (tabParam && validTabs.includes(tabParam)) {
@@ -199,8 +201,7 @@ function App() {
     }
     
     const currentPath = window.location.pathname;
-    const basePath = process.env.NODE_ENV === 'production' ? '/ahp-platform' : '';
-    const cleanPath = currentPath.startsWith(basePath) ? currentPath : basePath + '/';
+    const cleanPath = currentPath === '/' ? '/' : currentPath;
     const newPath = cleanPath + '?' + urlParams.toString();
     window.history.pushState(currentState, '', newPath);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -520,7 +521,7 @@ function App() {
     'evaluation-results', 'project-completion', 'personal-projects', 
     'personal-users', 'results', 'evaluator-dashboard', 'pairwise-evaluation', 
     'direct-evaluation', 'evaluator-status', 'evaluations', 'progress',
-    'demographic-survey', 'evaluator-mode'
+    'demographic-survey', 'evaluator-mode', 'ahp-analysis'
   ], []);
 
   // 사용자 상태 저장 및 복원
@@ -1335,6 +1336,9 @@ function App() {
             onSelectProject={setSelectedProjectId}
           />
         );
+
+      case 'ahp-analysis':
+        return <AHPProjectManager />;
 
       case 'landing':
         return (

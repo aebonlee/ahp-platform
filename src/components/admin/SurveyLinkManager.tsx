@@ -68,7 +68,7 @@ const SurveyLinkManager: React.FC<SurveyLinkManagerProps> = ({
   const generateLinksForEvaluators = () => {
     setLoading(true);
     const newLinks: SurveyLink[] = evaluators.map(evaluator => {
-      const originalLink = `${window.location.origin}/AHP_forPaper/?tab=evaluator-dashboard&project=${projectId}&evaluator=${evaluator.id}`;
+      const originalLink = `${window.location.origin}/?tab=evaluator-dashboard&project=${projectId}&evaluator=${evaluator.id}`;
       const shortLink = generateShortLink(evaluator.id, projectId || '');
       const fullShortLink = `https://${shortLink}`;
       

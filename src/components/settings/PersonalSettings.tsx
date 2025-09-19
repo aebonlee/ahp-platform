@@ -501,7 +501,7 @@ const PersonalSettings: React.FC<PersonalSettingsProps> = ({ user, onBack, onUse
             alert('계정 삭제 요청이 접수되었습니다. 24시간 내에 처리됩니다.');
             // 로그아웃 및 리다이렉트
             localStorage.clear();
-            window.location.href = '/login';
+            window.location.href = '/?tab=login';
           } else {
             const error = await response.json();
             alert(error.message || '계정 삭제 요청에 실패했습니다.');
