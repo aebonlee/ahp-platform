@@ -1,11 +1,14 @@
 /**
- * API 서비스 - 백엔드와의 통신을 담당
- * 새로 구현된 백엔드 API들과 연동
+ * API 서비스 - Django REST API 백엔드와의 통신
+ * AHP 플랫폼용 Django REST Framework API 연동
  */
 
 const API_BASE_URL = process.env.NODE_ENV === 'development' 
-  ? 'http://localhost:5000' 
-  : 'https://ahp-platform.onrender.com';
+  ? 'http://localhost:8000' 
+  : 'https://ahp-django-backend.onrender.com'; // Django REST API 백엔드
+
+// 인증 토큰 관리 (로컬 금지에 따라 세션 스토리지 사용)
+let authToken: string | null = sessionStorage.getItem('authToken');
 
 // API 응답 타입 정의
 export interface APIResponse<T = any> {
@@ -27,10 +30,15 @@ class APIClient {
     options: RequestInit = {}
   ): Promise<APIResponse<T>> {
     try {
-      const headers = {
+      const headers: any = {
         'Content-Type': 'application/json',
         ...options.headers,
       };
+      
+      // JWT 인증 토큰 추가
+      if (authToken) {
+        headers.Authorization = `Bearer ${authToken}`;
+      }
 
       const response = await fetch(`${this.baseURL}${endpoint}`, {
         credentials: 'include',
@@ -72,9 +80,55 @@ class APIClient {
   delete<T>(endpoint: string): Promise<APIResponse<T>> {
     return this.request<T>(endpoint, { method: 'DELETE' });
   }
+
+  patch<T>(endpoint: string, body?: any): Promise<APIResponse<T>> {
+    return this.request<T>(endpoint, {
+      method: 'PATCH',
+      body: body ? JSON.stringify(body) : undefined,
+    });
+  }
 }
 
 const apiClient = new APIClient(API_BASE_URL);
+
+// 인증 API
+export const authAPI = {
+  login: async (credentials: { username: string; password: string }) => {
+    const response = await apiClient.post('/api/v1/auth/token/', credentials);
+    if (response.data && (response.data as any).access) {
+      authToken = (response.data as any).access;
+      sessionStorage.setItem('authToken', authToken!);
+      sessionStorage.setItem('refreshToken', (response.data as any).refresh);
+    }
+    return response;
+  },
+  
+  logout: () => {
+    authToken = null;
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('refreshToken');
+  },
+  
+  refreshToken: async () => {
+    const refreshToken = sessionStorage.getItem('refreshToken');
+    if (!refreshToken) return { error: 'No refresh token' };
+    
+    const response = await apiClient.post('/api/v1/auth/token/refresh/', { 
+      refresh: refreshToken 
+    });
+    
+    if (response.data && (response.data as any).access) {
+      authToken = (response.data as any).access;
+      sessionStorage.setItem('authToken', authToken!);
+    }
+    return response;
+  },
+  
+  verifyToken: () => {
+    if (!authToken) return Promise.resolve({ error: 'No token' });
+    return apiClient.post('/api/v1/auth/token/verify/', { token: authToken });
+  }
+};
 
 // 직접입력 평가 API
 export const directEvaluationAPI = {
@@ -122,28 +176,28 @@ export const ahpCalculationAPI = {
 // 평가자 관리 API
 export const evaluatorAPI = {
   assign: (data: {
-    project_id: number;
-    evaluator_name: string;
-    evaluator_email?: string;
-    weight?: number;
-  }) => apiClient.post('/api/evaluators/assign', data),
+    project: string;
+    evaluator: number;
+    message?: string;
+  }) => apiClient.post('/api/v1/evaluations/invitations/', data),
 
-  fetchByProject: (projectId: number) =>
-    apiClient.get(`/api/evaluators/project/${projectId}`),
+  fetchByProject: (projectId: string) =>
+    apiClient.get(`/api/v1/evaluations/invitations/?project=${projectId}`),
 
-  updateWeight: (evaluatorId: number, data: {
-    project_id: number;
-    weight: number;
-  }) => apiClient.put(`/api/evaluators/${evaluatorId}/weight`, data),
+  list: (projectId: string) =>
+    apiClient.get(`/api/v1/evaluations/evaluations/?project=${projectId}`),
 
-  remove: (evaluatorId: number, projectId: number) =>
-    apiClient.delete(`/api/evaluators/${evaluatorId}/project/${projectId}`),
+  updateWeight: (evaluatorId: string, data: any) =>
+    apiClient.patch(`/api/v1/evaluations/invitations/${evaluatorId}/`, data),
 
-  fetchProgress: (projectId: number) =>
-    apiClient.get(`/api/evaluators/progress/${projectId}`),
+  remove: (evaluatorId: string) =>
+    apiClient.delete(`/api/v1/evaluations/invitations/${evaluatorId}/`),
 
-  validateAccessKey: (accessKey: string) =>
-    apiClient.post('/api/evaluators/auth/access-key', { access_key: accessKey }),
+  fetchProgress: (projectId: string) =>
+    apiClient.get(`/api/v1/evaluations/evaluations/?project=${projectId}&status=in_progress`),
+
+  validateAccessKey: (token: string) =>
+    apiClient.post('/api/v1/evaluations/invitations/accept/', { token }),
 };
 
 // 결과 API
@@ -176,25 +230,25 @@ export const resultsAPI = {
 
 // 기존 API들 (호환성 유지)
 export const projectAPI = {
-  fetch: () => apiClient.get('/api/projects'),
-  fetchById: (id: number) => apiClient.get(`/api/projects/${id}`),
-  create: (data: any) => apiClient.post('/api/projects', data),
-  update: (id: number, data: any) => apiClient.put(`/api/projects/${id}`, data),
-  delete: (id: number) => apiClient.delete(`/api/projects/${id}`),
+  fetch: () => apiClient.get('/api/v1/projects/projects/'),
+  fetchById: (id: string) => apiClient.get(`/api/v1/projects/projects/${id}/`),
+  create: (data: any) => apiClient.post('/api/v1/projects/projects/', data),
+  update: (id: string, data: any) => apiClient.patch(`/api/v1/projects/projects/${id}/`, data),
+  delete: (id: string) => apiClient.delete(`/api/v1/projects/projects/${id}/`),
 };
 
 export const criteriaAPI = {
-  fetch: (projectId: number) => apiClient.get(`/api/criteria/${projectId}`),
-  create: (data: any) => apiClient.post('/api/criteria', data),
-  update: (id: string, data: any) => apiClient.put(`/api/criteria/${id}`, data),
-  delete: (id: string) => apiClient.delete(`/api/criteria/${id}`),
+  fetch: (projectId: string) => apiClient.get(`/api/v1/projects/criteria/?project=${projectId}`),
+  create: (data: any) => apiClient.post('/api/v1/projects/criteria/', data),
+  update: (id: string, data: any) => apiClient.patch(`/api/v1/projects/criteria/${id}/`, data),
+  delete: (id: string) => apiClient.delete(`/api/v1/projects/criteria/${id}/`),
 };
 
 export const alternativesAPI = {
-  fetch: (projectId: number) => apiClient.get(`/api/alternatives/${projectId}`),
-  create: (data: any) => apiClient.post('/api/alternatives', data),
-  update: (id: string, data: any) => apiClient.put(`/api/alternatives/${id}`, data),
-  delete: (id: string) => apiClient.delete(`/api/alternatives/${id}`),
+  fetch: (projectId: string) => apiClient.get(`/api/v1/projects/criteria/?project=${projectId}&type=alternative`),
+  create: (data: any) => apiClient.post('/api/v1/projects/criteria/', { ...data, type: 'alternative' }),
+  update: (id: string, data: any) => apiClient.patch(`/api/v1/projects/criteria/${id}/`, data),
+  delete: (id: string) => apiClient.delete(`/api/v1/projects/criteria/${id}/`),
 };
 
 // 통합 헬퍼 함수들
@@ -235,6 +289,7 @@ export const apiHelpers = {
 };
 
 export default {
+  authAPI,
   directEvaluationAPI,
   pairwiseEvaluationAPI,
   ahpCalculationAPI,

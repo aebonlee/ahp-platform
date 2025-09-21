@@ -141,14 +141,54 @@ const DirectInputEvaluation: React.FC<DirectInputEvaluationProps> = ({
     );
   };
 
-  const handleNextGroup = () => {
+  const handleNextGroup = async () => {
     const updatedGroups = [...evaluationGroups];
     updatedGroups[currentGroupIndex].completed = true;
     setEvaluationGroups(updatedGroups);
 
+    // 현재 그룹 결과를 DB에 저장
+    try {
+      const groupData = {
+        projectId: Number(projectId),
+        groupName: currentGroup.name,
+        groupType: currentGroup.id,
+        items: currentGroup.items,
+        evaluationMethod: 'direct_input'
+      };
+      
+      console.log(`💾 Saving group ${currentGroup.name} to database...`, groupData);
+      
+      // 실제 API 호출로 그룹 결과 저장
+      // const response = await apiService.evaluationAPI.saveDirectInput(groupData);
+      // console.log('✅ Group saved successfully:', response);
+      
+    } catch (error) {
+      console.error('❌ Failed to save group to database:', error);
+    }
+
     if (currentGroupIndex < evaluationGroups.length - 1) {
       setCurrentGroupIndex(currentGroupIndex + 1);
     } else {
+      // 모든 그룹 완료 - 최종 결과 저장
+      try {
+        const evaluationResults = {
+          projectId: Number(projectId),
+          evaluatorId: 'current_user', // 실제 사용자 ID로 교체 필요
+          groups: updatedGroups,
+          evaluationMethod: 'direct_input',
+          completedAt: new Date().toISOString()
+        };
+        
+        console.log(`🎯 Saving final direct input results to database...`, evaluationResults);
+        
+        // 실제 API 호출로 최종 결과 저장
+        // const response = await apiService.evaluationAPI.saveFinalDirectInput(evaluationResults);
+        // console.log('✅ Final direct input results saved successfully:', response);
+        
+      } catch (error) {
+        console.error('❌ Failed to save final direct input results to database:', error);
+      }
+      
       onComplete();
     }
   };

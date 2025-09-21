@@ -28,60 +28,21 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
     // 프로젝트별 평가자 데이터 로드 (PostgreSQL에서)
     const loadProjectEvaluators = async () => {
       try {
-        const response = await apiService.evaluatorAPI.fetchByProject(Number(projectId));
+        const response = await apiService.evaluatorAPI.fetchByProject(projectId);
         if (response.data) {
           const evaluatorsData = (response.data as any).evaluators || response.data || [];
           setEvaluators(evaluatorsData);
           console.log(`Loaded ${evaluatorsData.length} evaluators from API for project ${projectId}`);
         } else {
-          // API 실패 시 기본 평가자 추가
-          console.log('API 실패 - 기본 평가자 추가');
-          setEvaluators([
-            {
-              id: '1',
-              code: 'EVL001',
-              name: '김평가',
-              email: 'evaluator1@example.com',
-              status: 'pending',
-              progress: 0,
-              inviteLink: 'https://ahp-system.com/eval/abc123'
-            },
-            {
-              id: '2', 
-              code: 'EVL002',
-              name: '이평가',
-              email: 'evaluator2@example.com',
-              status: 'pending',
-              progress: 0,
-              inviteLink: 'https://ahp-system.com/eval/def456'
-            }
-          ]);
-          console.log(`Default evaluators added for project ${projectId}`);
+          // API 연결 성공했지만 데이터가 없는 경우
+          setEvaluators([]);
+          console.log(`📋 No evaluators found for project ${projectId} - starting with empty list`);
         }
       } catch (error) {
-        console.error('Failed to load evaluators from API:', error);
-        // 네트워크 오류 시에도 기본 평가자 추가
-        setEvaluators([
-          {
-            id: '1',
-            code: 'EVL001',
-            name: '김평가',
-            email: 'evaluator1@example.com',
-            status: 'pending',
-            progress: 0,
-            inviteLink: 'https://ahp-system.com/eval/abc123'
-          },
-          {
-            id: '2',
-            code: 'EVL002', 
-            name: '이평가',
-            email: 'evaluator2@example.com',
-            status: 'pending',
-            progress: 0,
-            inviteLink: 'https://ahp-system.com/eval/def456'
-          }
-        ]);
-        console.log(`Default evaluators added due to network error for project ${projectId}`);
+        console.error('❌ Failed to load evaluators from API:', error);
+        // API 연결 실패 시 빈 배열로 시작
+        setEvaluators([]);
+        console.log(`⚠️ Starting with empty evaluator list for project ${projectId} due to API error`);
       }
     };
 
@@ -93,11 +54,11 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
   const [newEvaluator, setNewEvaluator] = useState({ code: '', name: '', email: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // 프로젝트별 평가자 데이터 저장 (localStorage 대신 PostgreSQL 사용)
-  const saveProjectEvaluators = async (evaluatorsData: Evaluator[]) => {
-    console.log(`Evaluators now saved to PostgreSQL for project ${projectId}`);
-    // localStorage 제거됨 - 모든 데이터는 PostgreSQL에 저장
-  };
+  // 프로젝트별 평가자 데이터 저장 (현재 미사용 - 향후 PostgreSQL 연동 시 활용)
+  // const saveProjectEvaluators = async (evaluatorsData: Evaluator[]) => {
+  //   console.log(`Evaluators now saved to PostgreSQL for project ${projectId}`);
+  //   // localStorage 제거됨 - 모든 데이터는 PostgreSQL에 저장
+  // };
 
   const generateEvaluatorCode = (): string => {
     const maxCode = Math.max(...evaluators.map(e => parseInt(e.code.replace('EVL', '')) || 0), 0);
@@ -127,10 +88,11 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
     return Object.keys(newErrors).length === 0;
   };
 
-  const generateInviteLink = (): string => {
-    const randomId = Math.random().toString(36).substring(2, 8);
-    return `https://ahp-system.com/eval/${randomId}`;
-  };
+  // 초대 링크 생성 (현재 미사용)
+  // const generateInviteLink = (): string => {
+  //   const randomId = Math.random().toString(36).substring(2, 8);
+  //   return `https://ahp-system.com/eval/${randomId}`;
+  // };
 
   const handleAddEvaluator = async () => {
     const evaluatorData = {
@@ -144,10 +106,9 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
 
     try {
       const assignData = {
-        project_id: Number(projectId),
-        evaluator_name: evaluatorData.name,
-        evaluator_email: evaluatorData.email || undefined,
-        weight: 1.0
+        project: projectId,
+        evaluator: 1, // 임시로 1 사용, 실제로는 사용자 ID가 필요
+        message: `평가자 ${evaluatorData.name} 초대`
       };
 
       console.log('📤 평가자 추가 요청 데이터:', assignData);
@@ -162,6 +123,7 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
         
         // 임시 fallback: API가 실패하면 로컬에서 임시 평가자 추가
         console.log('💡 임시 방안: 로컬에서 평가자 추가');
+        const evaluationToken = Math.random().toString(36).substring(2, 8);
         const tempEvaluator: Evaluator = {
           id: Date.now().toString(),
           code: evaluatorData.code,
@@ -169,7 +131,7 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
           email: evaluatorData.email,
           status: 'pending',
           progress: 0,
-          inviteLink: `https://ahp-system.com/eval/${Math.random().toString(36).substring(2, 8)}`
+          inviteLink: `${window.location.origin}/?eval=${projectId}&token=${evaluationToken}`
         };
         
         setEvaluators(prev => [...prev, tempEvaluator]);
@@ -180,7 +142,7 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
       }
 
       // API 성공 시 데이터 다시 로드
-      const updatedResponse = await apiService.evaluatorAPI.fetchByProject(Number(projectId));
+      const updatedResponse = await apiService.evaluatorAPI.fetchByProject(projectId);
       if (updatedResponse.data) {
         const evaluatorsData = (updatedResponse.data as any).evaluators || updatedResponse.data || [];
         setEvaluators(evaluatorsData);
@@ -232,7 +194,7 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
     }
 
     try {
-      const response = await apiService.evaluatorAPI.remove(Number(id), Number(projectId));
+      const response = await apiService.evaluatorAPI.remove(id);
       
       if (response.error) {
         console.error('Failed to delete evaluator:', response.error);
@@ -241,7 +203,7 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
       }
 
       // API 성공 시 데이터 다시 로드
-      const updatedResponse = await apiService.evaluatorAPI.fetchByProject(Number(projectId));
+      const updatedResponse = await apiService.evaluatorAPI.fetchByProject(projectId);
       if (updatedResponse.data) {
         const evaluatorsData = (updatedResponse.data as any).evaluators || updatedResponse.data || [];
         setEvaluators(evaluatorsData);
@@ -345,11 +307,27 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
                           </div>
                         )}
                         {evaluator.inviteLink && (
-                          <div className="mt-2">
-                            <span className="text-xs text-gray-500">초대링크: </span>
-                            <code className="text-xs bg-gray-100 px-2 py-1 rounded">
-                              {evaluator.inviteLink}
-                            </code>
+                          <div className="mt-2 space-y-1">
+                            <div className="flex items-center space-x-2">
+                              <span className="text-xs text-gray-500">평가 링크:</span>
+                              <code className="text-xs bg-green-50 text-green-700 px-2 py-1 rounded border border-green-200">
+                                {evaluator.inviteLink}
+                              </code>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <button
+                                onClick={() => window.open(evaluator.inviteLink, '_blank')}
+                                className="text-xs bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition-colors"
+                              >
+                                🔗 평가 시작하기
+                              </button>
+                              <button
+                                onClick={() => navigator.clipboard.writeText(evaluator.inviteLink || '')}
+                                className="text-xs bg-gray-500 text-white px-3 py-1 rounded hover:bg-gray-600 transition-colors"
+                              >
+                                📋 링크 복사
+                              </button>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -362,16 +340,9 @@ const EvaluatorAssignment: React.FC<EvaluatorAssignmentProps> = ({ projectId, on
                           variant="primary"
                           onClick={() => handleSendInvite(evaluator.id)}
                         >
-                          초대 발송
+                          📧 초대 발송
                         </Button>
                       )}
-                      <button
-                        onClick={() => navigator.clipboard.writeText(evaluator.inviteLink || '')}
-                        className="text-blue-600 hover:text-blue-800 text-sm"
-                        title="링크 복사"
-                      >
-                        📋
-                      </button>
                       <button
                         onClick={() => handleDeleteEvaluator(evaluator.id)}
                         className="text-red-500 hover:text-red-700 text-sm"

@@ -34,7 +34,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
     // 백엔드에서 실제 프로젝트별 기준 데이터 로드
     const loadProjectCriteria = async () => {
       try {
-        const response = await apiService.criteriaAPI.fetch(Number(projectId));
+        const response = await apiService.criteriaAPI.fetch(projectId);
         if (response.data) {
           const criteriaData = (response.data as any).criteria || response.data || [];
           setCriteria(criteriaData);
@@ -66,12 +66,11 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
   const [newCriterion, setNewCriterion] = useState({ name: '', description: '', parentId: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // 프로젝트별 기준 데이터 저장
-  const saveProjectCriteria = (criteriaData: Criterion[]) => {
-    const storageKey = `ahp_criteria_${projectId}`;
-    localStorage.setItem(storageKey, JSON.stringify(criteriaData));
-    console.log(`Saved ${getAllCriteria(criteriaData).length} criteria for project ${projectId}`);
-  };
+  // 프로젝트별 기준 데이터 저장 (현재 미사용 - localStorage 제거됨)
+  // const saveProjectCriteria = (criteriaData: Criterion[]) => {
+  //   // localStorage 제거됨 - PostgreSQL로 데이터 저장
+  //   console.log(`Saved ${getAllCriteria(criteriaData).length} criteria for project ${projectId}`);
+  // };
 
   const validateCriterion = (name: string): boolean => {
     const newErrors: Record<string, string> = {};
@@ -170,7 +169,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
       }
 
       // API 성공 시 데이터 다시 로드
-      const updatedResponse = await apiService.criteriaAPI.fetch(Number(projectId));
+      const updatedResponse = await apiService.criteriaAPI.fetch(projectId);
       if (updatedResponse.data) {
         const criteriaData = (updatedResponse.data as any).criteria || updatedResponse.data || [];
         setCriteria(criteriaData);
@@ -202,7 +201,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
       }
 
       // 성공 시 데이터 다시 로드
-      const updatedResponse = await apiService.criteriaAPI.fetch(Number(projectId));
+      const updatedResponse = await apiService.criteriaAPI.fetch(projectId);
       if (updatedResponse.data) {
         const criteriaData = (updatedResponse.data as any).criteria || updatedResponse.data || [];
         setCriteria(criteriaData);
@@ -312,7 +311,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
       }
       
       // 데이터 다시 로드
-      const response = await apiService.criteriaAPI.fetch(Number(projectId));
+      const response = await apiService.criteriaAPI.fetch(projectId);
       if (response.data) {
         const criteriaData = (response.data as any).criteria || response.data || [];
         setCriteria(criteriaData);
@@ -344,7 +343,7 @@ const CriteriaManagement: React.FC<CriteriaManagementProps> = ({ projectId, proj
       }
       
       // 데이터 다시 로드
-      const response = await apiService.criteriaAPI.fetch(Number(projectId));
+      const response = await apiService.criteriaAPI.fetch(projectId);
       if (response.data) {
         const criteriaData = (response.data as any).criteria || response.data || [];
         setCriteria(criteriaData);

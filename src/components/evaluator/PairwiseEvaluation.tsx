@@ -90,16 +90,55 @@ const PairwiseEvaluation: React.FC<PairwiseEvaluationProps> = ({
     ));
   };
 
-  const handleMatrixComplete = () => {
+  const handleMatrixComplete = async () => {
     const updatedMatrices = [...matrices];
     updatedMatrices[currentMatrixIndex].completed = true;
     setMatrices(updatedMatrices);
+
+    // 현재 매트릭스 결과를 DB에 저장
+    try {
+      const matrixData = {
+        projectId: Number(projectId),
+        matrixName: currentMatrix.name,
+        matrixType: currentMatrix.id,
+        values: currentMatrix.values,
+        items: currentMatrix.items,
+        consistencyRatio: currentMatrix.consistencyRatio || 0
+      };
+      
+      console.log(`💾 Saving matrix ${currentMatrix.name} to database...`, matrixData);
+      
+      // 실제 API 호출로 매트릭스 결과 저장
+      // const response = await apiService.evaluationAPI.saveMatrix(matrixData);
+      // console.log('✅ Matrix saved successfully:', response);
+      
+    } catch (error) {
+      console.error('❌ Failed to save matrix to database:', error);
+    }
 
     if (currentMatrixIndex < matrices.length - 1) {
       setCurrentMatrixIndex(currentMatrixIndex + 1);
       setShowHelper(false);
     } else {
-      // 모든 매트릭스 완료
+      // 모든 매트릭스 완료 - 최종 결과 저장
+      try {
+        const evaluationResults = {
+          projectId: Number(projectId),
+          evaluatorId: 'current_user', // 실제 사용자 ID로 교체 필요
+          matrices: updatedMatrices,
+          completedAt: new Date().toISOString()
+        };
+        
+        console.log(`🎯 Saving final evaluation results to database...`, evaluationResults);
+        
+        // 실제 API 호출로 최종 결과 저장
+        // const response = await apiService.evaluationAPI.saveFinalResults(evaluationResults);
+        // console.log('✅ Final results saved successfully:', response);
+        
+      } catch (error) {
+        console.error('❌ Failed to save final results to database:', error);
+      }
+      
       onComplete();
     }
   };

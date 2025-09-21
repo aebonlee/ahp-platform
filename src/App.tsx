@@ -3,10 +3,6 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import sessionService from './services/sessionService';
 import Layout from './components/layout/Layout';
 import LoginForm from './components/auth/LoginForm';
-import LoginSelectionPage from './components/auth/LoginSelectionPage';
-import RegisterPage from './components/auth/RegisterPage';
-import ServiceLoginPage from './components/auth/ServiceLoginPage';
-import AdminSelectPage from './components/auth/AdminSelectPage';
 import RegisterForm from './components/auth/RegisterForm';
 import HomePage from './components/home/HomePage';
 // import WelcomeDashboard from './components/admin/WelcomeDashboard'; // 더 이상 사용하지 않음
@@ -26,11 +22,11 @@ import UserManagement from './components/admin/UserManagement';
 import ProjectSelection from './components/evaluator/ProjectSelection';
 import PairwiseEvaluation from './components/evaluator/PairwiseEvaluation';
 import DirectInputEvaluation from './components/evaluator/DirectInputEvaluation';
-import UserGuideOverview from './components/guide/UserGuideOverview';
 import ComprehensiveUserGuide from './components/guide/ComprehensiveUserGuide';
 import EvaluatorDashboard from './components/evaluator/EvaluatorDashboard';
 import EvaluatorSurveyPage from './components/survey/EvaluatorSurveyPage';
 import EvaluationTest from './components/evaluation/EvaluationTest';
+import EvaluatorWorkflow from './components/evaluator/EvaluatorWorkflow';
 import { API_BASE_URL } from './config/api';
 import { useColorTheme } from './hooks/useColorTheme';
 import { useTheme } from './hooks/useTheme';
@@ -43,7 +39,6 @@ function App() {
 
   // GitHub Pages 하위 경로 처리 - 현재는 루트에 배포되므로 빈 문자열
   const basePath = '';
-  const getFullPath = (path: string) => basePath + path;
   const [user, setUser] = useState<{
     id: string | number;  // 백엔드는 number로 보냄
     first_name: string;
@@ -57,10 +52,16 @@ function App() {
     // URL 파라미터에서 초기 탭 결정
     const urlParams = new URLSearchParams(window.location.search);
     const tabParam = urlParams.get('tab');
+    const evalParam = urlParams.get('eval'); // 평가자 모드 확인
+    
+    // 평가자 모드가 있으면 우선 처리
+    if (evalParam) {
+      return 'evaluator-workflow';
+    }
     
     // tab 파라미터가 있고 유효한 탭이면 해당 탭으로, 아니면 'home'
     const validTabs = [
-      'home', 'user-guide', 'evaluator-mode',
+      'home', 'user-guide', 'evaluator-mode', 'evaluator-workflow',
       'personal-service', 'demographic-survey', 
       'my-projects', 'project-creation', 'model-builder',
       'evaluator-management', 'progress-monitoring', 'results-analysis',
@@ -86,10 +87,10 @@ function App() {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedEvaluationMethod, setSelectedEvaluationMethod] = useState<'pairwise' | 'direct'>('pairwise');
   
-  // 평가자 설문조사 관련 상태
-  const [isEvaluatorSurvey, setIsEvaluatorSurvey] = useState(false);
-  const [surveyId, setSurveyId] = useState<string>('');
-  const [surveyToken, setSurveyToken] = useState<string>('');
+  // 평가자 설문조사 관련 상태 (현재 미사용)
+  // const [isEvaluatorSurvey, setIsEvaluatorSurvey] = useState(false);
+  // const [surveyId, setSurveyId] = useState<string>('');
+  // const [surveyToken, setSurveyToken] = useState<string>('');
 
   // 휴지통 오버플로우 관리 상태
   const [trashOverflowData, setTrashOverflowData] = useState<{
@@ -308,12 +309,12 @@ function App() {
     }
   };
 
-  const fallbackToDemoMode = () => {
-    setBackendStatus('unavailable');
-    // DB 설정 전까지 에러 모달 비활성화
-    setShowApiErrorModal(false);
-    setIsNavigationReady(true);
-  };
+  // DB 연결 실패 시 대체 모드는 현재 미사용
+  // const fallbackToDemoMode = () => {
+  //   setBackendStatus('unavailable');
+  //   setShowApiErrorModal(false);
+  //   setIsNavigationReady(true);
+  // };
 
   // API 연결 상태 체크 (백그라운드에서 실행)
   const checkApiConnection = async () => {
@@ -1176,6 +1177,24 @@ function App() {
               mode={registerMode}
             />
           );
+
+        case 'evaluator-workflow':
+          // 평가자 워크플로우는 로그인 없이도 접근 가능
+          const urlParams = new URLSearchParams(window.location.search);
+          const projectId = urlParams.get('eval');
+          const evaluatorToken = urlParams.get('token');
+          
+          if (projectId) {
+            return (
+              <EvaluatorWorkflow 
+                projectId={projectId}
+                evaluatorToken={evaluatorToken || undefined}
+              />
+            );
+          } else {
+            // 프로젝트 ID가 없으면 홈으로 리다이렉트
+            return <HomePage onLoginClick={handleLoginClick} />;
+          }
         
         default:
           // 로그인하지 않은 상태에서 다른 페이지 접근 시 홈으로 리다이렉트
@@ -1242,16 +1261,35 @@ function App() {
           />
         );
 
-      case 'evaluator-survey':
-        // 평가자 전용 설문조사 페이지 (독립 페이지)
-        if (isEvaluatorSurvey && surveyId && surveyToken) {
+      case 'evaluator-workflow':
+        // 로그인한 상태에서도 평가자 워크플로우 접근 가능
+        const urlParams2 = new URLSearchParams(window.location.search);
+        const projectId2 = urlParams2.get('eval');
+        const evaluatorToken2 = urlParams2.get('token');
+        
+        if (projectId2) {
           return (
-            <EvaluatorSurveyPage 
-              surveyId={surveyId}
-              token={surveyToken}
+            <EvaluatorWorkflow 
+              projectId={projectId2}
+              evaluatorToken={evaluatorToken2 || undefined}
             />
           );
+        } else {
+          // 프로젝트 ID가 없으면 개인 서비스로 리다이렉트
+          setActiveTab('personal-service');
+          return null;
         }
+
+      case 'evaluator-survey':
+        // 평가자 전용 설문조사 페이지 (현재 미사용)
+        // if (isEvaluatorSurvey && surveyId && surveyToken) {
+        //   return (
+        //     <EvaluatorSurveyPage 
+        //       surveyId={surveyId}
+        //       token={surveyToken}
+        //     />
+        //   );
+        // }
         // 평가자 설문 정보가 없으면 대시보드로
         setActiveTab('personal-service');
         return null;

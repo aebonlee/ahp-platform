@@ -26,7 +26,7 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
     // 프로젝트별 대안 데이터 로드 (PostgreSQL에서)
     const loadProjectAlternatives = async () => {
       try {
-        const response = await apiService.alternativesAPI.fetch(Number(projectId));
+        const response = await apiService.alternativesAPI.fetch(projectId);
         if (response.data) {
           const alternativesData = (response.data as any).alternatives || response.data || [];
           setAlternatives(alternativesData);
@@ -58,11 +58,11 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
   const [editingAlternative, setEditingAlternative] = useState({ name: '', description: '' });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  // 프로젝트별 대안 데이터 저장 (localStorage 대신 PostgreSQL 사용)
-  const saveProjectAlternatives = async (alternativesData: Alternative[]) => {
-    console.log(`Alternatives now saved to PostgreSQL for project ${projectId}`);
-    // localStorage 제거됨 - 모든 데이터는 PostgreSQL에 저장
-  };
+  // 프로젝트별 대안 데이터 저장 (현재 미사용 - 향후 PostgreSQL 연동 시 활용)
+  // const saveProjectAlternatives = async (alternativesData: Alternative[]) => {
+  //   console.log(`Alternatives now saved to PostgreSQL for project ${projectId}`);
+  //   // localStorage 제거됨 - 모든 데이터는 PostgreSQL에 저장
+  // };
 
   const validateAlternative = (name: string, excludeId?: string): boolean => {
     const newErrors: Record<string, string> = {};
@@ -108,7 +108,7 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
       }
 
       // API 성공 시 데이터 다시 로드
-      const updatedResponse = await apiService.alternativesAPI.fetch(Number(projectId));
+      const updatedResponse = await apiService.alternativesAPI.fetch(projectId);
       if (updatedResponse.data) {
         const alternativesData = (updatedResponse.data as any).alternatives || updatedResponse.data || [];
         setAlternatives(alternativesData);
@@ -155,7 +155,7 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
       }
 
       // 성공 시 데이터 다시 로드
-      const updatedResponse = await apiService.alternativesAPI.fetch(Number(projectId));
+      const updatedResponse = await apiService.alternativesAPI.fetch(projectId);
       if (updatedResponse.data) {
         const alternativesData = (updatedResponse.data as any).alternatives || updatedResponse.data || [];
         setAlternatives(alternativesData);
@@ -187,7 +187,7 @@ const AlternativeManagement: React.FC<AlternativeManagementProps> = ({ projectId
       }
 
       // 성공 시 데이터 다시 로드
-      const updatedResponse = await apiService.alternativesAPI.fetch(Number(projectId));
+      const updatedResponse = await apiService.alternativesAPI.fetch(projectId);
       if (updatedResponse.data) {
         const alternativesData = (updatedResponse.data as any).alternatives || updatedResponse.data || [];
         setAlternatives(alternativesData);

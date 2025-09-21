@@ -29,9 +29,9 @@ const ModelFinalization: React.FC<ModelFinalizationProps> = ({
         
         // 실제 프로젝트 데이터 로드
         const [criteriaResponse, alternativesResponse, evaluatorsResponse] = await Promise.all([
-          apiService.criteriaAPI.fetch(Number(projectId)),
-          apiService.alternativesAPI.fetch(Number(projectId)),
-          apiService.evaluatorAPI.fetchByProject(Number(projectId))
+          apiService.criteriaAPI.fetch(projectId),
+          apiService.alternativesAPI.fetch(projectId),
+          apiService.evaluatorAPI.fetchByProject(projectId)
         ]);
         
         setCriteria((criteriaResponse.data as any)?.criteria || (criteriaResponse.data as any) || []);

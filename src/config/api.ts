@@ -1,6 +1,6 @@
-// API 설정 - 백엔드 서버 URL (Render.com 백엔드)
+// API 설정 - Django 백엔드 서버 URL (Render.com 백엔드)
 export const API_BASE_URL = process.env.REACT_APP_API_URL || 
-  (process.env.NODE_ENV === 'development' ? '' : 'https://ahp-platform.onrender.com');
+  (process.env.NODE_ENV === 'development' ? 'http://localhost:8000' : 'https://ahp-django-backend.onrender.com');
 
 // 데이터 저장 모드 설정
 export const DATA_STORAGE_MODE = process.env.REACT_APP_DATA_MODE || 
@@ -19,79 +19,80 @@ export const RETRY_config = {
   backoffMultiplier: 2
 };
 
-// API 엔드포인트
+// API 엔드포인트 - Django REST API 구조
 export const API_ENDPOINTS = {
-  // Auth
+  // Auth - Django JWT
   AUTH: {
-    LOGIN: '/api/auth/login',
-    REGISTER: '/api/auth/register',
-    LOGOUT: '/api/auth/logout',
-    VERIFY: '/api/auth/verify'
+    LOGIN: '/api/v1/auth/token/',
+    REGISTER: '/api/v1/accounts/register/',
+    LOGOUT: '/api/v1/auth/logout/',
+    VERIFY: '/api/v1/auth/token/verify/',
+    REFRESH: '/api/v1/auth/token/refresh/'
   },
-  // Projects
+  // Projects - Django ViewSet
   PROJECTS: {
-    LIST: '/api/projects',
-    CREATE: '/api/projects',
-    GET: (id: string) => `/api/projects/${id}`,
-    UPDATE: (id: string) => `/api/projects/${id}`,
-    DELETE: (id: string) => `/api/projects/${id}`
+    LIST: '/api/v1/projects/projects/',
+    CREATE: '/api/v1/projects/projects/',
+    GET: (id: string) => `/api/v1/projects/projects/${id}/`,
+    UPDATE: (id: string) => `/api/v1/projects/projects/${id}/`,
+    DELETE: (id: string) => `/api/v1/projects/projects/${id}/`
   },
-  // Criteria
+  // Criteria - Django ViewSet
   CRITERIA: {
-    LIST: (projectId: string) => `/api/projects/${projectId}/criteria`,
-    CREATE: '/api/criteria',
-    UPDATE: (id: string) => `/api/criteria/${id}`,
-    DELETE: (id: string) => `/api/criteria/${id}`
+    LIST: (projectId: string) => `/api/v1/projects/criteria/?project=${projectId}`,
+    CREATE: '/api/v1/projects/criteria/',
+    UPDATE: (id: string) => `/api/v1/projects/criteria/${id}/`,
+    DELETE: (id: string) => `/api/v1/projects/criteria/${id}/`
   },
-  // Alternatives
+  // Alternatives (같은 Criteria 모델 사용, type=alternative)
   ALTERNATIVES: {
-    LIST: (projectId: string) => `/api/projects/${projectId}/alternatives`,
-    CREATE: '/api/alternatives',
-    UPDATE: (id: string) => `/api/alternatives/${id}`,
-    DELETE: (id: string) => `/api/alternatives/${id}`
+    LIST: (projectId: string) => `/api/v1/projects/criteria/?project=${projectId}&type=alternative`,
+    CREATE: '/api/v1/projects/criteria/',
+    UPDATE: (id: string) => `/api/v1/projects/criteria/${id}/`,
+    DELETE: (id: string) => `/api/v1/projects/criteria/${id}/`
   },
-  // Evaluations
+  // Evaluations - Django ViewSet
   EVALUATIONS: {
-    SUBMIT: '/api/evaluate',
-    GET_MATRIX: (projectId: string) => `/api/matrix/${projectId}`,
-    COMPUTE: '/api/compute',
-    RESULTS: (projectId: string) => `/api/results/${projectId}`
+    SUBMIT: '/api/v1/evaluations/evaluations/',
+    GET_MATRIX: (projectId: string) => `/api/v1/evaluations/evaluations/?project=${projectId}`,
+    COMPUTE: '/api/v1/analysis/calculate/',
+    RESULTS: (projectId: string) => `/api/v1/analysis/results/?project=${projectId}`
   },
-  // Evaluators
+  // Evaluators - Django ViewSet
   EVALUATORS: {
-    LIST: (projectId: string) => `/api/projects/${projectId}/evaluators`,
-    ADD: '/api/evaluators',
-    UPDATE: (id: string) => `/api/evaluators/${id}`,
-    REMOVE: (id: string) => `/api/evaluators/${id}`,
-    SEND_INVITATIONS: (projectId: string) => `/api/projects/${projectId}/invitations`
+    LIST: (projectId: string) => `/api/v1/evaluations/invitations/?project=${projectId}`,
+    ADD: '/api/v1/evaluations/invitations/',
+    UPDATE: (id: string) => `/api/v1/evaluations/invitations/${id}/`,
+    REMOVE: (id: string) => `/api/v1/evaluations/invitations/${id}/`,
+    SEND_INVITATIONS: (projectId: string) => `/api/v1/evaluations/invitations/send/`
   },
-  // Comparisons
+  // Comparisons - Django ViewSet
   COMPARISONS: {
-    SAVE: '/api/comparisons',
+    SAVE: '/api/v1/evaluations/comparisons/',
     GET: (projectId: string, evaluatorId?: string) => 
-      `/api/projects/${projectId}/comparisons${evaluatorId ? `?evaluatorId=${evaluatorId}` : ''}`,
+      `/api/v1/evaluations/comparisons/?evaluation__project=${projectId}${evaluatorId ? `&evaluation__evaluator=${evaluatorId}` : ''}`,
     UPDATE_SESSION: (projectId: string, evaluatorId: string) =>
-      `/api/projects/${projectId}/evaluators/${evaluatorId}/session`
+      `/api/v1/evaluations/evaluations/${evaluatorId}/update_progress/`
   },
-  // Results
+  // Results - Django ViewSet
   RESULTS: {
-    GET: (projectId: string) => `/api/projects/${projectId}/results`,
+    GET: (projectId: string) => `/api/v1/analysis/results/${projectId}/`,
     INDIVIDUAL: (projectId: string, evaluatorId: string) =>
-      `/api/projects/${projectId}/evaluators/${evaluatorId}/results`,
-    CALCULATE_GROUP: (projectId: string) => `/api/projects/${projectId}/results/calculate`,
-    SENSITIVITY: (projectId: string) => `/api/projects/${projectId}/analysis/sensitivity`
+      `/api/v1/analysis/results/individual/?project=${projectId}&evaluator=${evaluatorId}`,
+    CALCULATE_GROUP: (projectId: string) => `/api/v1/analysis/results/group/`,
+    SENSITIVITY: (projectId: string) => `/api/v1/analysis/sensitivity/?project=${projectId}`
   },
-  // Export
+  // Export - Django ViewSet
   EXPORT: {
-    EXCEL: (projectId: string) => `/api/projects/${projectId}/export/excel`,
-    PDF: (projectId: string) => `/api/projects/${projectId}/export/pdf`,
-    REPORT: (projectId: string) => `/api/projects/${projectId}/export/report`
+    EXCEL: (projectId: string) => `/api/v1/analysis/export/excel/?project=${projectId}`,
+    PDF: (projectId: string) => `/api/v1/analysis/export/pdf/?project=${projectId}`,
+    REPORT: (projectId: string) => `/api/v1/analysis/export/report/?project=${projectId}`
   },
-  // Sync (for offline mode)
+  // Sync (for offline mode) - Django 미지원, 향후 구현
   SYNC: {
-    UPLOAD: '/api/sync/upload',
-    DOWNLOAD: '/api/sync/download',
-    STATUS: '/api/sync/status'
+    UPLOAD: '/api/v1/sync/upload/',
+    DOWNLOAD: '/api/v1/sync/download/',
+    STATUS: '/api/v1/sync/status/'
   }
 };
 
